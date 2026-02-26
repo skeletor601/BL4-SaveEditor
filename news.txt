@@ -1,0 +1,5 @@
+Welcome to the BL4 Save Editor.
+
+News and updates will appear here. Edit this file and push to GitHub to update the dashboard.
+
+Repo: https://github.com/skeletor601/BL4-SaveEditor

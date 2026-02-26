@@ -1,0 +1,35 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+# Long path workaround: ignore nested asset folders that exceed Windows path length
+class_mods/**/assets/class_mods/
+
+# Large files (GitHub 100 MB limit)
+*.zip
+neon_vault.zip
+build/
+dist/
+
+# Logs (optional)
+*.log
+logs/

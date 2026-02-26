@@ -1,0 +1,239 @@
+
+/* =========================
+   NeonVault - Official QSS
+   ========================= */
+
+/* NeonVault wallpaper background */
+#centralWidget {
+    background-image: url("bg.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Window stays transparent so centralWidget wallpaper can show */
+QMainWindow {
+    background-color: transparent;
+}
+
+/* Default: transparent, so we don't paint a solid layer over the wallpaper */
+QWidget {
+    background-color: transparent;
+    color: #00ffff;
+    font-family: Consolas, Segoe UI;
+    font-size: 10pt;
+}
+
+/* -------- Tabs / Panels (readable but still shows wallpaper) -------- */
+QTabWidget::pane {
+    border: 1px solid #00ffff;
+    background-color: rgba(10, 10, 18, 210);
+}
+
+QTabBar::tab {
+    background-color: rgba(17, 17, 34, 235);
+    border: 1px solid #00ffff;
+    padding: 6px;
+    color: #00ffff;
+}
+
+QTabBar::tab:selected {
+    background-color: #00ffff;
+    color: #000000;
+}
+
+/* Optional: GroupBoxes if they exist anywhere */
+QGroupBox {
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    margin-top: 10px;
+    background-color: rgba(10, 10, 18, 170);
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 6px;
+}
+
+/* -------- Buttons -------- */
+QPushButton {
+    background-color: rgba(18, 18, 38, 235);
+    border: 1px solid #ff00ff;
+    padding: 6px;
+    color: #00ffff;
+}
+
+QPushButton:hover {
+    background-color: rgba(26, 26, 51, 245);
+    border: 1px solid #00ffff;
+}
+
+/* -------- Inputs (YOUR REQUEST: opaque dark purple boxes) -------- */
+QLineEdit,
+QTextEdit,
+QComboBox,
+QSpinBox,
+QDoubleSpinBox {
+    background-color: rgba(35, 0, 60, 235);  /* dark purple, mostly opaque */
+    border: 1px solid #00ffff;
+    border-radius: 6px;
+    padding: 4px;
+    color: #00ffff;
+}
+
+QLineEdit:focus,
+QTextEdit:focus,
+QComboBox:focus,
+QSpinBox:focus,
+QDoubleSpinBox:focus {
+    border: 1px solid #ff00ff;
+}
+
+/* Dropdown popup list */
+QComboBox QAbstractItemView {
+    background-color: rgba(25, 0, 45, 245);
+    color: #00ffff;
+    border: 1px solid #ff00ff;
+    selection-background-color: rgba(170, 0, 255, 140);
+}
+
+/* -------- Scrollbar -------- */
+QScrollBar:vertical {
+    background: rgba(10, 10, 18, 200);
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: #00ffff;
+    border-radius: 4px;
+}
+
+/* --- NeonVault overrides: ensure ALL text boxes are readable --- */
+QPlainTextEdit {
+    background-color: rgba(40, 10, 70, 210);
+    border: 1px solid #00ffff;
+    color: #00ffff;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: rgba(40, 10, 70, 230);
+    color: #00ffff;
+    selection-background-color: rgba(0, 255, 255, 80);
+    outline: 0;
+    border: 1px solid #00ffff;
+}
+
+
+/* -------- Context menus (right-click) & menubar dropdowns -------- */
+QMenu {
+    background-color: rgba(25, 0, 45, 245);
+    border: 1px solid #ff00ff;
+    padding: 6px;
+}
+
+QMenu::item {
+    background-color: transparent;
+    color: #00ffff;
+    padding: 6px 24px 6px 24px;
+    border-radius: 6px;
+}
+
+QMenu::item:selected {
+    background-color: rgba(170, 0, 255, 160);
+    color: #ffffff;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: rgba(0, 255, 255, 80);
+    margin: 4px 8px;
+}
+
+/* Ensure any item views (combo popups, completers, lists) match neon theme */
+QAbstractItemView {
+    background-color: rgba(25, 0, 45, 245);
+    color: #00ffff;
+    border: 1px solid #ff00ff;
+    selection-background-color: rgba(170, 0, 255, 160);
+    selection-color: #ffffff;
+    outline: 0;
+}
+
+QAbstractItemView::item {
+    padding: 4px 8px;
+}
+
+QAbstractItemView::item:selected {
+    background-color: rgba(170, 0, 255, 160);
+    color: #ffffff;
+}
+
+
+/* -------- Neon cyan indicators (fix invisible checkboxes/radio) -------- */
+QCheckBox::indicator,
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #00ffff;
+    background-color: rgba(10, 10, 18, 200);
+}
+
+QCheckBox::indicator:checked {
+    background-color: #00ffff; /* makes the default black checkmark visible */
+}
+
+QRadioButton::indicator {
+    border-radius: 8px;
+}
+
+QRadioButton::indicator:checked {
+    background-color: #00ffff;
+}
+
+
+/* ===== Sexy Header / Footer (NeonVaultV2.69) ===== */
+#titleLabel {
+    color: #00F5FF;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+#versionBadge {
+    color: #FF00D4;
+    border: 1px solid #FF00D4;
+    border-radius: 11px;
+    padding: 3px 12px;
+    background-color: rgba(255, 0, 212, 0.18);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#headerDivider {
+    background: qlineargradient(
+        x1:0, y1:0, x2:1, y2:0,
+        stop:0 rgba(0, 245, 255, 200),
+        stop:1 rgba(255, 0, 212, 200)
+    );
+}
+
+#footer {
+    border-top: 1px solid rgba(0, 245, 255, 60);
+}
+
+#statusLabel {
+    color: rgba(0, 245, 255, 180);
+}
+
+#footerDot {
+    color: rgba(0, 245, 255, 120);
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+#creditLabel {
+    color: rgba(255, 0, 212, 160);
+}
