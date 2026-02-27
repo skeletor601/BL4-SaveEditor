@@ -48,6 +48,8 @@ class QtWeaponGeneratorTab(QWidget):
         self.part_combos = {}
         self.legendary_frame = None # Initialize to None
         self.current_lang = 'en-US'
+        # Currently selected skin token (for appending into generated guns)
+        self.current_skin_token = None
 
         # Curated God Roll presets (loaded from godrolls.json)
         self.godrolls = []
@@ -210,15 +212,10 @@ class QtWeaponGeneratorTab(QWidget):
         for label, token in self.skins2:
             self.skin_combo.addItem(label, token)
 
-        self.copy_skin_btn = QPushButton("Copy skin")
-        self.copy_token_btn = QPushButton("Copy token")
-        self.paste_skin_btn = QPushButton("Paste into Deserialize")
+        self.apply_skin_btn = QPushButton("Add to Gun")
 
         top_row.addWidget(QLabel("Skin:"))
         top_row.addWidget(self.skin_combo, 1)
-        top_row.addWidget(self.copy_skin_btn)
-        top_row.addWidget(self.copy_token_btn)
-        top_row.addWidget(self.paste_skin_btn)
         skin_layout.addLayout(top_row)
 
         # Preview frame
@@ -245,6 +242,7 @@ class QtWeaponGeneratorTab(QWidget):
         meta_col.addWidget(self.skin_preview_name)
         meta_col.addWidget(self.skin_preview_token)
         meta_col.addWidget(hint)
+        meta_col.addWidget(self.apply_skin_btn)
         meta_col.addStretch(1)
 
         prev_l.addWidget(self.skin_preview_label)
@@ -255,14 +253,14 @@ class QtWeaponGeneratorTab(QWidget):
         # Wire skin actions
         self.skin_combo.currentIndexChanged.connect(lambda *_: self._update_skin_preview())
 
-        def _copy_to_clipboard(text_to_copy: str):
-            cb = QApplication.clipboard()
-            cb.setText(text_to_copy)
+        def _on_apply_skin():
+            token = self.skin_combo.currentData()
+            # If "None" is selected, clear current skin; otherwise remember and regenerate.
+            self.current_skin_token = token or None
+            # Regenerate weapon so the skin block is baked into the decoded string.
+            self.generate_weapon()
 
-        self.copy_skin_btn.clicked.connect(lambda: _copy_to_clipboard(self._formatted_skin_code(self.skin_combo.currentData()) if self.skin_combo.currentData() else ""))
-        self.copy_token_btn.clicked.connect(lambda: _copy_to_clipboard(self.skin_combo.currentData() or ""))
-
-        self.paste_skin_btn.clicked.connect(lambda: self._append_skin_to_decoded(self.skin_combo.currentData()) if self.skin_combo.currentData() else None)
+        self.apply_skin_btn.clicked.connect(_on_apply_skin)
 
         # Click preview to open lightbox
         self.skin_preview_label.installEventFilter(self)
@@ -489,37 +487,13 @@ class QtWeaponGeneratorTab(QWidget):
         return reverse_map.get(localized_value, localized_value)
 
     # --- Skin utilities (shared with Scarlett skin preview) ---
-    def _load_skins_from_item_editor_html(self):
-        """Load skin list from master_search/db/Borderlands Item Editor and Save Editor.html.
-        Returns list of (display_name, token) e.g. ('Itty Bitty Kitty Committee - CuteCat', 'Cosmetics_Weapon_Mat07_CuteCat').
-        """
-        try:
-            path = resource_loader.get_resource_path("master_search/db/Borderlands Item Editor and Save Editor.html")
-            if not path or not path.exists():
-                return []
-            html = path.read_text(encoding="utf-8", errors="ignore")
-            # Match <option value="Cosmetics_Weapon_...">Display Name</option>
-            pattern = re.compile(
-                r'<option\s+value="(Cosmetics_Weapon_[^"]+)"[^>]*>([^<]+)</option>',
-                re.IGNORECASE
-            )
-            skins = []
-            for m in pattern.finditer(html):
-                token = m.group(1).strip()
-                label = m.group(2).strip()
-                if token and label:
-                    skins.append((label, token))
-            return skins
-        except Exception:
-            return []
-
     def _load_skins2_from_scarlett(self):
-        """Load skin list for dropdown in this order:
-        1) Static JSON (master_search/db/weapon_skins.json) – shipped with app.
-        2) Borderlands Item Editor HTML (dev convenience).
-        3) SKINS2 array from scarlett.html (legacy fallback).
+        """Load skin list for dropdown from our own DBs.
+        Order:
+          1) Static JSON (master_search/db/weapon_skins.json) – shipped with app.
+          2) SKINS2 array from scarlett.html (fallback).
         """
-        # 1) Preferred: static JSON so the app works without HTML.
+        # 1) Preferred: static JSON so the app works without parsing HTML.
         try:
             data = resource_loader.load_json_resource("master_search/db/weapon_skins.json")
             if isinstance(data, list) and data:
@@ -534,12 +508,7 @@ class QtWeaponGeneratorTab(QWidget):
         except Exception:
             pass
 
-        # 2) Dev-only: parse directly from the HTML item editor if present.
-        skins = self._load_skins_from_item_editor_html()
-        if skins:
-            return skins
-
-        # 3) Legacy: SKINS2 from scarlett.html.
+        # 2) Fallback: SKINS2 from scarlett.html.
         try:
             scarlett_path = resource_loader.get_resource_path("master_search/scarlett.html")
             if not scarlett_path.exists():
@@ -560,6 +529,8 @@ class QtWeaponGeneratorTab(QWidget):
             return []
 
     def _skin_image_path(self, token: str):
+        if token and token.startswith("Cosmetics_Weapon_Shiny_") and token != "Cosmetics_Weapon_Shiny_Ultimate":
+            token = "Cosmetics_Weapon_Shiny_bloodstarved"
         return resource_loader.get_resource_path(f"master_search/skin_images/{token}.png")
 
     def _formatted_skin_code(self, token: str) -> str:
@@ -772,6 +743,21 @@ class QtWeaponGeneratorTab(QWidget):
             
             component_str = " ".join(parts_list)
             full_decoded_str = f"{header} {component_str} |"
+
+            # Append skin block (if any) at the end so UI builder never overwrites it.
+            try:
+                skin_token = getattr(self, "current_skin_token", None) or (
+                    self.skin_combo.currentData() if hasattr(self, "skin_combo") else None
+                )
+            except Exception:
+                skin_token = None
+            if skin_token:
+                formatted = self._formatted_skin_code(skin_token)
+                # Strip trailing pipe so we can reuse the same delimiter pattern.
+                base = full_decoded_str.rstrip()
+                if base.endswith("|"):
+                    base = base[:-1].rstrip()
+                full_decoded_str = f"{base} {formatted}"
             encoded_serial, err = b_encoder.encode_to_base85(full_decoded_str)
             if err: raise ValueError(f"编码失败: {err}")
             

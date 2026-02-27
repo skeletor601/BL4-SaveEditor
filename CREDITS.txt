@@ -1,0 +1,17 @@
+Borderlands 4 All in One Editor - Credits
+
+- Original BL4 research and save format work:
+  * GZO and the BL4 modding community. especially Ynot, Terra, and the 30-06 crew fo all the help 
+
+-Superxboom:
+  *Original creaor of this editor. check out his version https://github.com/superexboom/Borderlands4-SaveEditor/releases
+
+- Spliff, Shaggy, Maliflow
+  *Testing 
+
+
+- Special thanks:
+  * Community testers, bug reporters, and build sharers
+
+
+

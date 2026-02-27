@@ -135,6 +135,7 @@ class QtConverterTab(QWidget):
         main_layout.addWidget(self.ui_groups['single'])
         self._parts_db = None
         self._parts_db_by_key = None  # (mfg, wtype, pid) -> list of rows (with "source")
+        self._parts_db_by_code = None  # "{type_id:part_id}" -> list of rows
         self._resolve_section = None  # e.g. "grenade", "shield", "weapon_edit"; None = universal
         # Section -> source name prefixes in universal DB (from build_universal_parts_db EXTRA_PART_CSV_PATHS stems)
         self._section_source_prefixes = {
@@ -230,16 +231,22 @@ class QtConverterTab(QWidget):
 
     def _load_parts_db(self):
         """Load parts DB and build lookup (mfg, wtype, part_id) -> list of rows (with 'source')."""
-        if self._parts_db_by_key is not None:
+        if self._parts_db_by_key is not None and self._parts_db_by_code is not None:
             return
         self._parts_db = resource_loader.load_parts_db()
         self._parts_db_by_key = {}
+        self._parts_db_by_code = {}
         if not self._parts_db or "rows" not in self._parts_db:
             return
         for row in self._parts_db.get("rows", []):
             mfg = (row.get("Manufacturer") or "").strip()
             wtype = (row.get("Weapon Type") or "").strip()
             pid = (row.get("ID") or "").strip()
+            code = (row.get("code") or "").strip()
+            if code:
+                if code not in self._parts_db_by_code:
+                    self._parts_db_by_code[code] = []
+                self._parts_db_by_code[code].append(row)
             if mfg and pid:  # wtype can be empty for e.g. Enhancements
                 key = (mfg, wtype, pid)
                 if key not in self._parts_db_by_key:
@@ -304,27 +311,32 @@ class QtConverterTab(QWidget):
             pass
 
     def _lookup_part_display(self, type_id, part_id):
-        """Return (part_type, string, stats) from Scarlett DB or elemental.csv for type_id 1."""
+        """Return (part_type, string, stats, code_key) from DB or elemental.csv for type_id 1."""
         # Elemental parts use type_id 1 and are not in the universal DB; resolve from weapon_edit/elemental.csv
+        code_key = f"{{{type_id}:{part_id}}}"
         if type_id == 1:
             self._load_elemental_map()
             name = (getattr(self, "_elemental_by_part_id", None) or {}).get(part_id)
             if name:
-                return "Elemental", name, ""
+                return "Elemental", name, "", code_key
         self._load_parts_db()
-        if not self._parts_db_by_key:
-            return "Unknown", f"{{{type_id}:{part_id}}}", ""
-        mfg, wtype, _ = lookup.get_kind_enums(type_id)
-        key = (mfg, wtype, str(part_id))
-        rows = self._parts_db_by_key.get(key)
+        rows = None
+        # 1) Prefer exact code match from universal_parts_db (most complete DB, matches website behaviour)
+        if getattr(self, "_parts_db_by_code", None):
+            rows = self._parts_db_by_code.get(code_key)
+        # 2) Fallback to (Manufacturer, Weapon Type, ID) mapping for older entries
+        if not rows and getattr(self, "_parts_db_by_key", None):
+            mfg, wtype, _ = lookup.get_kind_enums(type_id)
+            key = (mfg, wtype, str(part_id))
+            rows = self._parts_db_by_key.get(key)
         if not rows:
-            return "Unknown", f"{{{type_id}:{part_id}}}", ""
+            return "Unknown", f"{{{type_id}:{part_id}}}", "", code_key
         # Prefer a row from the current section's sources when resolve section is set
         row = self._pick_row_for_section(rows)
         pt = (row.get("Part Type") or "Part").strip()
         s = (row.get("String") or row.get("Model Name") or "").strip() or f"ID {part_id}"
         stats = (row.get("Stats (Level 50, Common)") or row.get("Stats") or "").strip()
-        return pt, s, stats
+        return pt, s, stats, code_key
 
     def _pick_row_for_section(self, rows: list) -> dict:
         """From multiple rows for same key, prefer one matching current _resolve_section; else first."""
@@ -382,15 +394,15 @@ class QtConverterTab(QWidget):
                 counts[("Skin", f'Skin ID {p[1]}', "")] += 1
             else:
                 type_id, part_id = p[0], p[1]
-                pt, s, stats = self._lookup_part_display(type_id, part_id)
-                counts[(pt, s, stats)] += 1
+                pt, s, stats, code_key = self._lookup_part_display(type_id, part_id)
+                counts[(pt, s, stats, code_key)] += 1
 
         lines = []
-        for (pt, s, stats), qty in sorted(counts.items(), key=lambda x: (-x[1], x[0][0], x[0][1])):
+        for (pt, s, stats, code_key), qty in sorted(counts.items(), key=lambda x: (-x[1], x[0][0], x[0][1])):
             if stats:
-                lines.append(f"  {qty}×  [{pt}]  {s}  —  {stats}")
+                lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}  —  {stats}")
             else:
-                lines.append(f"  {qty}×  [{pt}]  {s}")
+                lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}")
         self.part_list_output.setPlainText("\n".join(lines) if lines else "No parts.")
         self.single_status_label.setText(self.loc['labels']['status_success'])
         self.single_status_label.setStyleSheet("color: green;")

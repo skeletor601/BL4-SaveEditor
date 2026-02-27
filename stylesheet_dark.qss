@@ -97,3 +97,12 @@ QWidget#sectionSubNav QPushButton:checked {
     background: rgba(76, 195, 255, 0.22);
     border-color: #4CC3FF;
 }
+QFrame#dashboardNewsWidget {
+    min-width: 520px;
+    min-height: 440px;
+    background: rgba(12, 14, 16, 0.90);
+    border: 1px solid rgba(92, 104, 120, 0.60);
+    border-radius: 16px;
+}
+QLabel#dashboardNewsTitle { color: #E7ECF2; font-weight: 700; }
+QTextEdit#dashboardNewsText { color: rgba(231, 236, 242, 0.9); }

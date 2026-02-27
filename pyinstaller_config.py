@@ -52,24 +52,29 @@ for _path in ["master_search/scarlett.html", "master_search/db/universal_parts_d
         _dest = os.path.dirname(_path)
         master_search_files.append((_path, _dest))
 
+# Theme stylesheets and BG images (BG_Themes folder)
+theme_stylesheets = []
+for _name in ["Ion", "Lava", "Phoenix", "Violet", "Blue_Balls", "Artic_Hex", "Carbon_Flux", "Platinum"]:
+    _qss = f"stylesheet_{_name}.qss"
+    if os.path.isfile(_qss):
+        theme_stylesheets.append((_qss, '.'))
+
+bg_themes_files = []
+if os.path.isdir("BG_Themes"):
+    for _f in glob.glob("BG_Themes/*.png") + glob.glob("BG_Themes/*.jpg") + glob.glob("BG_Themes/*.jpeg"):
+        bg_themes_files.append((_f, "BG_Themes"))
+
 # 动态收集根目录下的item_localization_zh-CN.json文件
 root_files = [
-    ('stylesheet_monster.qss', '.'),
-    ('bg_monster.jpg', '.'),
     ('item_localization_zh-CN.json', '.'),
     ('ui_localization.json', '.'),
     ('ui_localization_EN.json', '.'),
     ('ui_localization_RU.json', '.'),
     ('ui_localization_UA.json', '.'),
     ('stylesheet.qss', '.'),
-    ('stylesheet_neon.qss', '.'),
-    ('stylesheet_dark.qss', '.'),
-    ('stylesheet_slate.qss', '.'),
-    ('stylesheet_obsidian.qss', '.'),
     ('BL4.ico', '.'),
-    ('bg.jpg', '.'),
     ('bg_dark.jpg', '.'),
-]
+] + theme_stylesheets + bg_themes_files
 
 
 # PyInstaller spec文件内容

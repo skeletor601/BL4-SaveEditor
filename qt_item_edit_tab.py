@@ -83,6 +83,52 @@ def load_item_data_for_type(type_key: str, lang: str = "en-US"):
         return None, None, None
 
 
+def _load_weapon_skins2():
+    """Shared helper: load weapon skin list for previews.
+    Order:
+      1) master_search/db/weapon_skins.json
+      2) Borderlands Item Editor HTML (dev)
+      3) Legacy SKINS2 from scarlett.html
+    Returns list[(label, token)].
+    """
+    import json as _json
+    import re as _re
+    # 1) Static JSON
+    try:
+        data = resource_loader.load_json_resource("master_search/db/weapon_skins.json")
+        if isinstance(data, list) and data:
+            skins = []
+            for it in data:
+                val = (it.get("value") or "").strip()
+                lab = (it.get("label") or val).strip()
+                if val:
+                    skins.append((lab, val))
+            if skins:
+                return skins
+    except Exception:
+        pass
+
+    # 2) SKINS2 from scarlett.html (fallback)
+    try:
+        scarlett_path = resource_loader.get_resource_path("master_search/scarlett.html")
+        if not scarlett_path or not scarlett_path.exists():
+            return []
+        html = scarlett_path.read_text(encoding="utf-8", errors="ignore")
+        m = _re.search(r"const\s+SKINS2\s*=\s*(\[.*?\])\s*;", html, _re.S)
+        if not m:
+            return []
+        arr = _json.loads(m.group(1))
+        skins = []
+        for it in arr:
+            val = (it.get("value") or "").strip()
+            lab = (it.get("label") or val).strip()
+            if val:
+                skins.append((lab, val))
+        return skins
+    except Exception:
+        return []
+
+
 class ItemEditTab(QtWidgets.QWidget):
     add_to_backpack_requested = QtCore.pyqtSignal(str, str)
     update_item_requested = QtCore.pyqtSignal(dict)
@@ -100,8 +146,18 @@ class ItemEditTab(QtWidgets.QWidget):
         self.current_lang = "en-US"
         self._load_ui_localization()
 
+        # Outer layout + scroll area so the entire tab scrolls like Weapon Edit
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(8, 8, 8, 8)
+
+        scroll = QtWidgets.QScrollArea()
+        scroll.setWidgetResizable(True)
+        self.main_layout.addWidget(scroll)
+
+        container = QtWidgets.QWidget()
+        scroll.setWidget(container)
+        content_layout = QtWidgets.QVBoxLayout(container)
+        content_layout.setContentsMargins(0, 0, 0, 0)
 
         # Type selector
         type_row = QtWidgets.QHBoxLayout()
@@ -112,7 +168,7 @@ class ItemEditTab(QtWidgets.QWidget):
         self.type_combo.currentIndexChanged.connect(self._on_type_changed)
         type_row.addWidget(self.type_combo)
         type_row.addStretch(1)
-        self.main_layout.addLayout(type_row)
+        content_layout.addLayout(type_row)
 
         # Load from backpack
         bp_group = QtWidgets.QGroupBox("Load from backpack")
@@ -124,7 +180,7 @@ class ItemEditTab(QtWidgets.QWidget):
         self.backpack_items_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.backpack_scroll.setWidget(self.backpack_widget)
         bp_layout.addWidget(self.backpack_scroll)
-        self.main_layout.addWidget(bp_group)
+        content_layout.addWidget(bp_group)
 
         # Serial B85 + Decoded
         serial_group = QtWidgets.QGroupBox("Serial")
@@ -137,7 +193,65 @@ class ItemEditTab(QtWidgets.QWidget):
         self.serial_decoded_entry = AutoGrowPlainTextEdit(min_lines=8, max_lines=28)
         self.serial_decoded_entry.setPlaceholderText("Decoded serial (prefix|| part tokens |)")
         serial_layout.addWidget(self.serial_decoded_entry, 1, 1)
-        self.main_layout.addWidget(serial_group)
+        content_layout.addWidget(serial_group)
+
+        # Skin preview (shared weapon-skin list, applies a cosmetic block into decoded serial)
+        self.skins2 = _load_weapon_skins2()
+
+        skin_box = QtWidgets.QGroupBox("Skin")
+        skin_box.setStyleSheet("QGroupBox{font-weight:600;}")
+        skin_layout = QtWidgets.QVBoxLayout(skin_box)
+        top_row = QtWidgets.QHBoxLayout()
+
+        self.skin_combo = QtWidgets.QComboBox()
+        self.skin_combo.setMinimumWidth(260)
+        self.skin_combo.addItem("(None)", None)
+        for label, token in self.skins2:
+            self.skin_combo.addItem(label, token)
+
+        self.apply_skin_btn = QtWidgets.QPushButton("Add to item")
+
+        top_row.addWidget(QtWidgets.QLabel("Skin:"))
+        top_row.addWidget(self.skin_combo, 1)
+        skin_layout.addLayout(top_row)
+
+        # Preview frame
+        self.skin_preview_frame = QtWidgets.QFrame()
+        self.skin_preview_frame.setVisible(False)
+        prev_l = QtWidgets.QHBoxLayout(self.skin_preview_frame)
+        prev_l.setContentsMargins(0, 0, 0, 0)
+
+        self.skin_preview_label = QtWidgets.QLabel()
+        self._skin_prev_w = 240
+        self._skin_prev_h = 120
+        self.skin_preview_label.setFixedSize(self._skin_prev_w, self._skin_prev_h)
+        self.skin_preview_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.skin_preview_label.setStyleSheet(
+            "QLabel{border:1px solid rgba(0,255,255,110); border-radius:10px; background: rgba(10,10,16,120);}"
+            "QLabel:hover{border:1px solid rgba(255,0,200,180);}"
+        )
+
+        meta_col = QtWidgets.QVBoxLayout()
+        self.skin_preview_name = QtWidgets.QLabel("")
+        self.skin_preview_name.setStyleSheet("font-weight:600;")
+        self.skin_preview_token = QtWidgets.QLabel("")
+        self.skin_preview_token.setStyleSheet("color: rgba(180,180,200,200);")
+        meta_col.addWidget(self.skin_preview_name)
+        meta_col.addWidget(self.skin_preview_token)
+        meta_col.addWidget(self.apply_skin_btn)
+        meta_col.addStretch(1)
+
+        prev_l.addWidget(self.skin_preview_label)
+        prev_l.addLayout(meta_col, 1)
+        skin_layout.addWidget(self.skin_preview_frame)
+
+        # Wire skin actions
+        self.skin_combo.currentIndexChanged.connect(self._update_skin_preview)
+        self.apply_skin_btn.clicked.connect(lambda: self._append_skin_to_decoded(self.skin_combo.currentData()) if self.skin_combo.currentData() else None)
+        self.skin_preview_label.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.skin_preview_label.mousePressEvent = lambda e: self._open_skin_lightbox()
+
+        content_layout.addWidget(skin_box)
 
         # Buttons: Refresh backpack, Update item, Add to backpack
         btn_row = QtWidgets.QHBoxLayout()
@@ -153,26 +267,27 @@ class ItemEditTab(QtWidgets.QWidget):
         btn_row.addWidget(QtWidgets.QLabel("Flag:"))
         btn_row.addWidget(self.flag_combo)
         btn_row.addStretch(1)
-        self.main_layout.addLayout(btn_row)
+        content_layout.addLayout(btn_row)
 
         # Parts section
         parts_group = QtWidgets.QGroupBox("Parts")
         parts_layout = QtWidgets.QVBoxLayout(parts_group)
         parts_header = QtWidgets.QHBoxLayout()
         self.refresh_parts_btn = QtWidgets.QPushButton("Refresh")
-        self.add_part_btn = QtWidgets.QPushButton("Add part")
+        self.add_part_btn = QtWidgets.QPushButton("Browse Parts")
+        self.add_part_btn.setMinimumWidth(120)
         parts_header.addWidget(self.refresh_parts_btn)
         parts_header.addWidget(self.add_part_btn)
         parts_header.addStretch(1)
         parts_layout.addLayout(parts_header)
-        self.parts_list_scroll = QtWidgets.QScrollArea()
-        self.parts_list_scroll.setWidgetResizable(True)
+
+        # Parts list container – no inner scroll; height grows with content,
+        # outer scroll area handles scrolling (like Weapon Editor tab).
         self.parts_list_widget = QtWidgets.QWidget()
         self.parts_list_layout = QtWidgets.QVBoxLayout(self.parts_list_widget)
         self.parts_list_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        self.parts_list_scroll.setWidget(self.parts_list_widget)
-        parts_layout.addWidget(self.parts_list_scroll)
-        self.main_layout.addWidget(parts_group)
+        parts_layout.addWidget(self.parts_list_widget)
+        content_layout.addWidget(parts_group)
 
         self.serial_b85_entry.textChanged.connect(self._on_b85_changed)
         self.serial_decoded_entry.textChanged.connect(self._on_decoded_changed)
@@ -439,11 +554,26 @@ class ItemEditTab(QtWidgets.QWidget):
             for cb in content.findChildren(QtWidgets.QCheckBox):
                 if cb.isChecked() and hasattr(cb, "_part_info"):
                     selected.append(cb._part_info)
+            if not selected:
+                dialog.reject()
+                return
+            qty, ok = QtWidgets.QInputDialog.getInt(
+                self,
+                self._get_loc("quantity_title", "Quantity"),
+                self._get_loc("quantity_prompt", "How many copies of each selected part?"),
+                1,
+                1,
+                99,
+                1,
+            )
+            if not ok:
+                return
             for _info in selected:
                 tid = _info["type_id"]
                 pid = _info["part_id"]
-                raw = f"{{{tid}:{pid}}}"
-                self.parts_data.append({"type_id": tid, "part_id": pid, "raw": raw})
+                for _ in range(qty):
+                    raw = f"{{{tid}:{pid}}}"
+                    self.parts_data.append({"type_id": tid, "part_id": pid, "raw": raw})
             dialog.accept()
             self._regenerate_ui_and_serial()
 
@@ -494,6 +624,12 @@ class ItemEditTab(QtWidgets.QWidget):
             self.backpack_items_layout.addWidget(btn)
 
     def _load_from_item(self, item: dict):
+        # Ensure current type (grenade/shield/repkit/heavy) matches the item so
+        # part lookups use the correct CSVs instead of always grenade.
+        item_type_en = (item or {}).get("type_en", "") or ""
+        if item_type_en:
+            self._ensure_type_for_item(item_type_en)
+
         self.selected_item_path = item.get("original_path")
         serial = item.get("serial", "") or ""
         decoded = item.get("decoded_full", "") or item.get("decoded", "") or ""
@@ -537,6 +673,139 @@ class ItemEditTab(QtWidgets.QWidget):
         flag = self.flag_combo.currentText()
         self.add_to_backpack_requested.emit(encoded, flag)
 
+    # --- Skin preview helpers (mirroring weapon tabs) ---
+    def _skin_image_path(self, token: str):
+        if token and token.startswith("Cosmetics_Weapon_Shiny_") and token != "Cosmetics_Weapon_Shiny_Ultimate":
+            token = "Cosmetics_Weapon_Shiny_bloodstarved"
+        return resource_loader.get_resource_path(f"master_search/skin_images/{token}.png")
+
+    def _formatted_skin_code(self, token: str) -> str:
+        safe = (token or "").strip().replace('"', '\\"')
+        return f'"c", "{safe}" |'
+
+    def _append_skin_to_decoded(self, token: str):
+        """Append a cosmetic skin block to the decoded serial and re-encode."""
+        try:
+            decoded = (self.serial_decoded_entry.toPlainText() or "").strip()
+            if not decoded:
+                QtWidgets.QMessageBox.warning(self, "No item loaded", "Load or paste an item first, then apply a skin.")
+                return
+
+            formatted = self._formatted_skin_code(token)
+            if "|" in decoded:
+                last = decoded.rfind("|")
+                base = decoded[: last + 1].rstrip()
+                new_decoded = f"{base} {formatted}"
+            else:
+                base = decoded.rstrip()
+                if not base.endswith("|"):
+                    base = f"{base} |"
+                new_decoded = f"{base} {formatted}"
+
+            encoded_serial, err = b_encoder.encode_to_base85(new_decoded)
+            if err:
+                raise ValueError(err)
+
+            self.is_handling_change = True
+            try:
+                self.serial_decoded_entry.blockSignals(True)
+                self.serial_decoded_entry.setPlainText(new_decoded)
+                self.serial_decoded_entry.blockSignals(False)
+                self.serial_b85_entry.blockSignals(True)
+                self.serial_b85_entry.setPlainText(encoded_serial)
+                self.serial_b85_entry.blockSignals(False)
+            finally:
+                self.is_handling_change = False
+
+            # Re-parse parts so UI stays in sync.
+            self._parse_and_display_parts(new_decoded)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Skin apply failed", f"Could not apply skin: {e}")
+
+    def _update_skin_preview(self):
+        token = self.skin_combo.currentData() if hasattr(self, "skin_combo") else None
+        if not token:
+            self.skin_preview_frame.setVisible(False)
+            return
+
+        img_path = self._skin_image_path(token)
+        if not img_path or not img_path.exists():
+            self.skin_preview_frame.setVisible(False)
+            return
+
+        pix = QtGui.QPixmap(str(img_path))
+        if pix.isNull():
+            self.skin_preview_frame.setVisible(False)
+            return
+
+        scaled = pix.scaled(
+            self._skin_prev_w,
+            self._skin_prev_h,
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+            QtCore.Qt.TransformationMode.SmoothTransformation,
+        )
+        self.skin_preview_label.setPixmap(scaled)
+        self.skin_preview_name.setText(self.skin_combo.currentText())
+        self.skin_preview_token.setText(str(token))
+        self.skin_preview_frame.setVisible(True)
+
+    def _open_skin_lightbox(self):
+        token = self.skin_combo.currentData() if hasattr(self, "skin_combo") else None
+        if not token:
+            return
+        img_path = self._skin_image_path(token)
+        if not img_path or not img_path.exists():
+            return
+        pix = QtGui.QPixmap(str(img_path))
+        if pix.isNull():
+            return
+
+        dlg = QtWidgets.QDialog(self, QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        dlg.setModal(True)
+        dlg.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        dlg.setStyleSheet("background-color: rgba(0,0,0,180);")
+
+        lay = QtWidgets.QVBoxLayout(dlg)
+        lay.setContentsMargins(0, 0, 0, 0)
+
+        lbl = QtWidgets.QLabel()
+        lbl.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        max_w = int(self.window().width() * 0.85)
+        max_h = int(self.window().height() * 0.85)
+        scaled = pix.scaled(
+            max_w,
+            max_h,
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+            QtCore.Qt.TransformationMode.SmoothTransformation,
+        )
+        lbl.setPixmap(scaled)
+        lbl.setStyleSheet(
+            "QLabel{border:2px solid rgba(180,255,80,180); "
+            "border-radius:14px; background: rgba(10,10,16,120); padding:10px;}"
+        )
+        lay.addWidget(lbl, 1, QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        dlg.mousePressEvent = lambda e: dlg.accept()
+        dlg.keyPressEvent = lambda e: dlg.accept()
+        dlg.exec()
+
     def load_from_item(self, item: dict):
         """Called from main window (e.g. Edit in Item Edit)."""
         self._load_from_item(item)
+
+    # --- Helpers for selecting the correct item type based on item.type_en ---
+    def _ensure_type_for_item(self, item_type_en: str):
+        """Switch current_type_key and type combo so lookups use the right CSVs."""
+        target_key = None
+        for key, _label, type_en_val in ITEM_TYPES:
+            if type_en_val == item_type_en:
+                target_key = key
+                break
+        if not target_key or target_key == self.current_type_key:
+            return
+
+        # Updating the combo will trigger _on_type_changed and reload data.
+        for i in range(self.type_combo.count()):
+            if self.type_combo.itemData(i) == target_key:
+                self.type_combo.setCurrentIndex(i)
+                break
