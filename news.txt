@@ -1,5 +1,4 @@
-Welcome to the BL4 Save Editor.
-
-News and updates will appear here. Edit this file and push to GitHub to update the dashboard.
-
+Welcome to the BL4_AIO Save Editor. This is the first public release.
+If you have any problems, find any bugs, or need any help on using this please message me  @discord.com/users/doc_tr3
+Huge thanks to Ynot,Terra and the testers of the beta 
 Repo: https://github.com/skeletor601/BL4-SaveEditor
