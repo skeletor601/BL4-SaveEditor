@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo === NeonVault Windows Build ===
+echo === BL4 AIO Windows Build ===
 echo.
 
 where python >nul 2>nul
@@ -27,6 +27,6 @@ if errorlevel 1 (
 )
 
 echo.
-echo If build succeeded, find the EXE in: dist\NeonVault.exe
+echo If build succeeded, find the EXE in: dist\BL4_AIO.exe
 echo.
 pause

@@ -8,7 +8,7 @@ import os
 import traceback
 from datetime import datetime
 
-APP_NAME_DEFAULT = "NeonVaultV2"
+APP_NAME_DEFAULT = "BL4_AIO"
 
 def get_log_dir(app_name: str = APP_NAME_DEFAULT) -> Path:
     # Windows: %APPDATA%\<app_name>\logs

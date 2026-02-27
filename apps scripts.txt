@@ -1,1 +1,51 @@
 python scripts/yaml_to_godrolls.py "c:\Users\picas\Desktop\22.yaml"
+
+
+
+cd /c/BL4/Borderlands4-SaveEditor-3.4.5.2
+
+# 1) Check status
+git status
+
+# 2) Stage your changes
+git add .
+
+# 3) Commit
+git commit -m "Version 3.69 Update   Changed the whole app"
+
+# 4) Push to GitHub
+git push
+
+
+
+
+
+
+Use **GitHub Releases** for the EXE. Release assets can be up to **2 GB per file** and don’t live in the repo, so they don’t bloat git.
+
+### 1. Create a release and upload the EXE
+
+1. Open your repo: **https://github.com/skeletor601/BL4-SaveEditor**
+2. Click **Releases** (right side).
+3. Click **“Create a new release”**.
+4. **Choose a tag:** e.g. `v1.0` or `v3.4.5` (create the tag when prompted).
+5. **Release title:** e.g. `BL4 AIO v3.4.5` or `Windows build 3.4.5`.
+6. Add notes (what’s in this build, how to run it).
+7. **Attach the EXE:** drag `dist/BL4_AIO.exe` into the “Attach binaries” area (or use the file picker).
+8. Click **“Publish release”**.
+
+The EXE will be at something like:  
+`https://github.com/skeletor601/BL4-SaveEditor/releases/download/v1.0/BL4_AIO.exe`
+
+You can share that link; people download the file, not from the repo itself.
+
+### 2. Optional: automate with a script
+
+You can add a small script that builds the EXE and then uses the GitHub CLI to create a release and upload the file (e.g. `gh release create`). If you want that, say your OS (Windows/Linux/mac) and we can sketch the commands.
+
+### 3. Other options
+
+- **itch.io** – Good for tools/games; simple upload, optional pay‑what‑you‑want.
+- **Google Drive / OneDrive / Dropbox** – Easy, but link can change and looks less “official” than GitHub Releases.
+
+For an open‑source project, **GitHub Releases** is usually the best place to host the EXE.

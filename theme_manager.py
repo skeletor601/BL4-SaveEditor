@@ -1,6 +1,6 @@
 """theme_manager.py
 
-NeonVault theme manager. Themes are named after background images in BG_Themes/.
+BL4 AIO theme manager. Themes are named after background images in BG_Themes/.
 
 Themes (each uses its own BG image from BG_Themes/<Name>.png or .jpg):
   Ion, Lava, Phoenix, Violet, Blue_Balls, Artic_Hex, Carbon_Flux, Platinum

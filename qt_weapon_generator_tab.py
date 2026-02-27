@@ -534,7 +534,7 @@ class QtWeaponGeneratorTab(QWidget):
         return resource_loader.get_resource_path(f"master_search/skin_images/{token}.png")
 
     def _formatted_skin_code(self, token: str) -> str:
-        # IMPORTANT: The decoder/encoder used by NeonVault (bl4_decoder_py.from_string)
+        # IMPORTANT: The decoder/encoder used by BL4 AIO (bl4_decoder_py.from_string)
         # does NOT accept the semicolon-delimited form ("c"; token |) that some
         # external tools/webpages use.
         #
@@ -795,7 +795,7 @@ def _on_check_db_updates(self):
         res = update_community_db(project_root=project_root)
 
         # persist last check time
-        settings = QSettings("NeonVault", "NeonVaultV2.69")
+        settings = QSettings("BL4_AIO", "BL4_AIO")
         settings.setValue("community_db/last_check_utc", res.message.split("Rows:")[0].strip())
         settings.setValue("community_db/last_check_epoch", int(__import__("time").time()))
 

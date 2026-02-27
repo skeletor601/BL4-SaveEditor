@@ -10,6 +10,7 @@ import bl4_functions as bl4f
 import b_encoder
 import resource_loader
 from qt_autogrow_textedit import AutoGrowPlainTextEdit
+from clean_code_dialog import open_clean_code_dialog
 
 class WeaponEditorTab(QtWidgets.QWidget):
     add_to_backpack_requested = QtCore.pyqtSignal(str, str)
@@ -201,18 +202,21 @@ class WeaponEditorTab(QtWidgets.QWidget):
         s_frame = QtWidgets.QFrame(); s_frame.setObjectName("InnerFrame")
         s_layout = QtWidgets.QGridLayout(s_frame)
         s_layout.setColumnStretch(1, 1)
-        s_layout.addWidget(QtWidgets.QLabel(self.get_localized_string("serial_b85")), 0, 0)
+        self.clean_code_btn = QtWidgets.QPushButton("Clean Code")
+        self.clean_code_btn.setToolTip("Combine like codes in the decoded serial (group simple parts, merge same-index lists). Opens a dialog with confirmation.")
+        s_layout.addWidget(self.clean_code_btn, 0, 0, 1, 2, QtCore.Qt.AlignmentFlag.AlignLeft)
+        s_layout.addWidget(QtWidgets.QLabel(self.get_localized_string("serial_b85")), 1, 0)
         self.serial_b85_entry = AutoGrowPlainTextEdit()
         self.serial_b85_entry.setLineWrapMode(QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth)
         self.serial_b85_entry.setWordWrapMode(QtGui.QTextOption.WrapMode.WrapAnywhere)
         self.serial_b85_entry.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        s_layout.addWidget(self.serial_b85_entry, 0, 1)
-        s_layout.addWidget(QtWidgets.QLabel(self.get_localized_string("serial_decoded")), 1, 0)
+        s_layout.addWidget(self.serial_b85_entry, 1, 1)
+        s_layout.addWidget(QtWidgets.QLabel(self.get_localized_string("serial_decoded")), 2, 0)
         self.serial_decoded_entry = AutoGrowPlainTextEdit()
         self.serial_decoded_entry.setLineWrapMode(QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth)
         self.serial_decoded_entry.setWordWrapMode(QtGui.QTextOption.WrapMode.WrapAnywhere)
         self.serial_decoded_entry.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        s_layout.addWidget(self.serial_decoded_entry, 1, 1)
+        s_layout.addWidget(self.serial_decoded_entry, 2, 1)
         layout.addWidget(s_frame, 1, 0)
 
         # --- Skin selector (Scarlett-style preview) ---
@@ -268,6 +272,7 @@ class WeaponEditorTab(QtWidgets.QWidget):
         # Wire skin selector actions
         self.skin_combo.currentIndexChanged.connect(self._update_skin_preview)
         self.apply_skin_btn.clicked.connect(self._paste_skin_into_deserialize)
+        self.clean_code_btn.clicked.connect(self._on_clean_code)
         self.skin_preview_label.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.skin_preview_label.mousePressEvent = lambda e: self._open_skin_lightbox()
         self._update_skin_preview()
@@ -1309,9 +1314,16 @@ def _open_skin_lightbox(self):
 
 
 
+def _on_clean_code(self):
+    """Open Clean Code dialog with current decoded serial pre-filled."""
+    current = (self.serial_decoded_entry.toPlainText() or "").strip()
+    open_clean_code_dialog(self, current)
+
+
 # ------------------------------------------------------------------
 # Bind skin helper functions as instance methods (fix missing attribute)
 # ------------------------------------------------------------------
+WeaponEditorTab._on_clean_code = _on_clean_code
 WeaponEditorTab._load_skins2_from_scarlett = _load_skins2_from_scarlett
 WeaponEditorTab._skin_image_path = _skin_image_path
 WeaponEditorTab._formatted_skin_code = _formatted_skin_code

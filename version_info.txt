@@ -19,13 +19,13 @@ VSVersionInfo(
       [
       StringTable(
         '040904B0',
-        [StringStruct('CompanyName', 'NeonVault'),
+        [StringStruct('CompanyName', 'BL4 AIO'),
          StringStruct('FileDescription', 'Borderlands 4 ALL-IN-ONE Save Editor'),
          StringStruct('FileVersion', '2.69.0'),
-         StringStruct('InternalName', 'NeonVaultV2.69'),
+         StringStruct('InternalName', 'BL4_AIO'),
          StringStruct('LegalCopyright', 'All credit goes to original creator Superexboom'),
-         StringStruct('OriginalFilename', 'NeonVaultV2.69.exe'),
-         StringStruct('ProductName', 'NeonVaultV2.69'),
+         StringStruct('OriginalFilename', 'BL4_AIO.exe'),
+         StringStruct('ProductName', 'BL4 AIO'),
          StringStruct('ProductVersion', '2.69.0')])
       ])
     ,

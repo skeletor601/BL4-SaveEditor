@@ -1,4 +1,4 @@
-Write-Host "=== NeonVaultV2.69 Windows Build ===`n"
+Write-Host "=== BL4 AIO Windows Build ===`n"
 
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   Write-Host "ERROR: python not found in PATH. Install Python 3.11+ and reopen PowerShell." -ForegroundColor Red
@@ -15,4 +15,4 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[2/3] Generating spec + building EXE..."
 python pyinstaller_config.py
 
-Write-Host "`nIf build succeeded, find the EXE in: dist\NeonVaultV2.69.exe`n"
+Write-Host "`nIf build succeeded, find the EXE in: dist\BL4_AIO.exe`n"

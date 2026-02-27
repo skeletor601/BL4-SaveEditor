@@ -12,6 +12,7 @@ import b_encoder
 import resource_loader
 import bl4_functions as bl4f
 from qt_autogrow_textedit import AutoGrowPlainTextEdit
+from clean_code_dialog import open_clean_code_dialog
 
 # Type keys and display; type_en values used in process_and_load_items
 ITEM_TYPES = [
@@ -185,14 +186,17 @@ class ItemEditTab(QtWidgets.QWidget):
         # Serial B85 + Decoded
         serial_group = QtWidgets.QGroupBox("Serial")
         serial_layout = QtWidgets.QGridLayout(serial_group)
-        serial_layout.addWidget(QtWidgets.QLabel("Base85:"), 0, 0)
+        self.clean_code_btn = QtWidgets.QPushButton("Clean Code")
+        self.clean_code_btn.setToolTip("Combine like codes in the decoded serial. Opens a dialog with confirmation.")
+        serial_layout.addWidget(self.clean_code_btn, 0, 0, 1, 2, QtCore.Qt.AlignmentFlag.AlignLeft)
+        serial_layout.addWidget(QtWidgets.QLabel("Base85:"), 1, 0)
         self.serial_b85_entry = AutoGrowPlainTextEdit(min_lines=5, max_lines=18)
         self.serial_b85_entry.setPlaceholderText("Paste or load from backpack")
-        serial_layout.addWidget(self.serial_b85_entry, 0, 1)
-        serial_layout.addWidget(QtWidgets.QLabel("Decoded:"), 1, 0)
+        serial_layout.addWidget(self.serial_b85_entry, 1, 1)
+        serial_layout.addWidget(QtWidgets.QLabel("Decoded:"), 2, 0)
         self.serial_decoded_entry = AutoGrowPlainTextEdit(min_lines=8, max_lines=28)
         self.serial_decoded_entry.setPlaceholderText("Decoded serial (prefix|| part tokens |)")
-        serial_layout.addWidget(self.serial_decoded_entry, 1, 1)
+        serial_layout.addWidget(self.serial_decoded_entry, 2, 1)
         content_layout.addWidget(serial_group)
 
         # Skin preview (shared weapon-skin list, applies a cosmetic block into decoded serial)
@@ -291,6 +295,7 @@ class ItemEditTab(QtWidgets.QWidget):
 
         self.serial_b85_entry.textChanged.connect(self._on_b85_changed)
         self.serial_decoded_entry.textChanged.connect(self._on_decoded_changed)
+        self.clean_code_btn.clicked.connect(self._on_clean_code)
         self.refresh_backpack_btn.clicked.connect(self.refresh_backpack_items)
         self.update_item_btn.clicked.connect(self._update_item)
         self.add_to_backpack_btn.clicked.connect(self._add_to_backpack)
@@ -360,6 +365,11 @@ class ItemEditTab(QtWidgets.QWidget):
             self.update_item_btn.setEnabled(True)
         self._parse_and_display_parts(text)
         self.is_handling_change = False
+
+    def _on_clean_code(self):
+        """Open Clean Code dialog with current decoded serial pre-filled."""
+        current = (self.serial_decoded_entry.toPlainText() or "").strip()
+        open_clean_code_dialog(self, current)
 
     def _parse_component_string(self, component_str: str) -> list:
         """Same regex as weapon tab: {id}, {mfg:id}, {mfg:[ids]}."""

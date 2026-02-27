@@ -125,10 +125,10 @@ If you encounter this error when launching the application:
 - **@THATDONFC** - For Weapon builder UI design
 
 
-## Building Windows EXE (NeonVaultV2.69)
+## Building Windows EXE (BL4 AIO)
 
 - Create/activate your venv, install requirements.
 - Run `build_windows.bat` (or `build_windows.ps1`).
-- Output: `dist/NeonVaultV2.69.exe`
+- Output: `dist/BL4_AIO.exe`
 
 The EXE name controls the desktop shortcut name in Windows.

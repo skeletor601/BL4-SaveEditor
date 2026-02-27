@@ -1,9 +1,9 @@
 
 /* =========================
-   NeonVault - Official QSS
+   BL4 AIO - Official QSS
    ========================= */
 
-/* NeonVault wallpaper background */
+/* BL4 AIO wallpaper background */
 #centralWidget {
     background-image: url("bg.jpg");
     background-position: center;
@@ -108,7 +108,7 @@ QScrollBar::handle:vertical {
     border-radius: 4px;
 }
 
-/* --- NeonVault overrides: ensure ALL text boxes are readable --- */
+/* --- BL4 AIO overrides: ensure ALL text boxes are readable --- */
 QPlainTextEdit {
     background-color: rgba(40, 10, 70, 210);
     border: 1px solid #00ffff;
