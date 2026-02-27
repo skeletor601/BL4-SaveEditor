@@ -1,9 +1,17 @@
-# Borderlands 4 Save Editor
+# Borderlands 4 Save Editor (BL4 AIO)
 
 [中文版](README_CN.md)
 
-<h1 align="center">Borderlands 4 Save Editor</h1>
+<h1 align="center">Borderlands 4 Save Editor — BL4 AIO</h1>
 <p align="center"><b>By SuperExboom</b></p>
+
+---
+
+### Download (Windows)
+
+**Latest build:** [BL4_AIO.exe](https://github.com/skeletor601/BL4-SaveEditor/releases/download/V3.69/BL4_AIO.exe) (from [Releases](https://github.com/skeletor601/BL4-SaveEditor/releases))
+
+No install needed — run the EXE. Back up your saves before editing.
 
 ---
 
@@ -66,21 +74,21 @@ Features dedicated tabs for deep customization of various gear types:
 
 ### How to Build
 
-If you want to build the executable (`.exe`) from source, please ensure you have Python installed and run the `pyinstaller_config.py` script located in the project root directory.
-
-This script will automatically handle dependencies, collect required resource files (such as images, JSONs, CSVs, etc.), and invoke PyInstaller to generate `dist/BL4SaveEditor.exe`.
+Build the Windows EXE from source with Python and PyInstaller.
 
 **Steps:**
 
-1.  Install dependencies:
-    ```bash
-    pip install pyinstaller pillow pyyaml pycryptodome PyQt6 pandas
-    ```
-2.  Run the build script:
-    ```bash
-    python pyinstaller_config.py
-    ```
-3.  Once the script finishes, the generated executable will be located in the `dist` folder.
+1. Install dependencies:
+   ```bash
+   pip install pyinstaller pillow pyyaml pycryptodome PyQt6 pandas
+   ```
+2. Run the build script (from project root):
+   ```bash
+   python build_exe.py
+   ```
+3. The executable will be at `dist/BL4_AIO.exe`.
+
+Alternatively use `build_windows.bat` or `build_windows.ps1`; they produce the same `dist/BL4_AIO.exe`.
 
 ---
 
