@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-PyInstaller build script for NeonVault (Borderlands 4 Save Editor).
+PyInstaller build script for BL4 AIO (Borderlands 4 Save Editor).
 
 Collects all runtime data (resources, icons, DBs, stylesheets, skin images),
 generates a .spec file, and runs PyInstaller to produce a single Windows EXE.
 
 Usage (from project root):
   python build_exe.py              # generate spec and build
-  python build_exe.py --spec-only  # only generate NeonVault.spec
+  python build_exe.py --spec-only  # only generate BL4_AIO.spec
 
 Requires: pip install pyinstaller pillow pyyaml pycryptodome pandas PyQt6
 """
@@ -92,7 +92,7 @@ def collect_datas() -> list:
             datas.append((f, "."))
 
     # Optional root files
-    for f in ("BL4.ico", "NeonVault.ico", "bg_dark.jpg"):
+    for f in ("BL4.ico", "BL4_AIO.ico", "bg_dark.jpg"):
         if (root / f).exists():
             datas.append((f, "."))
 
@@ -106,7 +106,7 @@ def collect_datas() -> list:
 
 def get_icon_arg() -> str:
     """Return icon path for EXE if present."""
-    for name in ("BL4.ico", "NeonVault.ico"):
+    for name in ("BL4.ico", "BL4_AIO.ico"):
         if Path(name).exists():
             return repr(name)
     return "None"
@@ -147,6 +147,7 @@ a = Analysis(
         'theme_manager',
         'dashboard_widget',
         'converter_tab',
+        'clean_code_dialog',
         'nv_logger',
         'lookup',
         'qt_character_tab',
@@ -182,7 +183,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='NeonVault',
+    name='BL4_AIO',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -210,12 +211,12 @@ def main():
     print(f"  Collected {len(datas)} data entries.")
 
     spec_content = build_spec(datas)
-    spec_path = Path("NeonVault.spec")
+    spec_path = Path("BL4_AIO.spec")
     spec_path.write_text(spec_content, encoding="utf-8")
     print(f"Wrote {spec_path}")
 
     if spec_only:
-        print("Done (spec only). Run: pyinstaller --clean --noconfirm NeonVault.spec")
+        print("Done (spec only). Run: pyinstaller --clean --noconfirm BL4_AIO.spec")
         return 0
 
     try:
@@ -230,7 +231,7 @@ def main():
         "--noconfirm",
         str(spec_path),
     ])
-    print("Build finished. EXE: dist/NeonVault.exe")
+    print("Build finished. EXE: dist/BL4_AIO.exe")
     return 0
 
 

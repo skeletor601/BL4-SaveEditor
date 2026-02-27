@@ -143,7 +143,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='NeonVaultV2.69',
+    name='BL4_AIO',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -157,13 +157,13 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     version="version_info.txt",
-    icon="NeonVault.ico",
+    icon="BL4_AIO.ico",
 )
 '''
 
 def create_spec_file():
     """创建PyInstaller spec文件"""
-    spec_path = Path('NeonVaultV2.69.spec')
+    spec_path = Path('BL4_AIO.spec')
     # 使用f-string来格式化SPEC_CONTENT
     with open(spec_path, 'w', encoding='utf-8') as f:
         f.write(SPEC_CONTENT)
@@ -192,7 +192,7 @@ def build_executable():
     
     if result.returncode == 0:
         print("Build successful!")
-        print("Executable location: dist/NeonVaultV2.69.exe")
+        print("Executable location: dist/BL4_AIO.exe")
     else:
         print("Build failed!")
         print("STDOUT:", result.stdout)
@@ -202,7 +202,7 @@ def build_executable():
 
 if __name__ == "__main__":
     print("=== PyInstaller Configuration ===")
-    print("This script will help you build a Windows executable for NeonVaultV2.69")
+    print("This script will help you build a Windows executable for BL4 AIO")
     print("Make sure all dependencies are installed:")
     print("  pip install pyinstaller pillow pyyaml pycryptodome pandas PyQt6")
     print()

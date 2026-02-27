@@ -3,11 +3,15 @@ import sys
 import time
 import itertools
 import os
+import json
+import urllib.request
+import urllib.error
+import urllib.parse
 from pathlib import Path
 
 
 from nv_logger import setup_logger, install_global_exception_hook
-NV_LOG = setup_logger('NeonVaultV2')
+NV_LOG = setup_logger('BL4_AIO')
 install_global_exception_hook(NV_LOG)
 VERSION = "3.4.5.2"
 from PyQt6.QtWidgets import (
@@ -302,6 +306,11 @@ class QtMasterSearchTab(QWidget):
         self.reload_btn.clicked.connect(self.reload_master_search)
         header_row.addWidget(self.reload_btn)
 
+        self.library_update_btn = QPushButton("Check for library updates")
+        self.library_update_btn.setToolTip("Download latest parts DB and weapon/item data (CSVs, JSON) from GitHub for Master Search, Weapon Gen, Weapon Edit, and Item Edit")
+        self.library_update_btn.clicked.connect(self._on_check_library_updates)
+        header_row.addWidget(self.library_update_btn)
+
         self.open_external_btn = QPushButton("Open External")
         self.open_external_btn.setToolTip("Open Master Search in your default browser")
         self.open_external_btn.clicked.connect(self.open_master_search_external)
@@ -403,6 +412,105 @@ class QtMasterSearchTab(QWidget):
         except Exception:
             request.accept()
 
+    def _on_check_library_updates(self):
+        """Fetch parts DB and weapon/item data (CSVs, JSON) from GitHub; save to project or user override when frozen."""
+        BASE = "https://raw.githubusercontent.com/skeletor601/BL4-SaveEditor/main/"
+        LIBRARY_PATHS = [
+            "master_search/db/universal_parts_db.json",
+            "master_search/db/weapon_skins.json",
+            "weapon_edit/weapon_name.csv",
+            "weapon_edit/all_weapon_part.csv",
+            "weapon_edit/skin_EN.csv",
+            "weapon_edit/weapon_rarity.csv",
+            "weapon_edit/skin.csv",
+            "weapon_edit/elemental.csv",
+            "weapon_edit/weapon_localization_zh-CN.json",
+            "weapon_edit/all_weapon_part_EN.csv",
+            "grenade/grenade_main_perk_EN.csv",
+            "grenade/Grenade_localization_zh-CN.json",
+            "grenade/grenade_main_perk.csv",
+            "grenade/manufacturer_rarity_perk.csv",
+            "grenade/manufacturer_rarity_perk_EN.csv",
+            "shield/manufacturer_perk.csv",
+            "shield/shield_main_perk_EN.csv",
+            "shield/Shield_localization_zh-CN.json",
+            "shield/manufacturer_perk_EN.csv",
+            "shield/shield_main_perk.csv",
+            "repkit/repkit_main_perk.csv",
+            "repkit/repkit_manufacturer_perk_EN.csv",
+            "repkit/repkit_manufacturer_perk.csv",
+            "repkit/repkit_main_perk_EN.csv",
+            "repkit/Repkit_localization_zh-CN.json",
+            "heavy/heavy_manufacturer_perk_EN.csv",
+            "heavy/heavy_main_perk_EN.csv",
+            "heavy/Heavy_localization_zh-CN.json",
+            "heavy/heavy_manufacturer_perk.csv",
+            "heavy/heavy_main_perk.csv",
+            "enhancement/Enhancement_rarity.csv",
+            "enhancement/localization_zh-CN.json",
+            "enhancement/Enhancement_perk.csv",
+            "enhancement/Enhancement_manufacturers.csv",
+        ]
+        # Master list CSVs/TSVs (names have spaces)
+        for name in (
+            "Borderlands 4 Item Parts Master List - Grenades.csv",
+            "Borderlands 4 Item Parts Master List - Heavy Weapons.tsv",
+            "Borderlands 4 Item Parts Master List - Weapon Elemental.csv",
+            "Borderlands 4 Item Parts Master List - Enhancements.csv",
+            "Borderlands 4 Item Parts Master List - Repkits.csv",
+            "Borderlands 4 Item Parts Master List - Rarities.tsv",
+            "Borderlands 4 Item Parts Master List - Shields.csv",
+        ):
+            LIBRARY_PATHS.append("master_search/db/" + name)
+
+        def save_path_for(rel: str) -> Path:
+            if getattr(sys, "frozen", False):
+                ob = resource_loader.get_override_base()
+                if not ob:
+                    return None
+                return ob / rel.replace("/", os.sep)
+            return Path(resource_loader.__file__).parent / rel.replace("/", os.sep)
+
+        ok = 0
+        failed = []
+        for rel in LIBRARY_PATHS:
+            try:
+                url = BASE + urllib.parse.quote(rel, safe="/")
+                req = urllib.request.Request(url, headers={"User-Agent": "BL4-AIO/1.0"})
+                with urllib.request.urlopen(req, timeout=15) as r:
+                    raw = r.read()
+                sp = save_path_for(rel)
+                if not sp:
+                    failed.append(rel + " (no save path)")
+                    continue
+                sp.parent.mkdir(parents=True, exist_ok=True)
+                if rel.endswith(".json"):
+                    text = raw.decode("utf-8")
+                    obj = json.loads(text)
+                    if rel == "master_search/db/universal_parts_db.json" and not isinstance(obj.get("rows"), list):
+                        failed.append(rel + " (invalid format)")
+                        continue
+                    with open(sp, "w", encoding="utf-8") as f:
+                        json.dump(obj, f, indent=2, ensure_ascii=False)
+                else:
+                    with open(sp, "wb") as f:
+                        f.write(raw)
+                ok += 1
+            except Exception as e:
+                failed.append(f"{rel}: {e}")
+
+        if failed:
+            msg = f"Updated {ok} file(s).\n\nFailed ({len(failed)}):\n" + "\n".join(failed[:10])
+            if len(failed) > 10:
+                msg += f"\n... and {len(failed) - 10} more."
+            QMessageBox.warning(self, "Library Update", msg)
+        else:
+            QMessageBox.information(
+                self,
+                "Library Update",
+                f"All {ok} library files updated successfully.\nReload tabs or restart the app to use the new data.",
+            )
+
 
 def _maybe_weekly_db_check(self):
     """
@@ -410,7 +518,7 @@ def _maybe_weekly_db_check(self):
     prompt the user to refresh. This does NOT auto-download without user action.
     """
     try:
-        settings = QSettings("NeonVault", "NeonVaultV2.69")
+        settings = QSettings("BL4_AIO", "BL4_AIO")
         last_epoch = int(settings.value("community_db/last_check_epoch", 0) or 0)
         now = int(__import__("time").time())
         seven_days = 7 * 24 * 60 * 60

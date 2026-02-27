@@ -18,7 +18,7 @@ DEFAULT_SOURCES = [
     ("parts_master",   "https://docs.google.com/spreadsheets/d/11TmXyGmIVoDFn4IFNJN1s2HuijSnn_nPZqN3LkDd5TA/export?format=csv&gid=1385091622"),
 ]
 
-USER_AGENT = "NeonVaultV2.69 Community DB Updater (+manual/weekly check)"
+USER_AGENT = "BL4_AIO Community DB Updater (+manual/weekly check)"
 
 @dataclass
 class UpdateResult:
@@ -437,7 +437,7 @@ def update_community_db(
 ) -> UpdateResult:
     """
     Downloads community-maintained Google Sheets (CSV export), merges them,
-    and writes a single JSON DB file used by Scarlett + NeonVault master search.
+    and writes a single JSON DB file used by Scarlett + BL4 AIO master search.
 
     Returns an UpdateResult with diff counts.
     """

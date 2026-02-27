@@ -32,24 +32,35 @@ def get_ui_localization_file(lang: str) -> str:
     }
     return mapping.get(lang, 'ui_localization_EN.json')
 
+def get_override_base() -> Optional[Path]:
+    """
+    When running as a frozen app, return the user-writable base dir for updated data
+    (e.g. AppData/Local/BL4_AIO). Used so "Check for library updates" can write
+    DBs/CSVs that weapon gen, weapon edit, item edit, and master search then load.
+    """
+    if not getattr(sys, "frozen", False):
+        return None
+    base = Path.home()
+    if sys.platform == "win32":
+        base = base / "AppData" / "Local"
+    return base / "BL4_AIO"
+
+
 def get_resource_path(relative_path: Union[str, Path]) -> Path:
     """
-    获取资源的绝对路径，支持PyInstaller打包环境
-    
-    Args:
-        relative_path: 相对路径
-        
-    Returns:
-        资源的绝对路径
+    获取资源的绝对路径，支持PyInstaller打包环境。
+    When frozen, if an updated file exists under the override dir (e.g. from
+    "Check for library updates"), that path is returned so all tabs use the new data.
     """
-    if getattr(sys, 'frozen', False):
-        # PyInstaller打包环境
+    rel = Path(relative_path).as_posix()
+    if getattr(sys, "frozen", False):
+        override_base = get_override_base()
+        if override_base and (override_base / rel).exists():
+            return override_base / rel
         base_path = Path(sys._MEIPASS)
     else:
-        # 开发环境
         base_path = Path(__file__).parent
-    
-    return base_path / relative_path
+    return base_path / rel
 
 def load_json_resource(relative_path: Union[str, Path], 
                       use_literal_eval: bool = False) -> Optional[Dict[str, Any]]:
@@ -79,12 +90,27 @@ def _load_json_resource_impl(relative_path: str, use_literal_eval: bool) -> Opti
         return None
 
 
+def get_override_parts_db_path() -> Optional[Path]:
+    """User-writable path for updated universal_parts_db.json when frozen."""
+    ob = get_override_base()
+    return (ob / "db" / "universal_parts_db.json") if ob else None
+
+
 def load_parts_db() -> Optional[Dict[str, Any]]:
     """
     Load the most complete parts database for the app.
-    Tries universal_parts_db.json first (merged from sources + app CSVs), then community_parts_db.json.
-    Use this whenever code needs to read parts data so the most complete DB is always used.
+    When frozen, checks user override path first (updated via "Check for library updates").
+    Then bundled universal_parts_db.json, then community_parts_db.json.
     """
+    override_path = get_override_parts_db_path()
+    if override_path and override_path.exists():
+        try:
+            with open(override_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if data and isinstance(data.get("rows"), list) and len(data.get("rows", [])) > 0:
+                return data
+        except Exception:
+            pass
     data = load_json_resource("master_search/db/universal_parts_db.json")
     if data and isinstance(data.get("rows"), list) and len(data.get("rows", [])) > 0:
         return data

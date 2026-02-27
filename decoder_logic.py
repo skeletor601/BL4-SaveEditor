@@ -98,6 +98,76 @@ def decode_serial_to_string(serial_b85: str) -> (str, list, str or None):
     except (ValueError, IOError, EOFError) as e:
         return "", [], f"解码过程中发生Error: {e}"
 
+def clean_decoded_string(decoded_string: str) -> (str, str or None):
+    """
+    Clean a decoded serial string by grouping like codes:
+    - First run of simple parts {a} {b} {c}... under the first header number N becomes {N:[a b c ...]}.
+    - Consecutive same-index list parts {k:[x]} {k:[y]} {k:[z]} become {k:[x y z]}.
+    Returns (cleaned_string, None) or ("", error_message).
+    """
+    from bl4_decoder_py.b4s.serial_datatypes.part.part import Part
+    if not decoded_string or not decoded_string.strip():
+        return "", "Input is empty."
+    try:
+        blocks = from_string(decoded_string)
+    except Exception as e:
+        return "", str(e)
+
+    # Find first number in the stream (used as group index for first simple-part run)
+    first_number = None
+    for b in blocks:
+        if b.token in (Token.TOK_VARINT, Token.TOK_VARBIT):
+            first_number = b.value
+            break
+    if first_number is None:
+        first_number = 0  # fallback
+
+    did_group_simple = False
+    out = []
+    i = 0
+    while i < len(blocks):
+        block = blocks[i]
+        # First run of consecutive TOK_PART SUBTYPE_NONE -> replace with {first_number:[...]}
+        if not did_group_simple and block.token == Token.TOK_PART and block.part and block.part.sub_type == PartSubType.SUBTYPE_NONE:
+            run = []
+            j = i
+            while j < len(blocks) and blocks[j].token == Token.TOK_PART and blocks[j].part and blocks[j].part.sub_type == PartSubType.SUBTYPE_NONE:
+                run.append(blocks[j].part.index)
+                j += 1
+            if len(run) > 1:
+                p = Part()
+                p.index = first_number
+                p.sub_type = PartSubType.SUBTYPE_LIST
+                p.values = run
+                bnew = Block(Token.TOK_PART)
+                bnew.part = p
+                out.append(bnew)
+                i = j
+                did_group_simple = True
+                continue
+        # Merge consecutive TOK_PART same index SUBTYPE_LIST
+        if block.token == Token.TOK_PART and block.part and block.part.sub_type == PartSubType.SUBTYPE_LIST:
+            merged_values = list(block.part.values)
+            j = i + 1
+            while j < len(blocks) and blocks[j].token == Token.TOK_PART and blocks[j].part and blocks[j].part.sub_type == PartSubType.SUBTYPE_LIST and blocks[j].part.index == block.part.index:
+                merged_values.extend(blocks[j].part.values)
+                j += 1
+            if j > i + 1:
+                p = Part()
+                p.index = block.part.index
+                p.sub_type = PartSubType.SUBTYPE_LIST
+                p.values = merged_values
+                bnew = Block(Token.TOK_PART)
+                bnew.part = p
+                out.append(bnew)
+                i = j
+                continue
+        out.append(block)
+        i += 1
+
+    return _format_blocks(out), None
+
+
 def encode_string_to_serial(decoded_string: str) -> (str, str or None):
     """
     Encodes a human-readable string back into a Base85 serial.
