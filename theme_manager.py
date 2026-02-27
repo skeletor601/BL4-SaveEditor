@@ -1,30 +1,32 @@
 """theme_manager.py
 
-NeonVault theme manager.
+NeonVault theme manager. Themes are named after background images in BG_Themes/.
 
-Themes (all dark, modern & sleek):
-* monster - matte charcoal + lime accents (default)
-* dark    - Industrial: dark steel + electric blue
-* slate   - cool gray + teal accent
-* obsidian - deep black + amber accent
+Themes (each uses its own BG image from BG_Themes/<Name>.png or .jpg):
+  Ion, Lava, Phoenix, Violet, Blue_Balls, Artic_Hex, Carbon_Flux, Platinum
 
-Legacy theme names 'neon' and 'light' are treated as 'monster'.
+Legacy theme names 'monster', 'dark', 'slate', 'obsidian', 'neon', 'light' are mapped to Ion.
 """
 
+from pathlib import Path
 from PyQt6.QtCore import QSettings
 import resource_loader
 
 
 class ThemeManager:
-    """Manages application themes (Monster / Dark / Slate / Obsidian)."""
+    """Manages application themes (one per BG_Themes image)."""
 
-    MONSTER = "monster"
-    DARK = "dark"
-    SLATE = "slate"
-    OBSIDIAN = "obsidian"
-    NEON = "neon"
+    ION = "Ion"
+    LAVA = "Lava"
+    PHOENIX = "Phoenix"
+    VIOLET = "Violet"
+    BLUE_BALLS = "Blue_Balls"
+    ARTIC_HEX = "Artic_Hex"
+    CARBON_FLUX = "Carbon_Flux"
+    PLATINUM = "Platinum"
 
-    _ALL_THEMES = (MONSTER, DARK, SLATE, OBSIDIAN)
+    _ALL_THEMES = (ION, LAVA, PHOENIX, VIOLET, BLUE_BALLS, ARTIC_HEX, CARBON_FLUX, PLATINUM)
+    _LEGACY_MAP = {"monster": ION, "dark": ION, "slate": ION, "obsidian": ION, "neon": ION, "light": ION}
 
     def __init__(self):
         self.settings = QSettings("SuperExboom", "BL4SaveEditor")
@@ -36,11 +38,10 @@ class ThemeManager:
         return self._current_theme
 
     def _load_saved_theme(self):
-        saved = self.settings.value("theme", self.MONSTER, type=str)
-        if saved in (self.NEON, "light"):
-            saved = self.MONSTER
+        saved = self.settings.value("theme", self.ION, type=str)
+        saved = self._LEGACY_MAP.get(saved, saved) if isinstance(saved, str) else self.ION
         if saved not in self._ALL_THEMES:
-            saved = self.MONSTER
+            saved = self.ION
         return saved
 
     def _load_stylesheet_template(self):
@@ -49,21 +50,25 @@ class ThemeManager:
         return content or ""
 
     def get_stylesheet_filename(self) -> str:
-        return {
-            self.MONSTER: "stylesheet_monster.qss",
-            self.DARK: "stylesheet_dark.qss",
-            self.SLATE: "stylesheet_slate.qss",
-            self.OBSIDIAN: "stylesheet_obsidian.qss",
-        }.get(self._current_theme, "stylesheet_monster.qss")
+        # File names use the theme key as-is (Ion, Lava, ...)
+        return f"stylesheet_{self._current_theme}.qss"
+
+    # Some BG_Themes files use a space in the name (e.g. "Artic Hex.png")
+    _BG_FILENAME_OVERRIDES = {"Artic_Hex": "Artic Hex"}
 
     def get_background_filename(self) -> str:
-        if self._current_theme == self.MONSTER:
-            return "bg_monster.jpg"
+        """Return path for BG image: BG_Themes/<Theme>.png or .jpg. Tries .png first."""
+        base_name = self._BG_FILENAME_OVERRIDES.get(self._current_theme, self._current_theme)
+        base = Path("BG_Themes") / base_name
+        for ext in (".png", ".jpg", ".jpeg"):
+            p = base.with_suffix(ext)
+            full = resource_loader.get_resource_path(p)
+            if full and Path(full).exists():
+                return str(p).replace("\\", "/")
         return "bg_dark.jpg"
 
     def set_theme(self, theme_name: str):
-        if theme_name in (self.NEON, "light"):
-            theme_name = self.MONSTER
+        theme_name = self._LEGACY_MAP.get(theme_name, theme_name) if isinstance(theme_name, str) else theme_name
         if theme_name not in self._ALL_THEMES:
             return
         self._current_theme = theme_name
@@ -71,48 +76,51 @@ class ThemeManager:
         self._stylesheet_template = self._load_stylesheet_template()
 
     def cycle_theme(self):
-        """Cycle to next theme: Monster → Dark → Slate → Obsidian → Monster."""
         idx = self._ALL_THEMES.index(self._current_theme)
         next_theme = self._ALL_THEMES[(idx + 1) % len(self._ALL_THEMES)]
         self.set_theme(next_theme)
         return next_theme
 
     def toggle_theme(self):
-        """Toggle between first two (Monster ↔ Dark). For full cycle use cycle_theme()."""
-        new_theme = self.DARK if self._current_theme == self.MONSTER else self.MONSTER
-        self.set_theme(new_theme)
-        return new_theme
+        idx = self._ALL_THEMES.index(self._current_theme)
+        next_theme = self._ALL_THEMES[(idx + 1) % len(self._ALL_THEMES)]
+        self.set_theme(next_theme)
+        return next_theme
 
     def get_stylesheet(self):
         return self._stylesheet_template
 
     def is_dark(self):
-        return self._current_theme in (self.DARK, self.SLATE, self.OBSIDIAN)
+        return True
 
     def is_neon(self):
-        return self._current_theme == self.MONSTER
+        return self._current_theme == self.ION
 
     def get_theme_icon(self):
         icons = {
-            self.MONSTER: "🌙",
-            self.DARK: "🧪",
-            self.SLATE: "◐",
-            self.OBSIDIAN: "◆",
+            self.ION: "⚡",
+            self.LAVA: "🔥",
+            self.PHOENIX: "🜲",
+            self.VIOLET: "◆",
+            self.BLUE_BALLS: "●",
+            self.ARTIC_HEX: "⬡",
+            self.CARBON_FLUX: "◈",
+            self.PLATINUM: "◇",
         }
-        return icons.get(self._current_theme, "🌙")
+        return icons.get(self._current_theme, "⚡")
 
     def get_theme_display_name(self):
-        names = {
-            self.MONSTER: "Monster",
-            self.DARK: "Industrial",
-            self.SLATE: "Slate",
-            self.OBSIDIAN: "Obsidian",
-        }
-        return names.get(self._current_theme, "Monster")
+        return self._current_theme
 
     def get_background_overlay_color(self):
-        if self._current_theme == self.MONSTER:
-            return "rgba(0, 0, 0, 0.22)"
-        if self._current_theme == self.OBSIDIAN:
-            return "rgba(0, 0, 0, 0.48)"
-        return "rgba(0, 0, 0, 0.40)"
+        overlays = {
+            self.ION: "rgba(0, 0, 0, 0.25)",
+            self.LAVA: "rgba(0, 0, 0, 0.45)",
+            self.PHOENIX: "rgba(0, 0, 0, 0.40)",
+            self.VIOLET: "rgba(0, 0, 0, 0.48)",
+            self.BLUE_BALLS: "rgba(0, 0, 0, 0.38)",
+            self.ARTIC_HEX: "rgba(0, 0, 0, 0.35)",
+            self.CARBON_FLUX: "rgba(0, 0, 0, 0.42)",
+            self.PLATINUM: "rgba(0, 0, 0, 0.30)",
+        }
+        return overlays.get(self._current_theme, "rgba(0, 0, 0, 0.40)")

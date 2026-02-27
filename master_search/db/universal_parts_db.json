@@ -38859,8 +38859,8 @@
       "ID": "98",
       "Part Type": "Rarity",
       "String": "Fisheye Skin",
-      "Model Name": "Epic",
-      "Stats (Level 50, Common)": "Can be used for skin\n{1}\nFisheye\nRarity - Order Sniper Rifle\n{76}\nSymmetry\nRarity - Order Sniper Rifle\n{79}\nRooker\nRarity - Order Sniper Rifle\n{95}\nORD_SR.comp_01_common\nRarity - Order Sniper Rifle\n{96}\nORD_SR.comp_02_uncommon\nRarity - Order Sniper Rifle\n{97}\nORD_SR.comp_03_rare\nRarity - Order Sniper Rifle\n{98}\nORD_SR.comp_04_epic\nRarity - Order Sniper Rifle\n{20}\nViking\nRarity - Paladin Class Mod\n{21}\nForge Master\nRarity - Paladin Class Mod\n{22}\nBlacksmith\nRarity - Paladin Class Mod\n{23}\nShatterwight\nRarity - Paladin Class Mod\n{24}\nElementalist\nRarity - Paladin Class Mod\n{25}\nFurnace\nRarity - Paladin Class Mod\n{67}\nclassmod_paladin.comp_04_epic\nRarity - Paladin Class Mod\n{68}\nclassmod_paladin.comp_03_rare\nRarity - Paladin Class Mod\n{69}\nclassmod_paladin.comp_02_uncommon\nRarity - Paladin Class Mod\n{70}\nclassmod_paladin.comp_01_common\nRarity - Paladin Class Mod\nDescription: Item Type ID: 26, Item ID: 98 mod\nStats: \"Item Type ID: 26, Item ID: 98\"\nModel: Epic",
+      "Model Name": "Legendary - Fisheye",
+      "Stats (Level 50, Common)": "Legendary cosmetic. Can be used as a skin for Fisheye and related Order sniper rifles and Paladin class mods.",
       "Effects": "Can be used for skin",
       "Requirements": "",
       "Stats": ""
@@ -38874,7 +38874,7 @@
       "Part Type": "Rarity",
       "String": "Ashers Rise Skin",
       "Model Name": "Legendary - Asher's Rise",
-      "Stats (Level 50, Common)": "Can be used for skin\n{59}\nComplex Root\nRarity - Maliwan Sniper Rifle\n{61}\nKatagawa's Revenge\nRarity - Maliwan Sniper Rifle\n{80}\nAsher's Rise\nRarity - Maliwan Sniper Rifle\n{95}\nMAL_SR.comp_01_common\nRarity - Maliwan Sniper Rifle\n{96}\nMAL_SR.comp_02_uncommon\nRarity - Maliwan Sniper Rifle\n{97}\nMAL_SR.comp_03_rare\nRarity - Maliwan Sniper Rifle\n{98}\nMAL_SR.comp_04_epic\nRarity - Maliwan Sniper Rifle\nDescription: Item Type ID: 25, Item ID: 80 mod\nStats: \"Item Type ID: 25, Item ID: 80\"\nEffects: \"Asher's Rise\"\nLegendary: Asher's Rise\nModel: Legendary - Asher's Rise",
+      "Stats (Level 50, Common)": "Can be used as a skin for Asher's Rise, Complex Root, Katagawa's Revenge, and other Maliwan sniper rifles in this family.",
       "Effects": "Can be used for skin",
       "Requirements": "",
       "Stats": ""
@@ -38888,7 +38888,7 @@
       "Part Type": "Rarity",
       "String": "Truck Skin",
       "Model Name": "Legendary - Truck",
-      "Stats (Level 50, Common)": "Can be used for skin\n{1}\nBoomslang\nRarity - Jakobs Sniper Rifle\n{73}\nBorstel Ballista\nRarity - Jakobs Sniper Rifle\n{76}\nTruck\nRarity - Jakobs Sniper Rifle\n{95}\nJAK_SR.comp_01_common\nRarity - Jakobs Sniper Rifle\n{96}\nJAK_SR.comp_02_uncommon\nRarity - Jakobs Sniper Rifle\n{97}\nJAK_SR.comp_03_rare\nRarity - Jakobs Sniper Rifle\n{98}\nJAK_SR.comp_04_epic\nRarity - Jakobs Sniper Rifle\nDescription: Item Type ID: 24, Item ID: 76 mod\nStats: \"Item Type ID: 24, Item ID: 76\"\nEffects: \"Truck\"\nLegendary: Truck\nModel: Legendary - Truck",
+      "Stats (Level 50, Common)": "Can be used as a skin for Truck, Boomslang, Borstel Ballista, and other Jakobs sniper rifles in this family.",
       "Effects": "Can be used for skin",
       "Requirements": "",
       "Stats": ""

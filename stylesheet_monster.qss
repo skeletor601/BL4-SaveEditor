@@ -142,11 +142,12 @@ QWidget#sectionSubNav QPushButton:checked {
     border-color: #B7FF2A;
 }
 QFrame#dashboardNewsWidget {
-    min-width: 380px;
-    min-height: 480px;
-    background: rgba(18, 19, 20, 0.85);
+    min-width: 520px;
+    min-height: 440px;
+    background: rgba(18, 19, 20, 0.88);
     border: 1px solid rgba(90, 98, 106, 0.55);
     border-radius: 16px;
 }
+QFrame#dashboardNewsWidget:hover { border-color: rgba(183, 255, 42, 0.6); }
 QLabel#dashboardNewsTitle { color: #EAF2F6; font-weight: 700; }
 QTextEdit#dashboardNewsText { color: rgba(234, 242, 246, 0.9); }

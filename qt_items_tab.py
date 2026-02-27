@@ -335,11 +335,11 @@ class QtItemsTab(QWidget):
             )
             if not ok:
                 return
-
-            # Reuse the exact same downstream duplication logic by emitting
-            # the same signal multiple times.
-            for _ in range(int(qty)):
-                self.duplicate_item_requested.emit(copy.deepcopy(item_data))
+            # Attach quantity hint so the main window can batch the work and
+            # refresh the UI only once instead of per-duplicate.
+            payload = copy.deepcopy(item_data)
+            payload["__duplicate_qty__"] = int(qty)
+            self.duplicate_item_requested.emit(payload)
         elif chosen == act_del:
             self.remove_item_requested.emit(item_data)
         elif chosen == act_edit:

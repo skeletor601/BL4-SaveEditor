@@ -71,11 +71,11 @@
       "heavy_weapon": "Heavies"
     },
     "dashboard": {
-      "character": { "title": "Character", "description": "Select save, character & YAML" },
-      "inventory": { "title": "Inventory", "description": "Parts translator & backpack" },
-      "weapon_toolbox": { "title": "Weapon Toolbox", "description": "Weapon gen & weapon edit" },
-      "accessories": { "title": "Accessories", "description": "Class mod, grenades, shields, heavies…" },
-      "master_search": { "title": "Master Search", "description": "Search parts & items database" }
+      "character": { "title": "Character", "description": "Select save, character, YAML" },
+      "inventory": { "title": "Inventory", "description": "Parts translator, backpack" },
+      "weapon_toolbox": { "title": "Weapon Toolbox", "description": "Weapon gen, weapon edit" },
+      "accessories": { "title": "Accessories", "description": "Class mod, grenades, shields, more" },
+      "master_search": { "title": "Master Search", "description": "Search parts and items database" }
     },
     "dialogs": {
       "success": "Success",

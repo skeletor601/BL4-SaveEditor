@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
     QGraphicsDropShadowEffect,
 )
 from PyQt6.QtGui import QAction, QIcon, QPixmap, QPainter, QBrush, QColor, QDesktopServices
-from PyQt6.QtCore import QSettings, QTimer, pyqtSlot, QPropertyAnimation, QEasingCurve, Qt, QTimer, QObject, QThread, pyqtSignal, QUrl, QSize
+from PyQt6.QtCore import QSettings, QTimer, pyqtSlot, QPropertyAnimation, QEasingCurve, Qt, QTimer, QObject, QThread, pyqtSignal, QUrl, QSize, QStandardPaths
 
 try:
     from PyQt6.QtWebEngineWidgets import QWebEngineView  # type: ignore
@@ -58,44 +58,47 @@ from dashboard_widget import (
 
 
 class BackgroundWidget(QLabel):
-    """Widget that displays a blurred background image for frosted glass effect."""
-    
+    """Widget that displays the theme background image (no blur)."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("backgroundLayer")
         self._original_pixmap = None
-        self._corner_radius = 20  # Match the window corner radius
-        # Prevent the background from affecting window size
+        self._corner_radius = 20
         from PyQt6.QtWidgets import QSizePolicy
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         self._load_background_image()
-        
+
     def set_theme(self, theme_manager: ThemeManager):
         """Update the wallpaper based on the active theme."""
         self._theme_manager = theme_manager
         self._load_background_image()
 
     def _load_background_image(self):
-        """Load and apply the background image with blur effect."""
-        # Default to neon wallpaper if theme manager isn't available yet.
+        """Load and show the background image (sharp, no blur)."""
+        self.setGraphicsEffect(None)
         fname = getattr(getattr(self, "_theme_manager", None), "get_background_filename", lambda: "bg.jpg")()
         bg_path = resource_loader.get_resource_path(fname)
-        if bg_path and bg_path.exists():
+        if bg_path and Path(bg_path).exists():
             self._original_pixmap = QPixmap(str(bg_path))
-            self._apply_blur()
-        else:
-            # Fallback: solid dark background
-            self.setStyleSheet("background-color: #1a1a20;")
-    
-    def _apply_blur(self):
-        """Apply blur effect to the background."""
-        if self._original_pixmap:
-            blur = QGraphicsBlurEffect(self)
-            blur.setBlurRadius(15)
-            blur.setBlurHints(QGraphicsBlurEffect.BlurHint.QualityHint)
-            self.setGraphicsEffect(blur)
-            # Don't set pixmap directly here, let resizeEvent handle scaling
             self.setScaledContents(True)
+            if self.width() > 0 and self.height() > 0:
+                scaled = self._original_pixmap.scaled(
+                    self.size(),
+                    Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                if scaled.size() != self.size():
+                    x = (scaled.width() - self.width()) // 2
+                    y = (scaled.height() - self.height()) // 2
+                    scaled = scaled.copy(x, y, self.width(), self.height())
+                self.setPixmap(scaled)
+            self.update()
+        else:
+            self._original_pixmap = None
+            self.clear()
+            self.setStyleSheet("background-color: #1a1a20;")
+            self.update()
     
     def resizeEvent(self, event):
         """Handle resize to scale background - maintains aspect ratio, crops to fill."""
@@ -292,10 +295,6 @@ class QtMasterSearchTab(QWidget):
         layout.setSpacing(10)
 
         header_row = QHBoxLayout()
-        title = QLabel("Master Search (Scarlett)")
-        title.setStyleSheet("font-size: 14pt; font-weight: 700;")
-        header_row.addWidget(title)
-
         header_row.addStretch(1)
 
         self.reload_btn = QPushButton("Reload")
@@ -320,12 +319,15 @@ class QtMasterSearchTab(QWidget):
             self.web = QWebEngineView()
             # Allow clipboard access for embedded Master Search (QtWebEngine).
             try:
-                from PyQt6.QtWebEngineCore import QWebEngineSettings  # type: ignore
+                from PyQt6.QtWebEngineCore import QWebEngineSettings, QWebEngineProfile  # type: ignore
                 s = self.web.settings()
                 if hasattr(QWebEngineSettings.WebAttribute, "JavascriptCanAccessClipboard"):
                     s.setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard, True)
                 if hasattr(QWebEngineSettings.WebAttribute, "JavascriptCanPaste"):
                     s.setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanPaste, True)
+                # Route downloads (e.g. Export favorites) to the user's Downloads folder.
+                profile = QWebEngineProfile.defaultProfile()
+                profile.downloadRequested.connect(self._on_master_search_download_requested)
             except Exception:
                 pass
 
@@ -363,11 +365,9 @@ class QtMasterSearchTab(QWidget):
             self.status_lbl.show()
             return
         url = QUrl.fromLocalFile(str(html_path.resolve()))
-        # Pass the active theme to Scarlett (monster vs dark-style).
+        # Pass the active theme so Scarlett HTML can match its CSS (Ion, Lava, etc.).
         try:
-            s = QSettings('SuperExboom', 'BL4SaveEditor')
-            t = (s.value('theme', 'monster') or 'monster').lower()
-            theme = 'dark' if t in ('dark', 'slate', 'obsidian') else 'monster'
+            theme = getattr(getattr(self, "theme_manager", None), "current", "Ion")
             url.setQuery(f"theme={theme}")
         except Exception:
             pass
@@ -388,6 +388,20 @@ class QtMasterSearchTab(QWidget):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(html_path.resolve())))
         except Exception as e:
             QMessageBox.critical(self, "Master Search", f"Failed to open Master Search:\n{e}")
+
+    def _on_master_search_download_requested(self, request):
+        """Save downloads (e.g. Export favorites) to the user's Downloads folder."""
+        try:
+            from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest  # type: ignore
+            download_dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DownloadLocation)
+            if not download_dir:
+                download_dir = str(Path.home() / "Downloads")
+            name = request.suggestedFileName() or "bl4-favorites.json"
+            full_path = str(Path(download_dir) / name)
+            request.setDownloadFileName(full_path)
+            request.accept()
+        except Exception:
+            request.accept()
 
 
 def _maybe_weekly_db_check(self):
@@ -444,7 +458,7 @@ class MainWindow(QMainWindow):
 
         self.controller = SaveGameController()
         self.is_nav_bar_expanded = True
-        self.nav_bar_width_expanded = 150
+        self.nav_bar_width_expanded = 180
         self.nav_bar_width_collapsed = 60
 
         # Apply themed stylesheet
@@ -496,8 +510,8 @@ class MainWindow(QMainWindow):
         
         self.content_stack = QStackedWidget()
         self._create_nav_bar()
+        # Nav bar no longer shown; main content fills full width. Navigation: dashboard cards + Back (home) button.
 
-        main_content_layout.addWidget(self.nav_bar)
         main_content_layout.addWidget(self.content_stack)
         
         root_layout.addLayout(main_content_layout)
@@ -627,6 +641,21 @@ class MainWindow(QMainWindow):
         header_layout.setContentsMargins(15, 5, 10, 5)
         header_layout.setSpacing(10)
 
+        # --- Back (Home) button: go to dashboard ---
+        self.back_home_btn = QPushButton()
+        self.back_home_btn.setObjectName("backHomeButton")
+        self.back_home_btn.setToolTip(self.loc.get("tabs", {}).get("home", "Home"))
+        self.back_home_btn.setFixedSize(36, 36)
+        self.back_home_btn.setIconSize(QSize(24, 24))
+        self.back_home_btn.clicked.connect(lambda: self.switch_to_tab(0))
+        try:
+            icon_path = resource_loader.get_resource_path(Path("assets") / "icons" / "home.png")
+            if icon_path and Path(icon_path).exists():
+                self.back_home_btn.setIcon(QIcon(str(icon_path)))
+        except Exception:
+            self.back_home_btn.setText("🏠")
+        header_layout.addWidget(self.back_home_btn)
+
         # --- Title (single-line) ---
         title_label = QLabel("Borderlands 4 ALL-IN-ONE Save Editor")
         title_label.setObjectName("titleLabel")
@@ -634,17 +663,7 @@ class MainWindow(QMainWindow):
 
         header_layout.addStretch()
 
-        # --- Version badge (pill) ---
-        version_badge = QLabel("NeonVault V2.69")
-        version_badge.setObjectName("versionBadge")
-        version_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header_layout.addWidget(version_badge)
-
-        badge_glow = QGraphicsDropShadowEffect(self)
-        badge_glow.setBlurRadius(18)
-        badge_glow.setOffset(0, 0)
-        badge_glow.setColor(QColor(255, 0, 212, 180))
-        version_badge.setGraphicsEffect(badge_glow)
+        # Optional version badge removed for rebranding; keep layout clean.
 
         self.open_button = QPushButton(self.loc['header']['open'])
         self.open_button.clicked.connect(self.open_action.trigger)
@@ -679,7 +698,12 @@ class MainWindow(QMainWindow):
         self.lang_button.setMenu(self.lang_menu)
         header_layout.addWidget(self.lang_button)
 
-        # Theme toggle button (next to language button)
+        # Credits button (opens local CREDITS.txt in default editor)
+        credits_btn = QPushButton("Credits")
+        credits_btn.clicked.connect(self._open_credits_file)
+        header_layout.addWidget(credits_btn)
+
+        # Theme toggle button (next to language / credits buttons)
         self.theme_button = QPushButton(self.theme_manager.get_theme_icon())
         self.theme_button.setObjectName("themeButton")
         self.theme_button.setFixedWidth(45)
@@ -704,6 +728,18 @@ class MainWindow(QMainWindow):
         header_layout.addWidget(self.minimize_button)
         header_layout.addWidget(self.maximize_button)
         header_layout.addWidget(self.close_button)
+
+    def _open_credits_file(self):
+        try:
+            from pathlib import Path
+            credits_path = resource_loader.get_resource_path("CREDITS.txt")
+            credits_path = Path(credits_path)
+            if not credits_path or not credits_path.exists():
+                QMessageBox.information(self, "Credits", "CREDITS.txt not found next to the application.")
+                return
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(credits_path.resolve())))
+        except Exception as e:
+            QMessageBox.critical(self, "Credits", f"Failed to open credits file:\n{e}")
 
     def toggle_maximize_restore(self):
         if self.isMaximized():
@@ -1174,7 +1210,17 @@ class MainWindow(QMainWindow):
             state_flags = str(item.get("state_flags", 0))
             if not serial:
                 return
-            self.controller.add_item_to_backpack(serial, state_flags)
+
+            # Allow the caller (Items tab) to request multiple duplicates in one go
+            # by attaching a "__duplicate_qty__" field to the payload. This lets us
+            # batch the work and refresh the UI only once instead of per-copy.
+            qty = int(item.get("__duplicate_qty__", 1) or 1)
+            if qty < 1:
+                qty = 1
+
+            for _ in range(qty):
+                self.controller.add_item_to_backpack(serial, state_flags)
+
             self.refresh_all_tabs()
         except Exception as e:
             self.log(f"Duplicate item failed: {e}", force_popup=True)
@@ -1194,16 +1240,40 @@ class MainWindow(QMainWindow):
             self.log(f"Remove item failed: {e}", force_popup=True)
 
     def handle_edit_item(self, item: dict):
-        """Open an item in the Wpn Edit tab by populating the serial fields."""
+        """Open an item in the appropriate editor tab based on its type."""
         try:
+            item_type_en = (item or {}).get("type_en", "") or ""
+            # Weapon types handled by Weapon Edit
+            weapon_types = {"Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"}
+
+            if item_type_en in weapon_types:
+                # Route guns to Weapon Edit (existing behavior)
+                self.switch_to_section_and_sub(SECTION_WEAPON_TOOLBOX, "weapon_edit")
+                if hasattr(self, "weapon_editor_tab") and self.weapon_editor_tab:
+                    if hasattr(self.weapon_editor_tab, "load_from_item"):
+                        self.weapon_editor_tab.load_from_item(item)
+                    else:
+                        serial_b85 = item.get("serial", "") or ""
+                        decoded = item.get("decoded_full", "") or item.get("decoded", "") or ""
+                        self.weapon_editor_tab.serial_b85_entry.setPlainText(str(serial_b85))
+                        if decoded:
+                            self.weapon_editor_tab.serial_decoded_entry.setPlainText(str(decoded))
+                return
+
+            # Heavy, grenade, shield, repkit → Item Edit
+            if item_type_en in {"Heavy Weapon", "Grenade", "Shield", "Repkit"}:
+                self.switch_to_section_and_sub(SECTION_WEAPON_TOOLBOX, "item_edit")
+                if hasattr(self, "item_edit_tab") and self.item_edit_tab:
+                    if hasattr(self.item_edit_tab, "load_from_item"):
+                        self.item_edit_tab.load_from_item(item)
+                return
+
+            # Fallback: default to Weapon Edit for anything else.
             self.switch_to_section_and_sub(SECTION_WEAPON_TOOLBOX, "weapon_edit")
-            # Use the tab's load helper so both Base85 + Decoded populate and parse
-            # regardless of focus state.
             if hasattr(self, "weapon_editor_tab") and self.weapon_editor_tab:
                 if hasattr(self.weapon_editor_tab, "load_from_item"):
                     self.weapon_editor_tab.load_from_item(item)
                 else:
-                    # Fallback (older builds)
                     serial_b85 = item.get("serial", "") or ""
                     decoded = item.get("decoded_full", "") or item.get("decoded", "") or ""
                     self.weapon_editor_tab.serial_b85_entry.setPlainText(str(serial_b85))
@@ -1432,11 +1502,14 @@ class MainWindow(QMainWindow):
         stylesheet = self.theme_manager.get_stylesheet()
         if stylesheet:
             self.setStyleSheet(stylesheet)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
         else:
             print("Warning: stylesheet.qss not found or failed to load.")
 
     def _cycle_theme(self):
-        """Cycle theme: Monster → Industrial → Slate → Obsidian → Monster."""
+        """Cycle theme: Ion → Lava → Phoenix → … → Ion."""
         self.theme_manager.cycle_theme()
         self._apply_themed_stylesheet()
         self._update_theme_button()
@@ -1451,7 +1524,7 @@ class MainWindow(QMainWindow):
             pass
 
     def toggle_theme(self):
-        """Toggle between Monster and Industrial (kept for compatibility)."""
+        """Switch to next theme (kept for compatibility)."""
         self.theme_manager.toggle_theme()
         self._apply_themed_stylesheet()
         self._update_theme_button()

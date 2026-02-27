@@ -82,7 +82,7 @@ class DashboardCard(QFrame):
         self.desc_label.setObjectName("dashboardCardDesc")
         self.desc_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.desc_label.setWordWrap(True)
-        self.desc_label.setMaximumWidth(480)
+        self.desc_label.setMinimumWidth(420)
         layout.addWidget(self.desc_label, 0, Qt.AlignmentFlag.AlignCenter)
         self.setMinimumSize(520, 440)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -110,6 +110,7 @@ class DashboardWidget(QWidget):
         scroll.setStyleSheet("QScrollArea { background: transparent; border: none; }")
         inner = QWidget()
         inner.setObjectName("dashboardInner")
+        inner.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         grid = QGridLayout(inner)
         grid.setSpacing(24)
         dashboard_labels = self.loc.get("dashboard", {})
@@ -120,16 +121,14 @@ class DashboardWidget(QWidget):
 
         section_keys = (SECTION_CHARACTER, SECTION_INVENTORY, SECTION_WEAPON_TOOLBOX, SECTION_ACCESSORIES, SECTION_MASTER_SEARCH)
         self._card_keys = [
-            ("character", "Character", "Select save, character & YAML"),
-            ("inventory", "Inventory", "Parts translator & backpack"),
-            ("weapon_toolbox", "Weapon Toolbox", "Weapon gen & weapon edit"),
-            ("accessories", "Accessories", "Class mod, grenades, shields, heavies…"),
-            ("master_search", "Master Search", "Search parts & items database"),
+            ("character", "Character", "Select save, character, YAML"),
+            ("inventory", "Inventory", "Parts translator, backpack"),
+            ("weapon_toolbox", "Weapon Toolbox", "Weapon gen, weapon edit"),
+            ("accessories", "Accessories", "Class mod, grenades, shields, more"),
+            ("master_search", "Master Search", "Search parts and items database"),
         ]
         self._cards = []
-        # Place main cards in a 2x3-ish grid:
-        #  Character | Inventory | Weapon Toolbox | News (spans 2 rows)
-        #  Accessories | Master Search | (empty)
+        # 3x2 grid: row0 = Character, Inventory, Weapon Toolbox; row1 = Accessories, Master Search, News
         card_positions = {
             0: (0, 0),  # Character
             1: (0, 1),  # Inventory
@@ -147,15 +146,14 @@ class DashboardWidget(QWidget):
             row, col = card_positions.get(i, (0, i))
             grid.addWidget(card, row, col, 1, 1, Qt.AlignmentFlag.AlignCenter)
 
-        # News / Updates panel on the right, spanning two rows
+        # News panel as 6th card in bottom-right so it matches the others
         self.news_widget = DashboardNewsWidget(self.loc, parent=self)
-        grid.addWidget(self.news_widget, 0, 3, 2, 1)
+        grid.addWidget(self.news_widget, 1, 2, 1, 1, Qt.AlignmentFlag.AlignCenter)
 
-        # Stretch so content fills horizontally but stays nicely spaced
+        # Stretch so content fills
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(2, 1)
-        grid.setColumnStretch(3, 1)
         grid.setRowStretch(0, 1)
         grid.setRowStretch(1, 1)
         scroll.setWidget(inner)
@@ -175,18 +173,20 @@ class DashboardWidget(QWidget):
 
 
 class DashboardNewsWidget(QFrame):
-    """News / Updates panel on the dashboard which pulls text from a remote .txt (e.g. GitHub)."""
+    """News / Updates panel on the dashboard; styled like other cards and pulls text from a remote .txt (e.g. GitHub)."""
 
     def __init__(self, loc: dict, parent=None):
         super().__init__(parent)
         self.setObjectName("dashboardNewsWidget")
         self._loc = loc or {}
+        self.setMinimumSize(520, 440)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.manager = QNetworkAccessManager(self)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(8)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(10)
 
         title = QLabel(self._loc.get("news_title", "News & Updates"))
         title.setObjectName("dashboardNewsTitle")
@@ -199,8 +199,6 @@ class DashboardNewsWidget(QFrame):
         self.text = QTextEdit()
         self.text.setReadOnly(True)
         self.text.setObjectName("dashboardNewsText")
-        self.text.setMinimumWidth(380)
-        self.text.setMinimumHeight(420)
         layout.addWidget(self.text, 1)
 
         btn_row = QHBoxLayout()
@@ -242,7 +240,7 @@ class DashboardNewsWidget(QFrame):
         try:
             path = resource_loader.get_resource_path("news.txt")
             if path and Path(path).exists():
-                self.text.setPlainText(path.read_text(encoding="utf-8", errors="ignore"))
+                self.text.setPlainText(Path(path).read_text(encoding="utf-8", errors="ignore"))
             else:
                 self.text.setPlainText("No news yet. Add a news.txt file or configure NEWS_URL.")
         except Exception:

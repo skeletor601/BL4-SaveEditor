@@ -229,15 +229,10 @@ class WeaponEditorTab(QtWidgets.QWidget):
         for label, token in self.skins2:
             self.skin_combo.addItem(label, token)
 
-        self.copy_skin_btn = QtWidgets.QPushButton("Copy skin")
-        self.copy_token_btn = QtWidgets.QPushButton("Copy token")
-        self.paste_skin_btn = QtWidgets.QPushButton("Paste into Deserialize")
+        self.apply_skin_btn = QtWidgets.QPushButton("Add to Gun")
 
         top_row.addWidget(QtWidgets.QLabel("Skin:"))
         top_row.addWidget(self.skin_combo, 1)
-        top_row.addWidget(self.copy_skin_btn)
-        top_row.addWidget(self.copy_token_btn)
-        top_row.addWidget(self.paste_skin_btn)
         skin_layout.addLayout(top_row)
 
         # Preview frame
@@ -263,6 +258,7 @@ class WeaponEditorTab(QtWidgets.QWidget):
         self.skin_preview_token.setStyleSheet("color: rgba(180,180,200,200);")
         meta_col.addWidget(self.skin_preview_name)
         meta_col.addWidget(self.skin_preview_token)
+        meta_col.addWidget(self.apply_skin_btn)
         meta_col.addStretch(1)
 
         prev_l.addWidget(self.skin_preview_label)
@@ -271,31 +267,13 @@ class WeaponEditorTab(QtWidgets.QWidget):
 
         # Wire skin selector actions
         self.skin_combo.currentIndexChanged.connect(self._update_skin_preview)
-        self.copy_skin_btn.clicked.connect(self._copy_skin_code)
-        self.copy_token_btn.clicked.connect(self._copy_skin_token)
-        self.paste_skin_btn.clicked.connect(self._paste_skin_into_deserialize)
+        self.apply_skin_btn.clicked.connect(self._paste_skin_into_deserialize)
         self.skin_preview_label.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
         self.skin_preview_label.mousePressEvent = lambda e: self._open_skin_lightbox()
         self._update_skin_preview()
 
 
         layout.addWidget(skin_box, 2, 0)
-
-        # Wire skin actions
-        self.skin_combo.currentIndexChanged.connect(lambda *_: self._update_skin_preview())
-
-        def _copy_to_clipboard(text_to_copy: str):
-            cb = QtWidgets.QApplication.clipboard()
-            cb.setText(text_to_copy)
-
-        self.copy_skin_btn.clicked.connect(lambda: _copy_to_clipboard(self._formatted_skin_code(self.skin_combo.currentData()) if self.skin_combo.currentData() else ""))
-        self.copy_token_btn.clicked.connect(lambda: _copy_to_clipboard(self.skin_combo.currentData() or ""))
-        self.paste_skin_btn.clicked.connect(lambda: self._append_skin_to_decoded(self.skin_combo.currentData()) if self.skin_combo.currentData() else None)
-
-        # Hover enlarge + click to lightbox
-        self.skin_preview_label.installEventFilter(self)
-        self.skin_preview_label.mousePressEvent = lambda ev: self._open_skin_lightbox()  # type: ignore
-
 
         act_frame = QtWidgets.QFrame()
         act_layout = QtWidgets.QGridLayout(act_frame)
@@ -348,7 +326,7 @@ class WeaponEditorTab(QtWidgets.QWidget):
         self.weapon_name_label = QtWidgets.QLabel(self.weapon_name_label_str)
         self.weapon_name_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         editor_layout.addWidget(self.weapon_name_label, 2, 0, 1, 5)
-        layout.addWidget(editor_frame, 3, 0)
+        layout.addWidget(editor_frame, 4, 0)
         
         parts_frame = QtWidgets.QFrame(); parts_frame.setObjectName("InnerFrame")
         parts_layout = QtWidgets.QVBoxLayout(parts_frame)
@@ -370,7 +348,7 @@ class WeaponEditorTab(QtWidgets.QWidget):
         self.parts_list_layout.setContentsMargins(0, 0, 0, 0)
         self.parts_list_layout.addWidget(QtWidgets.QLabel(self.get_localized_string("parse_serial_to_show_parts")))
         parts_layout.addWidget(parts_list_content)
-        layout.addWidget(parts_frame, 4, 0, QtCore.Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(parts_frame, 5, 0, QtCore.Qt.AlignmentFlag.AlignTop)
         main_frame.setLayout(layout) # Set the grid layout to the main frame
         
         self.serial_b85_entry.textChanged.connect(self.handle_b85_change)
@@ -1042,6 +1020,24 @@ class WeaponEditorTab(QtWidgets.QWidget):
 
     def add_selected_parts(self, window):
         parts_by_mfg = {}
+        # If all selected normal parts are still at quantity 1, offer a simple global quantity prompt.
+        selected_normal_items = [item for item in self.selected_parts_to_add if item['var'].isChecked() and 'entry' in item]
+        global_qty = None
+        if selected_normal_items:
+            all_one = all((item['entry'].text() or "1").strip() in ("", "1") for item in selected_normal_items)
+            if all_one:
+                qty, ok = QtWidgets.QInputDialog.getInt(
+                    self,
+                    self.get_localized_string("quantity_title", "Quantity"),
+                    self.get_localized_string("quantity_prompt", "How many copies of each selected part?"),
+                    1,
+                    1,
+                    99,
+                    1,
+                )
+                if not ok:
+                    return
+                global_qty = qty
         try:
             current_weapon_mfg_id = int(self.serial_decoded_entry.toPlainText().split(',')[0])
         except (ValueError, IndexError):
@@ -1054,8 +1050,16 @@ class WeaponEditorTab(QtWidgets.QWidget):
                 parts_by_mfg.setdefault(mfg_id, [])
                 if item.get('type') == 'elemental':
                     parts_by_mfg[mfg_id].append({'id': item['id'], 'type': 'elemental'})
-                elif 'entry' in item and (num_parts := item['entry'].text()).isdigit():
-                    parts_by_mfg[mfg_id].extend([{'id': item['id'], 'type': 'normal'}] * int(num_parts))
+                elif 'entry' in item:
+                    text_val = item['entry'].text().strip()
+                    if global_qty is not None:
+                        count = global_qty
+                    elif text_val.isdigit():
+                        count = int(text_val)
+                    else:
+                        count = 1
+                    if count > 0:
+                        parts_by_mfg[mfg_id].extend([{'id': item['id'], 'type': 'normal'}] * count)
 
         if not parts_by_mfg:
             return window.close()
@@ -1144,10 +1148,31 @@ if __name__ == '__main__':
 # Skin selector helpers (shared with Weapon Gen)
 # ------------------------------------------------------------------
 def _load_skins2_from_scarlett(self):
-    """Load SKINS2 array from master_search/scarlett.html (value/token + label)."""
+    """Load skin list in this order:
+    1) Static JSON (master_search/db/weapon_skins.json)
+    2) Borderlands Item Editor HTML (dev convenience)
+    3) Legacy SKINS2 array from scarlett.html
+    Returns list of (label, token).
+    """
+    # 1) Preferred: static JSON so the app works without HTML.
+    try:
+        data = resource_loader.load_json_resource("master_search/db/weapon_skins.json")
+        if isinstance(data, list) and data:
+            skins = []
+            for it in data:
+                val = (it.get("value") or "").strip()
+                lab = (it.get("label") or val).strip()
+                if val:
+                    skins.append((lab, val))
+            if skins:
+                return skins
+    except Exception:
+        pass
+
+    # 2) SKINS2 from scarlett.html (fallback).
     try:
         scarlett_path = resource_loader.get_resource_path("master_search/scarlett.html")
-        if not scarlett_path.exists():
+        if not scarlett_path or not scarlett_path.exists():
             return []
         html = scarlett_path.read_text(encoding="utf-8", errors="ignore")
         m = re.search(r"const\s+SKINS2\s*=\s*(\[.*?\])\s*;", html, re.S)
@@ -1165,6 +1190,8 @@ def _load_skins2_from_scarlett(self):
         return []
 
 def _skin_image_path(self, token: str):
+    if token and token.startswith("Cosmetics_Weapon_Shiny_") and token != "Cosmetics_Weapon_Shiny_Ultimate":
+        token = "Cosmetics_Weapon_Shiny_bloodstarved"
     return resource_loader.get_resource_path(f"master_search/skin_images/{token}.png")
 
 def _formatted_skin_code(self, token: str) -> str:
