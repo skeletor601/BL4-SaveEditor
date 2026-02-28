@@ -62,6 +62,7 @@ python -m tools.merge_codes_for_db "C:\Users\picas\Desktop\codes for db.txt"
 
 | Command | Purpose |
 |--------|---------|
+| `python -m tools.clean_class_mods_pngs` | Remove class_mods PNGs with corrupted/non-ASCII filenames (keeps only `name_1.png` … `name_4.png`). Run if you see "Failed to extract" at EXE launch. Use `--dry-run` to preview. |
 | `python scripts/generate_dashboard_icons.py` | Regenerate neon-style dashboard icons in `assets/icons/`. |
 | `python scripts/scrape_game8_weapon_skins.py` | Scrape weapon skin images (filenames must match `weapon_skins.json` "value"). |
 | `python scripts/yaml_to_godrolls.py "path\to\file.yaml"` | Convert YAML to godrolls (example in apps scripts.txt). |
