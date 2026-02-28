@@ -1,151 +1,111 @@
-# Borderlands 4 Save Editor (BL4 AIO)
+# BL4 AIO Save Editor
 
-[中文版](README_CN.md)
+An all-in-one Borderlands 4 save editing platform built for speed, flexibility, and modern workflow.
 
-<h1 align="center">Borderlands 4 Save Editor — BL4 AIO</h1>
-<p align="center"><b>By SuperExboom</b></p>
-
----
-
-### Download (Windows)
-
-**Latest build:** [BL4_AIO.exe](https://github.com/skeletor601/BL4-SaveEditor/releases/download/V3.69/BL4_AIO.exe) (from [Releases](https://github.com/skeletor601/BL4-SaveEditor/releases))
-
-No install needed — run the EXE. Back up your saves before editing.
+Originally forked and completely redesigned, BL4 AIO has evolved into a unified editing ecosystem for both desktop and mobile modders.
 
 ---
 
-### Introduction
-This is a powerful save editor for Borderlands 4, designed to provide comprehensive save editing capabilities. It is completely free and supports both English and Chinese languages.
-This tool allows you to modify character data, manage inventory items, unlock game content, instantly generate and customize gear, and provides powerful code conversion and generation features.
+## 🚀 Download
+
+Download the latest Windows build from the **Releases** tab:
+
+👉 https://github.com/skeletor601/BL4-SaveEditor/releases
+
+• Windows 64-bit standalone executable  
+• No installation required  
 
 ---
 
-### Features
+## ✨ Core Features
 
-#### Save Management
-- Automatically scans game save directories.
-- Supports 64-bit ID decryption and encryption for Steam and Epic platforms.
-- Supports opening, saving, and "save as" for `.sav` files.
-- Automatically backs up original save files.
+### 🔧 Unified Item Editor
+- Grenade, Shield, Repkit, and Heavy editing in a single window
+- Double-click inventory auto-load into the correct editor
+- Integrated on-screen part libraries
+- Live Base85 ↔ Deserialize bidirectional sync
+- Manual edit protection to prevent overwrite conflicts
 
-#### Character Editing
-- Modify character name and current class.
-- Customize difficulty settings.
-- Edit Character Level and Experience Points (XP).
-- Edit Spec Level and Spec Points.
-- Edit Money and Eridium.
-- One-click synchronization of all backpack item levels to the current character level.
+### 🔍 Master Search (Desktop + Mobile HTML Version)
+- High-speed searchable parts database
+- Advanced filtering & legendary highlighting
+- Lightbox-style preview system
+- Mobile-friendly HTML version for phone users
+- Optimized for modders who build and copy parts on mobile devices
 
-#### Unlocks & Presets
-Provides various one-click unlock functions:
-- Remove map fog, discover all locations, unlock all safehouses.
-- Unlock all collectibles, complete all challenges, complete all achievements.
-- Skip story missions, skip all missions.
-- One-click Max Level (Level 50), Max SDU (Storage Deck Upgrades).
-- Unlock Vault gates, unlock all vehicles, unlock all specializations, unlock UVHM mode.
-- Unlock/Max Everything.
+### 🎨 Live Skin Previews
+- Real-time cosmetic preview while typing
+- Click-to-insert skin tokens
+- Automatic formatting injection support
 
-#### Items & Backpack
-- View and manage items in your backpack.
-- Set Item Flags (Common, Favorite, Junk, Groups 1-4).
-- Directly add items to backpack using Base85 codes or decoded format.
-- Read items from backpack for modification or copy their serial numbers.
+### 🔄 One-Click Parts Library Updater
+- Checks for latest database version
+- Secure download & verification
+- Automatic backup before replacement
+- Hot reload support (no restart required)
 
-#### Gear Generation & Editing
-Features dedicated tabs for deep customization of various gear types:
-- **Weapon Editor**: Modify parts, skins, elements, anointments, etc., of existing weapons.
-- **Weapon Generator**: Generate custom weapons from scratch.
-- **Class Mod**: Customize class, rarity, skill bonuses, and passive perks.
-- **Enhancement**: Customize manufacturer, rarity, and perk stacking.
-- **Grenade**: Customize manufacturer, level, rarity, perks, elements, fuses, etc.
-- **Shield**: Customize manufacturer, level, rarity, shield type (Energy/Armor), and perks.
-- **Repkit**: Customize prefix, resistances, firmware, and perks.
-- **Heavy Weapon**: Customize barrel, element, firmware, attachments, etc.
-- All generators support direct "Add to Backpack" or "Copy Serial".
-
-#### Converter & Advanced Tools
-- **Code Converter**: Supports conversion between Base85 encoding and Deserialized data.
-- **Batch Processing**: Batch convert codes and batch import lists of codes into the backpack.
-- **Iterator Generator**: Supports batch generating item sequences by setting value ranges (e.g., generating all skins, iterating through all part combinations).
-- **YAML Editor**: Provides tree view and text view to directly edit the raw YAML data structure of the save file, suitable for advanced users.
+### 🎛 Modern UI
+- Complete dashboard redesign
+- 8 selectable themes
+- Live news feed integration
+- Improved signal handling and stability
 
 ---
 
-### How to Build
+## 📱 HTML / Mobile Version coming soon
 
-Build the Windows EXE from source with Python and PyInstaller.
+A dedicated mobile-friendly Master Search interface is available for modders who primarily work from phones should be available in a few weeks 
 
-**Steps:**
+Designed for:
+- Fast search
+- One-tap copy
+- Quick formatting
+- Lightweight performance
 
-1. Install dependencies:
-   ```bash
-   pip install pyinstaller pillow pyyaml pycryptodome PyQt6 pandas
-   ```
-2. Run the build script (from project root):
-   ```bash
-   python build_exe.py
-   ```
-3. The executable will be at `dist/BL4_AIO.exe`.
-
-Alternatively use `build_windows.bat` or `build_windows.ps1`; they produce the same `dist/BL4_AIO.exe`.
-
-**Maintenance (parts DB, merge codes):** See [MAINTENANCE_COMMANDS.md](MAINTENANCE_COMMANDS.md) for all commands. Common ones:
-- **Merge codes for db:** `python -m tools.merge_codes_for_db "C:\Users\picas\Desktop\codes for db.txt"`
-- **Rebuild universal DB:** `python -m tools.build_universal_parts_db`
-
-**Updating news (in-app welcome text):** The app loads news from the repo’s `news.txt` via GitHub raw URL. To change it:
-1. Edit `news.txt` in the project root (same repo as the code).
-2. Commit and push: `git add news.txt` → `git commit -m "Update news"` → `git push`.
-3. Users see the new text the next time they open the app (or refresh the dashboard).
+Built to support the mobile-heavy modding community.
 
 ---
 
-### Instructions
-1. Launch the software; it will automatically scan default save locations.
-2. Select a save file and enter the corresponding 64-bit ID if prompted (usually auto-detected; if manual input is required, enter your Steam ID or Epic ID).
-3. Once loaded, you can make modifications across the various tabs.
-4. Detailed features are organized by tabs (Character, Items, Weapon Editor, etc.).
-5. Click "Save" to apply changes.
-6. It is recommended to manually backup your save files before editing, although the software creates automatic backups.
+## 🛠 Built With
+
+- Python 3.11
+- PyQt6
+- PyInstaller
+- JSON-based parts database
+- Custom HTML Master Search interface
 
 ---
 
-### Notes
-- Please do not use modified illegal items in online multiplayer to ruin other players' experience.
-- This software is completely free. Do NOT pay for it.
+## ⚠️ Disclaimer
+
+This project is unofficial and is not affiliated with Gearbox Software or 2K Games.
+
+Use responsibly.
 
 ---
 
-### System Requirements
-- **Windows 10** or later (64-bit)
-- No additional runtime installation required for pre-compiled releases
+## 📌 Status
+
+Actively developed.
+
+Version 3.69 introduced:
+- Complete UI overhaul
+- Master Search rework
+- Parts Library Updater
+- Live skin preview injection
+- Structural code cleanup
+
+More features and improvements are planned.
 
 ---
 
-### Troubleshooting
+## 💬 Contact / Support
 
-#### "The ordinal XXX could not be located in dynamic link library" Error
-If you encounter this error when launching the application:
+For feedback, feature requests, or support:
 
-1. **Verify File Integrity**: Ensure the file size matches the official release (~70MB+). If significantly smaller, re-download from the official source.
-2. **Disable Antivirus Temporarily**: Some antivirus software may modify or quarantine parts of the executable.
-3. **Install Visual C++ Redistributable**: Download and install [Microsoft Visual C++ Redistributable 2022 (x64)](https://aka.ms/vs/17/release/vc_redist.x64.exe).
-4. **Run as Administrator**: Right-click the executable and select "Run as administrator".
-5. **Windows 7/8 Users**: This application is designed for Windows 10+. Older Windows versions may lack required system components.
+Discord: **DrLecter6969**  
+GitHub Issues are also welcome.
 
 ---
 
-### Special Thanks
-- **@Nicnl** and **@InflamedSebi** - For Base85 deserialize huge work
-- **@Whiteshark-2022** and **@Mattmab** - For Class mods icon, Enhancement UI design and data
-- **@THATDONFC** - For Weapon builder UI design
-
-
-## Building Windows EXE (BL4 AIO)
-
-- Create/activate your venv, install requirements.
-- Run `build_windows.bat` (or `build_windows.ps1`).
-- Output: `dist/BL4_AIO.exe`
-
-The EXE name controls the desktop shortcut name in Windows.
+BL4 AIO continues evolving into a complete all-in-one Borderlands 4 save editing platform.
