@@ -106,3 +106,4 @@ Shield_perk_main_ID,Part_ID,Part_type,Stat,Description
 237,24,Perk,拳击手,近战攻击时，消耗1个护甲段以提升+20%伤害
 237,25,Perk,拳击手,近战攻击时，消耗1个护甲段以提升+30%伤害
 237,31,Perk,拾荒者,护甲段填充完毕时，最高补充当前枪械弹匣容量10%的弹药
+246,21,PLACEHOLDER,Included when no Elemental Resistance is used,Included when no Elemental Resistance is used
