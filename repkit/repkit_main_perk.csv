@@ -100,3 +100,10 @@ Repkit_perk_main_ID,Part_ID,Part_type,Stat,Description
 243,106,Perfix,兆,最多回复量&持续回复&最长冷却时间
 243,112,Firmware,风险启用,
 243,113,Firmware,技能工艺,
+243,53,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,55,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,72,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,76,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,78,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,89,"Lower healing, longer cooldown","-Healing, -HoT, +CD","-Healing, -HoT, +CD"
+243,95,PLACEHOLDER,No Stat Changes,No Stat Changes

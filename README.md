@@ -90,6 +90,10 @@ Build the Windows EXE from source with Python and PyInstaller.
 
 Alternatively use `build_windows.bat` or `build_windows.ps1`; they produce the same `dist/BL4_AIO.exe`.
 
+**Maintenance (parts DB, merge codes):** See [MAINTENANCE_COMMANDS.md](MAINTENANCE_COMMANDS.md) for all commands. Common ones:
+- **Merge codes for db:** `python -m tools.merge_codes_for_db "C:\Users\picas\Desktop\codes for db.txt"`
+- **Rebuild universal DB:** `python -m tools.build_universal_parts_db`
+
 ---
 
 ### Instructions
