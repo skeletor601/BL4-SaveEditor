@@ -36,12 +36,16 @@ def collect_datas() -> list:
     for path in glob.glob("class_mods/*.json") + glob.glob("class_mods/*.csv"):
         if os.path.isfile(path):
             datas.append((path.replace("\\", "/"), "class_mods"))
+    # Only bundle ASCII-named PNGs to avoid PyInstaller extract errors (encoding)
+    _class_mod_png_re = __import__("re").compile(r"^[a-zA-Z0-9_!]+_[1-4]\.png$")
     for sub in ("Amon", "Harlowe", "Rafa", "Vex"):
         subdir = root / "class_mods" / sub
         if subdir.exists():
             for path in glob.glob(f"class_mods/{sub}/*.png"):
                 if os.path.isfile(path):
-                    datas.append((path.replace("\\", "/"), f"class_mods/{sub}"))
+                    name = os.path.basename(path)
+                    if _class_mod_png_re.match(name):
+                        datas.append((path.replace("\\", "/"), f"class_mods/{sub}"))
 
     # Item-type data folders (csv + json)
     for folder in ("enhancement", "weapon_edit", "grenade", "shield", "repkit", "heavy"):

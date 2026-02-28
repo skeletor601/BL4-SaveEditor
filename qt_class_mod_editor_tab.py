@@ -799,11 +799,11 @@ class QtClassModEditorTab(QWidget):
         self.add_to_backpack_requested.emit(serial, flag)
 
     def get_skill_icon(self, skill_name, class_name):
+        # ASCII-only filename so PyInstaller/extraction works on all systems (no encoding issues)
         norm = unicodedata.normalize('NFKD', skill_name)
-        norm = ''.join(c for c in norm if not unicodedata.combining(c))
-        norm = norm.replace("'", "").replace(" ", "_")
+        norm = "".join(c for c in norm if not unicodedata.combining(c))
+        norm = norm.replace("'", "").replace("'", "").replace(" ", "_")
         safe_name = re.sub(r"[^a-zA-Z0-9_!]", "", norm).lower()
-        safe_name = re.sub(r"[^a-zA-Z0-9_!áéíóúñÁÉÍÓÚÑ]", "", skill_name.replace("'", "").replace("'", "").replace(" ", "_")).lower()
         suffix_map = {"Vex": "_1", "Rafa": "_2", "Harlowe": "_3", "Amon": "_4"}
         suffix = suffix_map.get(class_name, "")
         filename = f"{safe_name}{suffix}.png"
