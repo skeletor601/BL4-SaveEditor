@@ -17,6 +17,170 @@ import b_encoder
 import resource_loader
 import lookup
 
+class TranslateWorker(QObject):
+    """Runs parts DB load + lookup in background so Single Converter stays responsive."""
+    finished = pyqtSignal(str, str)  # output_text, error_msg (empty if success)
+
+    def __init__(self, raw, resolve_section=None, section_prefixes=None):
+        super().__init__()
+        self.raw = raw
+        self.resolve_section = resolve_section
+        self.section_prefixes = section_prefixes or {}
+
+    def run(self):
+        try:
+            decoded_str, err_msg = None, None
+            if self.raw.startswith("@"):
+                decoded_str, _, err_msg = decoder_logic.decode_serial_to_string(self.raw)
+            else:
+                decoded_str, err_msg = self.raw, None
+            if err_msg or not decoded_str:
+                self.finished.emit("", err_msg or "Invalid input")
+                return
+            parts_list, _ = self._parse_parts(decoded_str)
+            if not parts_list:
+                self.finished.emit("No part tokens found in the code.", "")
+                return
+            db = resource_loader.load_parts_db()
+            by_code = {}
+            by_key = {}
+            if db and "rows" in db:
+                for row in db.get("rows", []):
+                    mfg = (row.get("Manufacturer") or "").strip()
+                    wtype = (row.get("Weapon Type") or "").strip()
+                    pid = (row.get("ID") or "").strip()
+                    code = (row.get("code") or "").strip()
+                    if code:
+                        if code not in by_code:
+                            by_code[code] = []
+                        by_code[code].append(row)
+                    if mfg and pid:
+                        key = (mfg, wtype, pid)
+                        if key not in by_key:
+                            by_key[key] = []
+                        by_key[key].append(row)
+            elemental = {}
+            try:
+                path = resource_loader.get_resource_path("weapon_edit/elemental.csv")
+                if path.exists():
+                    with open(path, "r", encoding="utf-8") as f:
+                        for row in csv.DictReader(f):
+                            try:
+                                pid = int((row.get("Part_ID") or "").strip())
+                                stat = (row.get("Stat") or "").strip()
+                                if stat:
+                                    elemental[pid] = stat
+                            except (ValueError, KeyError):
+                                continue
+            except Exception:
+                pass
+            skin_names = {}
+            try:
+                data = resource_loader.load_json_resource("master_search/db/weapon_skin_names.json")
+                if isinstance(data, dict):
+                    skin_names = {str(k): str(v).strip() for k, v in data.items() if v}
+            except Exception:
+                pass
+            counts = Counter()
+            for p in parts_list:
+                if p[0] == "skin":
+                    skin_id = p[1]
+                    skin_label = skin_names.get(str(skin_id), f"Skin ID {skin_id}")
+                    counts[("Skin", skin_label, "", f'"c", {skin_id}')] += 1
+                else:
+                    type_id, part_id = p[0], p[1]
+                    res = self._lookup(type_id, part_id, by_code, by_key, elemental)
+                    # Ensure 4-tuple (some DB/code paths may return 3)
+                    if len(res) != 4:
+                        res = (tuple(res) + ("",) * 4)[:4]
+                    pt, s, stats, code_key = res
+                    counts[(pt, s, stats, code_key)] += 1
+            lines = []
+            for item, qty in sorted(
+                counts.items(), key=lambda x: (-x[1], x[0][0], x[0][1])
+            ):
+                # Keys may be 3-tuple (legacy skin) or 4-tuple
+                pt, s, stats, code_key = (tuple(item) + ("",) * 4)[:4]
+                if stats:
+                    lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}  —  {stats}")
+                else:
+                    lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}")
+            self.finished.emit("\n".join(lines) if lines else "No parts.", "")
+        except Exception as e:
+            self.finished.emit("", str(e))
+
+    def _header_mfg_id(self, decoded_str):
+        if "||" not in decoded_str:
+            return None
+        header = decoded_str.split("||", 1)[0].strip()
+        try:
+            first = header.split("|")[0].strip().split(",")[0].strip()
+            return int(first)
+        except (ValueError, IndexError):
+            return None
+
+    def _parse_parts(self, decoded_str):
+        if "||" not in decoded_str:
+            return [], None
+        header, parts_part = decoded_str.split("||", 1)
+        header_mfg = self._header_mfg_id(decoded_str)
+        out = []
+        for m in re.finditer(r'\{(\d+)(?::(\d+|\[[\d\s]+\]))?\}|\"c\",\s*(\d+)', parts_part):
+            if m.group(3):
+                out.append(("skin", int(m.group(3))))
+                continue
+            outer, inner = int(m.group(1)), m.group(2)
+            if inner:
+                if "[" in inner:
+                    for sid in inner.strip("[]").split():
+                        try:
+                            out.append((outer, int(sid)))
+                        except ValueError:
+                            pass
+                else:
+                    out.append((outer, int(inner)))
+            else:
+                tid = header_mfg if header_mfg is not None else outer
+                out.append((tid, outer))
+        return out, header_mfg
+
+    def _pick_row(self, rows):
+        if not rows:
+            return {}
+        section = self.resolve_section
+        if not section:
+            return rows[0]
+        prefixes = self.section_prefixes.get(section)
+        if not prefixes:
+            return rows[0]
+        for r in rows:
+            src = (r.get("source") or "").strip()
+            if any(src == p or src.startswith(p + "_") for p in prefixes):
+                return r
+        return rows[0]
+
+    def _lookup(self, type_id, part_id, by_code, by_key, elemental):
+        code_key = f"{{{type_id}:{part_id}}}"
+        if type_id == 1:
+            name = elemental.get(part_id)
+            if name:
+                return ("Elemental", name, "", code_key)
+        rows = by_code.get(code_key)
+        if not rows:
+            mfg, wtype, _ = lookup.get_kind_enums(type_id)
+            key = (mfg, wtype, str(part_id))
+            rows = by_key.get(key)
+        if not rows:
+            return ("Unknown", code_key, "", code_key)
+        row = self._pick_row(rows)
+        if not isinstance(row, dict):
+            return ("Unknown", code_key, "", code_key)
+        pt = (row.get("Part Type") or "Part").strip()
+        s = (row.get("String") or row.get("Model Name") or "").strip() or f"ID {part_id}"
+        stats = (row.get("Stats (Level 50, Common)") or row.get("Stats") or "").strip()
+        return (pt, s, stats, code_key)
+
+
 class BatchConverterWorker(QObject):
     """后台工作线程，用于批量转换"""
     progress = pyqtSignal(int, int) # current, total
@@ -355,57 +519,40 @@ class QtConverterTab(QWidget):
         return rows[0]
 
     def perform_translate(self):
-        """Parse input (Base85 or deserialized), then show part list with quantities."""
+        """Parse input (Base85 or deserialized), then show part list with quantities. Runs in background thread."""
         raw = self.translate_input.toPlainText().strip()
         self.part_list_output.clear()
         if not raw:
             self.single_status_label.setText(self.loc['labels']['status_ready'])
             self.single_status_label.setStyleSheet("")
             return
-
         self.single_status_label.setText(self.loc['labels']['status_processing'])
         self.single_status_label.setStyleSheet("")
-        decoded_str = None
-        err_msg = None
-        try:
-            if raw.startswith("@"):
-                decoded_str, _, err_msg = decoder_logic.decode_serial_to_string(raw)
-            else:
-                decoded_str = raw
-                err_msg = None
-        except Exception as e:
-            err_msg = str(e)
-        if err_msg or not decoded_str:
-            self.single_status_label.setText(self.loc['labels']['status_error'].format(error=err_msg or "Invalid input"))
+        self.translate_btn.setEnabled(False)
+        self._translate_thread = QThread()
+        self._translate_worker = TranslateWorker(
+            raw,
+            resolve_section=getattr(self, "_resolve_section", None),
+            section_prefixes=getattr(self, "_section_source_prefixes", None),
+        )
+        self._translate_worker.moveToThread(self._translate_thread)
+        self._translate_thread.started.connect(self._translate_worker.run)
+        self._translate_worker.finished.connect(self._on_translate_finished)
+        self._translate_worker.finished.connect(self._translate_thread.quit)
+        self._translate_worker.finished.connect(self._translate_worker.deleteLater)
+        self._translate_thread.finished.connect(self._translate_thread.deleteLater)
+        self._translate_thread.start()
+
+    def _on_translate_finished(self, output_text, error_msg):
+        self.translate_btn.setEnabled(True)
+        if error_msg:
+            self.single_status_label.setText(self.loc['labels']['status_error'].format(error=error_msg))
             self.single_status_label.setStyleSheet("color: red;")
             self.part_list_output.setPlainText("")
-            return
-
-        parts_list, _ = self._parse_parts_from_decoded(decoded_str)
-        if not parts_list:
-            self.part_list_output.setPlainText("No part tokens found in the code.")
+        else:
+            self.part_list_output.setPlainText(output_text)
             self.single_status_label.setText(self.loc['labels']['status_success'])
             self.single_status_label.setStyleSheet("color: green;")
-            return
-
-        counts = Counter()
-        for p in parts_list:
-            if p[0] == "skin":
-                counts[("Skin", f'Skin ID {p[1]}', "")] += 1
-            else:
-                type_id, part_id = p[0], p[1]
-                pt, s, stats, code_key = self._lookup_part_display(type_id, part_id)
-                counts[(pt, s, stats, code_key)] += 1
-
-        lines = []
-        for (pt, s, stats, code_key), qty in sorted(counts.items(), key=lambda x: (-x[1], x[0][0], x[0][1])):
-            if stats:
-                lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}  —  {stats}")
-            else:
-                lines.append(f"  {qty}×  {code_key}  [{pt}]  {s}")
-        self.part_list_output.setPlainText("\n".join(lines) if lines else "No parts.")
-        self.single_status_label.setText(self.loc['labels']['status_success'])
-        self.single_status_label.setStyleSheet("color: green;")
 
     def on_single_input_changed(self):
         """No-op: we use explicit Translate button for the new single section."""
