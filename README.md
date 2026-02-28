@@ -94,6 +94,11 @@ Alternatively use `build_windows.bat` or `build_windows.ps1`; they produce the s
 - **Merge codes for db:** `python -m tools.merge_codes_for_db "C:\Users\picas\Desktop\codes for db.txt"`
 - **Rebuild universal DB:** `python -m tools.build_universal_parts_db`
 
+**Updating news (in-app welcome text):** The app loads news from the repo’s `news.txt` via GitHub raw URL. To change it:
+1. Edit `news.txt` in the project root (same repo as the code).
+2. Commit and push: `git add news.txt` → `git commit -m "Update news"` → `git push`.
+3. Users see the new text the next time they open the app (or refresh the dashboard).
+
 ---
 
 ### Instructions
