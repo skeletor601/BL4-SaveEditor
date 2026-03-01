@@ -1,0 +1,4 @@
+Change themes top right, next to Credits Button.
+
+Welcome to the BL4 AIO Save Editor Web. If you have any problems or need help, message on Discord.
+Repo: https://github.com/skeletor601/BL4-SaveEditor

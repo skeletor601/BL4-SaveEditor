@@ -1,0 +1,5 @@
+[
+  {"code": "{284:1}", "itemType": "Sure Shot", "rarity": "Legendary", "partName": "ATL_Enhancement.part_core_atl_sureshot", "effect": "Projectiles from Guns with Atlas-licensed parts automatically attach a Tracker Dart every 25s", "category": "Enhancement"},
+  {"code": "{296:11}", "itemType": "Trauma Bond", "rarity": "Legendary", "partName": "BOR_Enhancement.part_core_bor_traumabond", "effect": "After Reloading an empty Magazine, Guns with Ripper-licensed parts have a 30% Chance to increase the next Magazine's Fire Rate +100%", "category": "Enhancement"},
+  {"code": "{296:12}", "itemType": "Short Circuit", "rarity": "Legendary", "partName": "BOR_Enhancement.part_core_bor_shortcircuit", "effect": "Short Circuit effect description", "category": "Enhancement"}
+]
