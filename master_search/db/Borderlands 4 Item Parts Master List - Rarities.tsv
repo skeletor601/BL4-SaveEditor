@@ -1,0 +1,441 @@
+Manufacturer	Item Type	Item Type String	Item Type ID	Item ID	Legendary	Comment
+Atlas	Enhancement	ATL_Enhancement.comp_01_common	284	8		
+Atlas	Enhancement	ATL_Enhancement.comp_02_uncommon	284	7		
+Atlas	Enhancement	ATL_Enhancement.comp_03_rare	284	6		
+Atlas	Enhancement	ATL_Enhancement.comp_04_epic	284	5		
+Atlas	Enhancement	ATL_Enhancement.comp_05_legendary	284	4		
+COV	Enhancement	COV_Enhancement.comp_01_common	286	8		
+COV	Enhancement	COV_Enhancement.comp_02_uncommon	286	7		
+COV	Enhancement	COV_Enhancement.comp_03_rare	286	6		
+COV	Enhancement	COV_Enhancement.comp_04_epic	286	5		
+COV	Enhancement	COV_Enhancement.comp_05_legendary	286	4		
+Daedalus	Assault Rifle	DAD_AR.comp_01_common	13	95		
+Daedalus	Assault Rifle	DAD_AR.comp_02_uncommon	13	96		
+Daedalus	Assault Rifle	DAD_AR.comp_03_rare	13	97		
+Daedalus	Assault Rifle	DAD_AR.comp_04_epic	13	98		
+Daedalus	Assault Rifle	DAD_AR.comp_05_legendary_FirstImpression	13	85	First Impression	Pre-Order
+Daedalus	Assault Rifle	DAD_AR.comp_05_legendary_Lumberjack	13	72	Bloody Lumberjack	
+Daedalus	Assault Rifle	DAD_AR.comp_05_legendary_OM	13	100	Oscar Mike	
+Daedalus	Assault Rifle	DAD_AR.comp_05_legendary_star_helix	13	73	Star Helix	
+Daedalus	Enhancement	DAD_Enhancement.comp_01_common	299	4		
+Daedalus	Enhancement	DAD_Enhancement.comp_02_uncommon	299	5		
+Daedalus	Enhancement	DAD_Enhancement.comp_03_rare	299	6		
+Daedalus	Enhancement	DAD_Enhancement.comp_04_epic	299	7		
+Daedalus	Enhancement	DAD_Enhancement.comp_05_legendary	299	8		
+Daedalus	Grenade	dad_grenade_gadget.comp_01_common	270	1		
+Daedalus	Grenade	dad_grenade_gadget.comp_02_uncommon	270	2		
+Daedalus	Grenade	dad_grenade_gadget.comp_03_rare	270	3		
+Daedalus	Grenade	dad_grenade_gadget.comp_04_epic	270	4		
+Daedalus	Grenade	dad_grenade_gadget.comp_05_legendary_Axe	270	7	Buzz Axe	
+Daedalus	Grenade	dad_grenade_gadget.comp_05_legendary_fuse	270	9	Fuse	
+Daedalus	Pistol	DAD_PS.comp_01_common	2	95		
+Daedalus	Pistol	DAD_PS.comp_02_uncommon	2	96		
+Daedalus	Pistol	DAD_PS.comp_03_rare	2	97		
+Daedalus	Pistol	DAD_PS.comp_04_epic	2	98		
+Daedalus	Pistol	DAD_PS.comp_05_legendary_rangefinder	2	59	Rangefinder	
+Daedalus	Pistol	DAD_PS.comp_05_legendary_Zipgun	2	54	Zipper	
+Daedalus	Repkit	dad_repair_kit.comp_01_common	277	3		
+Daedalus	Repkit	dad_repair_kit.comp_02_uncommon	277	4		
+Daedalus	Repkit	dad_repair_kit.comp_03_rare	277	5		
+Daedalus	Repkit	dad_repair_kit.comp_04_epic	277	6		
+Daedalus	Repkit	dad_repair_kit.comp_05_legendary_Pacemaker	277	7	Pacemaker	
+Daedalus	Shield	dad_shield.comp_01_common	312	1		
+Daedalus	Shield	dad_shield.comp_02_uncommon	312	2		
+Daedalus	Shield	dad_shield.comp_03_rare	312	3		
+Daedalus	Shield	dad_shield.comp_04_epic	312	4		
+Daedalus	Shield	dad_shield.comp_05_legendary_angel	312	7	Guardian Angel	
+Daedalus	Shield	dad_shield.comp_05_legendary_SuperSoldier	312	9	Super Soldier	
+Daedalus	Shotgun	DAD_SG.comp_01_common	8	95		
+Daedalus	Shotgun	DAD_SG.comp_02_uncommon	8	96		
+Daedalus	Shotgun	DAD_SG.comp_03_rare	8	97		
+Daedalus	Shotgun	DAD_SG.comp_04_epic	8	98		
+Daedalus	Shotgun	DAD_SG.comp_05_legendary_bod	8	53	Bod	
+Daedalus	Shotgun	DAD_SG.comp_05_legendary_HeartGUn	8	55	Acey May	
+Daedalus	SMG	DAD_SM.comp_01_common	20	95		
+Daedalus	SMG	DAD_SM.comp_02_uncommon	20	96		
+Daedalus	SMG	DAD_SM.comp_03_rare	20	97		
+Daedalus	SMG	DAD_SM.comp_04_epic	20	98		
+Daedalus	SMG	DAD_SM.comp_05_legendary_bloodstarved	20	63	Darkbeast	
+Daedalus	SMG	DAD_SM.comp_05_legendary_Conglomerate	20	59	Frangible	Removed from game
+Daedalus	SMG	DAD_SM.comp_05_legendary_loarmaster	20	68	Rogue	Partial Implementation
+Hyperion	Enhancement	HYP_Enhancement.comp_01_common	264	4		
+Hyperion	Enhancement	HYP_Enhancement.comp_02_uncommon	264	5		
+Hyperion	Enhancement	HYP_Enhancement.comp_03_rare	264	6		
+Hyperion	Enhancement	HYP_Enhancement.comp_04_epic	264	7		
+Hyperion	Enhancement	HYP_Enhancement.comp_05_legendary	264	8		
+Jakobs	Assault Rifle	JAK_AR.comp_01_common	27	95		
+Jakobs	Assault Rifle	JAK_AR.comp_02_uncommon	27	96		
+Jakobs	Assault Rifle	JAK_AR.comp_03_rare	27	97		
+Jakobs	Assault Rifle	JAK_AR.comp_04_epic	27	98		
+Jakobs	Assault Rifle	JAK_AR.comp_05_legendary_BonnieClyde	27	1	Bonnie and Clyde	
+Jakobs	Assault Rifle	JAK_AR.comp_05_legendary_rowan	27	74	Rowan's Charge	
+Jakobs	Assault Rifle	JAK_AR.comp_05_legendary_screenwriter	27	77	Not implemented - purple gun with no damage	
+Jakobs	Enhancement	JAK_Enhancement.comp_01_common	268	4		
+Jakobs	Enhancement	JAK_Enhancement.comp_02_uncommon	268	5		
+Jakobs	Enhancement	JAK_Enhancement.comp_03_rare	268	6		
+Jakobs	Enhancement	JAK_Enhancement.comp_04_epic	268	7		
+Jakobs	Enhancement	JAK_Enhancement.comp_05_legendary	268	8		
+Jakobs	Grenade	jak_grenade_gadget.comp_01_common	267	4		
+Jakobs	Grenade	jak_grenade_gadget.comp_02_uncommon	267	5		
+Jakobs	Grenade	jak_grenade_gadget.comp_03_rare	267	6		
+Jakobs	Grenade	jak_grenade_gadget.comp_04_epic	267	7		
+Jakobs	Grenade	jak_grenade_gadget.comp_05_legendary_ShoKunai	267	12	Sho Kunai	
+Jakobs	Grenade	jak_grenade_gadget.comp_05_spinning_blade	267	10	Spinning Blade	
+Jakobs	Pistol	JAK_PS.comp_01_common	3	95		
+Jakobs	Pistol	JAK_PS.comp_02_uncommon	3	96		
+Jakobs	Pistol	JAK_PS.comp_03_rare	3	97		
+Jakobs	Pistol	JAK_PS.comp_04_epic	3	98		
+Jakobs	Pistol	JAK_PS.comp_05_legendary_kingsgambit	3	76	King's Gambit	
+Jakobs	Pistol	JAK_PS.comp_05_legendary_phantom_flame	3	78	Phantom Flame	
+Jakobs	Pistol	JAK_PS.comp_05_legendary_QuickDraw	3	79	San Saba Songbird	
+Jakobs	Pistol	JAK_PS.comp_05_legendary_seventh_sense	3	81	Seventh Sense	
+Jakobs	Repkit	jak_repair_kit.comp_01_common	265	1		
+Jakobs	Repkit	jak_repair_kit.comp_02_uncommon	265	2		
+Jakobs	Repkit	jak_repair_kit.comp_03_rare	265	3		
+Jakobs	Repkit	jak_repair_kit.comp_04_epic	265	4		
+Jakobs	Repkit	jak_repair_kit.comp_05_legendary_Defibrillator	265	5	Defibrillator	
+Jakobs	Shield	jak_shield.comp_01_common	306	1		
+Jakobs	Shield	jak_shield.comp_02_uncommon	306	2		
+Jakobs	Shield	jak_shield.comp_03_rare	306	3		
+Jakobs	Shield	jak_shield.comp_04_epic	306	4		
+Jakobs	Shield	jak_shield.comp_05_legendary_barrelAged	306	6	Aged Cask	
+Jakobs	Shield	jak_shield.comp_05_legendary_OnionLayeredGuard	306	9	Onion	
+Jakobs	Shotgun	JAK_SG.comp_01_common	9	95		
+Jakobs	Shotgun	JAK_SG.comp_02_uncommon	9	96		
+Jakobs	Shotgun	JAK_SG.comp_03_rare	9	97		
+Jakobs	Shotgun	JAK_SG.comp_04_epic	9	98		
+Jakobs	Shotgun	JAK_SG.comp_05_legendary_Hellwalker	9	83	Hellwalker	
+Jakobs	Shotgun	JAK_SG.comp_05_legendary_RainbowVomit	9	85	Rainbow Vomit	
+Jakobs	Shotgun	JAK_SG.comp_05_legendary_Slugger	9	80	Hot Slugger	
+Jakobs	Shotgun	JAK_SG.comp_05_legendary_TKsWave	9	91	T.K's Wave	
+Jakobs	Sniper Rifle	JAK_SR.comp_01_common	24	95		
+Jakobs	Sniper Rifle	JAK_SR.comp_02_uncommon	24	96		
+Jakobs	Sniper Rifle	JAK_SR.comp_03_rare	24	97		
+Jakobs	Sniper Rifle	JAK_SR.comp_04_epic	24	98		
+Jakobs	Sniper Rifle	JAK_SR.comp_05_legendary_ballista	24	73	Borstel Ballista	
+Jakobs	Sniper Rifle	JAK_SR.comp_05_legendary_Boomslang	24	1	Boomslang	
+Jakobs	Sniper Rifle	JAK_SR.comp_05_legendary_Truck	24	76	Truck	
+Maliwan	Enhancement	MAL_Enhancement.comp_01_common	271	4		
+Maliwan	Enhancement	MAL_Enhancement.comp_02_uncommon	271	5		
+Maliwan	Enhancement	MAL_Enhancement.comp_03_rare	271	6		
+Maliwan	Enhancement	MAL_Enhancement.comp_04_epic	271	7		
+Maliwan	Enhancement	MAL_Enhancement.comp_05_legendary	271	8		
+Maliwan	Grenade	mal_grenade_gadget.comp_01_common	263	4		
+Maliwan	Grenade	mal_grenade_gadget.comp_02_uncommon	263	5		
+Maliwan	Grenade	mal_grenade_gadget.comp_03_rare	263	6		
+Maliwan	Grenade	mal_grenade_gadget.comp_04_epic	263	7		
+Maliwan	Grenade	mal_grenade_gadget.comp_05_legendary_disco_disc	263	9	Destructo Disco	
+Maliwan	Grenade	mal_grenade_gadget.comp_05_legendary_recursive	263	11	Recursive	
+Maliwan	Heavy Weapon	MAL_HW.comp_01_common	289	20		
+Maliwan	Heavy Weapon	MAL_HW.comp_02_uncommon	289	21		
+Maliwan	Heavy Weapon	MAL_HW.comp_03_rare	289	22		
+Maliwan	Heavy Weapon	MAL_HW.comp_04_epic	289	23		
+Maliwan	Heavy Weapon	MAL_HW.comp_05_legendary_BottledLightning	289	1	Bottled Lightning	
+Maliwan	Heavy Weapon	MAL_HW.comp_05_legendary_GammaVoid	289	25	Gamma Void	
+Maliwan	Repkit	mal_repair_kit.comp_01_common	266	1		
+Maliwan	Repkit	mal_repair_kit.comp_02_uncommon	266	2		
+Maliwan	Repkit	mal_repair_kit.comp_03_rare	266	3		
+Maliwan	Repkit	mal_repair_kit.comp_04_epic	266	4		
+Maliwan	Repkit	mal_repair_kit.comp_05_legendary_BloodAnalyzer	266	5	Blood Analyzer	
+Maliwan	Shield	mal_shield.comp_01_common	279	3		
+Maliwan	Shield	mal_shield.comp_02_uncommon	279	4		
+Maliwan	Shield	mal_shield.comp_03_rare	279	5		
+Maliwan	Shield	mal_shield.comp_04_epic	279	6		
+Maliwan	Shield	mal_shield.comp_05_momento	279	9	Pandoran Momento	
+Maliwan	Shield	mal_shield.comp_05_supernova	279	10	Extra Medium	
+Maliwan	Shotgun	MAL_SG.comp_01_common	10	95		
+Maliwan	Shotgun	MAL_SG.comp_02_uncommon	10	96		
+Maliwan	Shotgun	MAL_SG.comp_03_rare	10	97		
+Maliwan	Shotgun	MAL_SG.comp_04_epic	10	98		
+Maliwan	Shotgun	MAL_SG.comp_05_legendary_Kaleidosplode	10	1	Kaleidosplode	
+Maliwan	Shotgun	MAL_SG.comp_05_legendary_Kickballer	10	100	Kickballer	
+Maliwan	Shotgun	MAL_SG.comp_05_legendary_Sweet_Embrace	10	57	Sweet Embrace	
+Maliwan	SMG	MAL_SM.comp_01_common	21	58		
+Maliwan	SMG	MAL_SM.comp_02_uncommon	21	96		
+Maliwan	SMG	MAL_SM.comp_03_rare	21	97		
+Maliwan	SMG	MAL_SM.comp_04_epic	21	98		
+Maliwan	SMG	MAL_SM.comp_05_legendary_Firework	21	83	Matador's Match	Pre-Order
+Maliwan	SMG	MAL_SM.comp_05_legendary_OhmIGot	21	60	Ohm I Got	
+Maliwan	SMG	MAL_SM.comp_05_legendary_PlasmaCoil	21	63	Plasma Coil	
+Maliwan	Sniper Rifle	MAL_SR.comp_01_common	25	95		
+Maliwan	Sniper Rifle	MAL_SR.comp_02_uncommon	25	96		
+Maliwan	Sniper Rifle	MAL_SR.comp_03_rare	25	97		
+Maliwan	Sniper Rifle	MAL_SR.comp_04_epic	25	98		
+Maliwan	Sniper Rifle	MAL_SR.comp_05_legendary_asher	25	80	Asher's Rise	
+Maliwan	Sniper Rifle	MAL_SR.comp_05_legendary_complex_root	25	59	Complex Root	
+Maliwan	Sniper Rifle	MAL_SR.comp_05_legendary_katagawa	25	61	Katagawa's Revenge	
+Paladin	Class Mod	classmod_paladin.comp_02_uncommon	255	69		
+Paladin	Class Mod	classmod_paladin.comp_03_rare	255	68		
+Paladin	Class Mod	classmod_paladin.comp_04_epic	255	67		
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_01	255	25	Furnace	
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_02	255	24	Elementalist	
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_03	255	23	Shatterwight	
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_04	255	22	Blacksmith	
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_05	255	21	Forge Master	
+Paladin	Class Mod	classmod_paladin.comp_05_legendary_06	255	20	Viking	
+Paladin	Class Mod	classmod_paladin.comp_01_common	255	70		
+Gravitar	Class Mod	classmod_gravitar.comp_02_uncommon	259	223		
+Gravitar	Class Mod	classmod_gravitar.comp_03_rare	259	222		
+Gravitar	Class Mod	classmod_gravitar.comp_04_epic	259	221		
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_01	259	26	Bio-Robot	
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_02	259	25	Reactor	
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_03	259	24	Generator	
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_04	259	23	Atomic Driver	
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_05	259	22	Skeptic	
+Gravitar	Class Mod	classmod_gravitar.comp_05_legendary_06	259	21	Scientist	
+Gravitar	Class Mod	classmod_gravitar.comp_01_common	259	224		
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_02_uncommon	256	67		
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_03_rare	256	68		
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_04_epic	256	69		
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_01	256	26	Dancer	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_02	256	25	Filántropo	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_03	256	24	Instigator	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_04	256	23	Buster	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_05	256	22	Esgrimidor	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_05_legendary_06	256	21	Grenazerker	
+Exo Soldier	Class Mod	classmod_exo_soldier.comp_01_common	256	66		
+Siren	Class Mod	classmod_dark_siren.comp_02_uncommon	254	218		
+Siren	Class Mod	classmod_dark_siren.comp_03_rare	254	219		
+Siren	Class Mod	classmod_dark_siren.comp_04_epic	254	220		
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_01	254	56	Technomancer	
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_02	254	55	Avatar	
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_03	254	54	Undead Eye	
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_04	254	53	Spirits	
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_05	254	52	Illusionist	
+Siren	Class Mod	classmod_dark_siren.comp_05_legendary_06	254	51	Teen Witch	
+Siren	Class Mod	classmod_dark_siren.comp_01_common	254	217		
+Order	Assault Rifle	ORD_AR.comp_01_common	15	95		
+Order	Assault Rifle	ORD_AR.comp_02_uncommon	15	96		
+Order	Assault Rifle	ORD_AR.comp_03_rare	15	97		
+Order	Assault Rifle	ORD_AR.comp_04_epic	15	98		
+Order	Assault Rifle	ORD_AR.comp_05_legendary_GMR	15	75	G.M.R.	
+Order	Assault Rifle	ORD_AR.comp_05_legendary_Goalkeeper	15	76	Goalkeeper	
+Order	Enhancement	ORD_Enhancement.comp_01_common	281	4		
+Order	Enhancement	ORD_Enhancement.comp_02_uncommon	281	5		
+Order	Enhancement	ORD_Enhancement.comp_03_rare	281	6		
+Order	Enhancement	ORD_Enhancement.comp_04_epic	281	7		
+Order	Enhancement	ORD_Enhancement.comp_05_legendary	281	8		
+Order	Grenade	ord_grenade_gadget.comp_01_common	272	2		
+Order	Grenade	ord_grenade_gadget.comp_02_uncommon	272	3		
+Order	Grenade	ord_grenade_gadget.comp_03_rare	272	4		
+Order	Grenade	ord_grenade_gadget.comp_04_epic	272	5		
+Order	Grenade	ord_grenade_gadget.comp_05_legendary_aggrovator	272	10	Chaumurky	
+Order	Grenade	ord_grenade_gadget.comp_05_legendary_skully	272	12	Skully	
+Order	Grenade	ord_grenade_gadget.comp_05_legendary_swarm	272	8	Swarm	
+Order	Pistol	ORD_PS.comp_01_common	4	95		
+Order	Pistol	ORD_PS.comp_02_uncommon	4	96		
+Order	Pistol	ORD_PS.comp_03_rare	4	97		
+Order	Pistol	ORD_PS.comp_04_epic	4	98		
+Order	Pistol	ORD_PS.comp_05_legendary_Bully	4	76	Bully	
+Order	Pistol	ORD_PS.comp_05_legendary_NoisyCricket	4	80	Noisy Cricket	
+Order	Pistol	ORD_PS.comp_05_legendary_RocketReload	4	53	Lucky Clover	
+Order	Pistol	ORD_PS.comp_Zadra_weapon	4	74		
+Order	Repkit	ord_repair_kit.comp_01_common	285	3		
+Order	Repkit	ord_repair_kit.comp_02_uncommon	285	4		
+Order	Repkit	ord_repair_kit.comp_03_rare	285	5		
+Order	Repkit	ord_repair_kit.comp_04_epic	285	6		
+Order	Repkit	ord_repair_kit.comp_05_legendary_TripleBypass	285	7	Triple Bypass	
+Order	Shield	ord_shield.comp_01_common	293	5		
+Order	Shield	ord_shield.comp_02_uncommon	293	6		
+Order	Shield	ord_shield.comp_03_rare	293	7		
+Order	Shield	ord_shield.comp_04_epic	293	8		
+Order	Shield	ord_shield.comp_05_legendary_cindershelly	293	10	Cindershelly	
+Order	Shield	ord_shield.comp_05_legendary_ProteanCell	293	3	Protean Cell	
+Order	Sniper Rifle	ORD_SR.comp_01_common	26	95		
+Order	Sniper Rifle	ORD_SR.comp_02_uncommon	26	96		
+Order	Sniper Rifle	ORD_SR.comp_03_rare	26	97		
+Order	Sniper Rifle	ORD_SR.comp_04_epic	26	98		
+Order	Sniper Rifle	ORD_SR.comp_05_legendary_Fisheye	26	1	Fisheye	
+Order	Sniper Rifle	ORD_SR.comp_05_legendary_symmetry	26	76	Symmetry	
+Ripper	Enhancement	BOR_Enhancement.comp_02_uncommon	296	8		
+Ripper	Enhancement	BOR_Enhancement.comp_03_rare	296	7		
+Ripper	Enhancement	BOR_Enhancement.comp_04_epic	296	6		
+Ripper	Enhancement	BOR_Enhancement.comp_05_legendary	296	5		
+Ripper	Enhancement	BOR_Enhancement.comp_01_common	296	4		
+Ripper	Grenade	borg_grenade_gadget.comp_02_uncommon	278	5		
+Ripper	Grenade	borg_grenade_gadget.comp_03_rare	278	6		
+Ripper	Grenade	borg_grenade_gadget.comp_04_epic	278	7		
+Ripper	Grenade	borg_grenade_gadget.comp_05_legendary_buoy	278	12	Buoy	
+Ripper	Grenade	borg_grenade_gadget.comp_05_legendary_rubber	278	9	Jelly	
+Ripper	Grenade	borg_grenade_gadget.comp_05_legendary_transmission	278	15	Transmitter	Pre-Order
+Ripper	Grenade	borg_grenade_gadget.comp_01_common	278	4		
+Ripper	Heavy Weapon	BOR_HW.comp_02_uncommon	275	27		
+Ripper	Heavy Weapon	BOR_HW.comp_03_rare	275	28		
+Ripper	Heavy Weapon	BOR_HW.comp_04_epic	275	29		
+Ripper	Heavy Weapon	BOR_HW.comp_05_legendary_DiscJockey	275	31	Disc Jockey	
+Ripper	Heavy Weapon	BOR_HW.comp_05_legendary_Streamer	275	32	Streamer	
+Ripper	Heavy Weapon	BOR_HW.comp_01_common	275	26		
+Ripper	Repkit	BOR_REPAIR_KIT.comp_02_uncommon	274	4		
+Ripper	Repkit	BOR_REPAIR_KIT.comp_03_rare	274	5		
+Ripper	Repkit	BOR_REPAIR_KIT.comp_04_epic	274	6		
+Ripper	Repkit	BOR_REPAIR_KIT.comp_05_legendary_Augmenter	274	7	AF1000	
+Ripper	Repkit	BOR_REPAIR_KIT.comp_01_common	274	3		
+Ripper	Shield	bor_shield.comp_02_uncommon	300	2		
+Ripper	Shield	bor_shield.comp_03_rare	300	3		
+Ripper	Shield	bor_shield.comp_04_epic	300	4		
+Ripper	Shield	bor_shield.comp_05_legendary_firewall	300	12	Firebreak	Shift Code
+Ripper	Shield	bor_shield.comp_05_legendary_Lightning	300	7	Sparky Shield	
+Ripper	Shield	bor_shield.comp_05_legendary_Watts4Dinner	300	9	Watts 4 Dinner	
+Ripper	Shield	bor_shield.comp_01_common	300	1		
+Ripper	Shotgun	BOR_SG.comp_02_uncommon	7	96		
+Ripper	Shotgun	BOR_SG.comp_03_rare	7	97		
+Ripper	Shotgun	BOR_SG.comp_04_epic	7	98		
+Ripper	Shotgun	BOR_SG.comp_05_legendary_convergence	7	100	Convergence	
+Ripper	Shotgun	BOR_SG.comp_05_legendary_GoldenGod	7	19	Golden God	
+Ripper	Shotgun	BOR_SG.comp_05_legendary_GoreMaster	7	20	Goremaster	
+Ripper	Shotgun	BOR_SG.comp_01_common	7	95		
+Ripper	SMG	BOR_SM.comp_02_uncommon	19	96		
+Ripper	SMG	BOR_SM.comp_03_rare	19	97		
+Ripper	SMG	BOR_SM.comp_04_epic	19	98		
+Ripper	SMG	BOR_SM.comp_05_legendary_hellfire	19	19	Hellfire	
+Ripper	SMG	BOR_SM.comp_05_legendary_prince	19	1	Prince Harming	
+Ripper	SMG	BOR_SM.comp_01_common	19	95		
+Ripper	Sniper Rifle	bor_sr.comp_02_uncommon	23	96		
+Ripper	Sniper Rifle	bor_sr.comp_03_rare	23	97		
+Ripper	Sniper Rifle	bor_sr.comp_04_epic	23	98		
+Ripper	Sniper Rifle	bor_sr.comp_05_legendary_stray	23	19	Stray	
+Ripper	Sniper Rifle	bor_sr.comp_05_legendary_Vamoose	23	1	Vamoose	
+Ripper	Sniper Rifle	bor_sr.comp_01_common	23	95		
+Tediore	Assault Rifle	TED_AR.comp_01_common	14	89		
+Tediore	Assault Rifle	TED_AR.comp_02_uncommon	14	90		
+Tediore	Assault Rifle	TED_AR.comp_03_rare	14	91		
+Tediore	Assault Rifle	TED_AR.comp_04_epic	14	92		
+Tediore	Assault Rifle	TED_AR.comp_05_legendary_Chuck	14	35	Chuck	
+Tediore	Assault Rifle	TED_AR.comp_05_legendary_DividedFocus	14	36	Divided Focus	
+Tediore	Assault Rifle	TED_AR.comp_05_legendary_murder	14	77	Murmur	
+Tediore	Enhancement	TED_Enhancement.comp_01_common	292	4		
+Tediore	Enhancement	TED_Enhancement.comp_02_uncommon	292	5		
+Tediore	Enhancement	TED_Enhancement.comp_03_rare	292	6		
+Tediore	Enhancement	TED_Enhancement.comp_04_epic	292	7		
+Tediore	Enhancement	TED_Enhancement.comp_05_legendary	292	8		
+Tediore	Grenade	ted_grenade_gadget.comp_01_common	311	1		
+Tediore	Grenade	ted_grenade_gadget.comp_02_uncommon	311	2		
+Tediore	Grenade	ted_grenade_gadget.comp_03_rare	311	3		
+Tediore	Grenade	ted_grenade_gadget.comp_04_epic	311	4		
+Tediore	Grenade	ted_grenade_gadget.comp_05_legendary_FaultyDetonator	311	7	Faulty Detonator	
+Tediore	Grenade	ted_grenade_gadget.comp_05_legendary_PredatorDrone	311	9	UAV	
+Tediore	Pistol	TED_PS.comp_01_common	5	95		
+Tediore	Pistol	TED_PS.comp_02_uncommon	5	96		
+Tediore	Pistol	TED_PS.comp_03_rare	5	97		
+Tediore	Pistol	TED_PS.comp_04_epic	5	98		
+Tediore	Pistol	TED_PS.comp_05_legendary_ATLien	5	60	Budget Deity	
+Tediore	Pistol	TED_PS.comp_05_legendary_RubysGrasp	5	66	Ruby's Grasp	
+Tediore	Pistol	TED_PS.comp_05_legendary_Sideshow	5	1	Sideshow	
+Tediore	Repkit	ted_repair_kit.comp_01_common	290	3		
+Tediore	Repkit	ted_repair_kit.comp_02_uncommon	290	4		
+Tediore	Repkit	ted_repair_kit.comp_03_rare	290	5		
+Tediore	Repkit	ted_repair_kit.comp_04_epic	290	6		
+Tediore	Repkit	ted_repair_kit.comp_05_legendary_KillSpring	290	7	Kill Spring	
+Tediore	Shield	ted_shield.comp_01_common	287	1		
+Tediore	Shield	ted_shield.comp_02_uncommon	287	2		
+Tediore	Shield	ted_shield.comp_03_rare	287	3		
+Tediore	Shield	ted_shield.comp_04_epic	287	4		
+Tediore	Shield	ted_shield.comp_05_legendary_ShieldBoi	287	7	Principal	
+Tediore	Shield	ted_shield.comp_05_legendary_timekeeper	287	8	Timekeeper's New	
+Tediore	Shotgun	TED_SG.comp_02_uncommon	11	96		
+Tediore	Shotgun	TED_SG.comp_03_rare	11	97		
+Tediore	Shotgun	TED_SG.comp_04_epic	11	98		
+Tediore	Shotgun	TED_SG.comp_05_legendary_anarchy	11	76	Anarchy	
+Tediore	Shotgun	TED_SG.comp_05_legendary_commBD	11	78	Forsaken Chaos	
+Tediore	Shotgun	TED_SG.comp_05_legendary_HeavyTurret	11	80	Husky Friend	
+Tediore	Shotgun	TED_SG.comp_01_common	11	95		
+Torgue	Assault Rifle	TOR_AR.comp_01_common	17	95		
+Torgue	Assault Rifle	TOR_AR.comp_02_uncommon	17	96		
+Torgue	Assault Rifle	TOR_AR.comp_03_rare	17	97		
+Torgue	Assault Rifle	TOR_AR.comp_04_epic	17	98		
+Torgue	Assault Rifle	TOR_AR.comp_05_legendary_Bugbear	17	1	Bugbear	
+Torgue	Assault Rifle	TOR_AR.comp_05_legendary_coldshoulder	17	56	Cold Shoulder	
+Torgue	Assault Rifle	TOR_AR.comp_05_legendary_PotatoThrower	17	78	Potato Thrower IV	
+Torgue	Assault Rifle	TOR_AR.comp_Brenda_weapon	17	53		
+Torgue	Enhancement	TOR_Enhancement.comp_01_common	303	4		
+Torgue	Enhancement	TOR_Enhancement.comp_02_uncommon	303	5		
+Torgue	Enhancement	TOR_Enhancement.comp_03_rare	303	6		
+Torgue	Enhancement	TOR_Enhancement.comp_04_epic	303	7		
+Torgue	Enhancement	TOR_Enhancement.comp_05_legendary	303	8		
+Torgue	Grenade	tor_grenade_gadget.comp_01_common	298	1		
+Torgue	Grenade	tor_grenade_gadget.comp_02_uncommon	298	2		
+Torgue	Grenade	tor_grenade_gadget.comp_03_rare	298	3		
+Torgue	Grenade	tor_grenade_gadget.comp_04_epic	298	4		
+Torgue	Grenade	tor_grenade_gadget.comp_05_legendary_firepot	298	7	Firepot	
+Torgue	Grenade	tor_grenade_gadget.comp_05_legendary_slippy	298	9	Slippy	
+Torgue	Heavy Weapon	TOR_HW.comp_01_common	273	30		
+Torgue	Heavy Weapon	TOR_HW.comp_02_uncommon	273	31		
+Torgue	Heavy Weapon	TOR_HW.comp_02_uncommon_Unique_HeavyTurret	273	39		
+Torgue	Heavy Weapon	TOR_HW.comp_03_rare	273	32		
+Torgue	Heavy Weapon	TOR_HW.comp_04_epic	273	33		
+Torgue	Heavy Weapon	TOR_HW.comp_05_legendary_Javelin	273	34	Sprezzatura	
+Torgue	Heavy Weapon	TOR_HW.comp_05_legendary_ravenfire	273	36	Ravenfire	
+Torgue	Heavy Weapon	TOR_HW.comp_05_legendary_sidewinder	273	38	Sidewinder	Pre-Order
+Torgue	Pistol	TOR_PS.comp_01_common	6	95		
+Torgue	Pistol	TOR_PS.comp_02_uncommon	6	96		
+Torgue	Pistol	TOR_PS.comp_03_rare	6	97		
+Torgue	Pistol	TOR_PS.comp_04_epic	6	98		
+Torgue	Pistol	TOR_PS.comp_05_legendary_QueensRest	6	53	Queen's Rest	
+Torgue	Pistol	TOR_PS.comp_05_legendary_Roach	6	1	Roach	
+Torgue	Repkit	tor_repair_kit.comp_01_common	261	1		
+Torgue	Repkit	tor_repair_kit.comp_02_uncommon	261	2		
+Torgue	Repkit	tor_repair_kit.comp_03_rare	261	3		
+Torgue	Repkit	tor_repair_kit.comp_04_epic	261	4		
+Torgue	Repkit	tor_repair_kit.comp_05_legendary_ShinyWarPaint	261	5	War Paint	
+Torgue	Shield	tor_shield.comp_01_common	321	1		
+Torgue	Shield	tor_shield.comp_02_uncommon	321	2		
+Torgue	Shield	tor_shield.comp_03_rare	321	3		
+Torgue	Shield	tor_shield.comp_04_epic	321	4		
+Torgue	Shield	tor_shield.comp_05_legendary_compleat	321	8	Compleation	
+Torgue	Shield	tor_shield.comp_05_legendary_firewerks	321	7	Firewerks	
+Torgue	Shotgun	TOR_SG.comp_02_uncommon	12	96		
+Torgue	Shotgun	TOR_SG.comp_03_rare	12	97		
+Torgue	Shotgun	TOR_SG.comp_04_epic	12	98		
+Torgue	Shotgun	TOR_SG.comp_05_legendary_LeadBalloon	12	57	Lead Balloon	
+Torgue	Shotgun	TOR_SG.comp_05_legendary_Linebacker	12	1	Linebacker	
+Torgue	Shotgun	TOR_SG.comp_01_common	12	95		
+Vladof	Assault Rifle	VLA_AR.comp_01_common	18	95		
+Vladof	Assault Rifle	VLA_AR.comp_02_uncommon	18	96		
+Vladof	Assault Rifle	VLA_AR.comp_03_rare	18	97		
+Vladof	Assault Rifle	VLA_AR.comp_04_epic	18	98		
+Vladof	Assault Rifle	VLA_AR.comp_05_legendary_DualDamage	18	88	Aegon's Dream	
+Vladof	Assault Rifle	VLA_AR.comp_05_legendary_Lucian	18	63	Lucian's Flank	
+Vladof	Assault Rifle	VLA_AR.comp_05_legendary_WF	18	93	Whiskey Foxtrot	
+Vladof	Assault Rifle	VLA_AR.comp_05_legendary_WomboCombo	18	65	Wombo Combo	
+Vladof	Enhancement	VLA_Enhancement.comp_01_common	310	8		
+Vladof	Enhancement	VLA_Enhancement.comp_02_uncommon	310	7		
+Vladof	Enhancement	VLA_Enhancement.comp_03_rare	310	6		
+Vladof	Enhancement	VLA_Enhancement.comp_04_epic	310	5		
+Vladof	Enhancement	VLA_Enhancement.comp_05_legendary	310	4		
+Vladof	Grenade	vla_grenade_gadget.comp_01_common	291	1		
+Vladof	Grenade	vla_grenade_gadget.comp_02_uncommon	291	2		
+Vladof	Grenade	vla_grenade_gadget.comp_03_rare	291	3		
+Vladof	Grenade	vla_grenade_gadget.comp_04_epic	291	4		
+Vladof	Grenade	vla_grenade_gadget.comp_05_legendary_Blockbuster	291	7	Blockbuster	
+Vladof	Grenade	vla_grenade_gadget.comp_05_legendary_Waterfall	291	9	Waterfall	
+Vladof	Heavy Weapon	VLA_HW.comp_01_common	282	21		
+Vladof	Heavy Weapon	VLA_HW.comp_02_uncommon	282	22		
+Vladof	Heavy Weapon	VLA_HW.comp_03_rare	282	23		
+Vladof	Heavy Weapon	VLA_HW.comp_04_epic	282	24		
+Vladof	Heavy Weapon	VLA_HW.comp_05_legendary_AtlingGun	282	26	Atling Gun	
+Vladof	Heavy Weapon	VLA_HW.comp_05_legendary_Splatoon	282	1	Inkling	
+Vladof	Repkit	vla_repair_kit.comp_01_common	269	1		
+Vladof	Repkit	vla_repair_kit.comp_02_uncommon	269	2		
+Vladof	Repkit	vla_repair_kit.comp_03_rare	269	3		
+Vladof	Repkit	vla_repair_kit.comp_04_epic	269	4		
+Vladof	Repkit	vla_repair_kit.comp_05_legendary_AdrenalinePUmp	269	5	Adrenaline Pump	
+Vladof	Shield	vla_shield.comp_01_common	283	1		
+Vladof	Shield	vla_shield.comp_02_uncommon	283	2		
+Vladof	Shield	vla_shield.comp_03_rare	283	3		
+Vladof	Shield	vla_shield.comp_04_epic	283	4		
+Vladof	Shield	vla_shield.comp_05_legendary_HeavyWeight	283	9	Heavyweight	
+Vladof	Shield	vla_shield.comp_05_legendary_Hoarder	283	7	Hoarder	
+Vladof	SMG	VLA_SM.comp_01_common	22	95		
+Vladof	SMG	VLA_SM.comp_02_uncommon	22	96		
+Vladof	SMG	VLA_SM.comp_03_rare	22	97		
+Vladof	SMG	VLA_SM.comp_04_epic	22	98		
+Vladof	SMG	VLA_SM.comp_05_legendary_BeeGun	22	88	Birt's Bees	
+Vladof	SMG	VLA_SM.comp_05_legendary_KaoSon	22	67	Kaoson	
+Vladof	SMG	VLA_SM.comp_05_legendary_Onslaught	22	1	Onslaught	
+Vladof	Sniper Rifle	VLA_SR.comp_01_common	16	95		
+Vladof	Sniper Rifle	VLA_SR.comp_02_uncommon	16	96		
+Vladof	Sniper Rifle	VLA_SR.comp_03_rare	16	97		
+Vladof	Sniper Rifle	VLA_SR.comp_04_epic	16	98		
+Vladof	Sniper Rifle	VLA_SR.comp_05_legendary_CrowdSourced	16	69	Midnight Defiance	Twitch Drop
+Vladof	Sniper Rifle	VLA_SR.comp_05_legendary_Finnty	16	66	Finnity XXX-L	
+Vladof	Sniper Rifle	VLA_SR.comp_05_legendary_StopGap	16	67	Stop Gap	

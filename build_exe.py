@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""
+PyInstaller build script for BL4 AIO (Borderlands 4 Save Editor).
+
+Collects all runtime data (resources, icons, DBs, stylesheets, skin images),
+generates a .spec file, and runs PyInstaller to produce a single Windows EXE.
+
+Usage (from project root):
+  python build_exe.py              # generate spec and build
+  python build_exe.py --spec-only  # only generate BL4_AIO.spec
+
+Requires: pip install pyinstaller pillow pyyaml pycryptodome pandas PyQt6
+"""
+
+import glob
+import os
+import sys
+from pathlib import Path
+
+# --- Data collection (paths relative to project root) ---
+
+def _glob_data(folder: str, *extensions: str) -> list:
+    out = []
+    for ext in extensions:
+        for path in glob.glob(f"{folder}/*{ext}"):
+            if os.path.isfile(path):
+                dest = os.path.dirname(path)
+                out.append((path.replace("\\", "/"), dest.replace("\\", "/")))
+    return out
+
+def collect_datas() -> list:
+    root = Path(".")
+    datas = []
+
+    # Class mods: json, csv, and per-character png folders (explicit files for spec)
+    for path in glob.glob("class_mods/*.json") + glob.glob("class_mods/*.csv"):
+        if os.path.isfile(path):
+            datas.append((path.replace("\\", "/"), "class_mods"))
+    # Only bundle ASCII-named PNGs to avoid PyInstaller extract errors (encoding)
+    _class_mod_png_re = __import__("re").compile(r"^[a-zA-Z0-9_!]+_[1-4]\.png$")
+    for sub in ("Amon", "Harlowe", "Rafa", "Vex"):
+        subdir = root / "class_mods" / sub
+        if subdir.exists():
+            for path in glob.glob(f"class_mods/{sub}/*.png"):
+                if os.path.isfile(path):
+                    name = os.path.basename(path)
+                    if _class_mod_png_re.match(name):
+                        datas.append((path.replace("\\", "/"), f"class_mods/{sub}"))
+
+    # Item-type data folders (csv + json)
+    for folder in ("enhancement", "weapon_edit", "grenade", "shield", "repkit", "heavy"):
+        for path in glob.glob(f"{folder}/*"):
+            if os.path.isfile(path) and (path.endswith(".csv") or path.endswith(".json") or path.endswith(".tsv")):
+                dest = os.path.dirname(path)
+                datas.append((path.replace("\\", "/"), dest.replace("\\", "/")))
+
+    # Master Search: scarlett, full db folder, skin_images folder
+    datas.append(("master_search/scarlett.html", "master_search"))
+    if (root / "master_search" / "db").exists():
+        for path in glob.glob("master_search/db/*"):
+            if os.path.isfile(path):
+                datas.append((path.replace("\\", "/"), "master_search/db"))
+        if (root / "master_search" / "db" / "sources").exists():
+            for path in glob.glob("master_search/db/sources/*"):
+                if os.path.isfile(path):
+                    datas.append((path.replace("\\", "/"), "master_search/db/sources"))
+    if (root / "master_search" / "skin_images").exists():
+        for path in glob.glob("master_search/skin_images/*.png"):
+            datas.append((path.replace("\\", "/"), "master_search/skin_images"))
+
+    # Theme stylesheets (all .qss in root)
+    for path in glob.glob("stylesheet*.qss"):
+        datas.append((path.replace("\\", "/"), "."))
+
+    # BG_Themes images
+    if (root / "BG_Themes").exists():
+        for path in glob.glob("BG_Themes/*.png") + glob.glob("BG_Themes/*.jpg") + glob.glob("BG_Themes/*.jpeg"):
+            if os.path.isfile(path):
+                datas.append((path.replace("\\", "/"), "BG_Themes"))
+
+    # Root / assets
+    root_files = [
+        "item_localization_zh-CN.json",
+        "ui_localization.json",
+        "ui_localization_EN.json",
+        "ui_localization_RU.json",
+        "ui_localization_UA.json",
+        "stylesheet.qss",
+        "godrolls.json",
+        "news.txt",
+        "CREDITS.txt",
+        "version_info.txt",
+    ]
+    for f in root_files:
+        if (root / f).exists():
+            datas.append((f, "."))
+
+    # Optional root files
+    for f in ("BL4.ico", "BL4_AIO.ico", "bg_dark.jpg"):
+        if (root / f).exists():
+            datas.append((f, "."))
+
+    # App icons (only used: home, character, inventory, weapon_toolbox, accessories, master_search)
+    if (root / "assets" / "icons").exists():
+        for path in glob.glob("assets/icons/*.png"):
+            datas.append((path.replace("\\", "/"), "assets/icons"))
+
+    return datas
+
+
+def get_icon_arg() -> str:
+    """Return icon path for EXE if present."""
+    for name in ("BL4.ico", "BL4_AIO.ico"):
+        if Path(name).exists():
+            return repr(name)
+    return "None"
+
+
+def build_spec(datas: list) -> str:
+    # Format datas for spec (list of tuples as string)
+    datas_str = "[\n        "
+    datas_str += ",\n        ".join(f"({repr(src)}, {repr(dest)})" for src, dest in datas)
+    datas_str += "\n    ]"
+    icon_arg = get_icon_arg()
+
+    return f'''# -*- mode: python ; coding: utf-8 -*-
+# Generated by build_exe.py - do not edit by hand.
+
+block_cipher = None
+
+a = Analysis(
+    ['main_window.py'],
+    pathex=[],
+    binaries=[],
+    datas={datas_str},
+    hiddenimports=[
+        'PIL',
+        'PIL.Image',
+        'pandas',
+        'yaml',
+        'Crypto.Cipher',
+        'Crypto.Util.Padding',
+        'resource_loader',
+        'bl4_functions',
+        'decoder_logic',
+        'b_encoder',
+        'unlock_logic',
+        'unlock_data',
+        'save_game_controller',
+        'save_selector_widget',
+        'theme_manager',
+        'dashboard_widget',
+        'converter_tab',
+        'clean_code_dialog',
+        'nv_logger',
+        'lookup',
+        'qt_character_tab',
+        'qt_items_tab',
+        'qt_converter_tab',
+        'qt_item_edit_tab',
+        'qt_yaml_editor_tab',
+        'qt_class_mod_editor_tab',
+        'qt_enhancement_editor_tab',
+        'qt_weapon_editor_tab',
+        'qt_weapon_generator_tab',
+        'qt_grenade_editor_tab',
+        'qt_shield_editor_tab',
+        'qt_repkit_editor_tab',
+        'qt_heavy_weapon_editor_tab',
+        'bl4_decoder_py',
+    ],
+    hookspath=[],
+    hooksconfig={{}},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='BL4_AIO',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    version='version_info.txt',
+    icon={icon_arg},
+)
+'''
+
+
+def main():
+    spec_only = "--spec-only" in sys.argv
+    os.chdir(Path(__file__).resolve().parent)
+
+    print("Collecting data files...")
+    datas = collect_datas()
+    print(f"  Collected {len(datas)} data entries.")
+
+    spec_content = build_spec(datas)
+    spec_path = Path("BL4_AIO.spec")
+    spec_path.write_text(spec_content, encoding="utf-8")
+    print(f"Wrote {spec_path}")
+
+    if spec_only:
+        print("Done (spec only). Run: pyinstaller --clean --noconfirm BL4_AIO.spec")
+        return 0
+
+    try:
+        import PyInstaller.__main__
+    except ImportError:
+        print("PyInstaller not installed. Run: pip install pyinstaller")
+        return 1
+
+    print("Running PyInstaller...")
+    PyInstaller.__main__.run([
+        "--clean",
+        "--noconfirm",
+        str(spec_path),
+    ])
+    print("Build finished. EXE: dist/BL4_AIO.exe")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

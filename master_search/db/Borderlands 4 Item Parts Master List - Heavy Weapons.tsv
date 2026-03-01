@@ -1,0 +1,96 @@
+Manufacturer	Part Type	Part String	Type ID	ID	Stats	Effects	Comments
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_dXa	289	2	No Stat Changes	MIRV	Spawns 3 MIRV Orbs on explosion
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_aXD	289	3	No Stat Changes	Proxy Homing	Homes in on a nearby target before exploding
+Maliwan	Body	MAL_HW.part_body	289	5	No Stat Changes, always present		
+Maliwan	Body Accessory	MAL_HW.part_body_a	289	6	+Ammo	High-Capacity	
+Maliwan	Body Accessory	MAL_HW.part_body_b	289	7	+Damage	High-Energy	
+Maliwan	Body Accessory	MAL_HW.part_body_c	289	8	-Cooldown	Shunted	
+Maliwan	Body Accessory	MAL_HW.part_body_d	289	9	No Stat Changes	Abnormal	
+Maliwan	Barrel	MAL_HW.part_barrel_01	289	10	C-Beam, 70s CD, 13831 Damage, 72% Acc, 0.8/s FR, 3 Shots	Energy Bolt	
+Maliwan	Barrel	MAL_HW.part_barrel_02	289	11	Supercell, 55s CD, 6692 Damage, 65% Acc, 1.6/s FR, 6 Shots	Energy Orb	
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_01_a	289	12	No Stat Changes	Ricochet	Projectiles bounce off of surfaces
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_01_b	289	13	No Stat Changes	Penetration	Projectiles pierce through enemies
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_01_c	289	14	-Cooldown, +Damage, +Fire Rate	Speed Loader	Fire Rate is increased by 30%
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_01_d	289	15	No Stat Changes	Overload	Directly damaged enemies explode for additional Damage after a delay
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_a	289	16	No Stat Changes	MIRV	Spawns 3 MIRV Orbs on explosion
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_b	289	17	+Damage	Two Shot	Fires 2 Projectiles at a time
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_c	289	18	-Cooldown	Aerodynamics	Projectile Speed is increased by +100%
+Maliwan	Barrel Accessory	MAL_HW.part_barrel_02_d	289	19	No Stat Changes	Proxy Homing	Homes in on a nearby target before exploding
+Maliwan	Barrel	MAL_HW.part_barrel_02_GammaVoid	289	24	Gamma Void, 100s CD, 2008 Damage, 65% Acc, 5.0/s FR 1 Shot	Radiation Exposure - Creates a Singularity for 6s, in which enemies take +50% Radiation Damage over time	
+Maliwan	Barrel	MAL_HW.part_barrel_02_BottledLightning	289	26	Bottled Lightning, 75s CD, 6692 Damage, 65% Acc, 1.6/s FR, 2 Shots	Strike Twice	
+Ripper	Barrel	BOR_HW.part_barrel_01_Streamer	275	1	Streamer, 120s CD, 3346 Damage, 81% Acc, 2.0/s FR, 8 Shots	Delegation - Launches stationary Projectiles that each fire a Beam forward	
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_dXa	275	2	-Damage	Explosive	Damage splashes to other enemies near the target
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_aXd	275	3	-Damage	Beam Splitter	The beam splits up to 2 other nearby targets
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_dXc	275	4	-Damage	Compound	Deals increased Damage per enemy hit
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_cXd	275	5	-Cooldown, +Damage	Ricochet	Projectiles bounce off of surfaces
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_dXa	275	6	+Damage	Wide Disk	Increases the Projectile width
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_aXD	275	7	-Cooldown, +Damage	Ricochet	Projectiles bounce off of surfaces
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_cXa	275	8	+Damage	Wide Disk	Increases the Projectile width
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_aXC	275	9	-Damage	Compound	Deals increased Damage per enemy hit
+Ripper	Body	BOR_HW.part_body	275	11	No Stat Changes, always present		
+Ripper	Body Accessory	BOR_HW.part_body_a	275	12	+Damage	Chosen	
+Ripper	Body Accessory	BOR_HW.part_body_b	275	13	+Ammo	Bestowed	
+Ripper	Body Accessory	BOR_HW.part_body_c	275	14	-Cooldown	Ritualized	
+Ripper	Body Accessory	BOR_HW.part_body_d	275	15	No Stat Changes	Strange	
+Ripper	Barrel	BOR_HW.part_barrel_01	275	16	Auspex, 120s CD, 3123 Damage, 81% Acc, 4.0/s FR, 24 Shots	Beam Rifle	
+Ripper	Barrel	BOR_HW.part_barrel_02	275	17	Razor, 50s CD, 9815 Damage, 70% Acc, 1.4/s FR, 4 Shots	Disc Launcher	
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_a	275	18	-Damage	Explosive	Damage splashes to other enemies near the target
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_b	275	19	-Damage	Thermal Convection	Damage increases the longer the beam is fired
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_c	275	20	+Ammo	Heat Sink	Magazine Size is increased by 25%
+Ripper	Barrel Accessory	BOR_HW.part_barrel_01_d	275	21	-Damage	Beam Splitter	The beam splits up to 2 other nearby targets
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_a	275	22	+Damage	Wide Disk	Increases the Projectile width
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_b	275	23	-Cooldown, +Damage	Heat Exchange	Fires full auto after the initial charge
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_c	275	24	-Damage	Compound	Deals increased Damage per enemy hit
+Ripper	Barrel Accessory	BOR_HW.part_barrel_02_d	275	25	-Cooldown, +Damage	Ricochet	Projectiles bounce off of surfaces
+Ripper	Barrel	BOR_HW.part_barrel_02_DiscJockey	275	30	Disc Jockey, 60s CD, 1115 Damage, 83% Acc, 3.0/s FR, 8 Shots	Bouncing Biscuits - Energy disc Projectiles bounce up to 5 times, and gain +20% Damage per bounce	
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_dXc	273	1	No Stat Changes	Reticle Homing	Rocket homes in on the Reticle's target
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_dXb	273	2	No Stat Changes	Reticle Homing	Rocket homes in on the Reticle's target
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_dXa	273	3	No Stat Changes	Reticle Homing	Rocket homes in on the Reticle's target
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_cxd	273	4	-Cooldown, -Damage	Air Burst	Rockets explode when in proximity of an enemy
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_bxd	273	5	-Cooldown, +Damage	Shrapnel Rockets	On exploding, propels shrapnel forward
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_aXd	273	6	-Damage	Triple Barrel	Fires swirling Rockets, or charge up to fire all of them at once
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_cxb	273	7	-Cooldown, -Damage	Air Burst	Rockets explode when in proximity of an enemy
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_bXC	273	8	-Cooldown, +Damage	Shrapnel Rockets	On exploding, propels shrapnel forward
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_axc	273	9	-Damage	Triple Barrel	Fires swirling Rockets, or charge up to fire all of them at once
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_cxa	273	10	-Cooldown, -Damage	Air Burst	Rockets explode when in proximity of an enemy
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_bxa	273	11	-Cooldown, +Damage	Shrapnel Rockets	On exploding, propels shrapnel forward
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_axb	273	12	-Damage	Triple Barrel	Fires swirling Rockets, or charge up to fire all of them at once
+Torgue	Body	TOR_HW.part_body	273	14	No Stat Changes, always present		
+Torgue	Body Accessory	TOR_HW.part_body_a	273	15	-Cooldown, +Damage	Blasting	
+Torgue	Body Accessory	TOR_HW.part_body_b	273	16	+Splash Radius	Covering	
+Torgue	Body Accessory	TOR_HW.part_body_c	273	17	-Cooldown	Eager	
+Torgue	Body Accessory	TOR_HW.part_body_d	273	18	No Stat Changes	Itchy	
+Torgue	Barrel	TOR_HW.part_barrel_01	273	20	Shoot Chute, 50s CD, 8254 Damage, 64% Acc, 1.0/s FR, 6 Shots	Rocket Launcher	
+Torgue	Barrel	TOR_HW.part_barrel_02	273	21	Rainmaker, 70s CD, 1896 Damage, 61% Acc, 6.3/s FR, 25 Shots	Micro Missile Launcher	
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_a	273	22	-Damage	Triple Barrel	Fires swirling Rockets, or charge up to fire all of them at once
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_b	273	23	-Cooldown, +Damage	Shrapnel Rockets	On exploding, propels shrapnel forward
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_c	273	24	-Cooldown, -Damage	Air Burst	Rockets explode when in proximity of an enemy
+Torgue	Barrel Accessory	TOR_HW.part_barrel_01_d	273	25	No Stat Changes	Reticle Homing	Rocket homes in on the Reticle's target
+Torgue	Barrel Accessory	TOR_HW.part_barrel_02_a	273	26	+Damage	Two Shot	Fires 2 Rockets at a time
+Torgue	Barrel Accessory	TOR_HW.part_barrel_02_b	273	27	-Cooldown, +Fire Rate	Fire Rate	Fire Rate is increased by +30%
+Torgue	Barrel Accessory	TOR_HW.part_barrel_02_c	273	28	+Ammo	Extended Magazine	Magazine Size is increased by +25%
+Torgue	Barrel Accessory	TOR_HW.part_barrel_02_d	273	29	-Damage	Scanning	Rockets home toward nearby targets
+Torgue	Barrel	TOR_HW.part_barrel_javelin	273	35	Sprezzatura, 50s CD, 17846 Damage, 64% Acc, 0.6/s FR, 2 Shots	Gungnir	
+Torgue	Barrel	TOR_HW.part_unique_barrel_01_sidewinder	273	37	Sidewinder, 4s CD, 6692 Damage, 64% Acc, 1.5/s FR 5 Shots	Sidewinder	
+Torgue	Barrel	TOR_HW.part_unique_barrel_02_ravenfire	273	40	Ravenfire, 70s CD, 2231 Damage, 61% Acc, 2.0/s FR, 4 Shots	621 - Explosions radiate outward from the point of impact	
+Vladof	Barrel	VLA_HW.part_barrel_02_Splatoon	282	2	Inkling, 50s CD, 2454 Damage, 76% Acc, 4.0/s FR, 12 Shots	Inklink - Fires bouncing Projectiles that leave an Elemental Splat on Bounce	
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_ad	282	4	No Stat Changes		
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_ac	282	5	No Stat Changes		
+Vladof	Body	VLA_HW.part_body	282	6	No Stat Changes, always present		
+Vladof	Body Accessory	VLA_HW.part_body_a	282	7	+Ammo	Mad	
+Vladof	Body Accessory	VLA_HW.part_body_b	282	8	+Fire Rate	Wide	
+Vladof	Body Accessory	VLA_HW.part_body_c	282	9	-Cooldown	Thorough	
+Vladof	Body Accessory	VLA_HW.part_body_d	282	10	No Stat Changes	Tinged	
+Vladof	Barrel	VLA_HW.part_barrel_02	282	12	Golub, 50s CD, 2454 Damage, 76% Acc, 4.0/s FR, 12 Shots	Cannon Barrel	
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_a	282	13	-Cooldown, +Damage, +Fire Rate	Additional Barrel	Adds 1 additional barrel, increasing Fire Rate by +17%
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_b	282	14	-Cooldown	Angel's Share	Every 6th shot doesn't cost Ammo
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_c	282	15	+Cooldown, +Damage	Magic Bullet	Every 6th shot is homing
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_d	282	16	+Damage	Devil's Share	Every 6th shot deals +100% Damage
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_a	282	17	-Cooldown, +Fire Rate	Additional Barrels	Adds 2 additional barrels, increasing Fire Rate by -65%
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_b	282	18	+Splash Radius	Explosive Rounds	Explosive Rounds - Increases Damage by +125% and Damage Radius by +200%
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_c	282	19	+Damage	Two Shot	Two-Shot - 2 barrels fire simultaneously
+Vladof	Barrel Accessory	VLA_HW.part_barrel_02_d	282	20	-Cooldown, +Damage	Penetration	Penetration - Projectiles pierce through enemies
+Vladof	Barrel	VLA_HW.part_unique_barrel_01_atlinggun	282	25	Atling Gun, 90s CD, 446 Damage, 41% Acc, 40.0/s FR, 90 Shots	Whistler	
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_cxd	282	27	-Cooldown, -Damage	Magic Bullet	Every 6th shot is homing
+Vladof	Barrel Accessory	VLA_HW.part_barrel_01_dXc	282	28	+Damage	Devil's Share	Every 6th shot deals +100% Damage
+Vladof	Barrel	VLA_HW.part_barrel_01	282	29	Steelburner, 80s CD, 357 Damage, 71% Acc, 30.0/s FR, 120 Shots	Minigun Barrel	
