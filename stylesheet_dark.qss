@@ -1,0 +1,108 @@
+/* Industrial theme: dark steel + electric blue accents (no neon glow) */
+* { font-family: Segoe UI; font-size: 10.5pt; }
+QWidget { color: #E7ECF2; background: transparent; }
+QMainWindow { background: transparent; }
+
+QFrame#HeaderBar, QFrame#FooterBar {
+    background: rgba(8, 10, 12, 0.82);
+    border: 1px solid rgba(86, 96, 110, 0.55);
+    border-radius: 14px;
+}
+
+QLabel#AppTitle {
+    color: #E7ECF2;
+    font-size: 16pt;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+QLabel#VersionBadge {
+    color: #071017;
+    background: #4CC3FF;
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-weight: 700;
+}
+
+QPushButton {
+    color: #E7ECF2;
+    background: rgba(12, 14, 16, 0.90);
+    border: 1px solid rgba(92, 104, 120, 0.60);
+    border-radius: 10px;
+    padding: 6px 10px;
+}
+QPushButton:hover { border-color: #4CC3FF; }
+QPushButton:pressed { background: rgba(8, 10, 12, 0.92); }
+
+QComboBox, QLineEdit, QTextEdit, QPlainTextEdit {
+    color: #E7ECF2;
+    background: rgba(10, 12, 14, 0.86);
+    border: 1px solid rgba(92, 104, 120, 0.60);
+    border-radius: 10px;
+    padding: 6px 10px;
+    selection-background-color: rgba(76,195,255,0.25);
+}
+QComboBox:hover, QLineEdit:hover, QTextEdit:hover, QPlainTextEdit:hover { border-color: #4CC3FF; }
+
+QComboBox::drop-down { border: none; width: 26px; }
+QComboBox::down-arrow { image: none; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #4CC3FF; }
+/* Dropdown popup: dark background + light text for contrast */
+QComboBox QAbstractItemView {
+    background-color: rgba(10, 12, 14, 0.98);
+    color: #E7ECF2;
+    selection-background-color: rgba(76, 195, 255, 0.25);
+    selection-color: #0a0c0e;
+    outline: 0;
+    border: 1px solid rgba(92, 104, 120, 0.60);
+}
+
+QScrollBar:vertical { background: rgba(0,0,0,0.0); width: 10px; margin: 2px; }
+QScrollBar::handle:vertical { background: rgba(76,195,255,0.55); border-radius: 5px; min-height: 30px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+
+QGroupBox {
+    border: 1px solid rgba(92, 104, 120, 0.50);
+    border-radius: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 6px; color: #4CC3FF; font-weight: 600; }
+
+QMenu {
+    background-color: #2d2d32;
+    color: #e0e0e0;
+    border: 1px solid #4a4a50;
+    padding: 4px;
+}
+QMenu::item { padding: 6px 18px; background-color: transparent; }
+QMenu::item:selected { background-color: #3d3d44; color: #ffffff; }
+QMenu::separator { height: 1px; background: #4a4a50; margin: 4px 8px; }
+
+/* Dashboard and section sub-nav */
+QFrame#dashboardCard {
+    background: rgba(12, 14, 16, 0.90);
+    border: 1px solid rgba(92, 104, 120, 0.60);
+    border-radius: 16px;
+    min-width: 520px;
+    min-height: 440px;
+}
+QFrame#dashboardCard:hover { border-color: #4CC3FF; background: rgba(18, 22, 26, 0.92); }
+QLabel#dashboardCardTitle { color: #E7ECF2; font-weight: 700; }
+QLabel#dashboardCardDesc { color: rgba(231, 236, 242, 0.78); font-size: 9.5pt; }
+QWidget#sectionSubNav {
+    background: rgba(8, 10, 12, 0.65);
+    border-bottom: 1px solid rgba(92, 104, 120, 0.50);
+}
+QWidget#sectionSubNav QPushButton:checked {
+    background: rgba(76, 195, 255, 0.22);
+    border-color: #4CC3FF;
+}
+QFrame#dashboardNewsWidget {
+    min-width: 520px;
+    min-height: 440px;
+    background: rgba(12, 14, 16, 0.90);
+    border: 1px solid rgba(92, 104, 120, 0.60);
+    border-radius: 16px;
+}
+QLabel#dashboardNewsTitle { color: #E7ECF2; font-weight: 700; }
+QTextEdit#dashboardNewsText { color: rgba(231, 236, 242, 0.9); }

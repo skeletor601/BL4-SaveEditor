@@ -1,0 +1,3 @@
+BL4 AIO packaging notes:
+- Do NOT include: venv/, __pycache__/, *.pyc, build/, dist/ in source zips.
+- Use requirements.txt + build_windows scripts to reproduce builds.

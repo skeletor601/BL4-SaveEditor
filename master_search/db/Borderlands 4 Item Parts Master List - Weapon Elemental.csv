@@ -1,0 +1,46 @@
+String,Element,Type ID,ID,Description
+Weapon.part_corrosive,Corrosive,1,10,First element
+Weapon.part_cryo,Cryo,1,11,First element
+Weapon.part_fire,Fire,1,12,First element
+Weapon.part_radiation,Radiation,1,13,First element
+Weapon.part_shock,Shock,1,14,First element
+Weapon.part_secondary_elem_corrosive_cryo_mal,Corrosive/Cryo,1,28,Second element on Maliwan weapons
+Weapon.part_secondary_elem_corrosive_fire_mal,Corrosive/Fire,1,27,Second element on Maliwan weapons
+Weapon.part_secondary_elem_corrosive_radiation_mal,Corrosive/Radiation,1,26,Second element on Maliwan weapons
+Weapon.part_secondary_elem_corrosive_shock_mal,Corrosive/Shock,1,25,Second element on Maliwan weapons
+Weapon.part_secondary_elem_cryo_corrosive_mal,Cryo/Corrosive,1,24,Second element on Maliwan weapons
+Weapon.part_secondary_elem_cryo_fire_mal,Cryo/Fire,1,23,Second element on Maliwan weapons
+Weapon.part_secondary_elem_cryo_radiation_mal,Cryo/Radiation,1,22,Second element on Maliwan weapons
+Weapon.part_secondary_elem_cryo_shock_mal,Cryo/Shock,1,21,Second element on Maliwan weapons
+Weapon.part_secondary_elem_fire_corrosive_mal,Fire/Corrosive,1,20,Second element on Maliwan weapons
+Weapon.part_secondary_elem_fire_cryo_mal,Fire/Cryo,1,19,Second element on Maliwan weapons
+Weapon.part_secondary_elem_fire_radiation_mal,Fire Radiation,1,18,Second element on Maliwan weapons
+Weapon.part_secondary_elem_fire_shock_mal,Fire/Shock,1,48,Second element on Maliwan weapons
+Weapon.part_secondary_elem_radiation_corrosive_mal,Radiation/Corrosive,1,17,Second element on Maliwan weapons
+Weapon.part_secondary_elem_radiation_cryo_mal,Radiation/Cryo,1,16,Second element on Maliwan weapons
+Weapon.part_secondary_elem_radiation_fire_mal,Radiation/Fire,1,15,Second element on Maliwan weapons
+Weapon.part_secondary_elem_radiation_shock_mal,Radiation/Shock,1,9,Second element on Maliwan weapons
+Weapon.part_secondary_elem_shock_corrosive_mal,Shock/Corrosive,1,8,Second element on Maliwan weapons
+Weapon.part_secondary_elem_shock_cryo_mal,Shock/Cryo,1,7,Second element on Maliwan weapons
+Weapon.part_secondary_elem_shock_fire_mal,Shock/Fire,1,6,Second element on Maliwan weapons
+Weapon.part_secondary_elem_shock_radiation_mal,Shock/Radiation,1,5,Second element on Maliwan weapons
+Weapon.part_secondary_elem_corrosive_cryo,Corrosive/Cryo,1,40,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_corrosive_fire,Corrosive/Fire,1,44,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_corrosive_radiation,Corrosive/Radiation,1,32,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_corrosive_shock,Corrosive/Shock,1,47,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_cryo_corrosive,Cryo/Corrosive,1,36,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_cryo_fire,Cryo/Fire,1,42,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_cryo_radiation,Cryo/Radiation,1,31,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_cryo_shock,Cryo/Shock,1,46,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_fire_corrosive,Fire/Corrosive,1,35,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_fire_cryo,Fire/Cryo,1,39,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_fire_radiation,Fire Radiation,1,30,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_fire_shock,Fire/Shock,1,49,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_radiation_corrosive,Radiation/Corrosive,1,33,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_radiation_cryo,Radiation/Cryo,1,37,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_radiation_fire,Radiation/Fire,1,41,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_radiation_shock,Radiation/Shock,1,45,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_shock_corrosive,Shock/Corrosive,1,34,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_shock_cryo,Shock/Cryo,1,38,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_shock_fire,Shock/Fire,1,43,Maliwan Licenced Underbarrel
+Weapon.part_secondary_elem_shock_radiation,Shock/Radiation,1,29,Maliwan Licenced Underbarrel
