@@ -68,8 +68,18 @@ def main():
                     os.remove(entry.path)  # entry.path = correct filesystem path from OS
                     safe_print(f"Removed: class_mods/{sub}/{safe_display}")
                 except OSError:
-                    safe_print(f"Could not remove: class_mods/{sub}/{safe_display}")
-                    removed -= 1
+                    # On Windows, path length may exceed MAX_PATH; use long-path form
+                    if sys.platform == "win32":
+                        try:
+                            long_path = "\\\\?\\" + str(Path(entry.path).resolve())
+                            os.remove(long_path)
+                            safe_print(f"Removed (long path): class_mods/{sub}/{safe_display}")
+                        except OSError:
+                            safe_print(f"Could not remove: class_mods/{sub}/{safe_display}")
+                            removed -= 1
+                    else:
+                        safe_print(f"Could not remove: class_mods/{sub}/{safe_display}")
+                        removed -= 1
     safe_print(f"\nKept: {kept} | Removed: {removed}")
     if dry_run and removed:
         safe_print("Run without --dry-run to actually delete.")
