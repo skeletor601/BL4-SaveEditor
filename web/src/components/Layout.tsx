@@ -3,9 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const nav = [
-  { to: "/", label: "Dashboard" },
+  { to: "/", label: "Home" },
+  { to: "/character", label: "Character" },
+  { to: "/inventory", label: "Inventory" },
+  { to: "/weapon-toolbox", label: "Weapon Toolbox" },
+  { to: "/accessories", label: "Accessories" },
   { to: "/master-search", label: "Master Search" },
-  { to: "/save-tools", label: "Save Tools" },
   { to: "/settings", label: "Settings" },
 ];
 
@@ -39,7 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 key={to}
                 to={to}
                 className={`px-3 py-2 rounded border text-sm ${
-                  location.pathname === to || (to !== "/" && location.pathname.startsWith(to))
+                  location.pathname === to || (to !== "/" && location.pathname.startsWith(to + "/"))
                     ? "bg-accent/20 border-accent text-accent"
                     : "border-panel-border text-[var(--color-text-muted)] hover:bg-panel"
                 }`}

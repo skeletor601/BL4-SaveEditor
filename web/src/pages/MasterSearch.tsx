@@ -11,7 +11,8 @@ import {
   parseCode,
   buildCopyFormat,
   RARITY_ORDER,
-  FAV_KEY,
+  apiItemToPartRow,
+  getManufacturer,
 } from "@/data/partsData";
 import { SAMPLE_PARTS } from "@/data/sampleParts";
 import SearchBar from "@/components/master-search/SearchBar";
@@ -26,6 +27,7 @@ const defaultFilters: FilterState = {
   sortRarity: "Default",
   manufacturer: "All",
   favoritesOnly: false,
+  quickFilter: "",
 };
 
 type SortCol = "code" | "itemType" | "rarity" | "partName" | "effect" | null;
@@ -41,12 +43,27 @@ export default function MasterSearch() {
   const [sortCol, setSortCol] = useState<SortCol>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-  // Sync body data-theme for Scarlett CSS (optional; we use CSS vars from ThemeContext)
+  const [data, setData] = useState<PartRow[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
   useEffect(() => {
     document.body.setAttribute("data-theme", theme);
   }, [theme]);
 
-  const data = useMemo(() => SAMPLE_PARTS, []);
+  useEffect(() => {
+    setDataLoading(true);
+    fetch("/api/parts/data")
+      .then((r) => r.json())
+      .then((body: { items?: unknown[] }) => {
+        const items = body?.items ?? [];
+        const rows = Array.isArray(items)
+          ? (items as { code?: string; itemType?: string; partName?: string; effect?: string; category?: string; manufacturer?: string; partType?: string; id?: number }[]).map(apiItemToPartRow)
+          : [];
+        setData(rows.length > 0 ? rows : SAMPLE_PARTS);
+      })
+      .catch(() => setData(SAMPLE_PARTS))
+      .finally(() => setDataLoading(false));
+  }, []);
 
   const toggleFavorite = useCallback((row: PartRow) => {
     const key = getRowKey(row);
@@ -64,8 +81,17 @@ export default function MasterSearch() {
     const q = search.trim().toLowerCase();
     let list = data.filter((row) => {
       if (filters.category !== "All" && deriveCategory(row) !== filters.category) return false;
+      if (filters.manufacturer !== "All" && getManufacturer(row) !== filters.manufacturer) return false;
+      if (filters.partType !== "All") {
+        const pt = (row["Part Type"] ?? "").toString().trim();
+        if (pt !== filters.partType) return false;
+      }
       if (filters.favoritesOnly && !favorites.has(getRowKey(row))) return false;
-      if (q && !blob(row).includes(q)) return false;
+      const b = blob(row);
+      if (q && !b.includes(q)) return false;
+      if (filters.quickFilter === "damage" && !b.includes("damage")) return false;
+      if (filters.quickFilter === "crit" && (!(b.includes("crit") || b.includes("critical")) || !b.includes("damage"))) return false;
+      if (filters.quickFilter === "splash" && (!b.includes("splash") || !b.includes("damage"))) return false;
       return true;
     });
     if (filters.sortRarity !== "Default") {
@@ -84,6 +110,26 @@ export default function MasterSearch() {
     }
     return list;
   }, [data, search, filters, favorites]);
+
+  const manufacturerOptions = useMemo(() => {
+    const set = new Set<string>();
+    data.forEach((row) => {
+      const m = getManufacturer(row);
+      if (m) set.add(m);
+    });
+    return ["All", ...Array.from(set).sort()];
+  }, [data]);
+
+  const partTypeOptions = useMemo(() => {
+    const set = new Set<string>();
+    const manufacturer = filters.manufacturer;
+    data.forEach((row) => {
+      if (manufacturer !== "All" && getManufacturer(row) !== manufacturer) return;
+      const pt = (row["Part Type"] ?? "").toString().trim();
+      if (pt) set.add(pt);
+    });
+    return ["All", ...Array.from(set).sort()];
+  }, [data, filters.manufacturer]);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -199,9 +245,17 @@ export default function MasterSearch() {
 
       <Filters
         filters={filters}
-        onFiltersChange={setFilters}
+        onFiltersChange={(next) => {
+          if (next.manufacturer !== filters.manufacturer) {
+            setFilters({ ...next, partType: "All" });
+          } else {
+            setFilters(next);
+          }
+        }}
         onExportFavorites={exportFavorites}
         onImportFavorites={importFavorites}
+        manufacturerOptions={manufacturerOptions}
+        partTypeOptions={partTypeOptions}
       />
 
       <PartsTable
@@ -215,7 +269,7 @@ export default function MasterSearch() {
       />
 
       <p className="px-4 py-2 text-[10px] text-[var(--color-text-muted)]">
-        {filteredAndSorted.length} result(s)
+        {dataLoading ? "Loading…" : `${filteredAndSorted.length} result(s)`}
       </p>
 
       {copyDialogRow && (

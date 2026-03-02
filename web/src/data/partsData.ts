@@ -15,7 +15,64 @@ export interface PartRow {
   Code?: string;
   category?: string;
   "Weapon Type"?: string;
+  Manufacturer?: string;
+  Rarity?: string;
   [key: string]: unknown;
+}
+
+/** API PartItem shape from backend */
+export interface ApiPartItem {
+  code: string;
+  itemType: string;
+  rarity?: string;
+  partName: string;
+  effect?: string;
+  category?: string;
+  manufacturer?: string;
+  partType?: string;
+  id?: number;
+}
+
+function getStr(obj: Record<string, unknown>, ...keys: string[]): string {
+  for (const k of keys) {
+    const v = obj[k];
+    if (v != null && String(v).trim() !== "") return String(v).trim();
+  }
+  return "";
+}
+
+/** Map API response item to PartRow for Master Search. Accepts camelCase, snake_case, or other keys. Includes rarity and all fields so blob() can search (e.g. "legendary", "enhancement"). */
+export function apiItemToPartRow(item: ApiPartItem | Record<string, unknown>): PartRow {
+  const raw = item as Record<string, unknown>;
+  const partName = getStr(raw, "partName", "part_name", "Part Name", "String");
+  const itemType = getStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name");
+  const partType = getStr(raw, "partType", "part_type", "Part Type");
+  const effect = getStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats");
+  const code = getStr(raw, "code", "Code");
+  const category = getStr(raw, "category", "Category");
+  const rarity = getStr(raw, "rarity", "Rarity");
+  const manufacturer = getStr(raw, "manufacturer", "Manufacturer");
+  const id = raw.id ?? raw.ID;
+  const weaponType = getStr(raw, "weaponType", "Weapon Type", "weapon_type");
+  const row: PartRow = {
+    String: partName,
+    "Model Name": itemType,
+    "Part Type": partType || category,
+    "Stats (Level 50, Common)": effect,
+    code: code || (typeof id === "number" ? `{${id}}` : ""),
+    Code: code || (typeof id === "number" ? `{${id}}` : ""),
+    category: category || undefined,
+    ID: typeof id === "number" ? id : undefined,
+    Manufacturer: manufacturer || undefined,
+    Rarity: rarity || undefined,
+    "Weapon Type": weaponType || undefined,
+  };
+  for (const [k, v] of Object.entries(raw)) {
+    if (k === "_blob" || k === "__hot") continue;
+    if (row[k] !== undefined) continue;
+    if (v != null && (typeof v === "string" || typeof v === "number")) row[k] = v;
+  }
+  return row;
 }
 
 export const FAV_KEY = "bl4_parts_favorites_v2";
@@ -111,6 +168,10 @@ export function getPartName(row: PartRow): string {
 
 export function getEffect(row: PartRow): string {
   return (row["Stats (Level 50, Common)"] ?? row["Effects"] ?? row.Stats ?? "").toString().trim() || "—";
+}
+
+export function getManufacturer(row: PartRow): string {
+  return (row.Manufacturer ?? "").toString().trim();
 }
 
 export function blob(row: PartRow): string {

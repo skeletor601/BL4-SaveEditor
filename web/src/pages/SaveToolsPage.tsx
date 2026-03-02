@@ -1,5 +1,7 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCallback, useRef, useState } from "react";
+import { useSave } from "@/contexts/SaveContext";
+import CharacterPage from "@/pages/save-tools/CharacterPage";
 
 const sections = [
   { path: "character", title: "Character", desc: "Select save, character, YAML" },
@@ -11,66 +13,186 @@ const sections = [
 ];
 
 function SaveToolsHub() {
-  const [fileInfo, setFileInfo] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const savInputRef = useRef<HTMLInputElement>(null);
+  const [savBytes, setSavBytes] = useState<Uint8Array | null>(null);
+  const [savFileName, setSavFileName] = useState<string | null>(null);
+  const [userIdInput, setUserIdInput] = useState("");
+  const {
+    saveData,
+    saveFileName,
+    loadError,
+    summary,
+    savePlatform,
+    loadFromFile,
+    decryptSav,
+    clearSave,
+    exportAsJson,
+    exportAsYaml,
+    downloadAsSav,
+    downloadRebuiltSavNoEdit,
+    hasRawBytesForRoundtrip,
+  } = useSave();
 
-  const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      loadFromFile(f);
+      e.target.value = "";
+    },
+    [loadFromFile]
+  );
+
+  const onSavFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    setFileInfo(`${f.name} (${(f.size / 1024).toFixed(1)} KB) – client-side only, not uploaded`);
+    f.arrayBuffer().then((buf) => {
+      setSavBytes(new Uint8Array(buf));
+      setSavFileName(f.name);
+    });
     e.target.value = "";
   }, []);
 
-  const exportBlob = useCallback(() => {
-    const blob = new Blob(["# BL4 save export placeholder\n"], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "bl4-export.txt";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }, []);
+  const onDecryptSav = useCallback(() => {
+    if (!savBytes || !userIdInput.trim()) return;
+    decryptSav(savBytes, userIdInput.trim(), savFileName);
+  }, [savBytes, userIdInput, savFileName, decryptSav]);
 
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold text-[var(--color-text)]">Save Tools</h1>
-      <p className="text-[var(--color-text-muted)]">All save file handling is client-side only. Nothing is uploaded.</p>
+      <p className="text-[var(--color-text-muted)]">Load, edit, and download saves in this app. Decrypt and encrypt run on the server (API must be running).</p>
 
-      <div className="border border-panel-border rounded-lg p-6 bg-panel/80">
-        <h2 className="text-accent font-medium mb-3">File import / export</h2>
+      <div className="border border-[var(--color-panel-border)] rounded-lg p-6 bg-[rgba(24,28,34,0.6)]">
+        <h2 className="text-[var(--color-accent)] font-medium mb-3">Open .sav (decrypt)</h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-3">Decrypt a BL4 .sav file here. Enter your Epic Games ID or Steam ID (17 digits).</p>
+        <div className="flex flex-wrap gap-3 items-end">
+          <input
+            ref={savInputRef}
+            type="file"
+            accept=".sav,application/octet-stream"
+            className="hidden"
+            onChange={onSavFileChange}
+          />
+          <button
+            type="button"
+            onClick={() => savInputRef.current?.click()}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-dim)]"
+          >
+            Choose .sav file
+          </button>
+          <label className="flex flex-col gap-1">
+            <span className="text-[11px] text-[var(--color-text-muted)]">Epic or Steam User ID</span>
+            <input
+              type="text"
+              value={userIdInput}
+              onChange={(e) => setUserIdInput(e.target.value)}
+              placeholder="Epic ID or 17-digit Steam ID"
+              className="px-3 py-2 min-h-[44px] w-[220px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={onDecryptSav}
+            disabled={!savBytes || !userIdInput.trim()}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Decrypt
+          </button>
+        </div>
+        {savFileName && <p className="mt-2 text-sm text-[var(--color-text-muted)]">Selected: {savFileName}</p>}
+      </div>
+
+      <div className="border border-[var(--color-panel-border)] rounded-lg p-6 bg-[rgba(24,28,34,0.6)]">
+        <h2 className="text-[var(--color-accent)] font-medium mb-3">Open JSON/YAML or export</h2>
         <div className="flex flex-wrap gap-3 items-center">
           <input
             ref={inputRef}
             type="file"
-            accept=".sav,.json,.txt"
+            accept=".json,.yaml,.yml,.txt,application/json,text/yaml,text/plain"
             className="hidden"
             onChange={onFileChange}
           />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="px-4 py-2 rounded border border-panel-border text-accent hover:bg-panel"
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-dim)]"
           >
-            Open (choose file)
+            Open (JSON or YAML)
           </button>
           <button
             type="button"
-            onClick={exportBlob}
-            className="px-4 py-2 rounded border border-panel-border text-accent hover:bg-panel"
+            onClick={() => downloadRebuiltSavNoEdit()}
+            disabled={!hasRawBytesForRoundtrip}
+            title="Re-encrypt decrypted bytes without editing (for round-trip validation)."
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save / Export
+            No-Edit Roundtrip
           </button>
-          {fileInfo && <span className="text-sm text-[var(--color-text-muted)]">{fileInfo}</span>}
+          <button
+            type="button"
+            onClick={() => downloadAsSav()}
+            disabled={!saveData || !savePlatform}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Download .sav
+          </button>
+          <button
+            type="button"
+            onClick={() => exportAsJson()}
+            disabled={!saveData}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Export as JSON
+          </button>
+          <button
+            type="button"
+            onClick={() => exportAsYaml()}
+            disabled={!saveData}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Export as YAML
+          </button>
+          {saveData && (
+            <button
+              type="button"
+              onClick={clearSave}
+              className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]"
+            >
+              Clear save
+            </button>
+          )}
         </div>
+        {loadError && (
+          <p className="mt-3 text-sm text-red-400" role="alert">
+            {loadError}
+          </p>
+        )}
+        {summary && saveData && (
+          <div className="mt-4 p-3 rounded-lg bg-[rgba(0,0,0,0.2)] text-sm text-[var(--color-text)]">
+            <p className="font-medium text-[var(--color-accent)]">Loaded save</p>
+            {saveFileName && <p>File: {saveFileName}</p>}
+            {savePlatform && <p>Platform: {savePlatform}</p>}
+            <p>Character: {summary.charName}</p>
+            <p>Level: {summary.level}</p>
+            {summary.difficulty !== "—" && <p>Difficulty: {summary.difficulty}</p>}
+          </div>
+        )}
       </div>
+
+      <p className="text-[10px] text-[var(--color-text-muted)]">
+        Use &quot;No-Edit Roundtrip&quot; after decrypt to download a rebuilt .sav (no YAML touch). Use &quot;Download .sav&quot; for edited or JSON/YAML-opened saves. Use “Open .sav” + your Epic or Steam User ID to load a save; edit in Character/Inventory/etc., then “Download .sav” to get an encrypted file back. You never need a PC or another site.
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sections.map(({ path, title, desc }) => (
           <Link
             key={path}
             to={`/save-tools/${path}`}
-            className="block p-4 rounded-lg border border-panel-border bg-panel/80 hover:bg-accent/10"
+            className="block p-4 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] hover:bg-[var(--color-accent-dim)]"
           >
-            <h2 className="font-semibold text-accent">{title}</h2>
+            <h2 className="font-semibold text-[var(--color-accent)]">{title}</h2>
             <p className="text-sm text-[var(--color-text-muted)] mt-1">{desc}</p>
           </Link>
         ))}
@@ -95,6 +217,10 @@ export default function SaveToolsPage() {
 
   if (subPath === "index" || subPath === "") {
     return <SaveToolsHub />;
+  }
+
+  if (subPath === "character") {
+    return <CharacterPage />;
   }
 
   const section = sections.find((s) => s.path === subPath);
