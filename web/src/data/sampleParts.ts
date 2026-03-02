@@ -12,6 +12,7 @@ export const SAMPLE_PARTS: PartRow[] = [
     "Stats (Level 50, Common)": "Projectiles from Guns with Atlas-licensed parts automatically attach a Tracker Dart every 25s",
     code: "{284:1}",
     category: "Enhancement",
+    Rarity: "Legendary",
   },
   {
     "String": "BOR_Enhancement.part_core_bor_traumabond",
@@ -21,6 +22,7 @@ export const SAMPLE_PARTS: PartRow[] = [
     "Stats (Level 50, Common)": "After Reloading an empty Magazine, Guns with Ripper-licensed parts have a 30% Chance to increase the next Magazine's Fire Rate +100%",
     code: "{296:11}",
     category: "Enhancement",
+    Rarity: "Legendary",
   },
   {
     "String": "BOR_Enhancement.part_core_bor_shortcircuit",
@@ -30,6 +32,7 @@ export const SAMPLE_PARTS: PartRow[] = [
     "Stats (Level 50, Common)": "Short Circuit effect description.",
     code: "{296:12}",
     category: "Enhancement",
+    Rarity: "Legendary",
   },
   {
     "String": "DAD_Weapon.part_pistol_bonn91",
@@ -40,6 +43,7 @@ export const SAMPLE_PARTS: PartRow[] = [
     code: "{55:2}",
     category: "Weapon",
     "Weapon Type": "Pistol",
+    Rarity: "Legendary",
   },
   {
     "String": "ATL_ClassMod.Furnace",
@@ -48,6 +52,7 @@ export const SAMPLE_PARTS: PartRow[] = [
     "Stats (Level 50, Common)": "Class mod effect.",
     code: "{255:0}",
     category: "Class Mod",
+    Rarity: "Legendary",
   },
   {
     "String": "MAL_Grenade.part_core",
@@ -56,5 +61,6 @@ export const SAMPLE_PARTS: PartRow[] = [
     "Stats (Level 50, Common)": "Grenades stick to enemies.",
     code: "{263:0}",
     category: "Grenade",
+    Rarity: "Legendary",
   },
 ];
