@@ -106,8 +106,9 @@ const LEG_SET = new Set(LEG_NAMES.map((n) => norm(n)).filter(Boolean));
 export function getRowKey(row: PartRow): string {
   const s = (row["String"] ?? row.String ?? "").toString().trim();
   if (s) return s;
-  const id = (row["ID"] != null ? row["ID"] : (row as PartRow).ID != null ? (row as PartRow).ID : "").toString().trim();
-  if (id) return "id:" + id;
+  const rawId = row["ID"];
+  const idStr = rawId != null ? String(rawId).trim() : "";
+  if (idStr) return "id:" + idStr;
   return JSON.stringify(row);
 }
 

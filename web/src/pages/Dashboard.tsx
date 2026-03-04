@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchApi } from "@/lib/apiClient";
 
 const cards = [
-  { to: "/save-tools/character", title: "Character", desc: "Select save, character, YAML", icon: "👤" },
-  { to: "/save-tools/inventory", title: "Inventory", desc: "Parts translator, backpack", icon: "🎒" },
-  { to: "/save-tools/weapon-toolbox", title: "Weapon Toolbox", desc: "Weapon gen, weapon edit", icon: "🔧" },
-  { to: "/save-tools/accessories", title: "Accessories", desc: "Class mod, grenades, shields, more", icon: "💣" },
+  { to: "/character", title: "Character", desc: "Select save, character, YAML", icon: "👤" },
+  { to: "/inventory", title: "Inventory", desc: "Parts translator, backpack", icon: "🎒" },
+  { to: "/weapon-toolbox", title: "Weapon Toolbox", desc: "Weapon gen, weapon edit", icon: "🔧" },
+  { to: "/accessories", title: "Accessories", desc: "Class mod, grenades, shields, more", icon: "💣" },
   { to: "/master-search", title: "Master Search", desc: "Search parts and items database", icon: "🔍" },
 ];
 
@@ -13,7 +14,7 @@ export default function Dashboard() {
   const [news, setNews] = useState<string>("");
 
   useEffect(() => {
-    fetch("/api/news")
+    fetchApi("news")
       .then((r) => r.json())
       .then((d) => setNews(d.content ?? ""))
       .catch(() => setNews("Welcome to BL4 AIO Save Editor Web. Change themes in the header or Settings."));

@@ -20,6 +20,7 @@ import Filters, { type FilterState } from "@/components/master-search/Filters";
 import PartsTable from "@/components/master-search/PartsTable";
 import CopyQuantityDialog from "@/components/master-search/CopyQuantityDialog";
 import Toast from "@/components/master-search/Toast";
+import { fetchApi } from "@/lib/apiClient";
 
 const defaultFilters: FilterState = {
   category: "All",
@@ -52,7 +53,7 @@ export default function MasterSearch() {
 
   useEffect(() => {
     setDataLoading(true);
-    fetch("/api/parts/data")
+    fetchApi("parts/data")
       .then((r) => r.json())
       .then((body: { items?: unknown[] }) => {
         const items = body?.items ?? [];

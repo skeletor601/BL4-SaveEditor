@@ -1,0 +1,27 @@
+# Dependencies and build outputs
+api/node_modules
+web/node_modules
+node_modules
+**/__pycache__
+*.pyc
+.git
+.gitignore
+
+# Don't ship desktop app / Qt into the image (web is needed for single-service build)
+qt_*.py
+main_window.py
+dashboard_widget.py
+save_selector_widget.py
+save_game_controller.py
+converter_tab.py
+build_exe.py
+pyinstaller_config.py
+*.spec
+theme_manager.py
+extract_localization.py
+nv_logger.py
+clean_code_dialog.py
+tools
+
+# Optional: shrink image (uncomment if build is slow)
+# api/dist

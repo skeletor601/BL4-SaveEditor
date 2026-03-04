@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "copy-bg-themes": "node -e \"const fs=require('fs');const path=require('path');const src=path.join(process.cwd(),'..','..','Borderlands4-SaveEditor-3.4.5.2','BG_Themes');const dest=path.join(process.cwd(),'public','BG_Themes');if(!fs.existsSync(dest))fs.mkdirSync(dest,{recursive:true});fs.readdirSync(src).filter(f=>/\\\\.png$/i.test(f)).forEach(f=>fs.copyFileSync(path.join(src,f),path.join(dest,f)));console.log('Copied BG_Themes images');\""
   },
   "dependencies": {
     "react": "^18.3.1",
