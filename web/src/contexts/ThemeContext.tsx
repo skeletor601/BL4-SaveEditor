@@ -23,6 +23,18 @@ type ThemeConfig = {
   bgOverlay: string;
 };
 
+/** Background image filename per theme (matches desktop BG_Themes/). Artic_Hex uses "Artic Hex" in filename. */
+const THEME_BG_FILENAMES: Record<ThemeId, string> = {
+  Ion: "Ion",
+  Lava: "Lava",
+  Phoenix: "Phoenix",
+  Violet: "Violet",
+  Blue_Balls: "Blue_Balls",
+  Artic_Hex: "Artic Hex",
+  Carbon_Flux: "Carbon_Flux",
+  Platinum: "Platinum",
+};
+
 const themeConfig: Record<ThemeId, ThemeConfig> = {
   Ion: { accent: "#00BFFF", accentMuted: "rgba(0,245,255,0.7)", accentDim: "rgba(0,191,255,0.35)", panelBorder: "#00ffff", bgOverlay: "rgba(0,0,0,0.25)" },
   Lava: { accent: "#FF6600", accentMuted: "rgba(255,102,0,0.7)", accentDim: "rgba(255,102,0,0.35)", panelBorder: "#ff6600", bgOverlay: "rgba(0,0,0,0.45)" },
@@ -59,6 +71,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.style.setProperty("--color-accent-dim", c.accentDim);
     document.documentElement.style.setProperty("--color-panel-border", c.panelBorder);
     document.documentElement.style.setProperty("--color-bg-overlay", c.bgOverlay);
+    const bgName = THEME_BG_FILENAMES[theme];
+    const encoded = encodeURIComponent(bgName);
+    document.documentElement.style.setProperty("--theme-bg-url", `url("/BG_Themes/${encoded}.png")`);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   const value = useMemo(

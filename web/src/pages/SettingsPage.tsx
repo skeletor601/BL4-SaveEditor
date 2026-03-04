@@ -1,13 +1,14 @@
 import { useTheme, THEMES, type ThemeId } from "@/contexts/ThemeContext";
 import { useEffect, useState } from "react";
+import { fetchApi } from "@/lib/apiClient";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [version, setVersion] = useState<{ version?: string; downloadUrl?: string }>({});
 
   useEffect(() => {
-    fetch("/api/version")
-      .then((r) => r.json())
+    fetchApi("version")
+      .then((r: Response) => r.json())
       .then(setVersion)
       .catch(() => setVersion({ version: "—", downloadUrl: "#" }));
   }, []);

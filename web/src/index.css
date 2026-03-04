@@ -5,6 +5,7 @@
 :root {
   --color-bg: #0a0a12;
   --color-bg-overlay: rgba(0, 0, 0, 0.4);
+  --theme-bg-url: url("/BG_Themes/Ion.png");
   --color-panel: rgba(10, 10, 18, 0.92);
   --color-panel-border: #00ffff;
   --color-accent: #00ffff;

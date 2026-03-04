@@ -14,11 +14,23 @@ const nav = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, themeConfig } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const overlay = themeConfig.bgOverlay;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Theme background image (matches desktop): changes when theme changes */}
+      <div
+        className="fixed inset-0 z-0 bg-bg"
+        style={{
+          backgroundImage: `linear-gradient(${overlay}, ${overlay}), var(--theme-bg-url)`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      <div className="relative z-10 flex flex-col min-h-screen">
       <header className="border-b border-panel-border bg-panel/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-4">
@@ -99,6 +111,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <span>All Credit Goes to Original Creator Superexboom</span>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

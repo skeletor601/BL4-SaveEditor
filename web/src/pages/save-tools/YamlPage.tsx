@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { parse as yamlParse, stringify as yamlStringify } from "yaml";
+import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import type { SaveData } from "@/contexts/SaveContext";
 

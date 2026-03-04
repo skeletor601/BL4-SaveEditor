@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
+import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
 function bytesToBase64(bytes: Uint8Array): string {
   const chunk = 8192;
@@ -141,14 +142,18 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       const base64 = bytesToBase64(encBytes);
-      const res = await fetch("/api/save/decrypt", {
+      const res = await fetchApi("save/decrypt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: uid, sav_data: base64 }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setLoadError(typeof data.error === "string" ? data.error : "Decrypt failed. Is the API running?");
+        const msg =
+          isLikelyUnavailable(res)
+            ? getApiUnavailableError()
+            : (typeof data.error === "string" ? data.error : "Decrypt failed.");
+        setLoadError(msg);
         setSaveData(null);
         setSaveFileName(null);
         setSaveUserId(null);
@@ -179,7 +184,7 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       setRawYamlUtf8(data.yaml_content);
       setRawBytesBase64(typeof data.raw_bytes_base64 === "string" ? data.raw_bytes_base64 : null);
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : "Decrypt failed. Is the API running?");
+      setLoadError(e instanceof Error ? e.message : getApiUnavailableError());
       setSaveData(null);
       setSaveFileName(null);
       setSaveUserId(null);
@@ -197,14 +202,17 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
 
   const doEncryptDownload = useCallback(
     async (body: Record<string, unknown>, defaultFilename: string) => {
-      const res = await fetch("/api/save/encrypt", {
+      const res = await fetchApi("save/encrypt", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setLoadError(typeof data.error === "string" ? data.error : "Encrypt failed. Is the API running?");
+        const msg =
+          isLikelyUnavailable(res)
+            ? getApiUnavailableError()
+            : (typeof data.error === "string" ? data.error : "Encrypt failed.");
+        setLoadError(msg);
         return;
       }
       const buf = await res.arrayBuffer();

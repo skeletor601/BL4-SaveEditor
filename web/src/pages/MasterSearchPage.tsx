@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { fetchApi } from "@/lib/apiClient";
 
 const FAVORITES_KEY = "bl4-master-search-favorites";
 
@@ -51,7 +52,7 @@ export default function MasterSearchPage() {
     if (query) params.set("q", query);
     if (category !== "All") params.set("category", category);
     params.set("limit", "500");
-    fetch(`/api/parts/search?${params}`)
+    fetchApi(`parts/search?${params}`)
       .then((r) => r.json())
       .then((d) => setItems(d.items ?? []))
       .catch(() => setItems([]))

@@ -1,4 +1,14 @@
-const API_BASE = (import.meta.env.VITE_API_URL as string) || "";
+function getImportMetaEnv(): Record<string, string | undefined> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const env = (import.meta as any)?.env as Record<string, string | undefined> | undefined;
+    return env ?? {};
+  } catch {
+    return {};
+  }
+}
+
+const API_BASE = (getImportMetaEnv().VITE_API_URL as string) || "";
 
 export async function apiGet<T>(path: string): Promise<T> {
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;

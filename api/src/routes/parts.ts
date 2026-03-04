@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { getManifest } from "../data/parts.js";
-import { searchParts } from "../data/parts.js";
+import { getManifest, getAllParts, searchParts, getPartByCode, getPartsByCodes } from "../data/parts.js";
 
 export async function partsRoutes(
   fastify: FastifyInstance,
@@ -11,12 +10,33 @@ export async function partsRoutes(
     return reply.send(manifest);
   });
 
+  /** Full dataset for client-side search/filter. No pagination. */
+  fastify.get("/data", async (_request, reply) => {
+    const items = getAllParts();
+    return reply.send({ items });
+  });
+
+  /** Look up one part by code (e.g. {291:1}). For item/weapon edit fallback when CSV has no row. */
+  fastify.get<{ Querystring: { code?: string } }>("/lookup", async (request, reply) => {
+    const code = (request.query.code ?? "").trim();
+    if (!code) return reply.code(400).send({ error: "Missing code" });
+    const part = getPartByCode(code);
+    return reply.send(part ?? null);
+  });
+
+  /** Look up multiple parts by code. Body: { codes: string[] }. Returns { [code]: PartItem | null }. */
+  fastify.post<{ Body: { codes?: string[] } }>("/lookup-bulk", async (request, reply) => {
+    const codes = Array.isArray(request.body?.codes) ? request.body.codes : [];
+    const result = getPartsByCodes(codes);
+    return reply.send(result);
+  });
+
   fastify.get<{
     Querystring: { q?: string; category?: string; limit?: string };
   }>("/search", async (request, reply) => {
     const q = request.query.q ?? "";
     const category = request.query.category;
-    const limit = Math.min(Number(request.query.limit) || 100, 500);
+    const limit = Math.min(Number(request.query.limit) || 10000, 50000);
     const items = searchParts(q, category, limit);
     return reply.send({ items });
   });

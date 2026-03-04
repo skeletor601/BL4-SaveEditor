@@ -155,7 +155,7 @@ export default function Filters({
       </div>
 
       <p className="text-[10px] text-[var(--color-text-muted)] ml-1 self-center max-w-[320px] w-full sm:w-auto shrink-0">
-        Export saves to your Downloads folder as bl4-favorites.json. When importing, open that file from Downloads.
+        Favorites are saved on this device—no import needed each visit. Export for backup or to use on another device.
       </p>
     </div>
   );
