@@ -156,9 +156,18 @@ export function getAllParts(): PartItem[] {
   return loadPartsJson();
 }
 
-/** Normalize code to {x:y} or {x} form for lookup. */
+/** Normalize code to {x:y} or {x} form for lookup.
+ * Accepts common user input variants like:
+ *  - "{285:1}"
+ *  - "285:1"
+ *  - "285,1"  (comma instead of colon, as often typed)
+ *  - "285"    (no variant index)
+ */
 function normalizeCode(code: string): string {
-  const s = (code || "").trim();
+  const original = (code || "").trim();
+  if (!original) return "";
+  // Treat commas like colons so inputs like "285,1" work the same as "285:1"
+  const s = original.replace(/,/g, ":");
   if (/^\{\d+:\d+\}$/.test(s) || /^\{\d+\}$/.test(s)) return s;
   const match = s.match(/\{(\d+)(?::(\d+))?\}/);
   if (match) return match[2] != null ? `{${match[1]}:${match[2]}}` : `{${match[1]}}`;

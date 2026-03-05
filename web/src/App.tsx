@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import StagingGate from "@/components/StagingGate";
 import Dashboard from "@/pages/Dashboard";
 import MasterSearch from "@/pages/MasterSearch";
+import MasterSearchPage from "@/pages/MasterSearchPage";
 import CharacterSectionPage from "@/pages/CharacterSectionPage";
 import InventoryPage from "@/pages/InventoryPage";
 import WeaponToolboxPage from "@/pages/WeaponToolboxPage";
@@ -21,7 +22,10 @@ function AppRoutes() {
         <Route path="/inventory/*" element={<InventoryPage />} />
         <Route path="/weapon-toolbox/*" element={<WeaponToolboxPage />} />
         <Route path="/accessories/*" element={<AccessoriesPage />} />
-        <Route path="/master-search" element={<MasterSearch />} />
+        {/* Master Search: use the simple page that works; we'll restyle it next */}
+        <Route path="/master-search" element={<MasterSearchPage />} />
+        {/* Rich UI (filters/quick buttons) – experimental */}
+        <Route path="/master-search-rich" element={<MasterSearch />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />

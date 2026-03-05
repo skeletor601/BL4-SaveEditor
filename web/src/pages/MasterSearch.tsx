@@ -52,19 +52,31 @@ export default function MasterSearch() {
   }, [theme]);
 
   useEffect(() => {
+    // Use the backend /parts/search endpoint for text + category filtering,
+    // then apply the richer UI filters (manufacturer, part type, quick filters, etc.) client-side.
     setDataLoading(true);
-    fetchApi("parts/data")
+    const params = new URLSearchParams();
+    if (search.trim()) params.set("q", search.trim());
+    if (filters.category !== "All") params.set("category", filters.category);
+    params.set("limit", "500");
+    fetchApi(`parts/search?${params.toString()}`)
       .then((r) => r.json())
       .then((body: { items?: unknown[] }) => {
         const items = body?.items ?? [];
         const rows = Array.isArray(items)
-          ? (items as { code?: string; itemType?: string; partName?: string; effect?: string; category?: string; manufacturer?: string; partType?: string; id?: number }[]).map(apiItemToPartRow)
+          ? (items as { code?: string; itemType?: string; partName?: string; effect?: string; category?: string; manufacturer?: string; partType?: string; id?: number }[]).map(
+              apiItemToPartRow
+            )
           : [];
-        setData(rows.length > 0 ? rows : SAMPLE_PARTS);
+        // Always show real API data; if there are no matches, show an empty table instead of sample data
+        setData(rows);
       })
-      .catch(() => setData(SAMPLE_PARTS))
+      .catch(() => {
+        // On error, show no rows rather than confusing sample data
+        setData([]);
+      })
       .finally(() => setDataLoading(false));
-  }, []);
+  }, [search, filters.category]);
 
   const toggleFavorite = useCallback((row: PartRow) => {
     const key = getRowKey(row);
@@ -79,7 +91,6 @@ export default function MasterSearch() {
   }, []);
 
   const filteredAndSorted = useMemo(() => {
-    const q = search.trim().toLowerCase();
     let list = data.filter((row) => {
       if (filters.category !== "All" && deriveCategory(row) !== filters.category) return false;
       if (filters.manufacturer !== "All" && getManufacturer(row) !== filters.manufacturer) return false;
@@ -89,7 +100,6 @@ export default function MasterSearch() {
       }
       if (filters.favoritesOnly && !favorites.has(getRowKey(row))) return false;
       const b = blob(row);
-      if (q && !b.includes(q)) return false;
       if (filters.quickFilter === "damage" && !b.includes("damage")) return false;
       if (filters.quickFilter === "crit" && (!(b.includes("crit") || b.includes("critical")) || !b.includes("damage"))) return false;
       if (filters.quickFilter === "splash" && (!b.includes("splash") || !b.includes("damage"))) return false;
