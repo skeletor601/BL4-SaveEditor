@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
 
 const FAVORITES_KEY = "bl4-master-search-favorites";
@@ -102,100 +103,160 @@ export default function MasterSearchPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Breadcrumb / back to dashboard */}
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className="text-xl font-semibold text-[var(--color-text)]">BL4 Master Search</h1>
-        <span className="px-2 py-0.5 rounded text-xs bg-accent/20 text-accent border border-panel-border">BETA</span>
+        <Link
+          to="/"
+          className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
+        >
+          ← Home
+        </Link>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-        <input
-          type="search"
-          placeholder="Search anything (code, part, name)"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 min-w-[200px] px-3 py-2 rounded border border-panel-border bg-panel text-[var(--color-text)] placeholder:text-[var(--color-text-muted)]"
-        />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="px-3 py-2 rounded border border-panel-border bg-panel text-accent"
-        >
-          <option value="All">Category: All</option>
-          <option value="Enhancement">Enhancement</option>
-        </select>
-        <select
-          value={sortRarity}
-          onChange={(e) => setSortRarity(e.target.value)}
-          className="px-3 py-2 rounded border border-panel-border bg-panel text-accent"
-        >
-          <option value="Default">Sort by rarity: Default</option>
-          <option value="Legendary first">Legendary first</option>
-        </select>
-        <select
-          value={manufacturer}
-          onChange={(e) => setManufacturer(e.target.value)}
-          className="px-3 py-2 rounded border border-panel-border bg-panel text-accent"
-        >
-          <option value="All">Manufacturer: All</option>
-        </select>
-        <label className="flex items-center gap-2 text-[var(--color-text-muted)]">
-          <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} className="rounded border-panel-border text-accent" />
-          Favorites only
-        </label>
-        <div className="flex gap-2">
-          <button type="button" onClick={() => setRefresh((r) => r + 1)} className="px-3 py-2 rounded border border-panel-border text-accent hover:bg-panel">Reload</button>
-          <button type="button" onClick={exportFavorites} className="px-3 py-2 rounded border border-panel-border text-accent hover:bg-panel">Export favorites</button>
-          <button type="button" onClick={importFavorites} className="px-3 py-2 rounded border border-panel-border text-accent hover:bg-panel">Import favorites</button>
+      {/* Page title card (matches Dashboard style) */}
+      <div className="rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-xl font-semibold text-[var(--color-text)]">Master Search</h1>
+          <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-accent/20 text-accent border border-panel-border">
+            BETA
+          </span>
         </div>
+        <p className="text-sm text-[var(--color-text-muted)] mt-1">
+          Search by code, part name, manufacturer, or type. Click a row for details.
+        </p>
       </div>
 
-      {loading ? (
-        <p className="text-[var(--color-text-muted)]">Loading…</p>
-      ) : (
-        <div className="border border-panel-border rounded-lg overflow-hidden bg-panel">
-          <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-panel border-b border-panel-border">
-                <tr>
-                  <th className="text-left p-2 w-10"></th>
-                  <th className="text-left p-2">Code</th>
-                  <th className="text-left p-2">Item Type</th>
-                  <th className="text-left p-2">Rarity</th>
-                  <th className="text-left p-2">Part Name</th>
-                  <th className="text-left p-2">Effect</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((row) => (
-                  <tr
-                    key={row.code + row.partName}
-                    className={`border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer ${row.rarity === "Legendary" ? "bg-accent/5" : ""}`}
-                    onClick={() => setLightboxItem(row)}
-                  >
-                    <td className="p-2">
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); toggleFavorite(row.code); }}
-                        className="text-lg"
-                        aria-label={favorites.has(row.code) ? "Remove favorite" : "Add favorite"}
-                      >
-                        {favorites.has(row.code) ? "★" : "☆"}
-                      </button>
-                    </td>
-                    <td className="p-2 font-mono">{row.code}</td>
-                    <td className="p-2">{row.itemType}</td>
-                    <td className="p-2">{row.rarity ?? "–"}</td>
-                    <td className="p-2 font-mono text-xs">{row.partName}</td>
-                    <td className="p-2 max-w-md truncate">{row.effect ?? "–"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Filters card */}
+      <div className="rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm p-4">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 flex-wrap items-stretch">
+            <input
+              type="search"
+              placeholder="Search (e.g. hellwalker, triple bypass, code…)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 min-w-[200px] px-4 py-2.5 rounded-lg border border-panel-border bg-panel text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-accent/50"
+              aria-label="Search parts"
+            />
+            <div className="flex flex-wrap gap-2 items-center">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-panel-border bg-panel text-accent text-sm"
+                aria-label="Category"
+              >
+                <option value="All">All categories</option>
+                <option value="Enhancement">Enhancement</option>
+              </select>
+              <select
+                value={sortRarity}
+                onChange={(e) => setSortRarity(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-panel-border bg-panel text-accent text-sm"
+                aria-label="Sort by rarity"
+              >
+                <option value="Default">Default order</option>
+                <option value="Legendary first">Legendary first</option>
+              </select>
+              <select
+                value={manufacturer}
+                onChange={(e) => setManufacturer(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-panel-border bg-panel text-accent text-sm"
+                aria-label="Manufacturer"
+              >
+                <option value="All">All manufacturers</option>
+              </select>
+              <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={favoritesOnly}
+                  onChange={(e) => setFavoritesOnly(e.target.checked)}
+                  className="rounded border-panel-border text-accent"
+                />
+                Favorites only
+              </label>
+            </div>
           </div>
-          <p className="p-2 text-[var(--color-text-muted)] text-xs">{filtered.length} result(s)</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setRefresh((r) => r + 1)}
+              className="px-3 py-2 rounded-lg border border-panel-border text-accent text-sm hover:bg-panel transition-colors"
+            >
+              Reload
+            </button>
+            <button
+              type="button"
+              onClick={exportFavorites}
+              className="px-3 py-2 rounded-lg border border-panel-border text-accent text-sm hover:bg-panel transition-colors"
+            >
+              Export favorites
+            </button>
+            <button
+              type="button"
+              onClick={importFavorites}
+              className="px-3 py-2 rounded-lg border border-panel-border text-accent text-sm hover:bg-panel transition-colors"
+            >
+              Import favorites
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Results card */}
+      <div className="rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm overflow-hidden">
+        {loading ? (
+          <p className="p-6 text-[var(--color-text-muted)]">Loading…</p>
+        ) : (
+          <>
+            <div className="overflow-x-auto max-h-[60vh] overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-[rgba(48,52,60,0.95)] border-b border-panel-border">
+                  <tr>
+                    <th className="text-left p-3 w-10" aria-label="Favorite" />
+                    <th className="text-left p-3 font-medium text-[var(--color-text)]">Code</th>
+                    <th className="text-left p-3 font-medium text-[var(--color-text)]">Item Type</th>
+                    <th className="text-left p-3 font-medium text-[var(--color-text)]">Rarity</th>
+                    <th className="text-left p-3 font-medium text-[var(--color-text)]">Part Name</th>
+                    <th className="text-left p-3 font-medium text-[var(--color-text)]">Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((row) => (
+                    <tr
+                      key={row.code + row.partName}
+                      className={`border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer transition-colors ${row.rarity === "Legendary" ? "bg-accent/15 text-accent" : ""}`}
+                      onClick={() => setLightboxItem(row)}
+                    >
+                      <td className="p-3">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(row.code);
+                          }}
+                          className="text-lg leading-none"
+                          aria-label={favorites.has(row.code) ? "Remove favorite" : "Add favorite"}
+                        >
+                          {favorites.has(row.code) ? "★" : "☆"}
+                        </button>
+                      </td>
+                      <td className="p-3 font-mono text-xs">{row.code}</td>
+                      <td className="p-3">{row.itemType}</td>
+                      <td className="p-3">{row.rarity ?? "–"}</td>
+                      <td className="p-3 font-mono text-xs text-[var(--color-text)]">{row.partName}</td>
+                      <td className="p-3 max-w-md truncate text-[var(--color-text-muted)]">{row.effect ?? "–"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="p-3 text-xs text-[var(--color-text-muted)] border-t border-panel-border">
+              {filtered.length} result(s)
+            </p>
+          </>
+        )}
+      </div>
 
       {lightboxItem && (
         <div
@@ -206,17 +267,17 @@ export default function MasterSearchPage() {
           aria-label="Part details"
         >
           <div
-            className="bg-panel border-2 border-panel-border rounded-lg max-w-lg w-full p-6 shadow-xl"
+            className="rounded-lg border-2 border-panel-border bg-[rgba(48,52,60,0.95)] backdrop-blur-sm max-w-lg w-full p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-accent font-semibold">{lightboxItem.itemType}</h3>
-            <p className="font-mono text-sm mt-1">{lightboxItem.partName}</p>
-            <p className="text-sm mt-2">{lightboxItem.effect ?? "–"}</p>
+            <p className="font-mono text-sm mt-1 text-[var(--color-text)]">{lightboxItem.partName}</p>
+            <p className="text-sm mt-2 text-[var(--color-text-muted)]">{lightboxItem.effect ?? "–"}</p>
             <p className="text-xs text-[var(--color-text-muted)] mt-2">Code: {lightboxItem.code}</p>
             <button
               type="button"
               onClick={() => setLightboxItem(null)}
-              className="mt-4 px-4 py-2 rounded border border-panel-border text-accent hover:bg-panel"
+              className="mt-4 px-4 py-2 rounded-lg border border-panel-border text-accent hover:bg-panel transition-colors"
             >
               Close
             </button>

@@ -4,7 +4,11 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export default function SearchBar({ value, onChange, placeholder = "Search" }: SearchBarProps) {
+export default function SearchBar({
+  value,
+  onChange,
+  placeholder = "Search code, part name, manufacturer, or type…",
+}: SearchBarProps) {
   return (
     <input
       type="text"

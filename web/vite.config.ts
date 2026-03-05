@@ -13,7 +13,8 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3001",
         changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/api/, ""),
+        // No rewrite: backend already serves everything under /api
+        // (e.g. /api/parts/data), so we proxy paths through unchanged.
       },
     },
   },
