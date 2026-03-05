@@ -14,7 +14,6 @@ import {
   apiItemToPartRow,
   getManufacturer,
 } from "@/data/partsData";
-import { SAMPLE_PARTS } from "@/data/sampleParts";
 import SearchBar from "@/components/master-search/SearchBar";
 import Filters, { type FilterState } from "@/components/master-search/Filters";
 import PartsTable from "@/components/master-search/PartsTable";
