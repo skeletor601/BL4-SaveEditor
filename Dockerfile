@@ -25,9 +25,9 @@ COPY bl4_functions.py bl4_decoder_py b_encoder.py decoder_logic.py lookup.py res
 COPY ui_localization*.json item_localization_zh-CN.json ./
 COPY bl4_decoder_py bl4_decoder_py
 
-# Build API
+# Build API (need devDependencies for tsc)
 WORKDIR /app/api
-RUN npm install --omit=dev && npm run build
+RUN npm install && npm run build
 
 # Web app (build with empty VITE_API_URL so frontend uses same-origin /api)
 WORKDIR /app
