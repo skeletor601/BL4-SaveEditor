@@ -28,14 +28,14 @@ export default function Dashboard() {
           <Link
             key={to}
             to={to}
-            className="block p-6 rounded-lg border-2 border-[var(--color-panel-border)] bg-[var(--color-panel)]/80 hover:bg-[var(--color-accent-dim)] transition-colors"
+            className="block p-6 rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm hover:bg-[rgba(48,52,60,0.65)] transition-colors"
           >
             <span className="text-3xl mb-2 block" aria-hidden>{icon}</span>
             <h2 className="font-semibold text-[var(--color-accent)]">{title}</h2>
             <p className="text-sm text-[var(--color-text-muted)] mt-1">{desc}</p>
           </Link>
         ))}
-        <div className="p-6 rounded-lg border-2 border-[var(--color-panel-border)] bg-[var(--color-panel)]/80 col-span-full lg:col-span-1">
+        <div className="p-6 rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm col-span-full lg:col-span-1">
           <h2 className="font-semibold text-[var(--color-accent)]">News & Updates</h2>
           <p className="text-sm text-[var(--color-text-muted)] mt-2 whitespace-pre-wrap">{news || "Loading…"}</p>
           <div className="mt-4 flex gap-2">
@@ -43,7 +43,7 @@ export default function Dashboard() {
               href="https://github.com/skeletor601/BL4-SaveEditor"
               target="_blank"
               rel="noreferrer"
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] text-[var(--color-accent)] text-sm hover:bg-[var(--color-panel)]"
+              className="px-3 py-2 rounded border border-[var(--color-panel-border)] text-[var(--color-accent)] text-sm hover:bg-[rgba(48,52,60,0.6)]"
             >
               Open in Browser
             </a>
