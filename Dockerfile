@@ -27,13 +27,13 @@ COPY bl4_decoder_py bl4_decoder_py
 
 # Build API
 WORKDIR /app/api
-RUN npm ci --omit=dev && npm run build
+RUN npm install --omit=dev && npm run build
 
 # Web app (build with empty VITE_API_URL so frontend uses same-origin /api)
 WORKDIR /app
 COPY web/package*.json web/
 WORKDIR /app/web
-RUN npm ci
+RUN npm install
 COPY web .
 WORKDIR /app/web
 ENV VITE_API_URL=
