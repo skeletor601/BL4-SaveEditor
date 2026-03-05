@@ -17,6 +17,7 @@ const FLAG_OPTIONS = [
 interface HeavyBuilderPart {
   partId: number;
   stat: string;
+  mfgId?: number;
   description?: string;
 }
 
