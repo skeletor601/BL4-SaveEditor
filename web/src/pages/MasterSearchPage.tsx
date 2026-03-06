@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
+import CopyQuantityDialog from "@/components/master-search/CopyQuantityDialog";
+import { buildCopyFormat, parseCode } from "@/data/partsData";
 
 const FAVORITES_KEY = "bl4-master-search-favorites";
 
@@ -36,6 +38,7 @@ export default function MasterSearchPage() {
   const [refresh, setRefresh] = useState(0);
   const [favorites, setFavorites] = useState<Set<string>>(loadFavorites);
   const [lightboxItem, setLightboxItem] = useState<PartItem | null>(null);
+  const [copyDialogItem, setCopyDialogItem] = useState<PartItem | null>(null);
 
   const toggleFavorite = useCallback((code: string) => {
     setFavorites((prev) => {
@@ -274,15 +277,40 @@ export default function MasterSearchPage() {
             <p className="font-mono text-sm mt-1 text-[var(--color-text)]">{lightboxItem.partName}</p>
             <p className="text-sm mt-2 text-[var(--color-text-muted)]">{lightboxItem.effect ?? "–"}</p>
             <p className="text-xs text-[var(--color-text-muted)] mt-2">Code: {lightboxItem.code}</p>
-            <button
-              type="button"
-              onClick={() => setLightboxItem(null)}
-              className="mt-4 px-4 py-2 rounded-lg border border-panel-border text-accent hover:bg-panel transition-colors"
-            >
-              Close
-            </button>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setCopyDialogItem(lightboxItem)}
+                className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black transition-colors min-h-[44px]"
+              >
+                Copy…
+              </button>
+              <button
+                type="button"
+                onClick={() => setLightboxItem(null)}
+                className="px-4 py-2 rounded-lg border border-panel-border text-accent hover:bg-panel transition-colors min-h-[44px]"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
+      )}
+
+      {copyDialogItem && (
+        <CopyQuantityDialog
+          code={copyDialogItem.code}
+          codePreview={copyDialogItem.code}
+          onConfirm={(qty) => {
+            const parsed = parseCode(copyDialogItem.code);
+            const out = parsed
+              ? buildCopyFormat(parsed.prefix, parsed.part, qty)
+              : copyDialogItem.code;
+            navigator.clipboard.writeText(out).catch(() => {});
+            setCopyDialogItem(null);
+          }}
+          onCancel={() => setCopyDialogItem(null)}
+        />
       )}
     </div>
   );

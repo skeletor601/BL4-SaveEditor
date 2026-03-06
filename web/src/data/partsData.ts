@@ -208,9 +208,18 @@ export function blob(row: PartRow): string {
   return (row as PartRow & { _blob: string })._blob;
 }
 
-/** Parse code like {33:22} or {33} into { prefix, part }. */
+/** Parse codes like {33:22}, {33:[22 22]}, or {33} into { prefix, part }. */
 export function parseCode(codeStr: string): { prefix: number; part: number } | null {
   const s = (codeStr ?? "").toString().trim();
+  const list = s.match(/^\s*\{\s*(\d+)\s*:\s*\[\s*([^\]]+?)\s*\]\s*\}\s*$/);
+  if (list) {
+    const prefix = parseInt(list[1], 10);
+    const firstPart = list[2].trim().match(/^(\d+)/);
+    if (!Number.isNaN(prefix) && firstPart) {
+      const part = parseInt(firstPart[1], 10);
+      if (!Number.isNaN(part)) return { prefix, part };
+    }
+  }
   const two = s.match(/^\s*\{\s*(\d+)\s*:\s*(\d+)\s*\}\s*$/);
   if (two) return { prefix: parseInt(two[1], 10), part: parseInt(two[2], 10) };
   const one = s.match(/^\s*\{\s*(\d+)\s*\}\s*$/);
