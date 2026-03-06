@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://BL4Editor.com/sitemap.xml
+Sitemap: https://bl4editor.com/sitemap.xml
