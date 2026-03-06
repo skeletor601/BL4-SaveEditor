@@ -88,7 +88,7 @@ export default function SelectSaveView() {
       <h2 className="text-lg font-semibold text-[var(--color-accent)]">Select Save</h2>
       <p className="text-sm text-[var(--color-text-muted)]">Decrypt a BL4 .sav or open JSON/YAML. Decrypt and encrypt run on the server (API must be running).</p>
 
-      <div className="border border-[var(--color-panel-border)] rounded-lg p-6 bg-[rgba(24,28,34,0.6)]">
+      <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
         <h3 className="text-[var(--color-accent)] font-medium mb-3">Open .sav (decrypt)</h3>
         <p className="text-sm text-[var(--color-text-muted)] mb-3">Enter your Epic Games ID or Steam ID (17 digits). Your ID is remembered on this device.</p>
         <div className="flex flex-wrap gap-3 items-end">
@@ -138,7 +138,7 @@ export default function SelectSaveView() {
         {savFileName && <p className="mt-2 text-sm text-[var(--color-text-muted)]">Selected: {savFileName}</p>}
       </div>
 
-      <div className="border border-[var(--color-panel-border)] rounded-lg p-6 bg-[rgba(24,28,34,0.6)]">
+      <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
         <h3 className="text-[var(--color-accent)] font-medium mb-3">Open JSON/YAML or export</h3>
         <p className="text-xs text-[var(--color-text-muted)] mb-3">Back up your original save before replacing it with a downloaded .sav.</p>
         <div className="flex flex-wrap gap-3 items-center">

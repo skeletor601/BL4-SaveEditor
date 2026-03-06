@@ -85,16 +85,41 @@ export const RARITY_ORDER: Record<string, number> = {
   common: 4,
 };
 
+/** Legendary item names from https://mobalytics.gg/borderlands-4/guides/legendary-weapons-and-gear – update when new legendaries release. */
 export const LEG_NAMES = [
-  "Aegon's Dream", "Bloody Lumberjack", "Bonnie and Clyde", "Bugbear", "Chuck", "Cold Shoulder",
-  "Divided Focus", "First Impression", "G.M.R", "Goalkeeper", "Lucian's Flank", "Murmur", "Oscar Mike",
-  "Potato Thrower IV", "Rowan's Charge", "Rowdy Rider", "Star Helix", "Whiskey Foxtrot", "Wombo Combo",
-  "Budget Deity", "Bully", "Hardpoint", "Inscriber", "King's Gambit", "Lucky Clover", "Noisy Cricket",
-  "Phantom Flame", "Queen's Rest", "Rangefinder", "Roach", "Ruby's Grasp", "San Saba Songbird",
-  "Seventh Sense", "Sideshow", "Zipper", "Acey May", "Anarchy", "Bod", "Convergence", "Forsaken Chaos",
-  "Golden God", "Goremaster", "Hellwalker", "Hot Slugger", "Husky Friend", "Kaleidosplode", "Kickballer",
-  "Lead Balloon", "Linebacker", "Mantra", "Missilaser", "Rainbow Vomit", "Sweet Embrace", "T.K's Wave",
-  "Sure Shot", "Trauma Bond", "Short Circuit", "Furnace", "Blacksmith", "Shatterwight",
+  "Accumulator", "Acey May", "Aching Roil", "Adrenaline Pump", "Aegon's Dream", "AF1000", "Anarchy", "ARC-TAN",
+  "Asher's Rise", "Assuit", "Atling Gun", "Autocannibal", "Avatar", "Besieger", "Big Banger", "Binger",
+  "Bio-Robot", "Birt's Bees", "Blacksmith",
+  "Blockbuster", "Blood Analyzer", "Bloodstarved", "Bloody Lumberjack", "Blind Box", "Body Counter", "Bonnie and Clyde",
+  "Boomslang", "Borstel Ballista", "Bottled Lightning", "Bod", "Budget Deity", "Bubbles", "Bugbear",
+  "Bully", "Buster", "Buoy", "Buzz Axe", "Champion", "Chaumurky", "Chuck", "Cindershelly", "Cold Shoulder",
+  "Collector", "Combo", "Compleation", "Complex Root", "Conflux", "Convergence", "Countermeasure",
+  "Dancer", "Darkbeast", "DAD_AR_Barrel_02", "Defibrillator", "Destructo Disco", "Devourer", "Director", "Disc Jockey",
+  "Disruptor", "Divided Focus", "Doeshot", "Dog Movement", "Driver", "Elementalist", "Eigenburst",
+  "Entangler", "Entropic", "Esgrimidor", "Evolver", "Extra Medium", "Extension", "Fashionista",
+  "Faulty Detonator", "Filántropo", "Finnity XXX-L", "Firebreak", "Firepot", "Firewerks", "First Impression",
+  "Fisheye", "Fleabag", "Flashpan", "Forsaken Chaos", "Forge Master", "Frangible", "Furnace", "Fuse",
+  "Gamma Void", "Gatherer", "Glacier", "G.M.R", "Golden God", "Goalkeeper", "Goremaster", "Generator", "Grenazerker",
+  "Guardian Angel", "Gummy", "Hair Trigger", "Handcannon", "Hardpoint", "Hat Trick", "Healthraiser",
+  "Heavyweight", "Hellfire", "Hellwalker", "Hephaestian", "Hero of Bullet", "Hopscotch", "Hot Slugger",
+  "Hoarder", "Husky Friend", "Hydrator", "Icon", "Illusionist", "Inscriber", "Inkling", "Instigator",
+  "Jackhammer", "Jelly", "Jetsetter", "Junction", "Kaoson", "Kaleidosplode", "Katagawa's Revenge",
+  "Kickballer", "Kill Spring", "King's Gambit", "Kindread Spirits", "Lame", "Lamplighter", "Laser Disker",
+  "Lead Balloon", "Linebacker", "Looper", "Lucian's Flank", "Lucky Clover", "Luty Madlad", "Ladykiller",
+  "Maestro", "Mantra", "Matador's Match", "Mercredi", "Mercurious", "Midnight Defiance", "Missilaser",
+  "Misericorde", "Multistrike", "Murmur", "Nexus", "Noisy Cricket", "Oak-Aged Cask", "Ohm I Got",
+  "Onion", "Onslaught", "Oscar Mike", "Ouroboros", "Overdriver", "Pacemaker", "Pandoran Momento",
+  "Parallaxis", "Phantom Flame", "Plasma Coil", "Potato Thrower IV",   "Prince Harming", "Primadiem", "Principal", "Power Cycle", "Protean Cell", "Pumper", "Quencher", "Quicksilver", "Queen's Rest", "Quintain",
+  "Rainbow Vomit", "Rainmaker", "Rangefinder", "Ravenfire", "Reactor", "Recursive", "Roach",
+  "Rooker", "Rowan's Charge", "Rowdy Rider", "Roulette", "Ruby's Grasp", "San Saba Songbird",
+  "Scattershot", "Scientist", "Scion", "Seventh Sense", "Shatterwight", "Shalashaska", "Sho Kunai",
+  "Sideshow", "Sidewinder", "Sparky Shield", "Spinning Blade", "Sprezzatura", "Steward", "Stop Gap",
+  "Stray", "Streamer", "Studfinder", "Super Soldier", "Sure Shot", "Sweet Embrace", "Swarm",
+  "Star Helix Underbarrel", "Symmetry", "T.K's Wave", "Tankbuster", "Technomancer", "Teen Witch", "Timekeeper's New Shield",
+  "Toile", "Transmitter", "Trauma Bond", "Triple Bypass", "Trooper", "Truck", "UAV", "Undead Eye",
+  "Undershield", "Urchin", "Value-Add", "Valuepalooza", "Vamoose", "Viking", "War Paint",
+  "Waterfall", "Watts 4 Dinner", "Whiskey Foxtrot", "Wombo Combo", "X-Initiator", "Y-Initiator",
+  "Z-Initiator", "Zipper", "Short Circuit", "Skeptic",
 ];
 
 function norm(s: string): string {
@@ -112,8 +137,9 @@ export function getRowKey(row: PartRow): string {
   return JSON.stringify(row);
 }
 
+/** True if the row matches any name on the legendary list (LEG_NAMES). Uses full blob so every field is searched regardless of DB column names. */
 export function isLegendaryByName(row: PartRow): boolean {
-  const n = norm((row["Model Name"] ?? (row as PartRow).name ?? (row as PartRow).title ?? "").toString());
+  const n = norm(blob(row));
   if (!n) return false;
   if (LEG_SET.has(n)) return true;
   for (const it of LEG_SET) {
@@ -123,15 +149,8 @@ export function isLegendaryByName(row: PartRow): boolean {
 }
 
 export function inferRarity(row: PartRow): string {
-  const h = (
-    (row["Model Name"] ?? "") + " " +
-    (row["Part Type"] ?? "") + " " +
-    (row["Stats (Level 50, Common)"] ?? "") + " " +
-    (row["String"] ?? "") + " " +
-    (row.Stats ?? "")
-  ).toLowerCase();
   if (isLegendaryByName(row)) return "legendary";
-  if (h.includes("legendary")) return "legendary";
+  const h = blob(row);
   if (h.includes("epic")) return "epic";
   if (h.includes("rare")) return "rare";
   if (h.includes("uncommon")) return "uncommon";

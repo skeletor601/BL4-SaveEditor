@@ -9,11 +9,14 @@
   --color-panel: rgba(10, 10, 18, 0.92);
   --color-panel-border: #00ffff;
   --color-accent: #00ffff;
-  --color-accent-muted: rgba(0, 245, 255, 0.7);
+  --color-accent-muted: rgba(0, 245, 255, 0.85);
   --color-accent-dim: rgba(0, 191, 255, 0.35);
   --color-text: #e0f4ff;
-  --color-text-muted: rgba(0, 245, 255, 0.8);
+  /* WCAG AA: muted text ≥4.5:1 on dark panels; slightly brighter than 0.8 */
+  --color-text-muted: #9ee8f0;
   --color-legendary: #ff8a00;
+  /* Placeholder text: ≥4.5:1 on input bg rgba(24,28,34,0.9) */
+  --color-placeholder: #7d9aa8;
   --font-sans: "Segoe UI", Consolas, system-ui, sans-serif;
   --font-mono: Consolas, "Cascadia Code", ui-monospace, monospace;
 }
@@ -26,6 +29,21 @@ body {
   min-height: 100vh;
 }
 
+/* WCAG AA: placeholder text contrast on dark inputs */
+::placeholder {
+  color: var(--color-placeholder);
+  opacity: 1;
+}
+
+/* Thin black outline so cyan/light text stands out on busy backgrounds */
+.text-outline {
+  text-shadow:
+    -0.5px -0.5px 0 rgba(0, 0, 0, 0.85),
+    0.5px -0.5px 0 rgba(0, 0, 0, 0.85),
+    -0.5px 0.5px 0 rgba(0, 0, 0, 0.85),
+    0.5px 0.5px 0 rgba(0, 0, 0, 0.85);
+}
+
 /* Focus visible for a11y */
 *:focus-visible {
   outline: 2px solid var(--color-accent);
@@ -36,4 +54,5 @@ body {
 tbody tr.legendary-row td {
   color: var(--color-legendary) !important;
   font-weight: 600;
+  background-color: rgba(255, 138, 0, 0.12);
 }

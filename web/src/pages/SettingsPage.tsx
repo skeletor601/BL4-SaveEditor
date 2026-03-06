@@ -14,11 +14,11 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-6 max-w-2xl">
       <h1 className="text-xl font-semibold text-[var(--color-text)]">Settings</h1>
 
-      <section className="border border-panel-border rounded-lg p-6 bg-panel/80">
-        <h2 className="text-accent font-medium mb-3">Theme</h2>
+      <section className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
+        <h2 className="text-[var(--color-accent)] font-medium mb-3">Theme</h2>
         <p className="text-sm text-[var(--color-text-muted)] mb-4">Match the 8 themes from the desktop app.</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {THEMES.map((t) => (
@@ -26,9 +26,10 @@ export default function SettingsPage() {
               key={t}
               type="button"
               onClick={() => setTheme(t as ThemeId)}
-              className={`px-3 py-2 rounded border text-sm ${
+              className={`min-h-[44px] px-3 py-2 rounded-lg border text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
                 theme === t ? "border-accent bg-accent/20 text-accent" : "border-panel-border text-[var(--color-text-muted)] hover:bg-panel"
               }`}
+              aria-label={`Theme ${t}`}
             >
               {t}
             </button>
@@ -36,18 +37,27 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="border border-panel-border rounded-lg p-6 bg-panel/80">
-        <h2 className="text-accent font-medium mb-3">About / Credits</h2>
+      <section className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
+        <h2 className="text-[var(--color-accent)] font-medium mb-3">About / Credits</h2>
         <p className="text-sm text-[var(--color-text-muted)]">
-          BL4 AIO Save Editor – Web version. All credit goes to original creator Superexboom.
+          BL4 AIO Save Editor – Web version. All credit goes to original creator <strong>Superexboom</strong>.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
           Special thanks to the modders that offered ideas.
         </p>
+        <p className="text-sm mt-3">
+          <a href="https://BL4Editor.com" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
+            BL4Editor.com
+          </a>
+          {" · "}
+          <a href="https://github.com/skeletor601/BL4-SaveEditor" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
+            Repository
+          </a>
+        </p>
         <p className="text-sm mt-4">
-          Version (EXE): <span className="font-mono">{version.version ?? "—"}</span>
-          {version.downloadUrl && (
-            <a href={version.downloadUrl} target="_blank" rel="noreferrer" className="ml-2 text-accent hover:underline">
+          Backend version: <span className="font-mono">{version.version ?? "—"}</span>
+          {version.downloadUrl && version.downloadUrl !== "#" && (
+            <a href={version.downloadUrl} target="_blank" rel="noreferrer" className="ml-2 text-[var(--color-accent)] hover:underline">
               Download desktop
             </a>
           )}

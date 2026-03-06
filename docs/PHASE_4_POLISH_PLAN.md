@@ -6,6 +6,23 @@
 
 ---
 
+## Done (Phase 4 kickoff)
+
+- **Meta description + OG tags:** `web/index.html` – `<meta name="description">`, `og:title`, `og:description`, `og:url`, `og:type`.
+- **README web section:** Replaced “HTML / Mobile Version coming soon” with “Web version” linking to https://BL4Editor.com and one sentence.
+- **Consistent panel style:** Settings and Select Save (Character) use `rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm`; Settings Credits mention BL4Editor.com and repo.
+- **Touch targets:** Layout – hamburger `min-w/min-h 44px`; Theme select and Credits link `min-h-[44px]`; Settings theme buttons `min-h-[44px]`.
+- **Safe areas:** Header uses `env(safe-area-inset-left/right)`; footer uses `env(safe-area-inset-bottom)`.
+- **Focus visible:** Global `*:focus-visible` in `index.css`; Layout hamburger, Theme select, Credits link and Settings theme buttons have `focus-visible:ring-2`.
+- **ARIA:** Layout hamburger and Theme select have `aria-label`; Settings theme buttons have `aria-label`.
+
+**Phase 4 follow-up:**
+- **Empty states:** Master Search shows “No results. Try a different search term or loosen the filters.” when the filtered list is empty. Character tab shows “No save loaded” with a “Go to Select Save” CTA in the same smoky panel style.
+- **API error + retry:** Master Search on fetch failure shows “Couldn’t load parts. Check your connection or try again.” and a **Retry** button that re-runs the request.
+- **Contrast (WCAG AA):** `--color-text-muted` set to solid `#9ee8f0`; `--color-accent-muted` 0.85 opacity; added `--color-placeholder` and global `::placeholder` so placeholders meet ≥4.5:1 on dark inputs.
+
+---
+
 ## 1. Mobile-first polish
 
 **Goal:** Same “smoky grey transparent” language and clear feedback everywhere.

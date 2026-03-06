@@ -166,6 +166,60 @@ function slotsFromWalk(data: SaveData): InventorySlots {
   return { backpack, equipped, lostLoot };
 }
 
+/** All inventory slots with path (for backpack view context menu: delete, duplicate, upgrade). Uses walk. */
+export function getInventorySlotsWithPaths(data: SaveData | null): {
+  backpack: ItemSlotWithPath[];
+  equipped: ItemSlotWithPath[];
+  lostLoot: ItemSlotWithPath[];
+} {
+  if (!data || typeof data !== "object") {
+    return { backpack: [], equipped: [], lostLoot: [] };
+  }
+  const backpack: ItemSlotWithPath[] = [];
+  const equipped: ItemSlotWithPath[] = [];
+  const lostLoot: ItemSlotWithPath[] = [];
+  const seen = new Set<string>();
+  const items = walkForSerials(data);
+  for (const { path, item } of items) {
+    const pathStr = path.join("/").toLowerCase();
+    if (pathStr.includes("unknown_items")) continue;
+    const serial = typeof item.serial === "string" ? item.serial : "";
+    const slotKey =
+      path.slice().reverse().find((p) => /^slot_\d+$/i.test(p)) ?? path.slice(-1)[0] ?? "slot_0";
+    const dedupe = `${pathStr}|${slotKey}`;
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    const slot: ItemSlotWithPath = {
+      slotKey,
+      serial,
+      flags: typeof item.flags === "number" ? item.flags : 0,
+      stateFlags: typeof item.state_flags === "number" ? item.state_flags : 0,
+      path,
+    };
+    if (pathStr.includes("lostloot") || pathStr.includes("lost_loot")) {
+      lostLoot.push(slot);
+    } else if (
+      pathStr.includes("equipped_inventory") ||
+      pathStr.includes("equipped") ||
+      pathStr.includes("equipment")
+    ) {
+      equipped.push(slot);
+    } else if (pathStr.includes("inventory") && pathStr.includes("backpack")) {
+      backpack.push(slot);
+    }
+  }
+  const sortSlots = (arr: ItemSlotWithPath[]) =>
+    arr.sort((a, b) => {
+      const na = parseInt(String(a.slotKey).replace(/^slot_/i, ""), 10);
+      const nb = parseInt(String(b.slotKey).replace(/^slot_/i, ""), 10);
+      return na - nb;
+    });
+  sortSlots(backpack);
+  sortSlots(equipped);
+  sortSlots(lostLoot);
+  return { backpack, equipped, lostLoot };
+}
+
 /** Backpack slots with path into save (for weapon edit update-item). Uses walk so path is always available. */
 export function getBackpackSlotsWithPaths(data: SaveData | null): ItemSlotWithPath[] {
   if (!data || typeof data !== "object") return [];

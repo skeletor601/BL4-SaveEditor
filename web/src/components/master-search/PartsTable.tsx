@@ -99,8 +99,9 @@ export default function PartsTable({
             {sorted.map((row) => {
               const key = getRowKey(row);
               const isFav = favorites.has(key);
-              const isLeg = isLegendaryByName(row);
               const rarity = inferRarity(row);
+              const isLeg = isLegendaryByName(row);
+              const itemTypeStr = (row["Model Name"] ?? (row as Record<string, unknown>).itemType ?? "").toString();
               const code = getCode(row);
               return (
                 <tr
@@ -120,7 +121,7 @@ export default function PartsTable({
                     {code}
                   </td>
                   <td className="py-2.5 px-3.5 text-xs">
-                    {(row["Model Name"] ?? "").toString() || "—"}
+                    {itemTypeStr || "—"}
                   </td>
                   <td className="py-2.5 px-3.5 text-xs">
                     <LegendaryBadge rarity={rarity} isLegendary={isLeg} />
@@ -143,8 +144,9 @@ export default function PartsTable({
         {sorted.map((row) => {
           const key = getRowKey(row);
           const isFav = favorites.has(key);
-          const isLeg = isLegendaryByName(row);
           const rarity = inferRarity(row);
+          const isLeg = isLegendaryByName(row);
+          const itemTypeStr = (row["Model Name"] ?? (row as Record<string, unknown>).itemType ?? "").toString();
           const code = getCode(row);
           return (
             <div
@@ -169,7 +171,7 @@ export default function PartsTable({
                 </button>
               </div>
               <p className="text-xs font-semibold text-[var(--color-text)]">
-                {(row["Model Name"] ?? "").toString() || "—"}
+                {itemTypeStr || "—"}
               </p>
               <p className="text-[11px] text-[var(--color-text-muted)] mt-1">
                 <LegendaryBadge rarity={rarity} isLegendary={isLeg} />

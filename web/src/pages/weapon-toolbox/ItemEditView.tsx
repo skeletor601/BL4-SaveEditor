@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { getBackpackSlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
+import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
 const FLAG_OPTIONS = [
   { value: 1, label: "1 (Normal)" },
@@ -131,6 +132,7 @@ function buildPartStringsFromSelections(
 }
 
 export default function ItemEditView() {
+  const location = useLocation();
   const { saveData, getYamlText, updateSaveData } = useSave();
   const [serialInput, setSerialInput] = useState("");
   const [decodedInput, setDecodedInput] = useState("");
@@ -143,6 +145,23 @@ export default function ItemEditView() {
 
   const [backpackItems, setBackpackItems] = useState<DecodedBackpackItem[]>([]);
   const [selectedItemPath, setSelectedItemPath] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    const loadItem = (location.state as { loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null)?.loadItem;
+    if (loadItem && typeof loadItem === "object") {
+      if (typeof loadItem.serial === "string" && loadItem.serial.trim()) {
+        setSerialInput(loadItem.serial.trim());
+      }
+      if (typeof loadItem.decodedFull === "string" && loadItem.decodedFull.trim()) {
+        setDecodedInput(loadItem.decodedFull.trim());
+      }
+      if (Array.isArray(loadItem.path) && loadItem.path.length > 0) {
+        setSelectedItemPath(loadItem.path);
+      }
+      setEncodedSerial("");
+      setMessage("Item loaded from backpack. Edit and click Update Item to save.");
+    }
+  }, [location.state]);
   const [itemEditData, setItemEditData] = useState<ItemEditData | null>(null);
   const [currentTypeKey, setCurrentTypeKey] = useState<ItemTypeKey | null>(null);
   const [parsedComponents, setParsedComponents] = useState<ParsedComponent[]>([]);
@@ -801,6 +820,14 @@ export default function ItemEditView() {
               Add to Item
             </button>
           </div>
+          {skinComboValue && (
+            <div className="mt-3">
+              <SkinPreview
+                token={skinComboValue}
+                label={skinOptions.find((s) => s.value === skinComboValue)?.label ?? skinComboValue}
+              />
+            </div>
+          )}
         </div>
       )}
 

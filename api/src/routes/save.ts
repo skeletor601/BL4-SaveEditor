@@ -12,7 +12,7 @@ const ENCODE_SCRIPT = join(REPO_ROOT, "scripts", "encode_serial.py");
 
 type SaveMutatePayload = {
   yaml_content: string;
-  action: "sync_levels" | "add_item" | "apply_preset" | "update_item";
+  action: "sync_levels" | "add_item" | "apply_preset" | "update_item" | "remove_item";
   params?: Record<string, unknown>;
 };
 
@@ -375,6 +375,35 @@ export async function saveRoutes(
     } catch (e) {
       const message = e instanceof Error ? e.message : "Update item failed";
       fastify.log.warn({ err: e }, "save/update-item failed");
+      return reply.code(500).send({ success: false, error: message });
+    }
+  });
+
+  fastify.post<{
+    Body: { yaml_content?: string; item_path?: string[] };
+  }>("/save/remove-item", async (request, reply) => {
+    const body = request.body as { yaml_content?: string; item_path?: string[] } | undefined;
+    const yamlContent = body?.yaml_content;
+    const itemPath = body?.item_path;
+    if (!yamlContent || typeof yamlContent !== "string") {
+      return reply.code(400).send({ success: false, error: "yaml_content is required" });
+    }
+    if (!Array.isArray(itemPath) || itemPath.length === 0) {
+      return reply.code(400).send({ success: false, error: "item_path (array of keys) is required" });
+    }
+    try {
+      const result = await runSaveMutate({
+        yaml_content: yamlContent,
+        action: "remove_item",
+        params: { original_path: itemPath },
+      });
+      if (!result.success) {
+        return reply.code(400).send({ success: false, error: result.error ?? "Remove item failed" });
+      }
+      return reply.send({ success: true, yaml_content: result.yaml_content });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Remove item failed";
+      fastify.log.warn({ err: e }, "save/remove-item failed");
       return reply.code(500).send({ success: false, error: message });
     }
   });
