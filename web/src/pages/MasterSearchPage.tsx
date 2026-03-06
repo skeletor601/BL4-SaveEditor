@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
-import CopyQuantityDialog from "@/components/master-search/CopyQuantityDialog";
-import { buildCopyFormat, parseCode } from "@/data/partsData";
+import { apiItemToPartRow, inferRarity } from "@/data/partsData";
 
 const FAVORITES_KEY = "bl4-master-search-favorites";
 
@@ -13,6 +12,15 @@ export interface PartItem {
   partName: string;
   effect?: string;
   category?: string;
+}
+
+function isLegendaryItem(item: PartItem): boolean {
+  return inferRarity(apiItemToPartRow(item)).toLowerCase() === "legendary";
+}
+
+function displayRarity(item: PartItem): string {
+  const inferred = inferRarity(apiItemToPartRow(item));
+  return inferred ? inferred.charAt(0).toUpperCase() + inferred.slice(1) : (item.rarity ?? "");
 }
 
 function loadFavorites(): Set<string> {
@@ -38,7 +46,6 @@ export default function MasterSearchPage() {
   const [refresh, setRefresh] = useState(0);
   const [favorites, setFavorites] = useState<Set<string>>(loadFavorites);
   const [lightboxItem, setLightboxItem] = useState<PartItem | null>(null);
-  const [copyDialogItem, setCopyDialogItem] = useState<PartItem | null>(null);
 
   const toggleFavorite = useCallback((code: string) => {
     setFavorites((prev) => {
@@ -66,7 +73,7 @@ export default function MasterSearchPage() {
   const filtered = useMemo(() => {
     let list = items;
     if (favoritesOnly) list = list.filter((p) => favorites.has(p.code));
-    if (sortRarity === "Legendary first") list = [...list].sort((a, b) => (b.rarity === "Legendary" ? 1 : 0) - (a.rarity === "Legendary" ? 1 : 0));
+    if (sortRarity === "Legendary first") list = [...list].sort((a, b) => (isLegendaryItem(b) ? 1 : 0) - (isLegendaryItem(a) ? 1 : 0));
     return list;
   }, [items, favoritesOnly, sortRarity, favorites]);
 
@@ -225,10 +232,13 @@ export default function MasterSearchPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((row) => (
+                  {filtered.map((row) => {
+                    const isLegendary = isLegendaryItem(row);
+                    const rarityLabel = displayRarity(row) || "–";
+                    return (
                     <tr
                       key={row.code + row.partName}
-                      className={`border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer transition-colors ${row.rarity === "Legendary" ? "bg-accent/15 text-accent" : ""}`}
+                      className={`border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer transition-colors ${isLegendary ? "bg-[rgba(255,138,0,0.12)]" : ""}`}
                       onClick={() => setLightboxItem(row)}
                     >
                       <td className="p-3">
@@ -244,13 +254,13 @@ export default function MasterSearchPage() {
                           {favorites.has(row.code) ? "★" : "☆"}
                         </button>
                       </td>
-                      <td className="p-3 font-mono text-xs">{row.code}</td>
-                      <td className="p-3">{row.itemType}</td>
-                      <td className="p-3">{row.rarity ?? "–"}</td>
-                      <td className="p-3 font-mono text-xs text-[var(--color-text)]">{row.partName}</td>
-                      <td className="p-3 max-w-md truncate text-[var(--color-text-muted)]">{row.effect ?? "–"}</td>
+                      <td className={`p-3 font-mono text-xs ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{row.code}</td>
+                      <td className={`p-3 ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{row.itemType}</td>
+                      <td className={`p-3 ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{rarityLabel}</td>
+                      <td className={`p-3 font-mono text-xs ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : "text-[var(--color-text)]"}`}>{row.partName}</td>
+                      <td className={`p-3 max-w-md truncate ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : "text-[var(--color-text-muted)]"}`}>{row.effect ?? "–"}</td>
                     </tr>
-                  ))}
+                  );})}
                 </tbody>
               </table>
             </div>
@@ -277,40 +287,15 @@ export default function MasterSearchPage() {
             <p className="font-mono text-sm mt-1 text-[var(--color-text)]">{lightboxItem.partName}</p>
             <p className="text-sm mt-2 text-[var(--color-text-muted)]">{lightboxItem.effect ?? "–"}</p>
             <p className="text-xs text-[var(--color-text-muted)] mt-2">Code: {lightboxItem.code}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setCopyDialogItem(lightboxItem)}
-                className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black transition-colors min-h-[44px]"
-              >
-                Copy…
-              </button>
-              <button
-                type="button"
-                onClick={() => setLightboxItem(null)}
-                className="px-4 py-2 rounded-lg border border-panel-border text-accent hover:bg-panel transition-colors min-h-[44px]"
-              >
-                Close
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setLightboxItem(null)}
+              className="mt-4 px-4 py-2 rounded-lg border border-panel-border text-accent hover:bg-panel transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
-      )}
-
-      {copyDialogItem && (
-        <CopyQuantityDialog
-          code={copyDialogItem.code}
-          codePreview={copyDialogItem.code}
-          onConfirm={(qty) => {
-            const parsed = parseCode(copyDialogItem.code);
-            const out = parsed
-              ? buildCopyFormat(parsed.prefix, parsed.part, qty)
-              : copyDialogItem.code;
-            navigator.clipboard.writeText(out).catch(() => {});
-            setCopyDialogItem(null);
-          }}
-          onCancel={() => setCopyDialogItem(null)}
-        />
       )}
     </div>
   );
