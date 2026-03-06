@@ -12,20 +12,17 @@ interface SkinPreviewProps {
 
 export default function SkinPreview({ token, label, className = "" }: SkinPreviewProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const imageUrl = getSkinImageUrl(token);
   const showPreview = token && imageUrl && !imgError;
 
   const handleImageLoad = useCallback(() => {
-    setImgLoaded(true);
     setImgError(false);
   }, []);
 
   const handleImageError = useCallback(() => {
     setImgError(true);
-    setImgLoaded(false);
   }, []);
 
   const openLightbox = useCallback(() => {
