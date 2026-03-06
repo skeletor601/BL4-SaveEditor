@@ -116,8 +116,8 @@ def main() -> None:
     if not isinstance(yaml_content, str) or not yaml_content.strip():
         print(json.dumps({"success": False, "error": "yaml_content is required"}))
         sys.exit(0)
-    if action not in ("sync_levels", "add_item", "apply_preset", "update_item"):
-        print(json.dumps({"success": False, "error": "action must be sync_levels, add_item, apply_preset, or update_item"}))
+    if action not in ("sync_levels", "add_item", "apply_preset", "update_item", "remove_item"):
+        print(json.dumps({"success": False, "error": "action must be sync_levels, add_item, apply_preset, update_item, or remove_item"}))
         sys.exit(0)
 
     try:
@@ -186,6 +186,25 @@ def main() -> None:
             print(json.dumps({"success": True, "yaml_content": out_yaml}))
         except (KeyError, IndexError, TypeError) as e:
             print(json.dumps({"success": False, "error": f"Invalid item_path or structure: {e}"}))
+        sys.exit(0)
+
+    if action == "remove_item":
+        original_path = params.get("original_path") or params.get("item_path")
+        if not isinstance(original_path, list) or len(original_path) == 0:
+            print(json.dumps({"success": False, "error": "params.original_path (list of keys) is required"}))
+            sys.exit(0)
+        # Convert numeric strings to int for list indices (JSON has no int type)
+        path = []
+        for step in original_path:
+            if isinstance(step, str) and step.isdigit():
+                path.append(int(step))
+            else:
+                path.append(step)
+        if bl4f.remove_item_by_original_path(data, path):
+            out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+            print(json.dumps({"success": True, "yaml_content": out_yaml}))
+        else:
+            print(json.dumps({"success": False, "error": "Item not found or could not remove"}))
         sys.exit(0)
 
     if action == "apply_preset":

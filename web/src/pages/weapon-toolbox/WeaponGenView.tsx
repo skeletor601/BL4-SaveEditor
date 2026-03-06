@@ -7,6 +7,7 @@ import {
   getApiUnavailableError,
   isLikelyUnavailable,
 } from "@/lib/apiClient";
+import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
 const NONE = "None";
 const FLAG_OPTIONS = [
@@ -336,6 +337,81 @@ export default function WeaponGenView() {
     setPartSelections((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const handleSurpriseMe = useCallback(() => {
+    if (!data?.mfgWtIdList?.length) return;
+    const list = data.mfgWtIdList;
+    const mfgWtEntry = list[Math.floor(Math.random() * list.length)];
+    const mfgWtId = mfgWtEntry.mfgWtId;
+    setManufacturer(mfgWtEntry.manufacturer);
+    setWeaponType(mfgWtEntry.weaponType);
+    setLevel(String(Math.floor(1 + Math.random() * 50)));
+    setSeed(String(Math.floor(100 + Math.random() * 9900)));
+
+    const rarityStats = data.rarityByMfgTypeId[mfgWtId]
+      ? [...new Set(data.rarityByMfgTypeId[mfgWtId].map((r) => r.stat).filter(Boolean))].sort()
+      : [];
+    const rarityChoices = [...rarityStats.filter((s) => s !== "Legendary"), "Legendary"].filter(Boolean);
+    const legendaryLabels = (data.legendaryByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? []);
+    const elementalOptions = data.elemental.map((e) => `${e.partId} - ${e.stat}`);
+
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const selections: Record<string, string> = {};
+
+    if (rarityChoices.length) selections["Rarity"] = pick(rarityChoices);
+    if (selections["Rarity"] === "Legendary" && legendaryLabels.length) {
+      selections["Legendary Type"] = pick(legendaryLabels);
+    }
+    if (elementalOptions.length) {
+      selections["Element 1"] = pick(elementalOptions);
+      selections["Element 2"] = pick(elementalOptions);
+    }
+
+    const partOrder = [
+      { key: "Body", slots: 1 },
+      { key: "Body Accessory", slots: MULTI_SLOTS["Body Accessory"] ?? 1 },
+      { key: "Barrel", slots: 1 },
+      { key: "Barrel Accessory", slots: MULTI_SLOTS["Barrel Accessory"] ?? 1 },
+      { key: "Magazine", slots: 1 },
+      { key: "Stat Modifier", slots: 1 },
+      { key: "Grip", slots: 1 },
+      { key: "Foregrip", slots: 1 },
+      { key: "Manufacturer Part", slots: MULTI_SLOTS["Manufacturer Part"] ?? 1 },
+      { key: "Scope", slots: 1 },
+      { key: "Scope Accessory", slots: MULTI_SLOTS["Scope Accessory"] ?? 1 },
+      { key: "Underbarrel", slots: 1 },
+      { key: "Underbarrel Accessory", slots: MULTI_SLOTS["Underbarrel Accessory"] ?? 1 },
+    ];
+    for (const { key: partType, slots } of partOrder) {
+      const opts = data.partsByMfgTypeId[mfgWtId]?.[partType] ?? [];
+      const choices = opts.length > 0 ? opts.map((o) => o.label) : [NONE];
+      for (let i = 0; i < slots; i++) {
+        const key = slots > 1 ? `${partType}_${i}` : partType;
+        selections[key] = pick(choices);
+      }
+    }
+    // When this weapon type has Underbarrel Accessory options (some underbarrels unlock that tab), ensure we fill all slots
+    const underbarrelAccOpts = data.partsByMfgTypeId[mfgWtId]?.["Underbarrel Accessory"] ?? [];
+    const underbarrelAccSlots = MULTI_SLOTS["Underbarrel Accessory"] ?? 1;
+    if (underbarrelAccOpts.length > 0) {
+      const underbarrelAccChoices = underbarrelAccOpts.map((o) => o.label);
+      for (let i = 0; i < underbarrelAccSlots; i++) {
+        selections[`Underbarrel Accessory_${i}`] = pick(underbarrelAccChoices);
+      }
+    }
+
+    // Defer so this runs after the effect that clears partSelections when mfgWtId changes
+    setTimeout(() => setPartSelections(selections), 0);
+
+    if (data.skins.length > 0) {
+      const skinPick = pick(data.skins);
+      setSkinComboValue(skinPick.value);
+      setSkinToken(skinPick.value);
+    } else {
+      setSkinComboValue("");
+      setSkinToken(null);
+    }
+  }, [data]);
+
   if (loadError) {
     return (
       <div className="space-y-4">
@@ -449,6 +525,14 @@ export default function WeaponGenView() {
         >
           🎲
         </button>
+        <button
+          type="button"
+          onClick={handleSurpriseMe}
+          className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black min-h-[44px] font-medium"
+          title="Randomize manufacturer, type, level, seed, all parts, and skin"
+        >
+          Surprise Me
+        </button>
       </div>
 
       {/* Part pickers: scrollable two-column grid, desktop order */}
@@ -546,6 +630,14 @@ export default function WeaponGenView() {
             Add to Gun
           </button>
         </div>
+        {skinComboValue && (
+          <div className="mt-3">
+            <SkinPreview
+              token={skinComboValue}
+              label={data.skins.find((s) => s.value === skinComboValue)?.label ?? skinComboValue}
+            />
+          </div>
+        )}
       </div>
 
       {/* Actions: Flag, God Roller, Add to Backpack */}

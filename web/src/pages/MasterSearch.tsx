@@ -45,15 +45,16 @@ export default function MasterSearch() {
 
   const [data, setData] = useState<PartRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     document.body.setAttribute("data-theme", theme);
   }, [theme]);
 
-  useEffect(() => {
-    // Use the backend /parts/search endpoint for text + category filtering,
-    // then apply the richer UI filters (manufacturer, part type, quick filters, etc.) client-side.
+  const loadParts = useCallback(() => {
     setDataLoading(true);
+    setDataError(false);
     const params = new URLSearchParams();
     if (search.trim()) params.set("q", search.trim());
     if (filters.category !== "All") params.set("category", filters.category);
@@ -67,15 +68,18 @@ export default function MasterSearch() {
               apiItemToPartRow
             )
           : [];
-        // Always show real API data; if there are no matches, show an empty table instead of sample data
         setData(rows);
       })
       .catch(() => {
-        // On error, show no rows rather than confusing sample data
         setData([]);
+        setDataError(true);
       })
       .finally(() => setDataLoading(false));
   }, [search, filters.category]);
+
+  useEffect(() => {
+    loadParts();
+  }, [loadParts, retryCount]);
 
   const toggleFavorite = useCallback((row: PartRow) => {
     const key = getRowKey(row);
@@ -268,6 +272,25 @@ export default function MasterSearch() {
         partTypeOptions={partTypeOptions}
       />
 
+      {dataError && (
+        <div className="mx-4 my-3 p-4 rounded-lg border-2 border-amber-500/60 bg-[rgba(48,52,60,0.85)] backdrop-blur-sm">
+          <p className="text-[var(--color-text)] mb-2">Couldn&apos;t load parts. Check your connection or try again.</p>
+          <button
+            type="button"
+            onClick={() => setRetryCount((c) => c + 1)}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] text-[var(--color-accent)] hover:bg-[var(--color-accent-dim)]"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!dataError && !dataLoading && filteredAndSorted.length === 0 && (
+        <div className="mx-4 my-3 p-4 rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
+          <p className="text-[var(--color-text-muted)]">No results. Try a different search term or loosen the filters.</p>
+        </div>
+      )}
+
       <PartsTable
         rows={filteredAndSorted}
         favorites={favorites}
@@ -279,7 +302,7 @@ export default function MasterSearch() {
       />
 
       <p className="px-4 py-2 text-[10px] text-[var(--color-text-muted)]">
-        {dataLoading ? "Loading…" : `${filteredAndSorted.length} result(s)`}
+        {dataLoading ? "Loading…" : dataError ? "Load failed" : `${filteredAndSorted.length} result(s)`}
       </p>
 
       {copyDialogRow && (

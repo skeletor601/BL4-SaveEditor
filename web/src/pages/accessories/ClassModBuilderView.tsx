@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
-import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
 const FLAG_OPTIONS = [
   { value: 1, label: "1 (Normal)" },
@@ -49,6 +49,19 @@ type PerkEntry = { perkId: number; count: number };
 
 function copyToClipboard(text: string): void {
   navigator.clipboard.writeText(text).catch(() => {});
+}
+
+/** Build skill icon filename to match desktop (qt_class_mod_editor_tab.py get_skill_icon). */
+function getSkillIconFilename(skillNameEN: string, className: string): string {
+  const norm = skillNameEN
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/['']/g, "")
+    .replace(/\s+/g, "_");
+  const safeName = norm.replace(/[^a-zA-Z0-9_!]/g, "").toLowerCase();
+  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4" };
+  const suffix = suffixMap[className] ?? "";
+  return `${safeName}${suffix}.png`;
 }
 
 function SkillPointControls({
@@ -638,8 +651,17 @@ export default function ClassModBuilderView() {
           className="w-full max-w-xs mb-3 px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)]"
         />
         <div className="max-h-[400px] overflow-auto space-y-2">
-          {skillFiltered.map((skill) => (
+          {skillFiltered.map((skill) => {
+            const iconFilename = getSkillIconFilename(skill.skillNameEN, className);
+            const iconSrc = apiUrl(`accessories/class-mod/skill-icon/${className}/${iconFilename}`);
+            return (
             <div key={skill.skillNameEN} className="flex flex-wrap items-center gap-2 py-1 border-b border-[var(--color-panel-border)] last:border-0">
+              <img
+                src={iconSrc}
+                alt=""
+                className="w-8 h-8 object-contain flex-shrink-0"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
               <span className="w-40 md:w-52 truncate text-[var(--color-text)]" title={skill.skillNameEN}>{skill.skillNameEN}</span>
               <span className="text-xs text-[var(--color-text-muted)]">{`{${skill.skillIds.slice(0, 5).join(", ")}}`}</span>
               <SkillPointControls
@@ -648,7 +670,8 @@ export default function ClassModBuilderView() {
                 onChange={(v) => setSkillPoint(skill.skillNameEN, v)}
               />
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

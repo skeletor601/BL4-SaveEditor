@@ -1,4 +1,7 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { createReadStream, existsSync } from "fs";
 import { getGrenadeBuilderData } from "../data/grenadeBuilder.js";
 import { getRepkitBuilderData } from "../data/repkitBuilder.js";
 import { getShieldBuilderData } from "../data/shieldBuilder.js";
@@ -59,6 +62,29 @@ export async function accessoriesRoutes(
       return reply.code(500).send({ error: "Failed to load class mod builder data" });
     }
   });
+
+  // Serve class mod skill icons (same layout as desktop: class_mods/Amon|Harlowe|Rafa|Vex/*.png)
+  const allowedClasses = ["Amon", "Harlowe", "Rafa", "Vex"];
+  const safeFilename = /^[a-zA-Z0-9_!]+\.png$/;
+  const __dirnameRoutes = dirname(fileURLToPath(import.meta.url));
+  const repoRoot = join(__dirnameRoutes, "..", "..", "..");
+
+  fastify.get<{ Params: { className: string; filename: string } }>(
+    "/accessories/class-mod/skill-icon/:className/:filename",
+    async (request, reply) => {
+      const { className, filename } = request.params;
+      if (!allowedClasses.includes(className) || !safeFilename.test(filename)) {
+        return reply.code(404).send({ error: "Not found" });
+      }
+      const filePath = join(repoRoot, "class_mods", className, filename);
+      if (!existsSync(filePath)) {
+        return reply.code(404).send({ error: "Not found" });
+      }
+      return reply
+        .type("image/png")
+        .send(createReadStream(filePath));
+    },
+  );
 
   fastify.get("/accessories/enhancement/builder-data", async (_request, reply) => {
     try {

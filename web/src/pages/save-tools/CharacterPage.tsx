@@ -152,9 +152,15 @@ export default function CharacterPage() {
           ← Select Save
         </Link>
         <h1 className="text-xl font-semibold text-[var(--color-text)]">Character</h1>
-        <p className="text-[var(--color-text-muted)]">
-          Load a save first: go to Select Save, decrypt a .sav (or open JSON/YAML), then edit character data here.
-        </p>
+        <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
+          <p className="text-[var(--color-text-muted)] mb-3">No save loaded. Select a save in the Select Save tab to edit character data.</p>
+          <Link
+            to="/character/select-save"
+            className="inline-block px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent-dim)]"
+          >
+            Go to Select Save
+          </Link>
+        </div>
       </div>
     );
   }

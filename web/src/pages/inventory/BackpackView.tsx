@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
-import { getInventorySlots, type ItemSlot } from "@/lib/inventoryData";
+import { getInventorySlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
 export interface DecodedItem {
@@ -55,6 +55,8 @@ interface TreeItem {
   manufacturer: string;
   /** Full deserialized code (header||parts) when decoded */
   decodedFull: string;
+  /** Path into save data for remove/update (from walk). */
+  path: string[];
 }
 
 /** Generic words we should not use as the display name (keep decoder's "Manufacturer Type" instead). */
@@ -111,12 +113,12 @@ function preferItemNameFromParts(decoded: DecodedItem | undefined, partsByCode: 
 }
 
 function buildTreeItems(
-  slots: { backpack: ItemSlot[]; equipped: ItemSlot[]; lostLoot: ItemSlot[] },
+  slots: { backpack: ItemSlotWithPath[]; equipped: ItemSlotWithPath[]; lostLoot: ItemSlotWithPath[] },
   decodeMap: Map<string, DecodedItem>,
   partsByCode: Map<string, PartLookupItem>
 ): TreeItem[] {
   const out: TreeItem[] = [];
-  const add = (container: ContainerKey, list: ItemSlot[]) => {
+  const add = (container: ContainerKey, list: ItemSlotWithPath[]) => {
     for (const s of list) {
       const decoded = s.serial ? decodeMap.get(s.serial) : undefined;
       const prettyName = decoded ? preferItemNameFromParts(decoded, partsByCode) : undefined;
@@ -131,6 +133,7 @@ function buildTreeItems(
         level: decoded != null ? String(decoded.level) : "—",
         manufacturer: decoded?.manufacturer ?? "—",
         decodedFull: decoded?.decodedFull ?? "",
+        path: s.path,
       });
     }
   };
@@ -153,7 +156,7 @@ function groupByType(items: TreeItem[]): Map<string, TreeItem[]> {
 
 export default function BackpackView() {
   const { saveData, getYamlText, updateSaveData } = useSave();
-  const slots = saveData ? getInventorySlots(saveData) : { backpack: [], equipped: [], lostLoot: [] };
+  const slots = saveData ? getInventorySlotsWithPaths(saveData) : { backpack: [], equipped: [], lostLoot: [] };
   const [search, setSearch] = useState("");
   const [itemSerial, setItemSerial] = useState("");
   const [flagValue, setFlagValue] = useState(1);
@@ -163,6 +166,13 @@ export default function BackpackView() {
   const [partsByCode, setPartsByCode] = useState<Map<string, PartLookupItem>>(new Map());
   const [isAdding, setIsAdding] = useState(false);
   const [addMessage, setAddMessage] = useState<string | null>(null);
+  const [contextItem, setContextItem] = useState<TreeItem | null>(null);
+  const [contextPos, setContextPos] = useState<{ x: number; y: number } | null>(null);
+  const [duplicateDialog, setDuplicateDialog] = useState<{ item: TreeItem; qty: string } | null>(null);
+  const navigate = useNavigate();
+
+  const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
+  const ITEM_EDIT_TYPES = new Set(["Heavy Weapon", "Grenade", "Shield", "Repkit"]);
 
   const serialsToDecode = useMemo(() => {
     const list: string[] = [];
@@ -309,6 +319,109 @@ export default function BackpackView() {
     }
   }, [saveData, itemSerial, flagValue, getYamlText, updateSaveData]);
 
+  const handleRemoveItem = useCallback(
+    async (item: TreeItem) => {
+      if (!saveData) return;
+      const yamlContent = getYamlText();
+      if (!yamlContent?.trim()) return;
+      setContextItem(null);
+      setContextPos(null);
+      try {
+        const res = await fetchApi("save/remove-item", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ yaml_content: yamlContent, item_path: item.path }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+          setAddMessage(data?.error ?? "Failed to remove item.");
+          return;
+        }
+        const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
+        updateSaveData(parsed);
+        setSelected(null);
+        setAddMessage("Item removed from inventory.");
+      } catch {
+        setAddMessage(getApiUnavailableError());
+      }
+    },
+    [saveData, getYamlText, updateSaveData]
+  );
+
+  const handleDuplicateSubmit = useCallback(
+    async (item: TreeItem, qty: number) => {
+      if (!saveData || !item.serial?.trim() || qty < 1) return;
+      setDuplicateDialog(null);
+      setContextItem(null);
+      setContextPos(null);
+      const yamlContent = getYamlText();
+      if (!yamlContent?.trim()) {
+        setAddMessage("No save YAML loaded.");
+        return;
+      }
+      const num = Math.min(99, Math.max(1, qty));
+      const stateFlags = String(item.stateFlags ?? item.flags ?? 1);
+      try {
+        let currentYaml = yamlContent;
+        for (let i = 0; i < num; i++) {
+          const res = await fetchApi("save/add-item", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              yaml_content: currentYaml,
+              serial: item.serial.trim(),
+              flag: stateFlags,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+            setAddMessage(data?.error ?? `Failed to add copy ${i + 1}.`);
+            return;
+          }
+          currentYaml = data.yaml_content;
+        }
+        const parsed = yamlParse(currentYaml) as Record<string, unknown>;
+        updateSaveData(parsed);
+        setAddMessage(`${num} copy/copies added to backpack.`);
+      } catch {
+        setAddMessage(getApiUnavailableError());
+      }
+    },
+    [saveData, getYamlText, updateSaveData]
+  );
+
+  const handleUpgradeItem = useCallback(
+    (item: TreeItem) => {
+      setContextItem(null);
+      setContextPos(null);
+      const typeLabel = item.typeLabel || "";
+      if (WEAPON_TYPES.has(typeLabel)) {
+        navigate("/weapon-toolbox/weapon-edit", {
+          state: {
+            loadItem: {
+              serial: item.serial,
+              decodedFull: item.decodedFull,
+              path: item.path,
+            },
+          },
+        });
+      } else if (ITEM_EDIT_TYPES.has(typeLabel)) {
+        navigate("/weapon-toolbox/item-edit", {
+          state: {
+            loadItem: {
+              serial: item.serial,
+              decodedFull: item.decodedFull,
+              path: item.path,
+            },
+          },
+        });
+      } else {
+        setAddMessage(`Unknown item type "${typeLabel}". Use Weapon Edit for weapons, Item Edit for Shield/Grenade/Repkit/Heavy.`);
+      }
+    },
+    [navigate]
+  );
+
   if (!saveData) {
     return (
       <div className="space-y-4">
@@ -411,6 +524,11 @@ export default function BackpackView() {
                               key={`${item.container}-${item.slotKey}`}
                               type="button"
                               onClick={() => setSelected(item)}
+                              onContextMenu={(e) => {
+                                e.preventDefault();
+                                setContextItem(item);
+                                setContextPos({ x: e.clientX, y: e.clientY });
+                              }}
                               className={`block w-full text-left py-1.5 px-2 rounded text-sm truncate ${
                                 selected?.container === item.container && selected?.slotKey === item.slotKey
                                   ? "bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
@@ -492,6 +610,92 @@ export default function BackpackView() {
           )}
         </div>
       </div>
+
+      {/* Right-click context menu */}
+      {contextItem && contextPos && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            aria-hidden="true"
+            onClick={() => { setContextItem(null); setContextPos(null); }}
+          />
+          <div
+            className="fixed z-50 min-w-[180px] py-1 rounded-lg border border-[var(--color-panel-border)] bg-[var(--color-panel)] shadow-lg"
+            style={{ left: contextPos.x, top: contextPos.y }}
+            role="menu"
+          >
+            <button
+              type="button"
+              className="block w-full text-left px-4 py-2 text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
+              onClick={() => handleRemoveItem(contextItem)}
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              className="block w-full text-left px-4 py-2 text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
+              onClick={() => {
+                setContextPos(null);
+                setDuplicateDialog({ item: contextItem, qty: "1" });
+                setContextItem(null);
+              }}
+            >
+              Duplicate…
+            </button>
+            <button
+              type="button"
+              className="block w-full text-left px-4 py-2 text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
+              onClick={() => handleUpgradeItem(contextItem)}
+            >
+              Upgrade Item
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Duplicate: How many dialog */}
+      {duplicateDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setDuplicateDialog(null)}
+        >
+          <div
+            className="rounded-lg border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 max-w-sm w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Duplicate</h3>
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">How many copies to add to backpack?</p>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={duplicateDialog.qty}
+              onChange={(e) => setDuplicateDialog((d) => d ? { ...d, qty: e.target.value } : null)}
+              className="w-20 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center font-mono"
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  const n = parseInt(duplicateDialog.qty, 10);
+                  if (Number.isFinite(n)) handleDuplicateSubmit(duplicateDialog.item, n);
+                  setDuplicateDialog(null);
+                }}
+                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium"
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                onClick={() => setDuplicateDialog(null)}
+                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

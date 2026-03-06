@@ -52,17 +52,9 @@ Download the latest Windows build from the **Releases** tab:
 
 ---
 
-## 📱 HTML / Mobile Version coming soon
+## 🌐 Web version
 
-A dedicated mobile-friendly Master Search interface is available for modders who primarily work from phones should be available in a few weeks 
-
-Designed for:
-- Fast search
-- One-tap copy
-- Quick formatting
-- Lightweight performance
-
-Built to support the mobile-heavy modding community.
+**https://BL4Editor.com** – Full save editor in the browser: Master Search, weapon and item editing, backpack (add/remove/duplicate/upgrade), character and inventory tools. No install; works on desktop and phone.
 
 ---
 

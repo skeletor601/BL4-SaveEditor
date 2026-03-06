@@ -5,6 +5,7 @@ import { useSave } from "@/contexts/SaveContext";
 import { getBackpackSlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
+import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
 const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
 
@@ -184,9 +185,24 @@ export default function WeaponEditView() {
   const [showCleanCode, setShowCleanCode] = useState(false);
 
   useEffect(() => {
-    const paste = (location.state as { pasteDecoded?: string } | null)?.pasteDecoded;
+    const state = location.state as { pasteDecoded?: string; loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null;
+    const paste = state?.pasteDecoded;
     if (typeof paste === "string" && paste.trim()) {
       setDecodedInput(paste.trim());
+    }
+    const loadItem = state?.loadItem;
+    if (loadItem && typeof loadItem === "object") {
+      if (typeof loadItem.serial === "string" && loadItem.serial.trim()) {
+        setSerialInput(loadItem.serial.trim());
+      }
+      if (typeof loadItem.decodedFull === "string" && loadItem.decodedFull.trim()) {
+        setDecodedInput(loadItem.decodedFull.trim());
+      }
+      if (Array.isArray(loadItem.path) && loadItem.path.length > 0) {
+        setSelectedWeaponPath(loadItem.path);
+      }
+      setEncodedSerial("");
+      setMessage("Item loaded from backpack. Edit and click Update Weapon to save.");
     }
   }, [location.state]);
 
@@ -927,6 +943,14 @@ export default function WeaponEditView() {
               Add to Gun
             </button>
           </div>
+          {skinComboValue && (
+            <div className="mt-3">
+              <SkinPreview
+                token={skinComboValue}
+                label={skinOptions.find((s) => s.value === skinComboValue)?.label ?? skinComboValue}
+              />
+            </div>
+          )}
         </div>
       )}
 

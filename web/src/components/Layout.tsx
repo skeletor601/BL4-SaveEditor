@@ -31,12 +31,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }}
       />
       <div className="relative z-10 flex flex-col min-h-screen">
-      <header className="border-b border-panel-border bg-panel/90 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+      <header
+        className="border-b border-panel-border sticky top-0 z-50 backdrop-blur-sm"
+        style={{
+          paddingLeft: "max(1rem, env(safe-area-inset-left))",
+          paddingRight: "max(1rem, env(safe-area-inset-right))",
+          backgroundColor: "rgba(48, 52, 60, 0.92)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between min-h-[44px] h-14">
           <div className="flex items-center gap-4">
             <button
               type="button"
-              className="md:hidden p-2 rounded border border-panel-border text-accent"
+              className="md:hidden min-w-[44px] min-h-[44px] p-2 rounded border border-panel-border text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
               onClick={() => setMenuOpen((o) => !o)}
               aria-label="Toggle menu"
             >
@@ -68,7 +75,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <select
               value={theme}
               onChange={(e) => setTheme(e.target.value as typeof theme)}
-              className="bg-panel border border-panel-border text-accent rounded px-2 py-1 text-sm min-w-[6rem]"
+              className="bg-panel border border-panel-border text-accent rounded px-2 py-1.5 text-sm min-w-[6rem] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
               aria-label="Theme"
             >
               {["Ion", "Lava", "Phoenix", "Violet", "Blue_Balls", "Artic_Hex", "Carbon_Flux", "Platinum"].map((t) => (
@@ -79,7 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </select>
             <Link
               to="/settings"
-              className="px-3 py-2 rounded border border-panel-border text-sm text-[var(--color-text-muted)] hover:bg-panel"
+              className="min-h-[44px] inline-flex items-center px-3 py-2 rounded border border-panel-border text-sm text-[var(--color-text-muted)] hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             >
               Credits
             </Link>
@@ -105,12 +112,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t border-panel-border py-3 px-4 text-sm text-[var(--color-text-muted)]">
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-between gap-2">
-          <span>Special Thanks to the Modders that Offered Ideas</span>
-          <span>All Credit Goes to Original Creator Superexboom</span>
-        </div>
-      </footer>
+      <footer
+        className="border-t border-panel-border py-2 px-4"
+        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+      />
       </div>
     </div>
   );
