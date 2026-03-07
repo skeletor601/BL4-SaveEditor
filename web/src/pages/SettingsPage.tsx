@@ -43,7 +43,13 @@ export default function SettingsPage() {
           BL4 AIO Save Editor – Web version. All credit goes to original creator <strong>Superexboom</strong>.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
-          Special thanks to the modders that offered ideas.
+          <strong>YNOT</strong> - for all the help with codes and the DB, plus answering all my other million questions.
+        </p>
+        <p className="text-sm text-[var(--color-text-muted)] mt-2">
+          <strong>Terra</strong> - for all the great ideas, plus testing and giving feedback.
+        </p>
+        <p className="text-sm text-[var(--color-text-muted)] mt-2">
+          <strong>Spliff and Shaggy</strong> - testing and spreading the word.
         </p>
         <p className="text-sm mt-3">
           <a href="https://BL4Editor.com" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">

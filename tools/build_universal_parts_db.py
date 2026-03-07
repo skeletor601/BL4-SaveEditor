@@ -14,6 +14,8 @@ Run from project root: python -m tools.build_universal_parts_db
 import csv
 import json
 import os
+import re
+import shutil
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -32,7 +34,92 @@ UNIVERSAL_COLUMNS = [
     "Effects",
     "Requirements",
     "Stats",
+    "canonicalManufacturer",
+    "canonicalPartType",
+    "canonicalRarity",
 ]
+
+CANONICAL_MANUFACTURERS = [
+    "Atlas",
+    "COV",
+    "Daedalus",
+    "Hyperion",
+    "Jakobs",
+    "Maliwan",
+    "Order",
+    "Ripper",
+    "Tediore",
+    "Torgue",
+    "Vladof",
+]
+_CANONICAL_MFG_MAP = {m.lower(): m for m in CANONICAL_MANUFACTURERS}
+_RARITY_VALUES = ("Legendary", "Epic", "Rare", "Uncommon", "Common")
+
+# Legendary item names (sync with web/src/data/partsData.ts LEG_NAMES). Rows whose name
+# matches one of these get Rarity = "Legendary" so sort/filter by rarity works without name lookup.
+LEGENDARY_NAMES = [
+    "Accumulator", "Acey May", "Aching Roil", "Adrenaline Pump", "Aegon's Dream", "AF1000", "Anarchy", "ARC-TAN",
+    "Asher's Rise", "Assuit", "Atling Gun", "Autocannibal", "Avatar", "Besieger", "Big Banger", "Binger",
+    "Bio-Robot", "Birt's Bees", "Blacksmith",
+    "Blockbuster", "Blood Analyzer", "Bloodstarved", "Bloody Lumberjack", "Blind Box", "Body Counter", "Bonnie and Clyde",
+    "Boomslang", "Borstel Ballista", "Bottled Lightning", "Bod", "Budget Deity", "Bubbles", "Bugbear",
+    "Bully", "Buster", "Buoy", "Buzz Axe", "Champion", "Chaumurky", "Chuck", "Cindershelly", "Cold Shoulder",
+    "Collector", "Combo", "Compleation", "Complex Root", "Conflux", "Convergence", "Countermeasure",
+    "Dancer", "Darkbeast", "DAD_AR_Barrel_02", "Defibrillator", "Destructo Disco", "Devourer", "Director", "Disc Jockey",
+    "Disruptor", "Divided Focus", "Doeshot", "Dog Movement", "Driver", "Elementalist", "Eigenburst",
+    "Entangler", "Entropic", "Esgrimidor", "Evolver", "Extra Medium", "Extension", "Fashionista",
+    "Faulty Detonator", "Filántropo", "Finnity XXX-L", "Firebreak", "Firepot", "Firewerks", "First Impression",
+    "Fisheye", "Fleabag", "Flashpan", "Forsaken Chaos", "Forge Master", "Frangible", "Furnace", "Fuse",
+    "Gamma Void", "Gatherer", "Glacier", "G.M.R", "Golden God", "Goalkeeper", "Goremaster", "Generator", "Grenazerker",
+    "Guardian Angel", "Gummy", "Hair Trigger", "Handcannon", "Hardpoint", "Hat Trick", "Healthraiser",
+    "Heavyweight", "Hellfire", "Hellwalker", "Hephaestian", "Hero of Bullet", "Hopscotch", "Hot Slugger",
+    "Hoarder", "Husky Friend", "Hydrator", "Icon", "Illusionist", "Inscriber", "Inkling", "Instigator",
+    "Jackhammer", "Jelly", "Jetsetter", "Junction", "Kaoson", "Kaleidosplode", "Katagawa's Revenge",
+    "Kickballer", "Kill Spring", "King's Gambit", "Kindread Spirits", "Lame", "Lamplighter", "Laser Disker",
+    "Lead Balloon", "Linebacker", "Looper", "Lucian's Flank", "Lucky Clover", "Luty Madlad", "Ladykiller",
+    "Maestro", "Mantra", "Matador's Match", "Mercredi", "Mercurious", "Midnight Defiance", "Missilaser",
+    "Misericorde", "Multistrike", "Murmur", "Nexus", "Noisy Cricket", "Oak-Aged Cask", "Ohm I Got",
+    "Onion", "Onslaught", "Oscar Mike", "Ouroboros", "Overdriver", "Pacemaker", "Pandoran Momento",
+    "Parallaxis", "Phantom Flame", "Plasma Coil", "Potato Thrower IV", "Prince Harming", "Primadiem", "Principal", "Power Cycle", "Protean Cell", "Pumper", "Quencher", "Quicksilver", "Queen's Rest", "Quintain",
+    "Rainbow Vomit", "Rainmaker", "Rangefinder", "Ravenfire", "Reactor", "Recursive", "Roach",
+    "Rooker", "Rowan's Charge", "Rowdy Rider", "Roulette", "Ruby's Grasp", "San Saba Songbird",
+    "Scattershot", "Scientist", "Scion", "Seventh Sense", "Shatterwight", "Shalashaska", "Sho Kunai",
+    "Sideshow", "Sidewinder", "Sparky Shield", "Spinning Blade", "Sprezzatura", "Steward", "Stop Gap",
+    "Stray", "Streamer", "Studfinder", "Super Soldier", "Sure Shot", "Sweet Embrace", "Swarm",
+    "Star Helix Underbarrel", "Symmetry", "T.K's Wave", "Tankbuster", "Technomancer", "Teen Witch", "Timekeeper's New Shield",
+    "Toile", "Transmitter", "Trauma Bond", "Triple Bypass", "Trooper", "Truck", "UAV", "Undead Eye",
+    "Undershield", "Urchin", "Value-Add", "Valuepalooza", "Vamoose", "Viking", "War Paint",
+    "Waterfall", "Watts 4 Dinner", "Whiskey Foxtrot", "Wombo Combo", "X-Initiator", "Y-Initiator",
+    "Z-Initiator", "Zipper", "Short Circuit", "Skeptic",
+]
+
+
+def _norm_name(s: str) -> str:
+    """Normalize for legendary name match (same as frontend norm())."""
+    return re.sub(r"[^a-z0-9]+", "", (s or "").lower()).strip()
+
+
+def _row_blob(row: Dict[str, str]) -> str:
+    """Searchable blob of all string fields (same idea as frontend blob())."""
+    parts = []
+    for k, v in row.items():
+        if v and isinstance(v, str) and v.strip():
+            parts.append(v.strip().lower())
+    return " ".join(parts)
+
+
+def _is_legendary_by_name(row: Dict[str, str]) -> bool:
+    """True if any field in the row matches a LEGENDARY_NAMES entry (normalized, include match)."""
+    blob_norm = _norm_name(_row_blob(row))
+    if not blob_norm:
+        return False
+    for leg in LEGENDARY_NAMES:
+        ln = _norm_name(leg)
+        if not ln:
+            continue
+        if ln in blob_norm or blob_norm in ln:
+            return True
+    return False
 
 # Map alternate column names into our schema
 COLUMN_ALIASES: Dict[str, str] = {
@@ -76,6 +163,47 @@ def _safe_str(v: Any) -> str:
     if v is None:
         return ""
     return str(v).strip()
+
+
+def _canonical_manufacturer(v: str) -> str:
+    s = _safe_str(v).lower()
+    if not s:
+        return ""
+    if s in _CANONICAL_MFG_MAP:
+        return _CANONICAL_MFG_MAP[s]
+    if s == "daedukus":
+        return "Daedalus"
+    if s == "children of the vault":
+        return "COV"
+    return ""
+
+
+def _canonical_part_type(v: str) -> str:
+    s = re.sub(r"\s+", " ", _safe_str(v))
+    return s
+
+
+def _canonical_rarity(row: Dict[str, str]) -> str:
+    existing = _safe_str(row.get("Rarity", ""))
+    if existing:
+        e = existing.lower()
+        for val in _RARITY_VALUES:
+            if e == val.lower():
+                return val
+    if _is_legendary_by_name(row):
+        return "Legendary"
+    b = _row_blob(row)
+    if re.search(r"\blegendary\b", b):
+        return "Legendary"
+    if re.search(r"\bepic\b", b):
+        return "Epic"
+    if re.search(r"\brare\b", b):
+        return "Rare"
+    if re.search(r"\buncommon\b", b):
+        return "Uncommon"
+    if re.search(r"\bcommon\b", b):
+        return "Common"
+    return ""
 
 
 def _build_code(raw: Dict[str, Any]) -> str:
@@ -256,9 +384,39 @@ def build_universal_db(project_root: str) -> Tuple[int, str]:
         if not _safe_str(r.get("code")) and _safe_str(r.get("ID")):
             r["code"] = "{" + r["ID"] + "}"
 
+    # 6) Set Rarity = "Legendary" when row name matches LEGENDARY_NAMES so sort/filter by rarity works
+    for r in merged:
+        if _is_legendary_by_name(r):
+            r["Rarity"] = "Legendary"
+
+    # 7) Canonical normalized fields for reliable app filtering while keeping legacy fields intact
+    for r in merged:
+        cm = _canonical_manufacturer(_safe_str(r.get("Manufacturer", "")))
+        cp = _canonical_part_type(_safe_str(r.get("Part Type", "")))
+        cr = _canonical_rarity(r)
+        r["canonicalManufacturer"] = cm
+        r["canonicalPartType"] = cp
+        r["canonicalRarity"] = cr
+        if not _safe_str(r.get("Manufacturer", "")) and cm:
+            r["Manufacturer"] = cm
+        if not _safe_str(r.get("Part Type", "")) and cp:
+            r["Part Type"] = cp
+        if not _safe_str(r.get("Rarity", "")) and cr:
+            r["Rarity"] = cr
+
+    # 8) Backup existing universal DB before overwrite so rollback is one file copy
+    backup_path = ""
+    if out_path.exists():
+        backups_dir = db_dir / "backups"
+        backups_dir.mkdir(parents=True, exist_ok=True)
+        stamp = time.strftime("%Y%m%d_%H%M%S", time.gmtime())
+        backup_path = str(backups_dir / f"universal_parts_db_{stamp}.json")
+        shutil.copy2(out_path, backup_path)
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "backup_of_previous": backup_path,
         "sources": [
             {"name": "master_search/db/sources/", "path": "*.json, *.csv"},
             {"name": "master_search/db/", "path": "*.csv (Master List etc.)"},

@@ -22,10 +22,9 @@ function AppRoutes() {
         <Route path="/inventory/*" element={<InventoryPage />} />
         <Route path="/weapon-toolbox/*" element={<WeaponToolboxPage />} />
         <Route path="/accessories/*" element={<AccessoriesPage />} />
-        {/* Master Search: use the simple page that works; we'll restyle it next */}
-        <Route path="/master-search" element={<MasterSearchPage />} />
-        {/* Rich UI (filters/quick buttons) – experimental */}
-        <Route path="/master-search-rich" element={<MasterSearch />} />
+        {/* Master Search: rich UI with filters, quick filters, manufacturer/part type/rarity dropdowns */}
+        <Route path="/master-search" element={<MasterSearch />} />
+        <Route path="/master-search-simple" element={<MasterSearchPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />

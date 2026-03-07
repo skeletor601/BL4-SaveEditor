@@ -545,3 +545,66 @@ def sync_inventory_item_levels(yaml_data: Dict[str, Any]) -> Tuple[int, int, Lis
             failed_items_info.append(f"{slot_identifier}: {loc.get('write_fail', 'Write fail')} ({e})")
 
     return success_count, fail_count, failed_items_info
+
+
+def set_backpack_item_levels(yaml_data: Dict[str, Any], target_level: int) -> Tuple[int, int, List[str]]:
+    """
+    Sets the level of all items in the backpack to target_level (0-99).
+    Same logic as sync_inventory_item_levels but uses a fixed level instead of character level.
+    """
+    loc = get_sync_localization()
+    success_count = 0
+    fail_count = 0
+    failed_items_info = []
+
+    if not isinstance(yaml_data, dict):
+        return 0, 0, ["YAML data is not a valid dictionary."]
+    level = int(target_level)
+    if level < 0 or level > 99:
+        return 0, 0, ["Level must be between 0 and 99."]
+
+    all_discovered_items = _walk_for_serials(yaml_data, [])
+    inventory_items = []
+    for path, item_data in all_discovered_items:
+        path_str = '/'.join(map(str, path))
+        if 'inventory' in path and 'backpack' in path_str:
+            inventory_items.append((path, item_data))
+
+    if not inventory_items:
+        return 0, 0, [loc.get("no_inventory_items", "No items found in backpack")]
+
+    for path, item_data in inventory_items:
+        original_serial = item_data.get("serial")
+        slot_identifier = next((p for p in reversed(path) if p.startswith("slot_")), "Slot-?")
+
+        if not original_serial:
+            fail_count += 1
+            failed_items_info.append(f"{slot_identifier}: {loc.get('missing_serial', 'Missing serial')}")
+            continue
+
+        decoded_full, _, err = decoder_logic.decode_serial_to_string(original_serial)
+        if err:
+            fail_count += 1
+            failed_items_info.append(f"{slot_identifier}: {loc.get('decode_fail', 'Decode failed')} ({err})")
+            continue
+
+        updated_decoded_str = update_level_in_decoded_str(decoded_full, level)
+        if not updated_decoded_str:
+            fail_count += 1
+            failed_items_info.append(f"{slot_identifier}: {loc.get('update_level_fail', 'Level update failed')}")
+            continue
+
+        new_serial, err = b_encoder.encode_to_base85(updated_decoded_str)
+        if err:
+            fail_count += 1
+            failed_items_info.append(f"{slot_identifier}: {loc.get('reencode_fail', 'Re-encode failed')} ({err})")
+            continue
+
+        try:
+            _set_by_path(yaml_data, path + ['serial'], new_serial)
+            success_count += 1
+        except (KeyError, IndexError) as e:
+            fail_count += 1
+            failed_items_info.append(f"{slot_identifier}: {loc.get('write_fail', 'Write fail')} ({e})")
+
+    return success_count, fail_count, failed_items_info

@@ -106,3 +106,17 @@ If you don’t use `api.bl4editor.com` and keep the default Render URL (e.g. `ht
 - [ ] Visit `https://bl4editor.com` and test: load save, decrypt, edit, download.
 
 Your domain is **https://bl4editor.com** (note: `https` and no typo). The steps above get both the site and the API running and, if you use the custom API domain, keep everything under **bl4editor.com**.
+
+---
+
+## 9. Troubleshooting: "Service unavailable"
+
+If users see **"Service unavailable. Check your connection and try again..."** when using **Sync All Backpack Item Levels to Character Level** (or decrypt, presets, add-item, etc.):
+
+| Cause | What to check / do |
+|-------|--------------------|
+| **Frontend not pointing at API** | Static Site must have env **`VITE_API_URL`** set to your API URL (e.g. `https://api.bl4editor.com` or your Web Service URL). Rebuild the Static Site after changing it. |
+| **API not reachable** | In a browser, open `https://api.bl4editor.com/health` (or your Web Service URL + `/health`). You should see a healthy JSON response. If it fails or times out, the API is down or DNS is wrong. |
+| **Render free tier cold start** | On free tier, the Web Service sleeps after ~15 min idle. The first request after that can time out or return 502/503. The app will suggest "Wait 30 seconds and try again." User can retry once the API has woken up. |
+| **API crash (500)** | Check the Web Service **Logs** on Render. If `save_mutate.py` or Python is missing, or the script errors, you’ll see it there. Ensure the Dockerfile includes the `scripts/` folder and Python. |
+| **CORS** | If the browser blocks the request (e.g. wrong API URL), you get a network error. Double-check `VITE_API_URL` and that the API allows your site origin in CORS (the repo’s API should allow any origin for `/api/*`). |

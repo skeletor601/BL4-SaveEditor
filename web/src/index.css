@@ -50,9 +50,8 @@ body {
   outline-offset: 2px;
 }
 
-/* Master Search: legendary row (scarlett) */
+/* Master Search: legendary row – orange text only, no background */
 tbody tr.legendary-row td {
   color: var(--color-legendary) !important;
   font-weight: 600;
-  background-color: rgba(255, 138, 0, 0.12);
 }

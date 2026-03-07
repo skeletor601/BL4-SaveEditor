@@ -91,7 +91,14 @@ export default function CharacterPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const msg = isLikelyUnavailable(res) ? getApiUnavailableError() : (data?.error ?? "Sync failed");
+        let msg: string;
+        if (res.status === 502 || res.status === 503) {
+          msg = "API is starting up or busy (common on free hosting). Wait 30 seconds and try again.";
+        } else if (isLikelyUnavailable(res)) {
+          msg = getApiUnavailableError();
+        } else {
+          msg = data?.error ?? "Sync failed";
+        }
         setMutationMessage(msg);
         return;
       }
@@ -105,7 +112,9 @@ export default function CharacterPage() {
         setMutationMessage(data?.error ?? "Sync failed");
       }
     } catch {
-      setMutationMessage(getApiUnavailableError());
+      setMutationMessage(
+        "Service unavailable. The API may be starting (wait 30s and retry), or check your connection. If you self-host, ensure the API is running."
+      );
     } finally {
       setMutationLoading(false);
     }
@@ -125,7 +134,14 @@ export default function CharacterPage() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          const msg = isLikelyUnavailable(res) ? getApiUnavailableError() : (data?.error ?? "Preset failed");
+          let msg: string;
+          if (res.status === 502 || res.status === 503) {
+            msg = "API is starting up or busy. Wait 30 seconds and try again.";
+          } else if (isLikelyUnavailable(res)) {
+            msg = getApiUnavailableError();
+          } else {
+            msg = data?.error ?? "Preset failed";
+          }
           setMutationMessage(msg);
           return;
         }
@@ -137,7 +153,9 @@ export default function CharacterPage() {
           setMutationMessage(data?.error ?? "Preset failed");
         }
       } catch {
-        setMutationMessage(getApiUnavailableError());
+        setMutationMessage(
+          "Service unavailable. The API may be starting (wait 30s and retry), or check your connection."
+        );
       } finally {
         setMutationLoading(false);
       }
