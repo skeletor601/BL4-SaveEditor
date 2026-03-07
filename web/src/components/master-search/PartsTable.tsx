@@ -20,6 +20,8 @@ interface PartsTableProps {
   sortCol: SortCol;
   sortDir: SortDir;
   onSort: (col: SortCol) => void;
+  /** When set (e.g. "Legendary first"), rows are already sorted by rarity; do not override with column sort */
+  sortByRarity?: string;
 }
 
 function sortRows(rows: PartRow[], sortCol: SortCol, sortDir: SortDir): PartRow[] {
@@ -64,8 +66,10 @@ export default function PartsTable({
   sortCol,
   sortDir,
   onSort,
+  sortByRarity,
 }: PartsTableProps) {
-  const sorted = sortRows(rows, sortCol, sortDir);
+  const useRarityOrder = sortByRarity && sortByRarity !== "Default";
+  const sorted = useRarityOrder ? rows : sortRows(rows, sortCol, sortDir);
 
   const th = (col: SortCol, label: string) => (
     <th

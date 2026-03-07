@@ -116,8 +116,8 @@ def main() -> None:
     if not isinstance(yaml_content, str) or not yaml_content.strip():
         print(json.dumps({"success": False, "error": "yaml_content is required"}))
         sys.exit(0)
-    if action not in ("sync_levels", "add_item", "apply_preset", "update_item", "remove_item"):
-        print(json.dumps({"success": False, "error": "action must be sync_levels, add_item, apply_preset, update_item, or remove_item"}))
+    if action not in ("sync_levels", "set_backpack_level", "add_item", "apply_preset", "update_item", "remove_item"):
+        print(json.dumps({"success": False, "error": "action must be sync_levels, set_backpack_level, add_item, apply_preset, update_item, or remove_item"}))
         sys.exit(0)
 
     try:
@@ -132,6 +132,30 @@ def main() -> None:
 
     if action == "sync_levels":
         success_count, fail_count, info = bl4f.sync_inventory_item_levels(data)
+        out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        print(json.dumps({
+            "success": True,
+            "yaml_content": out_yaml,
+            "success_count": success_count,
+            "fail_count": fail_count,
+            "info": info,
+        }))
+        sys.exit(0)
+
+    if action == "set_backpack_level":
+        level = params.get("level")
+        if level is None:
+            print(json.dumps({"success": False, "error": "params.level (0-99) is required"}))
+            sys.exit(0)
+        try:
+            target = int(level)
+        except (TypeError, ValueError):
+            print(json.dumps({"success": False, "error": "params.level must be a number 0-99"}))
+            sys.exit(0)
+        if target < 0 or target > 99:
+            print(json.dumps({"success": False, "error": "params.level must be between 0 and 99"}))
+            sys.exit(0)
+        success_count, fail_count, info = bl4f.set_backpack_item_levels(data, target)
         out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
         print(json.dumps({
             "success": True,

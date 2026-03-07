@@ -53,9 +53,9 @@ function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
     partName: pickStr(raw, "partName", "part_name", "Part Name", "String"),
     effect: pickStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats"),
     category: pickStr(raw, "category", "Category") || undefined,
-    rarity: pickStr(raw, "rarity", "Rarity") || undefined,
-    manufacturer: pickStr(raw, "manufacturer", "Manufacturer") || undefined,
-    partType: pickStr(raw, "partType", "part_type", "Part Type") || undefined,
+    rarity: pickStr(raw, "canonicalRarity", "rarity", "Rarity") || undefined,
+    manufacturer: pickStr(raw, "canonicalManufacturer", "manufacturer", "Manufacturer") || undefined,
+    partType: pickStr(raw, "canonicalPartType", "partType", "part_type", "Part Type") || undefined,
     weaponType: pickStr(raw, "weaponType", "Weapon Type", "weapon_type") || undefined,
     id: typeof raw.id === "number" ? raw.id : typeof raw.ID === "number" ? raw.ID : undefined,
   };

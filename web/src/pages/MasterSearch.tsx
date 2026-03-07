@@ -12,7 +12,9 @@ import {
   buildCopyFormat,
   RARITY_ORDER,
   apiItemToPartRow,
-  getManufacturer,
+  getPartType,
+  getCanonicalManufacturer,
+  CANONICAL_MANUFACTURERS,
 } from "@/data/partsData";
 import SearchBar from "@/components/master-search/SearchBar";
 import Filters, { type FilterState } from "@/components/master-search/Filters";
@@ -26,9 +28,14 @@ const defaultFilters: FilterState = {
   partType: "All",
   sortRarity: "Default",
   manufacturer: "All",
+  rarity: "All",
   favoritesOnly: false,
   quickFilter: "",
 };
+
+function normalize(v: unknown): string {
+  return String(v ?? "").trim().toLowerCase();
+}
 
 type SortCol = "code" | "itemType" | "rarity" | "partName" | "effect" | null;
 
@@ -55,16 +62,12 @@ export default function MasterSearch() {
   const loadParts = useCallback(() => {
     setDataLoading(true);
     setDataError(false);
-    const params = new URLSearchParams();
-    if (search.trim()) params.set("q", search.trim());
-    if (filters.category !== "All") params.set("category", filters.category);
-    params.set("limit", "500");
-    fetchApi(`parts/search?${params.toString()}`)
+    fetchApi("parts/data")
       .then((r) => r.json())
       .then((body: { items?: unknown[] }) => {
         const items = body?.items ?? [];
         const rows = Array.isArray(items)
-          ? (items as { code?: string; itemType?: string; partName?: string; effect?: string; category?: string; manufacturer?: string; partType?: string; id?: number }[]).map(
+          ? (items as { code?: string; itemType?: string; partName?: string; effect?: string; category?: string; manufacturer?: string; partType?: string; rarity?: string; id?: number }[]).map(
               apiItemToPartRow
             )
           : [];
@@ -75,7 +78,7 @@ export default function MasterSearch() {
         setDataError(true);
       })
       .finally(() => setDataLoading(false));
-  }, [search, filters.category]);
+  }, []);
 
   useEffect(() => {
     loadParts();
@@ -94,56 +97,81 @@ export default function MasterSearch() {
   }, []);
 
   const filteredAndSorted = useMemo(() => {
-    let list = data.filter((row) => {
+    const selectedPartType = normalize(filters.partType);
+    const selectedRarity = normalize(filters.rarity);
+    const selectedManufacturer = normalize(filters.manufacturer);
+    const searchLower = search.trim().toLowerCase();
+
+    const list = data.filter((row) => {
+      const raw = row as Record<string, unknown>;
+      const rowPartType = row["Part Type"] ?? raw["partType"];
+      const rowRarity = row.Rarity ?? raw["rarity"];
+      const rowManufacturer = getCanonicalManufacturer(row);
+      const rowName = normalize(row["String"] ?? raw["partName"] ?? row["Model Name"]);
+
+      if (selectedPartType && selectedPartType !== "all") {
+        const partTypeNorm = normalize(rowPartType);
+        if (selectedPartType === "barrel") {
+          if (partTypeNorm !== "barrel") return false;
+          // Guard against mis-tagged rows that are not actual barrels.
+          if (!rowName.includes("barrel")) return false;
+        } else if (partTypeNorm !== selectedPartType) {
+          return false;
+        }
+      }
+      if (selectedRarity && selectedRarity !== "all") {
+        if (normalize(rowRarity) !== selectedRarity) return false;
+      }
+      if (selectedManufacturer && selectedManufacturer !== "all") {
+        if (normalize(rowManufacturer) !== selectedManufacturer) return false;
+      }
       if (filters.category !== "All" && deriveCategory(row) !== filters.category) return false;
-      if (filters.manufacturer !== "All" && getManufacturer(row) !== filters.manufacturer) return false;
-      if (filters.partType !== "All") {
-        const pt = (row["Part Type"] ?? "").toString().trim();
-        if (pt !== filters.partType) return false;
+      if (searchLower) {
+        const b = blob(row);
+        const code = (row.code ?? row.Code ?? "").toString().toLowerCase();
+        if (!b.includes(searchLower) && !code.includes(searchLower)) return false;
       }
       if (filters.favoritesOnly && !favorites.has(getRowKey(row))) return false;
       const b = blob(row);
       if (filters.quickFilter === "damage" && !b.includes("damage")) return false;
-      if (filters.quickFilter === "crit" && (!(b.includes("crit") || b.includes("critical")) || !b.includes("damage"))) return false;
-      if (filters.quickFilter === "splash" && (!b.includes("splash") || !b.includes("damage"))) return false;
+      if (filters.quickFilter === "ammo" && !b.includes("ammo") && !b.includes("magazine")) return false;
       return true;
     });
+
     if (filters.sortRarity !== "Default") {
       const order = RARITY_ORDER;
-      list = [...list].sort((a, b) => {
+      const emptyOrder = 99;
+      return [...list].sort((a, b) => {
         const ra = inferRarity(a);
         const rb = inferRarity(b);
-        const ia = order[ra] ?? 99;
-        const ib = order[rb] ?? 99;
-        if (filters.sortRarity === "Legendary first") return ia - ib;
-        if (filters.sortRarity === "Epic first") return ia - ib;
-        if (filters.sortRarity === "Rare first") return ia - ib;
-        if (filters.sortRarity === "Common first") return ib - ia;
-        return 0;
+        const ia = order[ra] ?? emptyOrder;
+        const ib = order[rb] ?? emptyOrder;
+        let cmp = 0;
+        if (filters.sortRarity === "Legendary first" || filters.sortRarity === "Epic first" || filters.sortRarity === "Rare first") {
+          cmp = ia - ib;
+        } else if (filters.sortRarity === "Common first") {
+          cmp = ib - ia;
+        }
+        if (cmp !== 0) return cmp;
+        return String(getRowKey(a)).localeCompare(String(getRowKey(b)));
       });
     }
     return list;
   }, [data, search, filters, favorites]);
 
-  const manufacturerOptions = useMemo(() => {
-    const set = new Set<string>();
-    data.forEach((row) => {
-      const m = getManufacturer(row);
-      if (m) set.add(m);
-    });
-    return ["All", ...Array.from(set).sort()];
-  }, [data]);
+  const manufacturerOptions = useMemo(
+    () => ["All", ...CANONICAL_MANUFACTURERS],
+    []
+  );
 
   const partTypeOptions = useMemo(() => {
     const set = new Set<string>();
-    const manufacturer = filters.manufacturer;
     data.forEach((row) => {
-      if (manufacturer !== "All" && getManufacturer(row) !== manufacturer) return;
-      const pt = (row["Part Type"] ?? "").toString().trim();
+      const pt = getPartType(row);
       if (pt) set.add(pt);
     });
     return ["All", ...Array.from(set).sort()];
-  }, [data, filters.manufacturer]);
+  }, [data]);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -259,13 +287,7 @@ export default function MasterSearch() {
 
       <Filters
         filters={filters}
-        onFiltersChange={(next) => {
-          if (next.manufacturer !== filters.manufacturer) {
-            setFilters({ ...next, partType: "All" });
-          } else {
-            setFilters(next);
-          }
-        }}
+        onFiltersChange={setFilters}
         onExportFavorites={exportFavorites}
         onImportFavorites={importFavorites}
         manufacturerOptions={manufacturerOptions}
@@ -299,6 +321,7 @@ export default function MasterSearch() {
         sortCol={sortCol}
         sortDir={sortDir}
         onSort={handleSort}
+        sortByRarity={filters.sortRarity}
       />
 
       <p className="px-4 py-2 text-[10px] text-[var(--color-text-muted)]">

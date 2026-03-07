@@ -238,7 +238,7 @@ export default function MasterSearchPage() {
                     return (
                     <tr
                       key={row.code + row.partName}
-                      className={`border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer transition-colors ${isLegendary ? "bg-[rgba(255,138,0,0.12)]" : ""}`}
+                      className="border-b border-panel-border/50 hover:bg-accent/10 cursor-pointer transition-colors"
                       onClick={() => setLightboxItem(row)}
                     >
                       <td className="p-3">

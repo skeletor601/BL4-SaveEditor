@@ -12,7 +12,7 @@ const ENCODE_SCRIPT = join(REPO_ROOT, "scripts", "encode_serial.py");
 
 type SaveMutatePayload = {
   yaml_content: string;
-  action: "sync_levels" | "add_item" | "apply_preset" | "update_item" | "remove_item";
+  action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item";
   params?: Record<string, unknown>;
 };
 
@@ -311,6 +311,39 @@ export async function saveRoutes(
     } catch (e) {
       const message = e instanceof Error ? e.message : "Sync failed";
       fastify.log.warn({ err: e }, "save/sync-levels failed");
+      return reply.code(500).send({ success: false, error: message });
+    }
+  });
+
+  fastify.post<{ Body: { yaml_content?: string; level?: number } }>("/save/set-backpack-level", async (request, reply) => {
+    const body = request.body as { yaml_content?: string; level?: number } | undefined;
+    const yamlContent = body?.yaml_content;
+    const level = body?.level;
+    if (!yamlContent || typeof yamlContent !== "string") {
+      return reply.code(400).send({ success: false, error: "yaml_content is required" });
+    }
+    if (typeof level !== "number" || level < 0 || level > 99) {
+      return reply.code(400).send({ success: false, error: "level must be a number between 0 and 99" });
+    }
+    try {
+      const result = await runSaveMutate({
+        yaml_content: yamlContent,
+        action: "set_backpack_level",
+        params: { level },
+      });
+      if (!result.success) {
+        return reply.code(400).send({ success: false, error: result.error ?? "Set level failed" });
+      }
+      return reply.send({
+        success: true,
+        yaml_content: result.yaml_content,
+        success_count: result.success_count ?? 0,
+        fail_count: result.fail_count ?? 0,
+        info: result.info ?? [],
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Set backpack level failed";
+      fastify.log.warn({ err: e }, "save/set-backpack-level failed");
       return reply.code(500).send({ success: false, error: message });
     }
   });

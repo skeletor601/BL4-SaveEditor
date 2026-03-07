@@ -46,18 +46,19 @@ export function apiItemToPartRow(item: ApiPartItem | Record<string, unknown>): P
   const raw = item as Record<string, unknown>;
   const partName = getStr(raw, "partName", "part_name", "Part Name", "String");
   const itemType = getStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name");
-  const partType = getStr(raw, "partType", "part_type", "Part Type");
+  const partType = getStr(raw, "canonicalPartType", "partType", "part_type", "Part Type");
   const effect = getStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats");
   const code = getStr(raw, "code", "Code");
   const category = getStr(raw, "category", "Category");
-  const rarity = getStr(raw, "rarity", "Rarity");
-  const manufacturer = getStr(raw, "manufacturer", "Manufacturer");
+  const rarity = getStr(raw, "canonicalRarity", "rarity", "Rarity");
+  const manufacturer = getStr(raw, "canonicalManufacturer", "manufacturer", "Manufacturer");
   const id = raw.id ?? raw.ID;
   const weaponType = getStr(raw, "weaponType", "Weapon Type", "weapon_type");
+  const resolvedPartType = partType || category;
   const row: PartRow = {
     String: partName,
     "Model Name": itemType,
-    "Part Type": partType || category,
+    "Part Type": resolvedPartType,
     "Stats (Level 50, Common)": effect,
     code: code || (typeof id === "number" ? `{${id}}` : ""),
     Code: code || (typeof id === "number" ? `{${id}}` : ""),
@@ -67,15 +68,53 @@ export function apiItemToPartRow(item: ApiPartItem | Record<string, unknown>): P
     Rarity: rarity || undefined,
     "Weapon Type": weaponType || undefined,
   };
+  (row as Record<string, unknown>)["partType"] = resolvedPartType;
   for (const [k, v] of Object.entries(raw)) {
     if (k === "_blob" || k === "__hot") continue;
     if (row[k] !== undefined) continue;
     if (v != null && (typeof v === "string" || typeof v === "number")) row[k] = v;
   }
+  if (!row["Part Type"] && (row as Record<string, unknown>)["partType"]) {
+    row["Part Type"] = (row as Record<string, unknown>)["partType"] as string;
+  }
+  if (!(row as Record<string, unknown>)["partType"] && row["Part Type"]) {
+    (row as Record<string, unknown>)["partType"] = row["Part Type"];
+  }
   return row;
 }
 
 export const FAV_KEY = "bl4_parts_favorites_v2";
+
+/** Only these are real BL4 manufacturers. Dropdown uses this list so we never show Barrel/Perk/etc. */
+export const CANONICAL_MANUFACTURERS: readonly string[] = [
+  "Atlas",
+  "COV",
+  "Daedalus",
+  "Hyperion",
+  "Jakobs",
+  "Maliwan",
+  "Order",
+  "Ripper",
+  "Tediore",
+  "Torgue",
+  "Vladof",
+];
+
+const CANONICAL_MFG_SET = new Set(CANONICAL_MANUFACTURERS.map((m) => m.toLowerCase()));
+
+/** Map row manufacturer value to canonical name for filtering; returns "" if not a known manufacturer. */
+export function normalizeManufacturer(value: string): string {
+  const v = (value ?? "").toString().trim();
+  if (!v) return "";
+  const lower = v.toLowerCase();
+  if (CANONICAL_MFG_SET.has(lower)) {
+    const found = CANONICAL_MANUFACTURERS.find((m) => m.toLowerCase() === lower);
+    return found ?? "";
+  }
+  if (lower === "daedukus") return "Daedalus";
+  if (lower === "children of the vault" || lower === "cov") return "COV";
+  return "";
+}
 
 export const RARITY_ORDER: Record<string, number> = {
   legendary: 0,
@@ -129,11 +168,14 @@ function norm(s: string): string {
 const LEG_SET = new Set(LEG_NAMES.map((n) => norm(n)).filter(Boolean));
 
 export function getRowKey(row: PartRow): string {
-  const s = (row["String"] ?? row.String ?? "").toString().trim();
-  if (s) return s;
+  const code = (row.code ?? row.Code ?? "").toString().trim();
+  if (code) return `code:${code}`;
   const rawId = row["ID"];
   const idStr = rawId != null ? String(rawId).trim() : "";
-  if (idStr) return "id:" + idStr;
+  if (idStr) return `id:${idStr}`;
+  const s = (row["String"] ?? row.String ?? "").toString().trim();
+  const pt = (row["Part Type"] ?? (row as Record<string, unknown>)["partType"] ?? "").toString().trim();
+  if (s || pt) return `name:${s}|pt:${pt}`;
   return JSON.stringify(row);
 }
 
@@ -148,9 +190,18 @@ export function isLegendaryByName(row: PartRow): boolean {
   return false;
 }
 
+const RARITY_VALUES: Set<string> = new Set(["legendary", "epic", "rare", "uncommon", "common"]);
+
 export function inferRarity(row: PartRow): string {
+  const raw = row as Record<string, unknown>;
+  const explicit = (row.Rarity ?? raw["rarity"] ?? "")
+    .toString()
+    .trim()
+    .toLowerCase();
+  if (explicit && RARITY_VALUES.has(explicit)) return explicit;
   if (isLegendaryByName(row)) return "legendary";
   const h = blob(row);
+  if (h.includes("legendary")) return "legendary";
   if (h.includes("epic")) return "epic";
   if (h.includes("rare")) return "rare";
   if (h.includes("uncommon")) return "uncommon";
@@ -190,8 +241,24 @@ export function getEffect(row: PartRow): string {
   return (row["Stats (Level 50, Common)"] ?? row["Effects"] ?? row.Stats ?? "").toString().trim() || "—";
 }
 
+/** Manufacturer for filtering; reads "Manufacturer" or "manufacturer" so API shape doesn't matter. */
 export function getManufacturer(row: PartRow): string {
-  return (row.Manufacturer ?? "").toString().trim();
+  const r = row as Record<string, unknown>;
+  const v = row.Manufacturer ?? r["manufacturer"] ?? r["Manufacturer"];
+  return (v ?? "").toString().trim();
+}
+
+/** Canonical manufacturer for this row, or "" if not one of the 11 game manufacturers. */
+export function getCanonicalManufacturer(row: PartRow): string {
+  return normalizeManufacturer(getManufacturer(row));
+}
+
+/** Part type for filtering; reads "Part Type" or "partType" so API response shape doesn't matter. */
+export function getPartType(row: PartRow): string {
+  const r = row as Record<string, unknown>;
+  const v = row["Part Type"] ?? r["partType"] ?? r["Part Type"];
+  const s = (v ?? "").toString().trim();
+  return s || (row.category ?? "").toString().trim();
 }
 
 export function blob(row: PartRow): string {

@@ -169,6 +169,8 @@ export default function BackpackView() {
   const [contextItem, setContextItem] = useState<TreeItem | null>(null);
   const [contextPos, setContextPos] = useState<{ x: number; y: number } | null>(null);
   const [duplicateDialog, setDuplicateDialog] = useState<{ item: TreeItem; qty: string } | null>(null);
+  const [gearLevelDialog, setGearLevelDialog] = useState<{ level: number } | null>(null);
+  const [gearLevelLoading, setGearLevelLoading] = useState(false);
   const navigate = useNavigate();
 
   const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
@@ -390,6 +392,47 @@ export default function BackpackView() {
     [saveData, getYamlText, updateSaveData]
   );
 
+  const handleSetGearLevel = useCallback(async () => {
+    if (!gearLevelDialog || !saveData) return;
+    const yamlContent = getYamlText();
+    if (!yamlContent?.trim()) {
+      setAddMessage("No save YAML loaded.");
+      return;
+    }
+    const level = Math.max(0, Math.min(99, gearLevelDialog.level));
+    setGearLevelLoading(true);
+    setAddMessage(null);
+    try {
+      const res = await fetchApi("save/set-backpack-level", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ yaml_content: yamlContent, level }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+        const msg = isLikelyUnavailable(res)
+          ? getApiUnavailableError()
+          : (data?.error ?? "Failed to set gear level.");
+        setAddMessage(msg);
+        return;
+      }
+      const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
+      updateSaveData(parsed);
+      const ok = data.success_count ?? 0;
+      const fail = data.fail_count ?? 0;
+      setAddMessage(
+        fail > 0
+          ? `Set ${ok} item(s) to level ${level}; ${fail} failed.`
+          : `All backpack items set to level ${level}. Use "Download .sav" on Select Save to export.`
+      );
+      setGearLevelDialog(null);
+    } catch {
+      setAddMessage(getApiUnavailableError());
+    } finally {
+      setGearLevelLoading(false);
+    }
+  }, [gearLevelDialog, saveData, getYamlText, updateSaveData]);
+
   const handleUpgradeItem = useCallback(
     (item: TreeItem) => {
       setContextItem(null);
@@ -476,6 +519,13 @@ export default function BackpackView() {
           disabled={!itemSerial.trim() || isAdding}
         >
           {isAdding ? "Adding…" : "Add to Backpack"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setGearLevelDialog({ level: 50 })}
+          className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-accent)] text-sm hover:bg-[var(--color-accent)]/10 min-h-[44px]"
+        >
+          Change Gear Level
         </button>
       </div>
       {addMessage && (
@@ -651,6 +701,54 @@ export default function BackpackView() {
             </button>
           </div>
         </>
+      )}
+
+      {/* Change Gear Level dialog */}
+      {gearLevelDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => !gearLevelLoading && setGearLevelDialog(null)}
+        >
+          <div
+            className="rounded-lg border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 max-w-sm w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Change Gear Level</h3>
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              Set all backpack items to this level (0–99):
+            </p>
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={gearLevelDialog.level}
+              onChange={(e) => {
+                const n = parseInt(e.target.value, 10);
+                if (!Number.isFinite(n)) return;
+                setGearLevelDialog({ level: Math.max(0, Math.min(99, n)) });
+              }}
+              className="w-20 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center font-mono"
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={handleSetGearLevel}
+                disabled={gearLevelLoading}
+                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium disabled:opacity-50 min-h-[44px]"
+              >
+                {gearLevelLoading ? "Applying…" : "Apply"}
+              </button>
+              <button
+                type="button"
+                onClick={() => !gearLevelLoading && setGearLevelDialog(null)}
+                disabled={gearLevelLoading}
+                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] disabled:opacity-50 min-h-[44px]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Duplicate: How many dialog */}
