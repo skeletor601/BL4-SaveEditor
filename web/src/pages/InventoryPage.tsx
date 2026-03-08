@@ -1,8 +1,10 @@
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import BackpackView from "@/pages/inventory/BackpackView";
 import PartsTranslatorView from "@/pages/inventory/PartsTranslatorView";
+import DecoderView from "@/pages/inventory/DecoderView";
 
 const branches = [
+  { path: "decoder", label: "Decoder" },
   { path: "parts-translator", label: "Parts Translator" },
   { path: "backpack", label: "Backpack" },
 ];
@@ -32,10 +34,11 @@ export default function InventoryPage() {
       </nav>
       <div className="pt-2">
         <Routes>
-          <Route index element={<Navigate to="/inventory/parts-translator" replace />} />
+          <Route index element={<Navigate to="/inventory/decoder" replace />} />
+          <Route path="decoder" element={<DecoderView />} />
           <Route path="parts-translator" element={<PartsTranslatorView />} />
           <Route path="backpack" element={<BackpackView />} />
-          <Route path="*" element={<Navigate to="/inventory/parts-translator" replace />} />
+          <Route path="*" element={<Navigate to="/inventory/decoder" replace />} />
         </Routes>
       </div>
     </div>

@@ -94,8 +94,7 @@ export default function HeavyBuilderView() {
 
   const rebuildOutput = useCallback(async () => {
     if (manualOutputMode || !builderData) return;
-    // Desktop uses a random type in slot 2; we use a fixed safe value to keep serials stable.
-    const typeId = 307;
+    const typeId = Math.floor(Math.random() * (9999 - 100 + 1)) + 100;
     const mainParts = [`${mfgId}, 0, 1, ${level}| 2, ${typeId}||`];
     const skillParts: string[] = [];
 
@@ -106,13 +105,11 @@ export default function HeavyBuilderView() {
       skillParts.push(`{${bodyId}}`);
     }
 
-    const addSimple = (id: number | null) => {
-      if (id != null) skillParts.push(`{${id}}`);
-    };
-
-    addSimple(barrelPartId);
-    addSimple(elementPartId);
-    addSimple(firmwarePartId);
+    if (barrelPartId != null) skillParts.push(`{${barrelPartId}}`);
+    // Desktop uses prefixed tokens for main-table parts:
+    // element -> {1:<id>}, firmware -> {244:<id>}
+    if (elementPartId != null) skillParts.push(`{1:${elementPartId}}`);
+    if (firmwarePartId != null) skillParts.push(`{244:${firmwarePartId}}`);
 
     const addAccParts = (entries: AccEntry[]) => {
       for (const { partId, count } of entries) {

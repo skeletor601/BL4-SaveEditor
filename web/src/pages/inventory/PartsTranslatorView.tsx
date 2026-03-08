@@ -44,38 +44,78 @@ export default function PartsTranslatorView() {
 
   const byCode = useMemo(() => buildPartsByCode(partsData), [partsData]);
 
-  const runTranslate = useCallback(() => {
+  const runTranslate = useCallback(async () => {
     const raw = input.trim();
     if (!raw) {
       setOutput("");
       setStatus("ready");
       return;
     }
+    setStatus("loading");
     const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+    const decodedLines: string[] = Array(lines.length).fill("");
+    const serials: string[] = [];
+    const serialLineIndexes: number[] = [];
+    lines.forEach((line, idx) => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("@")) {
+        serials.push(trimmed);
+        serialLineIndexes.push(idx);
+      } else {
+        decodedLines[idx] = trimmed;
+      }
+    });
+
+    if (serials.length > 0) {
+      try {
+        const res = await fetchApi("save/decode-items", {
+          method: "POST",
+          body: JSON.stringify({ serials }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setOutput(data?.error ?? `Decode failed (${res.status})`);
+          setStatus("ready");
+          return;
+        }
+        const items = Array.isArray(data?.items) ? data.items : [];
+        serialLineIndexes.forEach((lineIdx, itemIdx) => {
+          const item = items[itemIdx];
+          if (item?.error) decodedLines[lineIdx] = `__ERROR__:${item.error}`;
+          else if (typeof item?.decodedFull === "string" && item.decodedFull.trim()) decodedLines[lineIdx] = item.decodedFull.trim();
+          else decodedLines[lineIdx] = "__ERROR__:No decoded output";
+        });
+      } catch (e) {
+        setOutput(e instanceof Error ? e.message : "Decode failed");
+        setStatus("ready");
+        return;
+      }
+    }
+
     const allParts: ReturnType<typeof parseDecodedSerial>["parts"] = [];
     const errors: string[] = [];
-    for (let i = 0; i < lines.length; i++) {
-      const decoded = lines[i].trim();
+    for (let i = 0; i < decodedLines.length; i++) {
+      const decoded = decodedLines[i].trim();
       if (!decoded) continue;
+      if (decoded.startsWith("__ERROR__:")) {
+        errors.push(`Line ${i + 1}: ${decoded.replace("__ERROR__:", "")}`);
+        continue;
+      }
       const { parts } = parseDecodedSerial(decoded);
       if (parts.length === 0) {
-        if (decoded.includes("||")) {
-          // had header but no tokens
-        } else {
-          errors.push(`Line ${i + 1}: no "||" or no part tokens found`);
-        }
+        errors.push(`Line ${i + 1}: no part tokens found`);
         continue;
       }
       allParts.push(...parts);
     }
     if (allParts.length === 0) {
-      setOutput(errors.length ? errors.join("\n") : "No part tokens found. Use decoded format: header||{type_id:part_id} ...");
+      setOutput(errors.length ? errors.join("\n") : "No part tokens found. Paste Base85 (@...) or decoded tokens.");
       setStatus("ready");
       return;
     }
     const translated = translateParts(allParts, byCode);
     const outLines = translated.map(formatTranslatedLine);
-    setOutput(outLines.join("\n"));
+    setOutput(errors.length ? `${outLines.join("\n")}\n\n${errors.join("\n")}` : outLines.join("\n"));
     setStatus("ready");
   }, [input, byCode]);
 
@@ -92,7 +132,9 @@ export default function PartsTranslatorView() {
       </Link>
       <h2 className="text-lg font-semibold text-[var(--color-accent)]">Parts Translator</h2>
       <p className="text-sm text-[var(--color-text-muted)]">
-        Paste decoded serial strings (format: <code className="text-[var(--color-accent)]">header||&#123;type_id:part_id&#125; ...</code>). One per line for batch. Base85 decode is not available here yet — use Weapon Edit to decode first if needed.
+        Paste Base85 (<code className="text-[var(--color-accent)]">@...</code>) or decoded serial strings
+        (format: <code className="text-[var(--color-accent)]">header||&#123;type_id:part_id&#125; ...</code>).
+        One per line for batch.
       </p>
 
       {status === "error" && (
@@ -104,11 +146,11 @@ export default function PartsTranslatorView() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--color-text-muted)]">
-            Input (decoded serials, one per line)
+            Input (Base85 or decoded serials, one per line)
           </label>
           <textarea
             className="w-full min-h-[200px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] px-3 py-2 font-mono text-sm text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent)] focus:outline-none"
-            placeholder="e.g. 1,2||{1:5}{3:12} or paste multiple lines"
+            placeholder='e.g. @U... or 1,2||{1:5}{3:12} or "c", "Cosmetics_Weapon_..."'
             value={input}
             onChange={(e) => setInput(e.target.value)}
             spellCheck={false}

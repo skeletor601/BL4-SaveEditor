@@ -155,7 +155,9 @@ export default function WeaponGenView() {
     let decoded = `${header} ${parts.join(" ")} |`;
     if (skinToken) {
       const safe = (skinToken || "").replace(/"/g, '\\"');
-      decoded = decoded.replace(/\|\s*$/, ` "c", "${safe}" |`);
+      decoded = decoded.replace(/\|\s*"c",\s*"(?:[^"\\]|\\.)*"\s*\|?\s*$/i, " |");
+      const normalized = decoded.trim().endsWith("|") ? decoded.trim() : `${decoded.trim()} |`;
+      decoded = normalized.replace(/\|\s*$/, `| "c", "${safe}" |`);
     }
     return decoded;
   }, [mfgWtId, level, seed, partSelections, skinToken, data]);

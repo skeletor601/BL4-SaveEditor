@@ -244,7 +244,11 @@ export default function ItemEditView() {
       return;
     }
     const safe = skinValue.replace(/"/g, '\\"');
-    const updated = decoded.replace(/\|\s*$/, ` "c", "${safe}" |`);
+    const withoutTrailingSkin = decoded.replace(/\|\s*"c",\s*"(?:[^"\\]|\\.)*"\s*\|?\s*$/i, " |");
+    const normalized = withoutTrailingSkin.trim().endsWith("|")
+      ? withoutTrailingSkin.trim()
+      : `${withoutTrailingSkin.trim()} |`;
+    const updated = normalized.replace(/\|\s*$/, `| "c", "${safe}" |`);
     setDecodedInput(updated);
     setMessage("Skin appended to decoded string. Click Encode or Update Item to apply.");
   }, [skinComboValue, decodedInput]);

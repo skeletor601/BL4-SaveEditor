@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
@@ -30,6 +30,9 @@ interface DecodedBackpackWeapon {
 }
 
 interface WeaponGenData {
+  mfgWtIdList?: { manufacturer: string; weaponType: string; mfgWtId: string }[];
+  partsByMfgTypeId?: Record<string, Record<string, { partId: string; label: string }[]>>;
+  elemental?: { partId: string; stat: string }[];
   skins: { label: string; value: string }[];
 }
 
@@ -71,6 +74,15 @@ interface AddPartSelection {
   checked: boolean;
   qty: string;
   label: string;
+}
+
+interface UniversalDbPartCode {
+  code: string;
+  partType?: string;
+  rarity?: string;
+  itemType?: string;
+  manufacturer?: string;
+  statText?: string;
 }
 
 function parseComponentString(componentStr: string): ParsedComponent[] {
@@ -164,6 +176,8 @@ export default function WeaponEditView() {
   const [serialInput, setSerialInput] = useState("");
   const [decodedInput, setDecodedInput] = useState("");
   const [encodedSerial, setEncodedSerial] = useState("");
+  const [newWeaponLevel, setNewWeaponLevel] = useState("50");
+  const [modPowerMode, setModPowerMode] = useState<"stable" | "op" | "insane">("op");
   const [flagValue, setFlagValue] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"decode" | "encode" | "add" | "update" | "backpack" | null>(null);
@@ -171,6 +185,7 @@ export default function WeaponEditView() {
   /** When set, we have a weapon loaded from backpack; Update Weapon will write to this path. */
   const [selectedWeaponPath, setSelectedWeaponPath] = useState<string[] | null>(null);
   const [backpackWeapons, setBackpackWeapons] = useState<DecodedBackpackWeapon[]>([]);
+  const [weaponGenData, setWeaponGenData] = useState<WeaponGenData | null>(null);
   const [skinOptions, setSkinOptions] = useState<WeaponGenData["skins"]>([]);
   const [skinComboValue, setSkinComboValue] = useState("");
   const [weaponEditData, setWeaponEditData] = useState<WeaponEditData | null>(null);
@@ -183,6 +198,7 @@ export default function WeaponEditView() {
   /** Fallback from master search DB when weapon CSV has no row (avoids empty rows). */
   const [universalFallback, setUniversalFallback] = useState<Record<string, { partType: string; string: string; stat: string }>>({});
   const [showCleanCode, setShowCleanCode] = useState(false);
+  const [universalPartCodes, setUniversalPartCodes] = useState<UniversalDbPartCode[]>([]);
 
   useEffect(() => {
     const state = location.state as { pasteDecoded?: string; loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null;
@@ -252,8 +268,14 @@ export default function WeaponEditView() {
   useEffect(() => {
     fetchApi("weapon-gen/data")
       .then((r) => r.json())
-      .then((d: WeaponGenData) => setSkinOptions(d?.skins ?? []))
-      .catch(() => setSkinOptions([]));
+      .then((d: WeaponGenData) => {
+        setWeaponGenData(d);
+        setSkinOptions(d?.skins ?? []);
+      })
+      .catch(() => {
+        setWeaponGenData(null);
+        setSkinOptions([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -261,6 +283,46 @@ export default function WeaponEditView() {
       .then((r) => r.json())
       .then((d: WeaponEditData) => setWeaponEditData(d))
       .catch(() => setWeaponEditData(null));
+  }, []);
+
+  useEffect(() => {
+    fetchApi("parts/data")
+      .then((r) => r.json())
+      .then((d: { items?: unknown[] }) => {
+        const items = Array.isArray(d?.items) ? d.items : [];
+        const out: UniversalDbPartCode[] = [];
+        for (const it of items) {
+          if (!it || typeof it !== "object") continue;
+          const raw = it as Record<string, unknown>;
+          const code = String(raw.code ?? raw.Code ?? "").trim();
+          if (!code) continue;
+          out.push({
+            code,
+            partType: String(raw.partType ?? raw["Part Type"] ?? raw.canonicalPartType ?? "").trim(),
+            rarity: String(raw.rarity ?? raw.Rarity ?? raw.canonicalRarity ?? "").trim(),
+            itemType: String(raw.itemType ?? raw["Item Type"] ?? raw["Weapon Type"] ?? "").trim(),
+            manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? raw.canonicalManufacturer ?? "").trim(),
+            statText: [
+              raw.effect,
+              raw.Effect,
+              raw.stat,
+              raw.Stat,
+              raw.stats,
+              raw.Stats,
+              raw.string,
+              raw.String,
+              raw.partName,
+              raw.name,
+              raw["Search Text"],
+            ]
+              .map((v) => String(v ?? "").trim())
+              .filter(Boolean)
+              .join(" "),
+          });
+        }
+        setUniversalPartCodes(out);
+      })
+      .catch(() => setUniversalPartCodes([]));
   }, []);
 
   /** Fetch master-search fallback for parts not in weapon CSV so we never show empty rows. */
@@ -517,11 +579,6 @@ export default function WeaponEditView() {
   }, [selectedWeaponPath, decodedInput, saveData, getYamlText, updateSaveData]);
 
   const handleAddToBackpack = useCallback(async () => {
-    const serial = encodedSerial.trim() || serialInput.trim();
-    if (!serial.startsWith("@U")) {
-      setMessage("Encode a serial first, or paste a Base85 serial.");
-      return;
-    }
     if (!saveData) {
       setMessage("Load a save first (Character → Select Save).");
       return;
@@ -534,6 +591,31 @@ export default function WeaponEditView() {
     setLoading("add");
     setMessage(null);
     try {
+      let serial = encodedSerial.trim() || serialInput.trim();
+      if (!serial.startsWith("@U")) {
+        const decoded = decodedInput.trim();
+        if (!decoded) {
+          setMessage("Generate or decode a weapon first (no serial/decoded data to add).");
+          return;
+        }
+        const encRes = await fetchApi("save/encode-serial", {
+          method: "POST",
+          body: JSON.stringify({ decoded_string: decoded }),
+        });
+        const encData = await encRes.json().catch(() => ({}));
+        if (!encRes.ok || !encData?.success || typeof encData?.serial !== "string") {
+          setMessage(
+            isLikelyUnavailable(encRes)
+              ? getApiUnavailableError()
+              : (encData?.error ?? "Auto-encode failed before Add to Backpack."),
+          );
+          return;
+        }
+        serial = encData.serial;
+        setEncodedSerial(serial);
+        setSerialInput(serial);
+      }
+
       const res = await fetchApi("save/add-item", {
         method: "POST",
         body: JSON.stringify({
@@ -559,7 +641,7 @@ export default function WeaponEditView() {
     } finally {
       setLoading(null);
     }
-  }, [encodedSerial, serialInput, saveData, flagValue, getYamlText, updateSaveData]);
+  }, [encodedSerial, serialInput, decodedInput, saveData, flagValue, getYamlText, updateSaveData]);
 
   const handleSkinAddToGun = useCallback(() => {
     const skinValue = skinComboValue?.trim();
@@ -573,7 +655,11 @@ export default function WeaponEditView() {
       return;
     }
     const safe = skinValue.replace(/"/g, '\\"');
-    const updated = decoded.replace(/\|\s*$/, ` "c", "${safe}" |`);
+    const withoutTrailingSkin = decoded.replace(/\|\s*"c",\s*"(?:[^"\\]|\\.)*"\s*\|?\s*$/i, " |");
+    const normalized = withoutTrailingSkin.trim().endsWith("|")
+      ? withoutTrailingSkin.trim()
+      : `${withoutTrailingSkin.trim()} |`;
+    const updated = normalized.replace(/\|\s*$/, `| "c", "${safe}" |`);
     setDecodedInput(updated);
     setMessage("Skin appended to decoded string. Click Encode or Update Weapon to apply.");
   }, [skinComboValue, decodedInput]);
@@ -682,6 +768,504 @@ export default function WeaponEditView() {
     setMessage("Parts added. Click Encode or Update Weapon to apply.");
   }, [addPartSelections, currentMfgWtId, decodedInput]);
 
+  const parseCodePair = useCallback((code: string): { prefix: number; part: number } | null => {
+    const s = code.trim();
+    const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
+    if (m2) return { prefix: Number(m2[1]), part: Number(m2[2]) };
+    const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
+    if (m1) {
+      const n = Number(m1[1]);
+      return { prefix: n, part: n };
+    }
+    return null;
+  }, []);
+
+  const handleRandomModdedWeapon = useCallback(async () => {
+    if (!weaponEditData) {
+      setMessage("Weapon parts data is still loading. Try again in a moment.");
+      return;
+    }
+    if (!universalPartCodes.length) {
+      setMessage("Universal parts DB data is still loading. Try again in a moment.");
+      return;
+    }
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+    const modeCfg = {
+      stable: {
+        exemplarCycleRepeats: [8, 24] as const,
+        exemplarAmmoCount: [12, 48] as const,
+        exemplarFireCount: [10, 36] as const,
+        useStabilityGroupChance: 0.7,
+        bodyAccRange: [4, 8] as const,
+        barrelAccRange: [4, 8] as const,
+        extraBarrelsRange: [4, 10] as const,
+        crossBarrelRange: [2, 5] as const,
+        grenadePerkRange: [16, 52] as const,
+        underAccRange: [1, 3] as const,
+        statRange: [2, 6] as const,
+      },
+      op: {
+        exemplarCycleRepeats: [16, 72] as const,
+        exemplarAmmoCount: [24, 140] as const,
+        exemplarFireCount: [18, 90] as const,
+        useStabilityGroupChance: 0.45,
+        bodyAccRange: [4, 12] as const,
+        barrelAccRange: [4, 12] as const,
+        extraBarrelsRange: [8, 22] as const,
+        crossBarrelRange: [4, 10] as const,
+        grenadePerkRange: [24, 120] as const,
+        underAccRange: [1, 6] as const,
+        statRange: [3, 10] as const,
+      },
+      insane: {
+        exemplarCycleRepeats: [56, 180] as const,
+        exemplarAmmoCount: [120, 420] as const,
+        exemplarFireCount: [90, 320] as const,
+        useStabilityGroupChance: 0.85,
+        bodyAccRange: [8, 20] as const,
+        barrelAccRange: [8, 24] as const,
+        extraBarrelsRange: [18, 48] as const,
+        crossBarrelRange: [8, 20] as const,
+        grenadePerkRange: [80, 280] as const,
+        underAccRange: [3, 10] as const,
+        statRange: [8, 20] as const,
+      },
+    }[modPowerMode];
+
+    const candidates = universalPartCodes
+      .map((row) => ({ row, parsed: parseCodePair(row.code) }))
+      .filter((x): x is { row: UniversalDbPartCode; parsed: { prefix: number; part: number } } => x.parsed != null);
+
+    const isLegendary = (row: { stat?: string; string?: string }) =>
+      /legendary/.test(norm(`${row.stat ?? ""} ${row.string ?? ""}`));
+
+    // Prefer prefixes with legendary barrel+rarity, but never hard-fail generation
+    // when DB labeling is inconsistent.
+    const weaponRowsByPrefix = new Map<number, WeaponEditPartRow[]>();
+    for (const row of weaponEditData.parts) {
+      const pfx = Number(row.mfgWtId);
+      if (!Number.isFinite(pfx)) continue;
+      if (!weaponRowsByPrefix.has(pfx)) weaponRowsByPrefix.set(pfx, []);
+      weaponRowsByPrefix.get(pfx)!.push(row);
+    }
+    const legendaryBarrelIdsByPrefix = new Map<number, Set<number>>();
+    const legendaryRarityIdsByPrefix = new Map<number, Set<number>>();
+    for (const c of candidates) {
+      const pt = norm(c.row.partType);
+      const r = norm(c.row.rarity);
+      if (r !== "legendary") continue;
+      if (pt === "barrel") {
+        if (!legendaryBarrelIdsByPrefix.has(c.parsed.prefix)) legendaryBarrelIdsByPrefix.set(c.parsed.prefix, new Set());
+        legendaryBarrelIdsByPrefix.get(c.parsed.prefix)!.add(c.parsed.part);
+      } else if (pt === "rarity") {
+        if (!legendaryRarityIdsByPrefix.has(c.parsed.prefix)) legendaryRarityIdsByPrefix.set(c.parsed.prefix, new Set());
+        legendaryRarityIdsByPrefix.get(c.parsed.prefix)!.add(c.parsed.part);
+      }
+    }
+    const hasCoreParts = (prefix: number): boolean => {
+      const rows = weaponRowsByPrefix.get(prefix) ?? [];
+      const hasBody = rows.some((r) => norm(r.partType) === "body");
+      const hasBarrel = rows.some((r) => norm(r.partType) === "barrel");
+      const hasMagazine = rows.some((r) => norm(r.partType) === "magazine");
+      return hasBody && hasBarrel && hasMagazine;
+    };
+    const validPrefixesLegendary = Array.from(weaponRowsByPrefix.keys()).filter((p) => {
+      const rows = weaponRowsByPrefix.get(p) ?? [];
+      const partIds = new Set(
+        rows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)),
+      );
+      const barrelSet = legendaryBarrelIdsByPrefix.get(p) ?? new Set<number>();
+      const raritySet = legendaryRarityIdsByPrefix.get(p) ?? new Set<number>();
+      const hasLegendaryBarrel =
+        Array.from(barrelSet).some((id) => partIds.has(id)) ||
+        rows.some((r) => norm(r.partType) === "barrel" && isLegendary(r));
+      const hasLegendaryRarity =
+        Array.from(raritySet).some((id) => partIds.has(id)) ||
+        rows.some((r) => norm(r.partType) === "rarity" && isLegendary(r));
+      return hasCoreParts(p) && hasLegendaryBarrel && hasLegendaryRarity;
+    });
+    const validPrefixesFallback = Array.from(weaponRowsByPrefix.keys()).filter((p) => {
+      const rows = weaponRowsByPrefix.get(p) ?? [];
+      const hasAnyRarity = rows.some((r) => norm(r.partType) === "rarity");
+      const hasAnyBarrel = rows.some((r) => norm(r.partType) === "barrel");
+      return hasCoreParts(p) && hasAnyRarity && hasAnyBarrel;
+    });
+    const validPrefixes = validPrefixesLegendary.length ? validPrefixesLegendary : validPrefixesFallback;
+    if (!validPrefixes.length) {
+      setMessage("No valid weapon prefix has required core parts and barrel/rarity.");
+      return;
+    }
+    const headerPrefix = pick(validPrefixes);
+    const seed = String(randInt(1000, 9999));
+    const parsedLevel = Number(newWeaponLevel.trim());
+    const level = Number.isFinite(parsedLevel) ? Math.max(1, Math.min(255, Math.trunc(parsedLevel))) : 50;
+
+    const weaponRows = weaponEditData.parts.filter((r) => Number(r.mfgWtId) === headerPrefix);
+    // Rule 2: first code must be legendary rarity for the weapon prefix.
+    const legendaryRarityRows = weaponRows.filter(
+      (r) => norm(r.partType) === "rarity" && /legendary/.test(norm(`${r.stat} ${r.string}`)),
+    );
+    const validCurrentPartIds = new Set(weaponRows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)));
+    const mappedLegendaryRarityIds = Array.from(legendaryRarityIdsByPrefix.get(headerPrefix) ?? []).filter((id) =>
+      validCurrentPartIds.has(id),
+    );
+    const anyRarityRows = weaponRows.filter((r) => norm(r.partType) === "rarity");
+    if (!legendaryRarityRows.length && !mappedLegendaryRarityIds.length && !anyRarityRows.length) {
+      setMessage("Could not find a rarity part for selected weapon prefix.");
+      return;
+    }
+    const firstRarityCode = legendaryRarityRows.length
+      ? `{${pick(legendaryRarityRows).partId}}`
+      : mappedLegendaryRarityIds.length
+        ? `{${pick(mappedLegendaryRarityIds)}}`
+        : `{${pick(anyRarityRows).partId}}`;
+
+    const toPartIds = (types: string[]): number[] => {
+      const set = new Set(types.map((t) => norm(t)));
+      return weaponRows
+        .filter((r) => set.has(norm(r.partType)))
+        .map((r) => Number(r.partId))
+        .filter((n) => Number.isFinite(n));
+    };
+    const pickToken = (types: string[]): string | null => {
+      const ids = toPartIds(types);
+      if (!ids.length) return null;
+      return `{${pick(ids)}}`;
+    };
+    const stackTokens = (types: string[], minCount: number, maxCount: number): string[] => {
+      const ids = toPartIds(types);
+      if (!ids.length) return [];
+      const count = randInt(minCount, maxCount);
+      const out: string[] = [];
+      for (let i = 0; i < count; i += 1) out.push(`{${pick(ids)}}`);
+      return out;
+    };
+    // Required order requested:
+    // rarity -> element -> body -> >=4 body accessories -> barrel -> extra barrels
+    // -> >=4 barrel accessories -> magazine/grip/foregrip/scope/(optional manufacturer)
+    // -> damage/ammo/fire stacks -> underbarrel/underbarrel accessories
+    // -> grenade (for Tediore-style reload setups) -> stalker stack -> skin.
+    const elementPool = weaponEditData.elemental ?? [];
+    const pickedElement = elementPool.length ? pick(elementPool) : null;
+    const elementToken = pickedElement && /^\d+$/.test(pickedElement.partId) ? `{1:${pickedElement.partId}}` : "";
+    const bodyToken = pickToken(["body"]);
+    if (!bodyToken) {
+      setMessage("Could not build stock weapon core: missing Body.");
+      return;
+    }
+    const bodyAccessoryStack = stackTokens(
+      ["body accessory"],
+      modeCfg.bodyAccRange[0],
+      modeCfg.bodyAccRange[1],
+    );
+    if (toPartIds(["body accessory"]).length > 0 && bodyAccessoryStack.length < 4) {
+      setMessage("Could not build stock weapon core: missing enough Body Accessory parts.");
+      return;
+    }
+
+    // Extra stat-focused stacks from DB text:
+    // damage, magazine/ammo, and fire rate.
+    const nonRarityCandidates = candidates.filter(({ row }) => norm(row.partType) !== "rarity");
+    const addStatStacks = (
+      matcher: (text: string) => boolean,
+      minCount: number,
+      maxCount: number,
+    ): string[] => {
+      const local = nonRarityCandidates.filter(
+        ({ row, parsed }) =>
+          parsed.prefix === headerPrefix &&
+          validCurrentPartIds.has(parsed.part) &&
+          matcher(norm(row.statText)),
+      );
+      const fallback = nonRarityCandidates.filter(({ row }) => matcher(norm(row.statText)));
+      const pool = local.length ? local : fallback;
+      if (!pool.length) return [];
+
+      const outTokens: string[] = [];
+      const byPrefix = new Map<number, number[]>();
+      const picks = randInt(minCount, maxCount);
+      for (let i = 0; i < picks; i += 1) {
+        const c = pick(pool);
+        const pfx = c.parsed.prefix;
+        if (pfx === headerPrefix) outTokens.push(`{${c.parsed.part}}`);
+        else {
+          if (!byPrefix.has(pfx)) byPrefix.set(pfx, []);
+          byPrefix.get(pfx)!.push(c.parsed.part);
+        }
+      }
+      for (const [pfx, ids] of byPrefix.entries()) {
+        if (!ids.length) continue;
+        outTokens.push(`{${pfx}:[${ids.join(" ")}]}`);
+      }
+      return outTokens;
+    };
+    const repeatPattern = (ids: number[], repeats: number): number[] => {
+      const out: number[] = [];
+      for (let i = 0; i < repeats; i += 1) out.push(...ids);
+      return out;
+    };
+    const groupedToken = (prefix: number, ids: number[]): string =>
+      `{${prefix}:[${ids.join(" ")}]}`;
+
+    // Exemplar-inspired stacks from known-working modded codes:
+    // - damage visual block: {9:[28 32 40 55 59 62 68 ...]}
+    // - ammo reserve block: {22:[72 72 ...]}
+    // - fire-rate-like push: {292:[9 9 ...]}
+    const exemplarDamageGroup = groupedToken(
+      9,
+      repeatPattern(
+        [28, 32, 40, 55, 59, 62, 68],
+        randInt(modeCfg.exemplarCycleRepeats[0], modeCfg.exemplarCycleRepeats[1]),
+      ),
+    );
+    const exemplarAmmoGroup = groupedToken(
+      22,
+      Array.from({ length: randInt(modeCfg.exemplarAmmoCount[0], modeCfg.exemplarAmmoCount[1]) }, () => 72),
+    );
+    const exemplarFireGroup = groupedToken(
+      292,
+      Array.from({ length: randInt(modeCfg.exemplarFireCount[0], modeCfg.exemplarFireCount[1]) }, () => 9),
+    );
+    const exemplarStabilityGroup =
+      Math.random() < modeCfg.useStabilityGroupChance
+        ? [groupedToken(14, Array.from({ length: randInt(8, 42) }, () => 3))]
+        : [];
+
+    const damageStacks = [
+      exemplarDamageGroup,
+      ...addStatStacks(
+      (text) => /\bdamage\b|\bsplash\b|\bbonus damage\b|\bgun damage\b|\bmelee damage\b/.test(text),
+      modeCfg.statRange[0],
+      modeCfg.statRange[1],
+      ),
+    ];
+    const ammoStacks = [
+      exemplarAmmoGroup,
+      ...addStatStacks(
+      (text) => /\bmag\b|\bmagazine\b|\bammo\b|\bshots?\b/.test(text),
+      modeCfg.statRange[0],
+      modeCfg.statRange[1],
+      ),
+    ];
+    const fireRateStacks = [
+      exemplarFireGroup,
+      ...exemplarStabilityGroup,
+      ...addStatStacks(
+      (text) => /\bfire rate\b|\/s fr\b|\bfr\b/.test(text),
+      modeCfg.statRange[0],
+      modeCfg.statRange[1],
+      ),
+    ];
+
+    // Rule 3: heavy barrels can be used (cross-prefix grouped barrel parts).
+    const mappedLegendaryBarrels = Array.from(legendaryBarrelIdsByPrefix.get(headerPrefix) ?? []).filter((id) =>
+      validCurrentPartIds.has(id),
+    );
+    const samePrefixBarrels = mappedLegendaryBarrels.length
+      ? mappedLegendaryBarrels
+      : weaponRows
+          .filter((r) => norm(r.partType) === "barrel" && isLegendary(r))
+          .map((r) => Number(r.partId))
+          .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
+    const anyPrefixBarrels = weaponRows
+      .filter((r) => norm(r.partType) === "barrel")
+      .map((r) => Number(r.partId))
+      .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
+    const usableSamePrefixBarrels = samePrefixBarrels.length ? samePrefixBarrels : anyPrefixBarrels;
+    if (!usableSamePrefixBarrels.length) {
+      setMessage("Could not build stock weapon core: missing Barrel for selected prefix.");
+      return;
+    }
+    const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
+    const crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
+      if (pfx === headerPrefix) return [];
+      const idsInPrefix = new Set(
+        rows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)),
+      );
+      const mapped = Array.from(legendaryBarrelIdsByPrefix.get(pfx) ?? []).filter((id) => idsInPrefix.has(id));
+      if (mapped.length) return mapped.map((part) => ({ prefix: pfx, part }));
+      return rows
+        .filter((r) => norm(r.partType) === "barrel" && isLegendary(r))
+        .map((r) => ({ prefix: pfx, part: Number(r.partId) }))
+        .filter((x) => Number.isFinite(x.part));
+    });
+    const samePrefixBarrelParts: string[] = [];
+    for (let i = 0; i < randInt(modeCfg.extraBarrelsRange[0], modeCfg.extraBarrelsRange[1]); i += 1) {
+      if (!usableSamePrefixBarrels.length) break;
+      samePrefixBarrelParts.push(`{${pick(usableSamePrefixBarrels)}}`);
+    }
+
+    const crossByPrefix = new Map<number, number[]>();
+    const crossPickCount = randInt(modeCfg.crossBarrelRange[0], modeCfg.crossBarrelRange[1]);
+    for (let i = 0; i < crossPickCount; i += 1) {
+      if (!crossPrefixBarrels.length) break;
+      const c = pick(crossPrefixBarrels);
+      if (!crossByPrefix.has(c.prefix)) crossByPrefix.set(c.prefix, []);
+      crossByPrefix.get(c.prefix)!.push(c.part);
+    }
+    const crossParts = Array.from(crossByPrefix.entries()).map(
+      ([prefix, parts]) => `{${prefix}:[${parts.join(" ")}]}`,
+    );
+    const barrelAccessoryStack = stackTokens(
+      ["barrel accessory"],
+      modeCfg.barrelAccRange[0],
+      modeCfg.barrelAccRange[1],
+    );
+    if (toPartIds(["barrel accessory"]).length > 0 && barrelAccessoryStack.length < 4) {
+      setMessage("Could not build stock weapon core: missing enough Barrel Accessory parts.");
+      return;
+    }
+
+    const magazineToken = pickToken(["magazine"]);
+    if (!magazineToken) {
+      setMessage("Could not build stock weapon core: missing Magazine.");
+      return;
+    }
+    const gripToken = pickToken(["grip"]);
+    const foregripToken = pickToken(["foregrip"]);
+    const scopeToken = pickToken(["scope"]);
+    const manufacturerToken = pickToken(["manufacturer part"]);
+    const underbarrelToken = pickToken(["underbarrel"]);
+    const underbarrelAccessoryStack = stackTokens(
+      ["underbarrel accessory"],
+      modeCfg.underAccRange[0],
+      modeCfg.underAccRange[1],
+    );
+
+    // Structured grenade sequence:
+    // (1) legendary grenade code, (2) grenade perks group, (3) legendary grenade rarity.
+    const grenadeParts: string[] = [];
+    const grenadeLegendaryCode = candidates.filter(
+      ({ row, parsed }) =>
+        parsed.prefix === 291 && norm(row.rarity) === "legendary" && norm(row.partType) !== "rarity",
+    );
+    const grenadePerkPool = candidates.filter(
+      ({ parsed, row }) => parsed.prefix === 245 && norm(row.partType) !== "rarity",
+    );
+    const grenadeLegendaryRarity = candidates.filter(
+      ({ parsed, row }) =>
+        [291, 289, 282, 273, 275, 281, 286].includes(parsed.prefix) &&
+        norm(row.rarity) === "legendary" &&
+        norm(row.partType) === "rarity",
+    );
+    const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");
+    const shouldAddGrenadeReloadParts =
+      weaponManufacturer.includes("tediore") ||
+      candidates.some(
+        ({ row, parsed }) =>
+          parsed.prefix === headerPrefix && /\btediore\b|\breload\b/.test(norm(row.statText)),
+      );
+    if (shouldAddGrenadeReloadParts && grenadeLegendaryCode.length) {
+      const g = pick(grenadeLegendaryCode);
+      grenadeParts.push(`{${g.parsed.prefix}:${g.parsed.part}}`);
+    }
+    if (shouldAddGrenadeReloadParts && grenadePerkPool.length) {
+      const n = randInt(modeCfg.grenadePerkRange[0], modeCfg.grenadePerkRange[1]);
+      const perkIds: number[] = [];
+      for (let i = 0; i < n; i += 1) perkIds.push(pick(grenadePerkPool).parsed.part);
+      grenadeParts.push(`{245:[${perkIds.join(" ")}]}`);
+    }
+    if (shouldAddGrenadeReloadParts && grenadeLegendaryRarity.length) {
+      const gr = pick(grenadeLegendaryRarity);
+      grenadeParts.push(`{${gr.parsed.prefix}:${gr.parsed.part}}`);
+    }
+
+    const stalkerCandidates = candidates.filter(
+      ({ row, parsed }) =>
+        parsed.prefix === headerPrefix &&
+        validCurrentPartIds.has(parsed.part) &&
+        /\bstalker\b|\browan'?s charge\b/.test(norm(row.statText)),
+    );
+    const stalkerStacks: string[] = [];
+    if (stalkerCandidates.length) {
+      const stalkerPart = pick(stalkerCandidates).parsed.part;
+      for (let i = 0; i < 7; i += 1) stalkerStacks.push(`{${stalkerPart}}`);
+    }
+
+    // Do not stack extra rarity tokens. We only enforce one legendary rarity
+    // token for the weapon so result stays legendary without unnecessary rarity spam.
+    const allNewParts = [
+      firstRarityCode,
+      ...(elementToken ? [elementToken] : []),
+      bodyToken,
+      ...bodyAccessoryStack,
+      primaryBarrelToken,
+      ...samePrefixBarrelParts,
+      ...crossParts,
+      ...barrelAccessoryStack,
+      magazineToken,
+      ...(gripToken ? [gripToken] : []),
+      ...(foregripToken ? [foregripToken] : []),
+      ...(scopeToken ? [scopeToken] : []),
+      ...(manufacturerToken ? [manufacturerToken] : []),
+      ...damageStacks,
+      ...ammoStacks,
+      ...fireRateStacks,
+      ...(underbarrelToken ? [underbarrelToken] : []),
+      ...underbarrelAccessoryStack,
+      ...grenadeParts,
+      ...stalkerStacks,
+    ];
+    if (!allNewParts.length) {
+      setMessage("Could not build random modded parts.");
+      return;
+    }
+    const finalParts = parseComponentString(allNewParts.join(" ")).filter((c) => typeof c !== "string");
+    const newComponentStr = finalParts
+      .map((p) => (typeof p === "string" ? p : p.raw))
+      .join(" ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    const chosenSkin = skinComboValue?.trim() || (skinOptions.length ? pick(skinOptions).value.trim() : "");
+    const safeSkin = chosenSkin.replace(/"/g, '\\"');
+    const updatedDecoded = safeSkin
+      ? `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} | "c", "${safeSkin}" |`
+      : `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} |`;
+    setDecodedInput(updatedDecoded);
+    setParsedComponents(finalParts);
+    setCurrentMfgWtId(headerPrefix);
+    setSelectedWeaponPath(null);
+    setLoading("encode");
+    try {
+      const res = await fetchApi("save/encode-serial", {
+        method: "POST",
+        body: JSON.stringify({ decoded_string: updatedDecoded }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setEncodedSerial("");
+        setSerialInput("");
+        setMessage(
+          isLikelyUnavailable(res)
+            ? getApiUnavailableError()
+            : (data?.error ?? "Generated weapon, but auto-encode failed. Click Encode → Base85."),
+        );
+        return;
+      }
+      if (data?.success && typeof data?.serial === "string") {
+        setEncodedSerial(data.serial);
+        setSerialInput(data.serial);
+        setMessage(
+          safeSkin
+            ? "Generated new modded weapon (with auto skin) and auto-encoded to Base85. Ready to Add to Backpack."
+            : "Generated new modded weapon and auto-encoded to Base85. No skin was available to apply.",
+        );
+      } else {
+        setEncodedSerial("");
+        setSerialInput("");
+        setMessage("Generated weapon, but auto-encode failed. Click Encode → Base85.");
+      }
+    } catch {
+      setEncodedSerial("");
+      setSerialInput("");
+      setMessage("Generated weapon, but auto-encode failed. Service unavailable.");
+    } finally {
+      setLoading(null);
+    }
+  }, [weaponEditData, universalPartCodes, parseCodePair, newWeaponLevel, modPowerMode, skinComboValue, skinOptions]);
+
   const rebuildDecodedFromComponents = useCallback(
     (components: ParsedComponent[]): string => {
       const [header] = decodedInput.split("||", 1);
@@ -723,6 +1307,12 @@ export default function WeaponEditView() {
     },
     [parsedComponents, rebuildDecodedFromComponents],
   );
+
+  const randomModReadyReason = useMemo(() => {
+    if (!weaponEditData) return "Weapon parts data is still loading.";
+    if (!universalPartCodes.length) return "Universal parts DB data is still loading.";
+    return "";
+  }, [weaponEditData, universalPartCodes.length]);
 
   return (
     <div className="space-y-6">
@@ -958,6 +1548,27 @@ export default function WeaponEditView() {
       <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
         <h3 className="text-[var(--color-accent)] font-medium mb-2">Actions</h3>
         <div className="flex flex-wrap items-center gap-2">
+          <label className="text-sm text-[var(--color-text-muted)]">New Weapon Level:</label>
+          <input
+            type="number"
+            min={1}
+            max={255}
+            value={newWeaponLevel}
+            onChange={(e) => setNewWeaponLevel(e.target.value)}
+            className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
+            title="Header level value used by Generate New Modded Weapon"
+          />
+          <label className="text-sm text-[var(--color-text-muted)]">Power Mode:</label>
+          <select
+            value={modPowerMode}
+            onChange={(e) => setModPowerMode(e.target.value as "stable" | "op" | "insane")}
+            className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
+            title="Stable = safest spawn, OP = default, Insane = max stack chaos"
+          >
+            <option value="stable">Stable</option>
+            <option value="op">OP</option>
+            <option value="insane">Insane</option>
+          </select>
           <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
           <select
             value={flagValue}
@@ -984,6 +1595,15 @@ export default function WeaponEditView() {
             className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
           >
             {loading === "add" ? "Adding…" : "Add to Backpack"}
+          </button>
+          <button
+            type="button"
+            onClick={handleRandomModdedWeapon}
+            disabled={loading !== null}
+            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            title={randomModReadyReason || "Generate a brand-new modded weapon with a fresh header and legendary-first part stack"}
+          >
+            Generate New Modded Weapon
           </button>
           {!saveData && (
             <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">

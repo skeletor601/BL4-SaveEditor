@@ -24,6 +24,21 @@ export interface CharacterData extends CharacterFormData {
   curPaths: CurrencyPaths;
 }
 
+function hasPath(root: unknown, path: (string | number)[]): boolean {
+  let cur: unknown = root;
+  for (const p of path) {
+    if (typeof p === "number") {
+      if (!Array.isArray(cur) || p < 0 || p >= cur.length) return false;
+      cur = cur[p];
+      continue;
+    }
+    if (cur === null || cur === undefined || typeof cur !== "object") return false;
+    if (!(p in (cur as Record<string, unknown>))) return false;
+    cur = (cur as Record<string, unknown>)[p];
+  }
+  return true;
+}
+
 function walkFind(
   node: unknown,
   targetKeys: string[],
@@ -48,12 +63,28 @@ function walkFind(
 }
 
 export function findCurrencyPaths(data: SaveData): CurrencyPaths {
-  const cash = (data.currencies && typeof data.currencies === "object" && "cash" in (data.currencies as object))
-    ? ["currencies", "cash"]
-    : walkFind(data, ["cash", "money"]);
-  const eridium = (data.currencies && typeof data.currencies === "object" && "eridium" in (data.currencies as object))
-    ? ["currencies", "eridium"]
-    : walkFind(data, ["eridium", "vaultcoin"]);
+  const stateNode = (data as Record<string, unknown>).state;
+  const preferredCashPaths: (string | number)[][] = [
+    ["state", "currencies", "cash"],
+    ["currencies", "cash"],
+  ];
+  const preferredEridiumPaths: (string | number)[][] = [
+    ["state", "currencies", "eridium"],
+    ["currencies", "eridium"],
+  ];
+
+  let cash: (string | number)[] | null = preferredCashPaths.find((p) => hasPath(data, p)) ?? null;
+  let eridium: (string | number)[] | null = preferredEridiumPaths.find((p) => hasPath(data, p)) ?? null;
+
+  if (!cash) {
+    const inState = walkFind(stateNode, ["cash", "money"]);
+    cash = inState ? ["state", ...inState] : walkFind(data, ["cash", "money"]);
+  }
+  if (!eridium) {
+    const inState = walkFind(stateNode, ["eridium", "vaultcoin"]);
+    eridium = inState ? ["state", ...inState] : walkFind(data, ["eridium", "vaultcoin"]);
+  }
+
   return {
     cash: cash ?? null,
     eridium: eridium ?? null,
@@ -94,18 +125,14 @@ export function getCharacterData(data: SaveData | null): CharacterData | null {
   let eridiumVal = "";
   if (curPaths.cash) {
     try {
-      let cur: unknown = data;
-      for (const p of curPaths.cash) cur = (cur as Record<string, unknown>)[p as string];
-      cash = String(cur ?? "");
+      cash = String(getByPath(data, curPaths.cash) ?? "");
     } catch {
       cash = "";
     }
   }
   if (curPaths.eridium) {
     try {
-      let cur: unknown = data;
-      for (const p of curPaths.eridium) cur = (cur as Record<string, unknown>)[p as string];
-      eridiumVal = String(cur ?? "");
+      eridiumVal = String(getByPath(data, curPaths.eridium) ?? "");
     } catch {
       eridiumVal = "";
     }
@@ -131,13 +158,41 @@ function maybeInt(x: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
+function getByPath(root: unknown, path: (string | number)[]): unknown {
+  let cur: unknown = root;
+  for (const p of path) {
+    if (typeof p === "number") {
+      if (!Array.isArray(cur)) return undefined;
+      cur = cur[p];
+      continue;
+    }
+    if (cur === null || cur === undefined || typeof cur !== "object") return undefined;
+    cur = (cur as Record<string, unknown>)[p];
+  }
+  return cur;
+}
+
 function setByPath(root: SaveData, path: (string | number)[], value: unknown): void {
+  if (!path.length) return;
   let cur: unknown = root;
   for (let i = 0; i < path.length - 1; i++) {
     const key = path[i]!;
-    cur = (cur as Record<string, unknown>)[key as string];
+    if (typeof key === "number") {
+      if (!Array.isArray(cur)) return;
+      cur = cur[key];
+      continue;
+    }
+    if (cur === null || cur === undefined || typeof cur !== "object") return;
+    cur = (cur as Record<string, unknown>)[key];
   }
-  (cur as Record<string, unknown>)[path[path.length - 1] as string] = value;
+  const last = path[path.length - 1]!;
+  if (typeof last === "number") {
+    if (!Array.isArray(cur)) return;
+    cur[last] = value;
+    return;
+  }
+  if (cur === null || cur === undefined || typeof cur !== "object") return;
+  (cur as Record<string, unknown>)[last] = value;
 }
 
 /**

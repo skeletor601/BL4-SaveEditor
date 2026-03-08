@@ -32,6 +32,7 @@ interface ShieldBuilderRarity {
 
 interface ShieldBuilderData {
   mfgs: { id: number; name: string }[];
+  mfgTypeById: Record<number, "Energy" | "Armor">;
   raritiesByMfg: Record<number, ShieldBuilderRarity[]>;
   element: ShieldBuilderPart[];
   firmware: ShieldBuilderPart[];
@@ -101,6 +102,9 @@ export default function ShieldBuilderView() {
 
   const rarities = builderData?.raritiesByMfg[mfgId] ?? [];
   const legendaryAvailableAll = builderData?.legendaryPerks ?? [];
+  const currentShieldType = builderData?.mfgTypeById[mfgId] ?? "Energy";
+  const isEnergyShield = currentShieldType === "Energy";
+  const isArmorShield = currentShieldType === "Armor";
 
   const rebuildOutput = useCallback(async () => {
     if (manualOutputMode || !builderData) return;
@@ -496,11 +500,14 @@ export default function ShieldBuilderView() {
               onChange={(e) => {
                 setMfgId(Number(e.target.value));
                 setRarityId(null);
+                setManualOutputMode(false);
               }}
               className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-w-[180px]"
             >
               {builderData.mfgs.map((m) => (
-                <option key={m.id} value={m.id}>{m.name} - {m.id}</option>
+                <option key={m.id} value={m.id}>
+                  {m.name} ({builderData.mfgTypeById[m.id] ?? "Unknown"}) - {m.id}
+                </option>
               ))}
             </select>
           </div>
@@ -706,7 +713,12 @@ export default function ShieldBuilderView() {
           {/* Energy */}
           <div>
             <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Energy (248)</h4>
-            <div className="flex gap-3 items-start">
+            {!isEnergyShield ? (
+              <div className="mt-1 border border-[var(--color-panel-border)] rounded px-3 py-4 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text-muted)]">
+                Current shield type is Armor. Cannot add Energy type perks.
+              </div>
+            ) : (
+              <div className="flex gap-3 items-start">
               <div className="flex-1 min-w-0">
                 <label className="text-xs text-[var(--color-text-muted)]">Available</label>
                 <select
@@ -750,6 +762,7 @@ export default function ShieldBuilderView() {
                 </button>
               </div>
             </div>
+            )}
             <ul className="mt-2 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-40 overflow-y-auto">
               {energySelectedWithStat.map((s) => (
                 <li key={s.partId}>
@@ -762,7 +775,12 @@ export default function ShieldBuilderView() {
           {/* Armor */}
           <div>
             <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Armor (237)</h4>
-            <div className="flex gap-3 items-start">
+            {!isArmorShield ? (
+              <div className="mt-1 border border-[var(--color-panel-border)] rounded px-3 py-4 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text-muted)]">
+                Current shield type is Energy. Cannot add Armor type perks.
+              </div>
+            ) : (
+              <div className="flex gap-3 items-start">
               <div className="flex-1 min-w-0">
                 <label className="text-xs text-[var(--color-text-muted)]">Available</label>
                 <select
@@ -806,6 +824,7 @@ export default function ShieldBuilderView() {
                 </button>
               </div>
             </div>
+            )}
             <ul className="mt-2 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-40 overflow-y-auto">
               {armorSelectedWithStat.map((s) => (
                 <li key={s.partId}>

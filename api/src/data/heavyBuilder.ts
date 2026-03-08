@@ -59,6 +59,13 @@ function trim(s: unknown): string {
   return String(s ?? "").trim();
 }
 
+function shortSubtypeName(v: string): string {
+  const s = trim(v);
+  if (!s) return "";
+  const [first] = s.split(",");
+  return trim(first);
+}
+
 let cached: HeavyBuilderData | null = null;
 
 export function getHeavyBuilderData(): HeavyBuilderData {
@@ -82,6 +89,9 @@ export function getHeavyBuilderData(): HeavyBuilderData {
   const barrel: HeavyBuilderPart[] = [];
   const barrelAccPerks: HeavyBuilderPart[] = [];
   const bodyAccPerks: HeavyBuilderPart[] = [];
+  const barrelSubtypeNames = new Map<string, string>();
+  const seenBarrelAcc = new Set<string>();
+  const seenBodyAcc = new Set<string>();
 
   if (existsSync(mfgPath)) {
     const { rows } = readCsv(mfgPath);
@@ -91,7 +101,8 @@ export function getHeavyBuilderData(): HeavyBuilderData {
       const partId = parseInt(trim(r["Part_ID"]), 10);
       if (!Number.isFinite(partId)) continue;
       const partType = trim(r["Part_type"]);
-      const stat = trim(r["String"]) || trim(r["Stat"]);
+      const stat = trim(r["Stat"]) || trim(r["String"]);
+      const rawString = trim(r["String"]);
       const desc = trim(r["Description"]);
 
       if (partType === "Rarity") {
@@ -103,18 +114,41 @@ export function getHeavyBuilderData(): HeavyBuilderData {
       } else if (partType === "Body") {
         bodiesByMfg[mfgId] = partId;
       } else if (partType === "Barrel") {
+        if (rawString && !stat.includes("（")) {
+          // Desktop map key: (Manufacturer ID, String) -> barrel display name.
+          barrelSubtypeNames.set(`${mfgId}:${rawString}`, shortSubtypeName(stat));
+        }
         barrel.push({ partId, stat, mfgId, ...(desc ? { description: desc } : {}) });
       } else if (partType === "Barrel Accessory") {
-        barrelAccPerks.push({ partId, stat, mfgId, ...(desc ? { description: desc } : {}) });
+        const dedupeKey = `${mfgId}:${partId}`;
+        if (seenBarrelAcc.has(dedupeKey)) continue;
+        seenBarrelAcc.add(dedupeKey);
+
+        // Match desktop style:
+        // "<barrel subtype> - <stat> - <description> - ID:<part_id>"
+        const barrelStringBase = rawString.split("_").slice(0, 2).join("_");
+        const subtypeName = barrelSubtypeNames.get(`${mfgId}:${barrelStringBase}`) ?? "";
+        const display = [subtypeName, stat, desc, `ID:${partId}`].filter(Boolean).join(" - ");
+
+        barrelAccPerks.push({ partId, stat: display, mfgId });
       } else if (partType === "Body Accessory") {
-        bodyAccPerks.push({ partId, stat, mfgId, ...(desc ? { description: desc } : {}) });
+        const dedupeKey = `${mfgId}:${partId}`;
+        if (seenBodyAcc.has(dedupeKey)) continue;
+        seenBodyAcc.add(dedupeKey);
+
+        // Match desktop style:
+        // "<manufacturer> - <stat> - ID:<part_id>"
+        const mfgName = HEAVY_MFG_NAMES[mfgId] ?? `Mfg ${mfgId}`;
+        const display = [mfgName, stat || rawString || `Part ${partId}`, `ID:${partId}`].filter(Boolean).join(" - ");
+        bodyAccPerks.push({ partId, stat: display, mfgId });
       }
     }
   }
 
   const element: HeavyBuilderPart[] = [];
   const firmware: HeavyBuilderPart[] = [];
-  // bodyAccPerks are primarily defined in the manufacturer CSV; keep any extras from main CSV too.
+  // Desktop heavy tab sources body/barrel accessories from manufacturer CSV.
+  // Main CSV contributes Element and Firmware only.
 
   if (existsSync(mainPath)) {
     const { rows } = readCsv(mainPath);
@@ -129,8 +163,6 @@ export function getHeavyBuilderData(): HeavyBuilderData {
         element.push({ partId, stat, ...(desc ? { description: desc } : {}) });
       } else if (partType === "Firmware") {
         firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
-      } else if (partType === "Body Accessory") {
-        bodyAccPerks.push({ partId, stat, ...(desc ? { description: desc } : {}) });
       }
     }
   }
@@ -182,6 +214,10 @@ export function getHeavyBuilderData(): HeavyBuilderData {
   for (const id of HEAVY_MFG_IDS) {
     if (!(id in bodiesByMfg)) bodiesByMfg[id] = null;
   }
+
+  // Match desktop ordering.
+  barrelAccPerks.sort((a, b) => a.stat.localeCompare(b.stat) || a.partId - b.partId);
+  bodyAccPerks.sort((a, b) => a.partId - b.partId);
 
   cached = {
     mfgs,

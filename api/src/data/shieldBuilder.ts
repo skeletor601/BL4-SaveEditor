@@ -29,6 +29,18 @@ const SHIELD_MFG_NAMES: Record<number, string> = {
   321: "Torgue",
 };
 
+/** Matches desktop `mfg_type_map_base` in qt_shield_editor_tab.py */
+const SHIELD_MFG_TYPE_BY_ID: Record<number, "Energy" | "Armor"> = {
+  279: "Energy",
+  283: "Armor",
+  287: "Armor",
+  293: "Energy",
+  300: "Energy",
+  306: "Armor",
+  312: "Energy",
+  321: "Armor",
+};
+
 export interface ShieldBuilderPart {
   partId: number;
   stat: string;
@@ -47,6 +59,7 @@ export interface ShieldBuilderRarity {
 
 export interface ShieldBuilderData {
   mfgs: { id: number; name: string }[];
+  mfgTypeById: Record<number, "Energy" | "Armor">;
   raritiesByMfg: Record<number, ShieldBuilderRarity[]>;
   /** Elemental resistance radio options. */
   element: ShieldBuilderPart[];
@@ -152,43 +165,13 @@ export function getShieldBuilderData(): ShieldBuilderData {
     }
   }
 
-  // Merge text from master list (Borderlands 4 Item Parts Master List - Shields.csv), if present.
-  const masterPath = getPath("shield/Borderlands 4 Item Parts Master List - Shields.csv");
-  if (existsSync(masterPath)) {
-    const { rows: masterRows } = readCsv(masterPath);
-    const masterById = new Map<number, { stat: string; desc: string }>();
-    for (const r of masterRows) {
-      const id = parseInt(trim(r["ID"]), 10);
-      if (!Number.isFinite(id)) continue;
-      const stats = trim(r["Stats"]);
-      const effects = trim(r["Effects"]);
-      const statText = stats || effects;
-      const desc = trim(r["Comments"]);
-      masterById.set(id, { stat: statText, desc });
-    }
-
-    const applyMaster = (list: ShieldBuilderPart[]) => {
-      for (const p of list) {
-        const m = masterById.get(p.partId);
-        if (!m) continue;
-        if (m.stat) p.stat = m.stat;
-        if (m.desc) p.description = m.desc;
-      }
-    };
-
-    applyMaster(element);
-    applyMaster(firmware);
-    applyMaster(universalPerks);
-    applyMaster(energyPerks);
-    applyMaster(armorPerks);
-  }
-
   for (const id of SHIELD_MFG_IDS) {
     if (!(id in modelsByMfg)) modelsByMfg[id] = null;
   }
 
   cached = {
     mfgs,
+    mfgTypeById: SHIELD_MFG_TYPE_BY_ID,
     raritiesByMfg,
     element,
     firmware,

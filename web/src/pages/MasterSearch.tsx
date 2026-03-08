@@ -49,6 +49,8 @@ export default function MasterSearch() {
   const [toastVisible, setToastVisible] = useState(false);
   const [sortCol, setSortCol] = useState<SortCol>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [bulkQty, setBulkQty] = useState(1);
 
   const [data, setData] = useState<PartRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -92,6 +94,30 @@ export default function MasterSearch() {
       if (next.has(key)) next.delete(key);
       else next.add(key);
       saveFavorites(next);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectRow = useCallback((row: PartRow) => {
+    const key = getRowKey(row);
+    if (!key) return;
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAllVisible = useCallback((rows: PartRow[], nextChecked: boolean) => {
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      for (const row of rows) {
+        const key = getRowKey(row);
+        if (!key) continue;
+        if (nextChecked) next.add(key);
+        else next.delete(key);
+      }
       return next;
     });
   }, []);
@@ -180,6 +206,28 @@ export default function MasterSearch() {
     return () => clearTimeout(t);
   }, []);
 
+  const health = useMemo(() => {
+    let missingPartType = 0;
+    let missingRarity = 0;
+    let unknownMfg = 0;
+    let duplicateCode = 0;
+    const seenCode = new Set<string>();
+    for (const row of data) {
+      const raw = row as Record<string, unknown>;
+      const pt = normalize(row["Part Type"] ?? raw["partType"]);
+      if (!pt) missingPartType += 1;
+      const rarity = normalize(row.Rarity ?? raw["rarity"]);
+      if (!rarity) missingRarity += 1;
+      if (!getCanonicalManufacturer(row)) unknownMfg += 1;
+      const code = normalize(row.code ?? row.Code);
+      if (code) {
+        if (seenCode.has(code)) duplicateCode += 1;
+        else seenCode.add(code);
+      }
+    }
+    return { total: data.length, missingPartType, missingRarity, unknownMfg, duplicateCode };
+  }, [data]);
+
   const exportFavorites = useCallback(() => {
     try {
       const payload = { version: 1, keys: Array.from(favorites) };
@@ -259,6 +307,24 @@ export default function MasterSearch() {
     [copyDialogRow, showToast]
   );
 
+  const handleBulkCopy = useCallback(() => {
+    const q = Math.max(1, Math.min(999, bulkQty || 1));
+    const selected = filteredAndSorted.filter((row) => selectedRows.has(getRowKey(row)));
+    if (selected.length === 0) {
+      showToast("No selected rows to copy");
+      return;
+    }
+    const parts = selected.map((row) => {
+      const codeStr = (row.code ?? row.Code ?? "").toString().trim();
+      const parsed = parseCode(codeStr);
+      return parsed ? buildCopyFormat(parsed.prefix, parsed.part, q) : codeStr;
+    });
+    navigator.clipboard.writeText(parts.join("\n")).then(
+      () => showToast(`Copied ${selected.length} code(s)`),
+      () => showToast("Bulk copy failed")
+    );
+  }, [bulkQty, filteredAndSorted, selectedRows, showToast]);
+
   const handleSort = useCallback((col: SortCol) => {
     setSortCol((prev) => {
       if (prev === col) {
@@ -294,6 +360,46 @@ export default function MasterSearch() {
         partTypeOptions={partTypeOptions}
       />
 
+      <div className="mx-4 mt-3 p-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.35)] text-xs text-[var(--color-text-muted)]">
+        <span className="font-semibold text-[var(--color-accent)] mr-3">Data health</span>
+        <span className="mr-3">Rows: {health.total}</span>
+        <span className="mr-3">Missing part type: {health.missingPartType}</span>
+        <span className="mr-3">Missing rarity: {health.missingRarity}</span>
+        <span className="mr-3">Unknown manufacturer: {health.unknownMfg}</span>
+        <span>Duplicate code entries: {health.duplicateCode}</span>
+      </div>
+
+      <div className="mx-4 mt-3 flex flex-wrap items-center gap-3 p-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.35)]">
+        <span className="text-xs text-[var(--color-text-muted)]">
+          Selected visible rows: {filteredAndSorted.filter((r) => selectedRows.has(getRowKey(r))).length}
+        </span>
+        <label className="text-xs text-[var(--color-text-muted)]">
+          Qty:
+          <input
+            type="number"
+            min={1}
+            max={999}
+            value={bulkQty}
+            onChange={(e) => setBulkQty(parseInt(e.target.value, 10) || 1)}
+            className="ml-2 w-20 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)]"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={handleBulkCopy}
+          className="px-3 py-2 rounded-[10px] border border-[var(--color-accent)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] text-xs"
+        >
+          Bulk copy selected
+        </button>
+        <button
+          type="button"
+          onClick={() => setSelectedRows(new Set())}
+          className="px-3 py-2 rounded-[10px] border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-xs"
+        >
+          Clear selection
+        </button>
+      </div>
+
       {dataError && (
         <div className="mx-4 my-3 p-4 rounded-lg border-2 border-amber-500/60 bg-[rgba(48,52,60,0.85)] backdrop-blur-sm">
           <p className="text-[var(--color-text)] mb-2">Couldn&apos;t load parts. Check your connection or try again.</p>
@@ -316,7 +422,10 @@ export default function MasterSearch() {
       <PartsTable
         rows={filteredAndSorted}
         favorites={favorites}
+        selectedKeys={selectedRows}
         onToggleFavorite={toggleFavorite}
+        onToggleSelect={toggleSelectRow}
+        onToggleSelectAllVisible={toggleSelectAllVisible}
         onCopyCode={handleCopyCode}
         sortCol={sortCol}
         sortDir={sortDir}

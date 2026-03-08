@@ -295,29 +295,63 @@ def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: st
     Returns the full path to the new item on success, otherwise None.
     """
     try:
-        # Find the path to the backpack dynamically
-        backpack_path = _walk_find(yaml_data, ["backpack"])
-        if not backpack_path:
-            return None
+        # Use explicit backpack containers first.
+        backpack_path: Optional[List[Union[str, int]]] = None
+        backpack_node: Optional[Any] = None
 
-        # Get a reference to the backpack node
-        backpack_node = yaml_data
-        temp_path = []
-        for key in backpack_path:
-            backpack_node = backpack_node[key]
-            temp_path.append(key)
+        for dotted in (
+            "state.inventory.backpack",
+            "inventory.backpack",
+            "state.inventory.Backpack",
+            "inventory.Backpack",
+        ):
+            node = find_node_by_path(yaml_data, dotted)
+            if isinstance(node, dict):
+                backpack_node = node
+                backpack_path = dotted.split(".")
+                break
+
+        # Fallback: recursively find any dict key named backpack/backpack with slot_* keys,
+        # preferring paths that include "inventory".
+        if backpack_node is None or backpack_path is None:
+            candidates: List[Tuple[List[Union[str, int]], Dict[str, Any]]] = []
+
+            def _collect_backpack_candidates(node: Any, path: List[Union[str, int]]) -> None:
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if isinstance(k, str) and k.lower() == "backpack" and isinstance(v, dict):
+                            has_slot = any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys())
+                            if has_slot or len(v) == 0:
+                                candidates.append((path + [k], v))
+                        _collect_backpack_candidates(v, path + [k])
+                elif isinstance(node, list):
+                    for i, v in enumerate(node):
+                        _collect_backpack_candidates(v, path + [i])
+
+            _collect_backpack_candidates(yaml_data, [])
+            if candidates:
+                # Prefer candidates under inventory-ish paths.
+                candidates.sort(
+                    key=lambda c: (
+                        0 if "inventory" in "/".join(map(str, c[0])).lower() else 1,
+                        len(c[0]),
+                    )
+                )
+                backpack_path, backpack_node = candidates[0]
+
+        if backpack_node is None or backpack_path is None:
+            return None
 
         # Find the highest existing slot number
         max_slot = -1
-        if isinstance(backpack_node, dict):
-            for key in backpack_node.keys():
-                if isinstance(key, str) and key.startswith("slot_"):
-                    try:
-                        num = int(key.split('_')[1])
-                        if num > max_slot:
-                            max_slot = num
-                    except (ValueError, IndexError):
-                        continue
+        for key in backpack_node.keys():
+            if isinstance(key, str) and key.startswith("slot_"):
+                try:
+                    num = int(key.split('_')[1])
+                    if num > max_slot:
+                        max_slot = num
+                except (ValueError, IndexError):
+                    continue
         
         # Determine the new slot key
         new_slot_key = f"slot_{max_slot + 1}"
@@ -332,14 +366,7 @@ def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: st
         backpack_node[new_slot_key] = new_item
         
         # Return the full path to the newly added item
-        return temp_path + [new_slot_key]
-
-    except Exception:
-        return None
-
-        
-        # Return the full path to the newly added item
-        return temp_path + [new_slot_key]
+        return backpack_path + [new_slot_key]
 
     except Exception:
         return None

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
@@ -412,7 +413,7 @@ export default function ClassModBuilderView() {
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage("Class mod added to backpack.");
+        setMessage("Class mod added to backpack. Use Download .sav on Select Save to export.");
       } else {
         setMessage(data?.error ?? "Add failed");
       }
@@ -633,7 +634,12 @@ export default function ClassModBuilderView() {
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
-              <button type="button" onClick={handleAddToBackpack} disabled={loading !== null} className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm disabled:opacity-50">Add to backpack</button>
+              <button type="button" onClick={handleAddToBackpack} disabled={loading !== null || !saveData} className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm disabled:opacity-50">Add to backpack</button>
+              {!saveData && (
+                <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">
+                  Load a save first
+                </Link>
+              )}
             </div>
           </div>
         </div>

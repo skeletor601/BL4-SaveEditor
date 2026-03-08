@@ -15,7 +15,10 @@ type SortDir = "asc" | "desc";
 interface PartsTableProps {
   rows: PartRow[];
   favorites: Set<string>;
+  selectedKeys: Set<string>;
   onToggleFavorite: (row: PartRow) => void;
+  onToggleSelect: (row: PartRow) => void;
+  onToggleSelectAllVisible: (rows: PartRow[], nextChecked: boolean) => void;
   onCopyCode: (row: PartRow) => void;
   sortCol: SortCol;
   sortDir: SortDir;
@@ -61,7 +64,10 @@ function sortRows(rows: PartRow[], sortCol: SortCol, sortDir: SortDir): PartRow[
 export default function PartsTable({
   rows,
   favorites,
+  selectedKeys,
   onToggleFavorite,
+  onToggleSelect,
+  onToggleSelectAllVisible,
   onCopyCode,
   sortCol,
   sortDir,
@@ -70,6 +76,8 @@ export default function PartsTable({
 }: PartsTableProps) {
   const useRarityOrder = sortByRarity && sortByRarity !== "Default";
   const sorted = useRarityOrder ? rows : sortRows(rows, sortCol, sortDir);
+  const selectedVisibleCount = sorted.reduce((n, row) => (selectedKeys.has(getRowKey(row)) ? n + 1 : n), 0);
+  const allVisibleSelected = sorted.length > 0 && selectedVisibleCount === sorted.length;
 
   const th = (col: SortCol, label: string) => (
     <th
@@ -89,6 +97,14 @@ export default function PartsTable({
         <table className="w-full border-collapse bg-[var(--color-panel)] border border-[var(--color-panel-border)] rounded-xl overflow-hidden">
           <thead>
             <tr>
+              <th scope="col" className="sticky top-0 z-10 w-10 text-center bg-[rgba(22,25,30,0.98)] py-3 px-3.5 text-[11px] font-bold border-b border-[var(--color-panel-border)] text-[var(--color-accent)]">
+                <input
+                  type="checkbox"
+                  checked={allVisibleSelected}
+                  onChange={(e) => onToggleSelectAllVisible(sorted, e.target.checked)}
+                  aria-label="Select all visible rows"
+                />
+              </th>
               <th scope="col" className="sticky top-0 z-10 w-10 text-center bg-[rgba(22,25,30,0.98)] py-3 px-3.5 text-[11px] font-bold border-b border-[var(--color-panel-border)] text-[var(--color-accent)]">
                 ★
               </th>
@@ -112,6 +128,14 @@ export default function PartsTable({
                   key={key}
                   className={`border-b border-[rgba(60,68,78,0.3)] hover:bg-[var(--color-accent-dim)] ${isLeg ? "legendary-row" : ""}`}
                 >
+                  <td className="w-10 text-center py-2.5 px-3.5">
+                    <input
+                      type="checkbox"
+                      checked={selectedKeys.has(key)}
+                      onChange={() => onToggleSelect(row)}
+                      aria-label="Select row"
+                    />
+                  </td>
                   <td
                     className="w-10 text-center py-2.5 px-3.5 text-base cursor-pointer select-none hover:text-[var(--color-accent)]"
                     onClick={() => onToggleFavorite(row)}
@@ -148,6 +172,7 @@ export default function PartsTable({
         {sorted.map((row) => {
           const key = getRowKey(row);
           const isFav = favorites.has(key);
+          const isSelected = selectedKeys.has(key);
           const rarity = inferRarity(row);
           const isLeg = isLegendaryByName(row);
           const itemTypeStr = (row["Model Name"] ?? (row as Record<string, unknown>).itemType ?? "").toString();
@@ -166,6 +191,10 @@ export default function PartsTable({
                 >
                   {isFav ? "★" : "☆"}
                 </button>
+                <label className="text-[11px] flex items-center gap-1">
+                  <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(row)} />
+                  Select
+                </label>
                 <button
                   type="button"
                   className="font-mono text-[11px] text-[var(--color-accent)] hover:underline touch-manipulation"

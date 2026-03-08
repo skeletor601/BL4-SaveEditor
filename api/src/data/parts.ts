@@ -49,13 +49,13 @@ function pickStr(obj: Record<string, unknown>, ...keys: string[]): string {
 function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
   return {
     code: pickStr(raw, "code", "Code"),
-    itemType: pickStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name"),
-    partName: pickStr(raw, "partName", "part_name", "Part Name", "String"),
-    effect: pickStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats"),
-    category: pickStr(raw, "category", "Category") || undefined,
-    rarity: pickStr(raw, "canonicalRarity", "rarity", "Rarity") || undefined,
+    itemType: pickStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name", "Weapon Type"),
+    partName: pickStr(raw, "Canonical Name", "partName", "part_name", "Part Name", "String", "Name"),
+    effect: pickStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats", "Description", "Search Text"),
+    category: pickStr(raw, "category", "Category", "General Category") || undefined,
+    rarity: pickStr(raw, "canonicalRarity", "Canonical Rarity", "rarity", "Rarity") || undefined,
     manufacturer: pickStr(raw, "canonicalManufacturer", "manufacturer", "Manufacturer") || undefined,
-    partType: pickStr(raw, "canonicalPartType", "partType", "part_type", "Part Type") || undefined,
+    partType: pickStr(raw, "canonicalPartType", "Specific Category", "partType", "part_type", "Part Type") || undefined,
     weaponType: pickStr(raw, "weaponType", "Weapon Type", "weapon_type") || undefined,
     id: typeof raw.id === "number" ? raw.id : typeof raw.ID === "number" ? raw.ID : undefined,
   };

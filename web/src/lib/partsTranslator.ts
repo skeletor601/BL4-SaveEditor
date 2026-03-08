@@ -1,6 +1,7 @@
 /**
  * Parts Translator: parse decoded item serial strings and resolve part codes to names.
- * Input format: header||body where body has tokens like {type_id:part_id}, {type_id}, or "c", skinId.
+ * Input format: header||body where body has tokens like {type_id:part_id}, {type_id},
+ * or '"c", skinId' / '"c", "Cosmetics_..."'.
  * Matches desktop qt_converter_tab.py logic (decoded string only; no Base85 here).
  */
 
@@ -15,8 +16,8 @@ export interface PartLookupRow {
   [key: string]: unknown;
 }
 
-/** One parsed part: either ("skin", skinId) or (type_id, part_id). */
-export type ParsedPart = ["skin", number] | [number, number];
+/** One parsed part: either ("skin", skinToken) or (type_id, part_id). */
+export type ParsedPart = ["skin", string] | [number, number];
 
 export interface TranslatedLine {
   codeKey: string;
@@ -26,25 +27,30 @@ export interface TranslatedLine {
   qty: number;
 }
 
-/** Extract parts list from decoded string (header||body with {tid:pid}, {tid}, "c", skinId). */
+/** Extract parts list from decoded string/body with {tid:pid}, {tid}, "c", skinId/string. */
 export function parseDecodedSerial(decoded: string): { parts: ParsedPart[]; headerMfg: number | null } {
   const parts: ParsedPart[] = [];
-  if (!decoded.includes("||")) return { parts, headerMfg: null };
-  const [header, body] = decoded.split("||", 2);
+  const hasHeader = decoded.includes("||");
+  const [header, body] = hasHeader ? decoded.split("||", 2) : ["", decoded];
   let headerMfg: number | null = null;
-  try {
-    const first = header.split("|")[0].trim().split(",")[0].trim();
-    headerMfg = parseInt(first, 10);
-    if (Number.isNaN(headerMfg)) headerMfg = null;
-  } catch {
-    // ignore
+  if (hasHeader) {
+    try {
+      const first = header.split("|")[0].trim().split(",")[0].trim();
+      headerMfg = parseInt(first, 10);
+      if (Number.isNaN(headerMfg)) headerMfg = null;
+    } catch {
+      // ignore
+    }
   }
-  // Same regex as desktop: {tid}, {tid:pid}, {tid:[id id ...]}, or "c", skinId
-  const tokenRe = /\{(\d+)(?::(\d+|\[[\d\s]+\]))?\}|\"c\",\s*(\d+)/g;
+  // Tolerant parser:
+  // - braces: {tid}, {tid:pid}, {tid:[id id ...]} (also accepts [] wrappers)
+  // - skin: "c", 12  OR  "c", "Cosmetics_Weapon_..."
+  const tokenRe = /[\{\[](\d+)(?::(\d+|\[[\d\s]+\]))?[\}\]]|"c",\s*(?:"((?:[^"\\]|\\.)*)"|(\d+))/gi;
   let m: RegExpExecArray | null;
   while ((m = tokenRe.exec(body)) !== null) {
-    if (m[3] !== undefined) {
-      parts.push(["skin", parseInt(m[3], 10)]);
+    if (m[3] !== undefined || m[4] !== undefined) {
+      const skinToken = m[3] !== undefined ? m[3].replace(/\\"/g, '"').trim() : m[4];
+      if (skinToken) parts.push(["skin", skinToken]);
       continue;
     }
     const outer = parseInt(m[1], 10);
@@ -77,9 +83,8 @@ export function lookupPart(
   elementalNames?: Map<number, string>
 ): { partType: string; name: string; stats: string; codeKey: string } {
   if (part[0] === "skin") {
-    const skinId = part[1];
-    const name = (elementalNames as Map<number, string> | undefined)?.get(skinId) ?? `Skin ID ${skinId}`;
-    return { partType: "Skin", name, stats: "", codeKey: `"c", ${skinId}` };
+    const skinToken = part[1];
+    return { partType: "Skin", name: skinToken, stats: "", codeKey: `"c", "${skinToken}"` };
   }
   const [typeId, partId] = part;
   const key = codeKey(typeId, partId);

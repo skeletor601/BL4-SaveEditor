@@ -24,6 +24,9 @@ from typing import Any, Dict, List, Tuple
 UNIVERSAL_COLUMNS = [
     "source",
     "code",
+    "Category",
+    "Specific Category",
+    "Item Type",
     "Manufacturer",
     "Weapon Type",
     "ID",
@@ -34,6 +37,11 @@ UNIVERSAL_COLUMNS = [
     "Effects",
     "Requirements",
     "Stats",
+    "Elemental",
+    "Canonical Name",
+    "Is Legendary",
+    "Matched Legendary Name",
+    "Search Text",
     "canonicalManufacturer",
     "canonicalPartType",
     "canonicalRarity",
@@ -109,27 +117,49 @@ def _row_blob(row: Dict[str, str]) -> str:
 
 
 def _is_legendary_by_name(row: Dict[str, str]) -> bool:
-    """True if any field in the row matches a LEGENDARY_NAMES entry (normalized, include match)."""
-    blob_norm = _norm_name(_row_blob(row))
-    if not blob_norm:
+    """True if key name-like fields match a legendary name.
+    Uses exact/contained matching, but keeps very short names (<=3 chars) exact-only
+    to avoid false positives like 'Bod' matching 'Body'.
+    """
+    candidates = [
+        _safe_str(row.get("Matched Legendary Name", "")),
+        _safe_str(row.get("Canonical Name", "")),
+        _safe_str(row.get("String", "")),
+        _safe_str(row.get("Model Name", "")),
+        _safe_str(row.get("Stats", "")),
+        _safe_str(row.get("Elemental", "")),
+    ]
+    norm_candidates = [_norm_name(c) for c in candidates if _norm_name(c)]
+    if not norm_candidates:
         return False
     for leg in LEGENDARY_NAMES:
         ln = _norm_name(leg)
         if not ln:
             continue
-        if ln in blob_norm or blob_norm in ln:
-            return True
+        for cn in norm_candidates:
+            if len(ln) <= 3:
+                if cn == ln:
+                    return True
+            else:
+                if cn == ln or ln in cn:
+                    return True
     return False
 
 # Map alternate column names into our schema
 COLUMN_ALIASES: Dict[str, str] = {
+    "Code": "code",
     "Part_ID": "ID",
     "Part ID": "ID",
     "Part_type": "Part Type",
     "Part Type": "Part Type",
+    "Item Type": "Item Type",
+    "Category": "Category",
+    "General Category": "Category",
+    "Specific Category": "Specific Category",
     "Stat": "Stats (Level 50, Common)",
     "Stats": "Stats (Level 50, Common)",
     "Stats (Level 50, Common)": "Stats (Level 50, Common)",
+    "Elemental": "Elemental",
     "Effects": "Effects",
     "Requirements": "Requirements",
     "Manufacturer": "Manufacturer",
@@ -137,7 +167,12 @@ COLUMN_ALIASES: Dict[str, str] = {
     "String": "String",
     "Model Name": "Model Name",
     "Part String": "String",
-    "Name": "Model Name",
+    "Name": "String",
+    "Canonical Name": "Canonical Name",
+    "Canonical Rarity": "canonicalRarity",
+    "Is Legendary": "Is Legendary",
+    "Matched Legendary Name": "Matched Legendary Name",
+    "Search Text": "Search Text",
     "Description": "Stats (Level 50, Common)",
     "perk_name_EN": "Stats (Level 50, Common)",
     "manufacturers_name": "Manufacturer",
@@ -178,13 +213,14 @@ def _canonical_manufacturer(v: str) -> str:
     return ""
 
 
-def _canonical_part_type(v: str) -> str:
-    s = re.sub(r"\s+", " ", _safe_str(v))
+def _canonical_part_type(primary: str, secondary: str = "") -> str:
+    s = _safe_str(primary) or _safe_str(secondary)
+    s = re.sub(r"\s+", " ", s)
     return s
 
 
 def _canonical_rarity(row: Dict[str, str]) -> str:
-    existing = _safe_str(row.get("Rarity", ""))
+    existing = _safe_str(row.get("canonicalRarity", "")) or _safe_str(row.get("Rarity", ""))
     if existing:
         e = existing.lower()
         for val in _RARITY_VALUES:
@@ -384,19 +420,25 @@ def build_universal_db(project_root: str) -> Tuple[int, str]:
         if not _safe_str(r.get("code")) and _safe_str(r.get("ID")):
             r["code"] = "{" + r["ID"] + "}"
 
-    # 6) Set Rarity = "Legendary" when row name matches LEGENDARY_NAMES so sort/filter by rarity works
+    # 6) Fill missing Rarity conservatively
     for r in merged:
-        if _is_legendary_by_name(r):
+        has_rarity = _safe_str(r.get("Rarity", "")) or _safe_str(r.get("canonicalRarity", ""))
+        is_leg_marked = _safe_str(r.get("Is Legendary", "")).lower() == "true"
+        if not has_rarity and (is_leg_marked or _is_legendary_by_name(r)):
             r["Rarity"] = "Legendary"
 
     # 7) Canonical normalized fields for reliable app filtering while keeping legacy fields intact
     for r in merged:
         cm = _canonical_manufacturer(_safe_str(r.get("Manufacturer", "")))
-        cp = _canonical_part_type(_safe_str(r.get("Part Type", "")))
+        cp = _canonical_part_type(_safe_str(r.get("Specific Category", "")), _safe_str(r.get("Part Type", "")))
         cr = _canonical_rarity(r)
         r["canonicalManufacturer"] = cm
         r["canonicalPartType"] = cp
         r["canonicalRarity"] = cr
+        if not _safe_str(r.get("Model Name", "")) and _safe_str(r.get("Canonical Name", "")):
+            r["Model Name"] = _safe_str(r.get("Canonical Name", ""))
+        if not _safe_str(r.get("String", "")) and _safe_str(r.get("Canonical Name", "")):
+            r["String"] = _safe_str(r.get("Canonical Name", ""))
         if not _safe_str(r.get("Manufacturer", "")) and cm:
             r["Manufacturer"] = cm
         if not _safe_str(r.get("Part Type", "")) and cp:

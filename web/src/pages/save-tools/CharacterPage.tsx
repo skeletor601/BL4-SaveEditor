@@ -52,7 +52,13 @@ export default function CharacterPage() {
   const [applied, setApplied] = useState(false);
   const [mutationLoading, setMutationLoading] = useState(false);
   const [mutationMessage, setMutationMessage] = useState<string | null>(null);
+  const [yamlWriteMessage, setYamlWriteMessage] = useState<string | null>(null);
   const [selectedClassKey, setSelectedClassKey] = useState("DarkSiren");
+
+  const stampYamlWrite = useCallback((actionLabel: string) => {
+    const ts = new Date().toLocaleTimeString();
+    setYamlWriteMessage(`✅ ${actionLabel} written to loaded YAML at ${ts}.`);
+  }, []);
 
   useEffect(() => {
     if (!saveData) return;
@@ -73,10 +79,74 @@ export default function CharacterPage() {
 
   const onApply = useCallback(() => {
     if (!saveData) return;
+    const current = getCharacterData(saveData);
+    if (!current) {
+      setMutationMessage("Could not read current character data from loaded YAML.");
+      return;
+    }
+
+    const changedFields: string[] = [];
+    const norm = (v: string) => String(v ?? "").trim();
+    const intNorm = (v: string) => String(parseInt(String(v ?? "").trim() || "0", 10) || 0);
+
+    if (norm(form.charName) !== norm(current.charName)) changedFields.push("Character name");
+    if (norm(form.difficulty) !== norm(current.difficulty)) changedFields.push("Difficulty");
+    if (intNorm(form.level) !== intNorm(current.level)) changedFields.push("Character level");
+    if (intNorm(form.xp) !== intNorm(current.xp)) changedFields.push("Character XP");
+    if (intNorm(form.specLevel) !== intNorm(current.specLevel)) changedFields.push("Spec level");
+    if (intNorm(form.specPoints) !== intNorm(current.specPoints)) changedFields.push("Spec points");
+    if (intNorm(form.cash) !== intNorm(current.cash)) changedFields.push("Money");
+    if (intNorm(form.eridium) !== intNorm(current.eridium)) changedFields.push("Eridium");
+
+    if (changedFields.length === 0) {
+      setMutationMessage("No character/currency changes detected to write.");
+      return;
+    }
+
+    const ok = window.confirm(
+      `Are you sure you want to write these changes to loaded YAML?\n\n${changedFields.map((f) => `- ${f}`).join("\n")}`
+    );
+    if (!ok) {
+      setMutationMessage("Apply cancelled. No YAML changes were written.");
+      return;
+    }
+
     const next = applyCharacterData(saveData, form);
     updateSaveData(next);
     setApplied(true);
-  }, [saveData, form, updateSaveData]);
+    setMutationMessage("Character/Currency changes saved to loaded YAML.");
+    stampYamlWrite("Character/Currency changes");
+  }, [saveData, form, updateSaveData, stampYamlWrite]);
+
+  useEffect(() => {
+    if (!saveData) return;
+    const current = getCharacterData(saveData);
+    if (!current) return;
+
+    const norm = (v: string) => String(v ?? "").trim();
+    const intNorm = (v: string) => String(parseInt(String(v ?? "").trim() || "0", 10) || 0);
+    const changed =
+      norm(form.charName) !== norm(current.charName) ||
+      norm(form.difficulty) !== norm(current.difficulty) ||
+      intNorm(form.level) !== intNorm(current.level) ||
+      intNorm(form.xp) !== intNorm(current.xp) ||
+      intNorm(form.specLevel) !== intNorm(current.specLevel) ||
+      intNorm(form.specPoints) !== intNorm(current.specPoints) ||
+      intNorm(form.cash) !== intNorm(current.cash) ||
+      intNorm(form.eridium) !== intNorm(current.eridium);
+
+    if (!changed) return;
+
+    const timer = window.setTimeout(() => {
+      const next = applyCharacterData(saveData, form);
+      updateSaveData(next);
+      setApplied(true);
+      setMutationMessage("Auto-saved character/currency changes to loaded YAML.");
+      stampYamlWrite("Auto-save character/currency changes");
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [saveData, form, updateSaveData, stampYamlWrite]);
 
   const syncLevels = useCallback(async () => {
     const yamlContent = getYamlText();
@@ -107,7 +177,12 @@ export default function CharacterPage() {
         updateSaveData(parsed);
         const ok = data.success_count ?? 0;
         const fail = data.fail_count ?? 0;
-        setMutationMessage(fail > 0 ? `Synced ${ok} item(s); ${fail} failed.` : `Synced ${ok} item level(s) to character level.`);
+        setMutationMessage(
+          fail > 0
+            ? `Synced ${ok} item(s); ${fail} failed. YAML updated.`
+            : `Synced ${ok} item level(s) to character level. YAML updated.`
+        );
+        stampYamlWrite("Backpack item level sync");
       } else {
         setMutationMessage(data?.error ?? "Sync failed");
       }
@@ -118,10 +193,10 @@ export default function CharacterPage() {
     } finally {
       setMutationLoading(false);
     }
-  }, [getYamlText, updateSaveData]);
+  }, [getYamlText, updateSaveData, stampYamlWrite]);
 
   const applyPreset = useCallback(
-    async (presetName: string, extraParams?: Record<string, string>) => {
+    async (presetName: string, extraParams?: Record<string, string>, actionLabel?: string) => {
       const yamlContent = getYamlText();
       if (!yamlContent.trim()) return;
       setMutationLoading(true);
@@ -148,7 +223,9 @@ export default function CharacterPage() {
         if (data.success && typeof data.yaml_content === "string") {
           const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
           updateSaveData(parsed);
-          setMutationMessage("Preset applied. Use Download .sav on Select Save to export.");
+          const label = actionLabel ?? presetName;
+          setMutationMessage(`Preset "${label}" applied and saved to loaded YAML. Use Download .sav on Select Save to export.`);
+          stampYamlWrite(`Preset: ${label}`);
         } else {
           setMutationMessage(data?.error ?? "Preset failed");
         }
@@ -160,7 +237,7 @@ export default function CharacterPage() {
         setMutationLoading(false);
       }
     },
-    [getYamlText, updateSaveData]
+    [getYamlText, updateSaveData, stampYamlWrite]
   );
 
   if (!saveData) {
@@ -192,6 +269,11 @@ export default function CharacterPage() {
       <p className="text-sm text-[var(--color-text-muted)]">
         Edit character and currency. Click Apply to update the loaded save. Then use &quot;Download .sav&quot; on Select Save to export.
       </p>
+      {yamlWriteMessage && (
+        <div className="max-w-4xl rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          {yamlWriteMessage}
+        </div>
+      )}
 
       <div className="border border-[var(--color-panel-border)] rounded-lg p-6 bg-[rgba(24,28,34,0.6)] max-w-xl">
         <h2 className="text-[var(--color-accent)] font-medium mb-4">Character info</h2>
@@ -316,7 +398,7 @@ export default function CharacterPage() {
               <button
                 key={preset_name}
                 type="button"
-                onClick={() => applyPreset(preset_name)}
+                onClick={() => applyPreset(preset_name, undefined, label)}
                 disabled={mutationLoading}
                 className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-left text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
               >
@@ -340,7 +422,7 @@ export default function CharacterPage() {
               </select>
               <button
                 type="button"
-                onClick={() => applyPreset("set_character_class", { class_key: selectedClassKey })}
+                onClick={() => applyPreset("set_character_class", { class_key: selectedClassKey }, "Change Character Class")}
                 disabled={mutationLoading}
                 className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
               >
@@ -351,7 +433,7 @@ export default function CharacterPage() {
               <button
                 key={preset_name}
                 type="button"
-                onClick={() => applyPreset(preset_name)}
+                onClick={() => applyPreset(preset_name, undefined, label)}
                 disabled={mutationLoading}
                 className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-left text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
               >

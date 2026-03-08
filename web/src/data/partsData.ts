@@ -211,15 +211,33 @@ export function inferRarity(row: PartRow): string {
 
 export function deriveCategory(row: PartRow): string {
   const wt = (row["Weapon Type"] ?? "").toString().toLowerCase();
-  const pt = (row["Part Type"] ?? "").toString().toLowerCase();
+  const pt = (row["Part Type"] ?? (row as Record<string, unknown>)["partType"] ?? "").toString().toLowerCase();
   const cat = (row.category ?? "").toString().toLowerCase();
+  const raw = row as Record<string, unknown>;
+  const itemType = (raw["itemType"] ?? raw["Item Type"] ?? row["Model Name"] ?? "").toString().toLowerCase();
+  const name = (row["String"] ?? raw["partName"] ?? row["Model Name"] ?? "").toString().toLowerCase();
+  const code = (row.code ?? row.Code ?? "").toString().trim();
+
+  // Hard rule: all {245:xx} belong to Grenade category.
+  if (/^\{\s*245\s*:/.test(code)) return "Grenade";
+
+  // Prefer explicit general category signals first (from canonical DB).
   if (cat.includes("class mod")) return "Class Mod";
-  if (cat.includes("enhancement") || pt.includes("enhancement")) return "Enhancement";
-  if (cat.includes("shield") || pt.includes("shield")) return "Shield";
-  if (cat.includes("grenade") || pt.includes("grenade")) return "Grenade";
-  if (cat.includes("repkit") || pt.includes("repkit")) return "Repkit";
-  if (/heavy|launcher|ordnance/.test(wt) || pt.includes("heavy")) return "Heavy";
-  if (/assault|rifle|pistol|smg|shotgun|sniper/.test(wt) || wt) return "Weapon";
+  if (cat.includes("enhancement")) return "Enhancement";
+  if (cat.includes("shield")) return "Shield";
+  if (cat.includes("grenade")) return "Grenade";
+  if (cat.includes("repkit")) return "Repkit";
+  if (cat.includes("heavy")) return "Heavy";
+  if (cat.includes("weapon part")) return "Weapon";
+
+  // Fallbacks based on item type / part type when category is generic or missing.
+  if (itemType.includes("classmod") || itemType.includes("class mod")) return "Class Mod";
+  if (itemType.includes("enhancement") || pt.includes("enhancement")) return "Enhancement";
+  if (itemType.includes("shield") || pt.includes("shield")) return "Shield";
+  if (itemType.includes("grenade") || pt.includes("grenade")) return "Grenade";
+  if (itemType.includes("repkit") || pt.includes("repkit") || name.includes("repair_kit") || name.includes("repkit")) return "Repkit";
+  if (itemType.includes("heavy") || /heavy|launcher|ordnance/.test(wt) || pt.includes("heavy")) return "Heavy";
+  if (/assault|rifle|pistol|smg|shotgun|sniper/.test(itemType) || /assault|rifle|pistol|smg|shotgun|sniper/.test(wt) || wt) return "Weapon";
   return "";
 }
 

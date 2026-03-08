@@ -44,7 +44,7 @@ def _ignore_unknown_tag(loader: IgnoreUnknownTagLoader, tag_suffix: str, node):
 IgnoreUnknownTagLoader.add_multi_constructor("", _ignore_unknown_tag)
 
 
-def apply_preset(data: dict, preset_name: str, params: dict) -> bool:
+def apply_preset(data: dict, preset_name: str, params: dict):
     """Apply unlock preset to data (same dispatch as save_game_controller.apply_unlock_preset)."""
     params = params or {}
     try:
@@ -66,8 +66,9 @@ def apply_preset(data: dict, preset_name: str, params: dict) -> bool:
             unlock_logic.complete_all_missions(data)
         elif preset_name == "set_character_class":
             class_key = params.get("class_key")
-            if class_key:
-                unlock_logic.set_character_class(data, class_key)
+            if not class_key:
+                return False, "set_character_class requires params.class_key"
+            unlock_logic.set_character_class(data, class_key)
         elif preset_name == "set_character_to_max_level":
             unlock_logic.set_character_to_max_level(data)
         elif preset_name == "set_max_sdu":
@@ -96,10 +97,10 @@ def apply_preset(data: dict, preset_name: str, params: dict) -> bool:
             unlock_logic.complete_all_challenges(data)
             unlock_logic.set_character_to_max_level(data)
         else:
-            return False
-        return True
-    except Exception:
-        return False
+            return False, f"Unknown preset: {preset_name}"
+        return True, None
+    except Exception as e:
+        return False, f"Preset '{preset_name}' failed: {e}"
 
 
 def main() -> None:
@@ -236,11 +237,12 @@ def main() -> None:
         if not preset_name:
             print(json.dumps({"success": False, "error": "params.preset_name is required"}))
             sys.exit(0)
-        if apply_preset(data, preset_name, params):
+        ok, err = apply_preset(data, preset_name, params)
+        if ok:
             out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
             print(json.dumps({"success": True, "yaml_content": out_yaml}))
         else:
-            print(json.dumps({"success": False, "error": f"Unknown or failed preset: {preset_name}"}))
+            print(json.dumps({"success": False, "error": err or f"Unknown or failed preset: {preset_name}"}))
         sys.exit(0)
 
     print(json.dumps({"success": False, "error": "Unknown action"}))

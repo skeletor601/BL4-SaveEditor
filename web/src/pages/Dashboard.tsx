@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
+import { CHANGE_LOG } from "@/data/changelog";
 
 const cards = [
   { to: "/character", title: "Character", desc: "Select save, character, YAML", icon: "👤" },
@@ -38,6 +39,19 @@ export default function Dashboard() {
         <div className="p-6 rounded-lg border-2 border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.45)] backdrop-blur-sm col-span-full lg:col-span-1">
           <h2 className="font-semibold text-[var(--color-accent)]">News & Updates</h2>
           <p className="text-sm text-[var(--color-text-muted)] mt-2 whitespace-pre-wrap">{news || "Loading…"}</p>
+          <h3 className="font-semibold text-[var(--color-accent)] mt-4">Change Log</h3>
+          <div className="mt-2 space-y-3">
+            {CHANGE_LOG.map((entry) => (
+              <div key={entry.date}>
+                <p className="text-xs font-mono text-[var(--color-text-muted)]">{entry.date}</p>
+                <ul className="text-sm text-[var(--color-text-muted)] list-disc pl-5 mt-1">
+                  {entry.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
           <div className="mt-4 flex gap-2">
             <a
               href="https://github.com/skeletor601/BL4-SaveEditor"
