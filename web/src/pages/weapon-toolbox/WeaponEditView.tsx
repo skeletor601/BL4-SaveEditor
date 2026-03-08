@@ -185,7 +185,6 @@ export default function WeaponEditView() {
   /** When set, we have a weapon loaded from backpack; Update Weapon will write to this path. */
   const [selectedWeaponPath, setSelectedWeaponPath] = useState<string[] | null>(null);
   const [backpackWeapons, setBackpackWeapons] = useState<DecodedBackpackWeapon[]>([]);
-  const [weaponGenData, setWeaponGenData] = useState<WeaponGenData | null>(null);
   const [skinOptions, setSkinOptions] = useState<WeaponGenData["skins"]>([]);
   const [skinComboValue, setSkinComboValue] = useState("");
   const [weaponEditData, setWeaponEditData] = useState<WeaponEditData | null>(null);
@@ -268,14 +267,8 @@ export default function WeaponEditView() {
   useEffect(() => {
     fetchApi("weapon-gen/data")
       .then((r) => r.json())
-      .then((d: WeaponGenData) => {
-        setWeaponGenData(d);
-        setSkinOptions(d?.skins ?? []);
-      })
-      .catch(() => {
-        setWeaponGenData(null);
-        setSkinOptions([]);
-      });
+      .then((d: WeaponGenData) => setSkinOptions(d?.skins ?? []))
+      .catch(() => setSkinOptions([]));
   }, []);
 
   useEffect(() => {
