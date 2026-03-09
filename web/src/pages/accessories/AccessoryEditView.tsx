@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
@@ -17,9 +17,20 @@ const FLAG_OPTIONS = [
 interface AccessoryEditViewProps {
   title: string;
   description: string;
+  suppressCodecPanels?: boolean;
+  onCodecChange?: (payload: { base85: string; decoded: string }) => void;
+  externalBase85?: string;
+  externalDecoded?: string;
 }
 
-export default function AccessoryEditView({ title, description }: AccessoryEditViewProps) {
+export default function AccessoryEditView({
+  title,
+  description,
+  suppressCodecPanels = false,
+  onCodecChange,
+  externalBase85,
+  externalDecoded,
+}: AccessoryEditViewProps) {
   const { saveData, getYamlText, updateSaveData } = useSave();
   const [serialInput, setSerialInput] = useState("");
   const [decodedInput, setDecodedInput] = useState("");
@@ -27,6 +38,31 @@ export default function AccessoryEditView({ title, description }: AccessoryEditV
   const [flagValue, setFlagValue] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"decode" | "encode" | "add" | null>(null);
+  const applyingExternalRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof externalBase85 === "string" && externalBase85 !== serialInput) {
+      applyingExternalRef.current = true;
+      setSerialInput(externalBase85);
+      setEncodedSerial("");
+    }
+  }, [externalBase85, serialInput]);
+
+  useEffect(() => {
+    if (typeof externalDecoded === "string" && externalDecoded !== decodedInput) {
+      applyingExternalRef.current = true;
+      setDecodedInput(externalDecoded);
+      setEncodedSerial("");
+    }
+  }, [externalDecoded, decodedInput]);
+
+  useEffect(() => {
+    if (applyingExternalRef.current) {
+      applyingExternalRef.current = false;
+      return;
+    }
+    onCodecChange?.({ base85: (encodedSerial || serialInput).trim(), decoded: decodedInput });
+  }, [encodedSerial, serialInput, decodedInput, onCodecChange]);
 
   const handleDecode = useCallback(async () => {
     const raw = serialInput.trim();
@@ -147,45 +183,47 @@ export default function AccessoryEditView({ title, description }: AccessoryEditV
     <div className="space-y-4">
       <p className="text-sm text-[var(--color-text-muted)]">{description}</p>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
-          <textarea
-            value={serialInput}
-            onChange={(e) => setSerialInput(e.target.value)}
-            placeholder="Paste @U... serial"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleDecode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "decode" ? "Decoding…" : "Decode"}
-          </button>
-        </div>
+      {!suppressCodecPanels && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
+            <textarea
+              value={serialInput}
+              onChange={(e) => setSerialInput(e.target.value)}
+              placeholder="Paste @U... serial"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleDecode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "decode" ? "Decoding…" : "Decode"}
+            </button>
+          </div>
 
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized string</h3>
-          <textarea
-            value={decodedInput}
-            onChange={(e) => setDecodedInput(e.target.value)}
-            placeholder="Paste decoded string"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleEncode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "encode" ? "Encoding…" : "Encode → Base85"}
-          </button>
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized string</h3>
+            <textarea
+              value={decodedInput}
+              onChange={(e) => setDecodedInput(e.target.value)}
+              placeholder="Paste decoded string"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleEncode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "encode" ? "Encoding…" : "Encode → Base85"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {(encodedSerial || serialInput.trim().startsWith("@U")) && (
         <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">

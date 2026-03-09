@@ -41,6 +41,8 @@ UNIVERSAL_COLUMNS = [
     "Canonical Name",
     "Is Legendary",
     "Matched Legendary Name",
+    "Unique Effect",
+    "Visual Unique Barrel",
     "Search Text",
     "canonicalManufacturer",
     "canonicalPartType",
@@ -172,6 +174,10 @@ COLUMN_ALIASES: Dict[str, str] = {
     "Canonical Rarity": "canonicalRarity",
     "Is Legendary": "Is Legendary",
     "Matched Legendary Name": "Matched Legendary Name",
+    "Unique Effect": "Unique Effect",
+    "uniqueEffect": "Unique Effect",
+    "Visual Unique Barrel": "Visual Unique Barrel",
+    "visualUniqueBarrel": "Visual Unique Barrel",
     "Search Text": "Search Text",
     "Description": "Stats (Level 50, Common)",
     "perk_name_EN": "Stats (Level 50, Common)",
@@ -405,15 +411,27 @@ def build_universal_db(project_root: str) -> Tuple[int, str]:
 
     # 4) Dedupe by code (or String|Part Type|ID); keep row with most filled columns
     seen: Dict[str, Dict[str, str]] = {}
+    key_has_unique_effect: Dict[str, bool] = {}
     passthrough: List[Dict[str, str]] = []
     for r in all_rows:
         k = _row_key(r)
         if not k:
             passthrough.append(r)
             continue
+        is_unique_true = _safe_str(r.get("Unique Effect", "")).lower() == "true"
+        if k not in key_has_unique_effect:
+            key_has_unique_effect[k] = is_unique_true
+        else:
+            key_has_unique_effect[k] = key_has_unique_effect[k] or is_unique_true
         if k not in seen or _score_row(r) > _score_row(seen[k]):
             seen[k] = r
     merged = passthrough + list(seen.values())
+
+    # Preserve Unique Effect if any source row for the dedupe key marked True.
+    for r in merged:
+        k = _row_key(r)
+        if k and key_has_unique_effect.get(k):
+            r["Unique Effect"] = "True"
 
     # 5) Ensure every row has a code if we have ID
     for r in merged:

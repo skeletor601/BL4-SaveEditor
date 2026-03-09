@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 export default function DecoderView() {
-  const [base85Input, setBase85Input] = useState("");
-  const [decodedInput, setDecodedInput] = useState("");
+  const [base85Input, setBase85Input] = usePersistedState("decoder.base85Input", "");
+  const [decodedInput, setDecodedInput] = usePersistedState("decoder.decodedInput", "");
   const [loading, setLoading] = useState<"decode" | "encode" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 

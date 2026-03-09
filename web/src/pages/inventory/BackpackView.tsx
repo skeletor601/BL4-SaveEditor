@@ -439,8 +439,10 @@ export default function BackpackView() {
       setContextPos(null);
       const typeLabel = item.typeLabel || "";
       if (WEAPON_TYPES.has(typeLabel)) {
-        navigate("/weapon-toolbox/weapon-edit", {
+        navigate("/gear-forge", {
           state: {
+            tab: "editor",
+            editorKind: "weapon",
             loadItem: {
               serial: item.serial,
               decodedFull: item.decodedFull,
@@ -449,8 +451,10 @@ export default function BackpackView() {
           },
         });
       } else if (ITEM_EDIT_TYPES.has(typeLabel)) {
-        navigate("/weapon-toolbox/item-edit", {
+        navigate("/gear-forge", {
           state: {
+            tab: "editor",
+            editorKind: "item",
             loadItem: {
               serial: item.serial,
               decodedFull: item.decodedFull,

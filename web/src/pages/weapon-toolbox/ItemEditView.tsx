@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { getBackpackSlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import { usePersistedState } from "@/lib/usePersistedState";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
@@ -46,6 +47,13 @@ interface ItemEditPartRow {
 
 interface ItemEditData {
   parts: ItemEditPartRow[];
+}
+
+interface ItemEditViewProps {
+  suppressCodecPanels?: boolean;
+  onCodecChange?: (payload: { base85: string; decoded: string }) => void;
+  externalBase85?: string;
+  externalDecoded?: string;
 }
 
 type ItemAddPartSelection = { row: ItemEditPartRow; checked: boolean; qty: string };
@@ -131,13 +139,18 @@ function buildPartStringsFromSelections(
   return tokens;
 }
 
-export default function ItemEditView() {
+export default function ItemEditView({
+  suppressCodecPanels = false,
+  onCodecChange,
+  externalBase85,
+  externalDecoded,
+}: ItemEditViewProps = {}) {
   const location = useLocation();
   const { saveData, getYamlText, updateSaveData } = useSave();
-  const [serialInput, setSerialInput] = useState("");
-  const [decodedInput, setDecodedInput] = useState("");
+  const [serialInput, setSerialInput] = usePersistedState("item-edit.serialInput", "");
+  const [decodedInput, setDecodedInput] = usePersistedState("item-edit.decodedInput", "");
   const [encodedSerial, setEncodedSerial] = useState("");
-  const [flagValue, setFlagValue] = useState(1);
+  const [flagValue, setFlagValue] = usePersistedState("item-edit.flagValue", 1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"decode" | "encode" | "add" | "backpack" | "update" | null>(
     null,
@@ -145,6 +158,7 @@ export default function ItemEditView() {
 
   const [backpackItems, setBackpackItems] = useState<DecodedBackpackItem[]>([]);
   const [selectedItemPath, setSelectedItemPath] = useState<string[] | null>(null);
+  const applyingExternalRef = useRef(false);
 
   useEffect(() => {
     const loadItem = (location.state as { loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null)?.loadItem;
@@ -162,6 +176,32 @@ export default function ItemEditView() {
       setMessage("Item loaded from backpack. Edit and click Update Item to save.");
     }
   }, [location.state]);
+
+  useEffect(() => {
+    if (typeof externalBase85 === "string" && externalBase85 !== serialInput) {
+      applyingExternalRef.current = true;
+      setSerialInput(externalBase85);
+      setEncodedSerial("");
+      setSelectedItemPath(null);
+    }
+  }, [externalBase85, serialInput, setSerialInput]);
+
+  useEffect(() => {
+    if (typeof externalDecoded === "string" && externalDecoded !== decodedInput) {
+      applyingExternalRef.current = true;
+      setDecodedInput(externalDecoded);
+      setEncodedSerial("");
+      setSelectedItemPath(null);
+    }
+  }, [externalDecoded, decodedInput, setDecodedInput]);
+
+  useEffect(() => {
+    if (applyingExternalRef.current) {
+      applyingExternalRef.current = false;
+      return;
+    }
+    onCodecChange?.({ base85: (encodedSerial || serialInput).trim(), decoded: decodedInput });
+  }, [encodedSerial, serialInput, decodedInput, onCodecChange]);
   const [itemEditData, setItemEditData] = useState<ItemEditData | null>(null);
   const [currentTypeKey, setCurrentTypeKey] = useState<ItemTypeKey | null>(null);
   const [parsedComponents, setParsedComponents] = useState<ParsedComponent[]>([]);
@@ -171,7 +211,7 @@ export default function ItemEditView() {
   const [universalFallback, setUniversalFallback] = useState<Record<string, { partType: string; string: string; stat: string }>>({});
   const [showCleanCode, setShowCleanCode] = useState(false);
   const [skinOptions, setSkinOptions] = useState<{ label: string; value: string }[]>([]);
-  const [skinComboValue, setSkinComboValue] = useState("");
+  const [skinComboValue, setSkinComboValue] = usePersistedState("item-edit.skinComboValue", "");
 
   useEffect(() => {
     fetchApi("item-edit/data")
@@ -760,45 +800,47 @@ export default function ItemEditView() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
-          <textarea
-            value={serialInput}
-            onChange={(e) => setSerialInput(e.target.value)}
-            placeholder="Paste @U... serial"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleDecode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "decode" ? "Decoding…" : "Decode → Deserialized"}
-          </button>
-        </div>
+      {!suppressCodecPanels && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
+            <textarea
+              value={serialInput}
+              onChange={(e) => setSerialInput(e.target.value)}
+              placeholder="Paste @U... serial"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleDecode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "decode" ? "Decoding…" : "Decode → Deserialized"}
+            </button>
+          </div>
 
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized (decoded) string</h3>
-          <textarea
-            value={decodedInput}
-            onChange={(e) => setDecodedInput(e.target.value)}
-            placeholder="Paste decoded string (e.g. 270, 0, 1, 50| ... || {245:1} {245:2})"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleEncode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "encode" ? "Encoding…" : "Encode → Base85"}
-          </button>
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized (decoded) string</h3>
+            <textarea
+              value={decodedInput}
+              onChange={(e) => setDecodedInput(e.target.value)}
+              placeholder="Paste decoded string (e.g. 270, 0, 1, 50| ... || {245:1} {245:2})"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleEncode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "encode" ? "Encoding…" : "Encode → Base85"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Skin - same as Weapon Edit: preview/paster, add to build */}
       {skinOptions.length > 0 && (

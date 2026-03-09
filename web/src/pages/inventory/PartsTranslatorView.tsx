@@ -8,10 +8,11 @@ import {
   type PartLookupRow,
 } from "@/lib/partsTranslator";
 import { fetchApi } from "@/lib/apiClient";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 export default function PartsTranslatorView() {
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = usePersistedState("parts-translator.input", "");
+  const [output, setOutput] = usePersistedState("parts-translator.output", "");
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [partsData, setPartsData] = useState<PartLookupRow[]>([]);
   const [errorMsg, setErrorMsg] = useState("");

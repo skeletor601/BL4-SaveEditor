@@ -6,8 +6,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/character", label: "Character" },
   { to: "/inventory", label: "Inventory" },
-  { to: "/weapon-toolbox", label: "Weapon Toolbox" },
-  { to: "/accessories", label: "Accessories" },
+  { to: "/gear-forge", label: "Gear Forge" },
   { to: "/master-search", label: "Master Search" },
   { to: "/settings", label: "Settings" },
 ];

@@ -7,9 +7,8 @@ import MasterSearch from "@/pages/MasterSearch";
 import MasterSearchPage from "@/pages/MasterSearchPage";
 import CharacterSectionPage from "@/pages/CharacterSectionPage";
 import InventoryPage from "@/pages/InventoryPage";
-import WeaponToolboxPage from "@/pages/WeaponToolboxPage";
-import AccessoriesPage from "@/pages/AccessoriesPage";
 import SettingsPage from "@/pages/SettingsPage";
+import SuperWorkbenchPage from "@/pages/SuperWorkbenchPage";
 
 function AppRoutes() {
   return (
@@ -20,8 +19,49 @@ function AppRoutes() {
         <Route path="/character" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/character/*" element={<CharacterSectionPage />} />
         <Route path="/inventory/*" element={<InventoryPage />} />
-        <Route path="/weapon-toolbox/*" element={<WeaponToolboxPage />} />
-        <Route path="/accessories/*" element={<AccessoriesPage />} />
+        <Route path="/gear-forge" element={<SuperWorkbenchPage />} />
+        <Route path="/unified-workbench" element={<Navigate to="/gear-forge" replace />} />
+        <Route path="/super-workbench" element={<Navigate to="/gear-forge" replace />} />
+        <Route path="/super-workbench-nova" element={<Navigate to="/gear-forge" replace />} />
+        <Route path="/super-workbench-pulse" element={<Navigate to="/gear-forge" replace />} />
+        <Route
+          path="/weapon-toolbox/weapon-gen"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "weapon" }} />}
+        />
+        <Route
+          path="/weapon-toolbox/weapon-edit"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "weapon" }} />}
+        />
+        <Route
+          path="/weapon-toolbox/item-edit"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "item" }} />}
+        />
+        <Route path="/weapon-toolbox/*" element={<Navigate to="/gear-forge" replace />} />
+        <Route
+          path="/accessories/class-mod"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "class-mod" }} />}
+        />
+        <Route
+          path="/accessories/enhancement"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "enhancement" }} />}
+        />
+        <Route
+          path="/accessories/repkit"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "repkit" }} />}
+        />
+        <Route
+          path="/accessories/grenade"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "grenade" }} />}
+        />
+        <Route
+          path="/accessories/shield"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "shield" }} />}
+        />
+        <Route
+          path="/accessories/heavy"
+          element={<Navigate to="/gear-forge" replace state={{ tab: "builder", builderKind: "heavy" }} />}
+        />
+        <Route path="/accessories/*" element={<Navigate to="/gear-forge" replace />} />
         {/* Master Search: rich UI with filters, quick filters, manufacturer/part type/rarity dropdowns */}
         <Route path="/master-search" element={<MasterSearch />} />
         <Route path="/master-search-simple" element={<MasterSearchPage />} />

@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { getBackpackSlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import { usePersistedState } from "@/lib/usePersistedState";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
@@ -83,6 +84,15 @@ interface UniversalDbPartCode {
   itemType?: string;
   manufacturer?: string;
   statText?: string;
+  uniqueEffect?: boolean;
+  visualUniqueBarrel?: boolean;
+}
+
+interface WeaponEditViewProps {
+  suppressCodecPanels?: boolean;
+  onCodecChange?: (payload: { base85: string; decoded: string }) => void;
+  externalBase85?: string;
+  externalDecoded?: string;
 }
 
 function parseComponentString(componentStr: string): ParsedComponent[] {
@@ -169,16 +179,21 @@ function buildPartStringsFromSelections(
   return newParts;
 }
 
-export default function WeaponEditView() {
+export default function WeaponEditView({
+  suppressCodecPanels = false,
+  onCodecChange,
+  externalBase85,
+  externalDecoded,
+}: WeaponEditViewProps = {}) {
   const location = useLocation();
   const { saveData, getYamlText, updateSaveData } = useSave();
 
-  const [serialInput, setSerialInput] = useState("");
-  const [decodedInput, setDecodedInput] = useState("");
+  const [serialInput, setSerialInput] = usePersistedState("weapon-edit.serialInput", "");
+  const [decodedInput, setDecodedInput] = usePersistedState("weapon-edit.decodedInput", "");
   const [encodedSerial, setEncodedSerial] = useState("");
-  const [newWeaponLevel, setNewWeaponLevel] = useState("50");
-  const [modPowerMode, setModPowerMode] = useState<"stable" | "op" | "insane">("op");
-  const [flagValue, setFlagValue] = useState(1);
+  const [newWeaponLevel, setNewWeaponLevel] = usePersistedState("weapon-edit.newWeaponLevel", "50");
+  const [modPowerMode, setModPowerMode] = usePersistedState<"stable" | "op" | "insane">("weapon-edit.modPowerMode", "op");
+  const [flagValue, setFlagValue] = usePersistedState("weapon-edit.flagValue", 1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"decode" | "encode" | "add" | "update" | "backpack" | null>(null);
 
@@ -186,7 +201,7 @@ export default function WeaponEditView() {
   const [selectedWeaponPath, setSelectedWeaponPath] = useState<string[] | null>(null);
   const [backpackWeapons, setBackpackWeapons] = useState<DecodedBackpackWeapon[]>([]);
   const [skinOptions, setSkinOptions] = useState<WeaponGenData["skins"]>([]);
-  const [skinComboValue, setSkinComboValue] = useState("");
+  const [skinComboValue, setSkinComboValue] = usePersistedState("weapon-edit.skinComboValue", "");
   const [weaponEditData, setWeaponEditData] = useState<WeaponEditData | null>(null);
   const [parsedComponents, setParsedComponents] = useState<ParsedComponent[]>([]);
   const [currentMfgWtId, setCurrentMfgWtId] = useState<number | null>(null);
@@ -198,6 +213,7 @@ export default function WeaponEditView() {
   const [universalFallback, setUniversalFallback] = useState<Record<string, { partType: string; string: string; stat: string }>>({});
   const [showCleanCode, setShowCleanCode] = useState(false);
   const [universalPartCodes, setUniversalPartCodes] = useState<UniversalDbPartCode[]>([]);
+  const applyingExternalRef = useRef(false);
 
   useEffect(() => {
     const state = location.state as { pasteDecoded?: string; loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null;
@@ -220,6 +236,33 @@ export default function WeaponEditView() {
       setMessage("Item loaded from backpack. Edit and click Update Weapon to save.");
     }
   }, [location.state]);
+
+  useEffect(() => {
+    if (typeof externalBase85 === "string" && externalBase85 !== serialInput) {
+      applyingExternalRef.current = true;
+      setSerialInput(externalBase85);
+      setEncodedSerial("");
+      setSelectedWeaponPath(null);
+    }
+  }, [externalBase85, serialInput, setSerialInput]);
+
+  useEffect(() => {
+    if (typeof externalDecoded === "string" && externalDecoded !== decodedInput) {
+      applyingExternalRef.current = true;
+      setDecodedInput(externalDecoded);
+      setEncodedSerial("");
+      setSelectedWeaponPath(null);
+    }
+  }, [externalDecoded, decodedInput, setDecodedInput]);
+
+  useEffect(() => {
+    if (applyingExternalRef.current) {
+      applyingExternalRef.current = false;
+      return;
+    }
+    onCodecChange?.({ base85: (encodedSerial || serialInput).trim(), decoded: decodedInput });
+  }, [encodedSerial, serialInput, decodedInput, onCodecChange]);
+
 
   // Whenever decodedInput changes, keep parsedComponents + currentMfgWtId in sync.
   useEffect(() => {
@@ -295,6 +338,10 @@ export default function WeaponEditView() {
             rarity: String(raw.rarity ?? raw.Rarity ?? raw.canonicalRarity ?? "").trim(),
             itemType: String(raw.itemType ?? raw["Item Type"] ?? raw["Weapon Type"] ?? "").trim(),
             manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? raw.canonicalManufacturer ?? "").trim(),
+            uniqueEffect: /^(true|1|yes)$/i.test(String(raw.uniqueEffect ?? raw["Unique Effect"] ?? "").trim()),
+            visualUniqueBarrel: /^(true|1|yes)$/i.test(
+              String(raw.visualUniqueBarrel ?? raw["Visual Unique Barrel"] ?? "").trim(),
+            ),
             statText: [
               raw.effect,
               raw.Effect,
@@ -936,13 +983,28 @@ export default function WeaponEditView() {
       return out;
     };
     // Required order requested:
-    // rarity -> element -> body -> >=4 body accessories -> barrel -> extra barrels
-    // -> >=4 barrel accessories -> magazine/grip/foregrip/scope/(optional manufacturer)
-    // -> damage/ammo/fire stacks -> underbarrel/underbarrel accessories
+    // rarity -> alt-fire setup (multi-element OR underbarrel route) -> body -> accessories
+    // -> barrels -> magazine/grip/foregrip/scope/(optional manufacturer) -> stat stacks
     // -> grenade (for Tediore-style reload setups) -> stalker stack -> skin.
     const elementPool = weaponEditData.elemental ?? [];
-    const pickedElement = elementPool.length ? pick(elementPool) : null;
-    const elementToken = pickedElement && /^\d+$/.test(pickedElement.partId) ? `{1:${pickedElement.partId}}` : "";
+    const elementalIds = elementPool
+      .map((e) => Number(e.partId))
+      .filter((n) => Number.isFinite(n));
+    let altFireTokens: string[] = [];
+    let shouldUseUnderbarrelAlt = false;
+    const canUseMultiElement = elementalIds.length >= 2;
+    if (canUseMultiElement && Math.random() < 0.55) {
+      const first = pick(elementalIds);
+      const secondPool = elementalIds.filter((id) => id !== first);
+      const second = secondPool.length ? pick(secondPool) : null;
+      if (second != null) {
+        altFireTokens = [`{1:${first}}`, `{1:${second}}`];
+      } else {
+        shouldUseUnderbarrelAlt = true;
+      }
+    } else {
+      shouldUseUnderbarrelAlt = true;
+    }
     const bodyToken = pickToken(["body"]);
     if (!bodyToken) {
       setMessage("Could not build stock weapon core: missing Body.");
@@ -1071,6 +1133,25 @@ export default function WeaponEditView() {
       setMessage("Could not build stock weapon core: missing Barrel for selected prefix.");
       return;
     }
+    const uniqueEffectBarrels = candidates.filter(
+      ({ row }) =>
+        norm(row.partType) === "barrel" &&
+        (row.visualUniqueBarrel === true || row.uniqueEffect === true),
+    );
+    const samePrefixUniqueBarrels = uniqueEffectBarrels.filter(
+      ({ parsed }) => parsed.prefix === headerPrefix && validCurrentPartIds.has(parsed.part),
+    );
+    const crossUniqueBarrels = uniqueEffectBarrels.filter(
+      ({ parsed }) => parsed.prefix !== headerPrefix,
+    );
+    const uniqueFirstBarrelToken = samePrefixUniqueBarrels.length
+      ? `{${pick(samePrefixUniqueBarrels).parsed.part}}`
+      : crossUniqueBarrels.length
+        ? (() => {
+            const u = pick(crossUniqueBarrels);
+            return `{${u.parsed.prefix}:${u.parsed.part}}`;
+          })()
+        : "";
     const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
     const crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
       if (pfx === headerPrefix) return [];
@@ -1117,15 +1198,48 @@ export default function WeaponEditView() {
       return;
     }
     const gripToken = pickToken(["grip"]);
-    const foregripToken = pickToken(["foregrip"]);
     const scopeToken = pickToken(["scope"]);
     const manufacturerToken = pickToken(["manufacturer part"]);
-    const underbarrelToken = pickToken(["underbarrel"]);
-    const underbarrelAccessoryStack = stackTokens(
-      ["underbarrel accessory"],
-      modeCfg.underAccRange[0],
-      modeCfg.underAccRange[1],
+    const currentWeaponTypeNorm = norm(weaponRows[0]?.weaponType ?? "");
+    const daedalusAltAmmoCandidates = candidates.filter(
+      ({ row }) =>
+        norm(row.partType) === "manufacturer part" &&
+        norm(row.manufacturer) === "daedalus" &&
+        (!currentWeaponTypeNorm || norm(row.itemType) === currentWeaponTypeNorm),
     );
+    const shouldUseDaedalusAltAmmo = daedalusAltAmmoCandidates.length > 0 && Math.random() < 0.35;
+    const daedalusAltAmmoToken = shouldUseDaedalusAltAmmo
+      ? (() => {
+          const c = pick(daedalusAltAmmoCandidates);
+          return c.parsed.prefix === headerPrefix ? `{${c.parsed.part}}` : `{${c.parsed.prefix}:${c.parsed.part}}`;
+        })()
+      : "";
+    const foregripToken = shouldUseDaedalusAltAmmo ? null : pickToken(["foregrip"]);
+
+    let underbarrelToken = "";
+    let underbarrelAccessoryStack: string[] = [];
+    const underbarrelInfiniteAmmoToken = "{27:[74 74 74 74 74 74 74]}";
+    if (shouldUseUnderbarrelAlt) {
+      underbarrelToken = pickToken(["underbarrel"]) ?? "";
+      if (!underbarrelToken && canUseMultiElement) {
+        const first = pick(elementalIds);
+        const secondPool = elementalIds.filter((id) => id !== first);
+        const second = secondPool.length ? pick(secondPool) : null;
+        if (second != null) {
+          altFireTokens = [`{1:${first}}`, `{1:${second}}`];
+          shouldUseUnderbarrelAlt = false;
+        }
+      }
+      if (shouldUseUnderbarrelAlt && !underbarrelToken) {
+        setMessage("Could not apply alt-fire mode: no underbarrel available and no dual-element fallback.");
+        return;
+      }
+      underbarrelAccessoryStack = stackTokens(
+        ["underbarrel accessory"],
+        Math.max(1, modeCfg.underAccRange[0]),
+        Math.max(1, modeCfg.underAccRange[1]),
+      );
+    }
 
     // Structured grenade sequence:
     // (1) legendary grenade code, (2) grenade perks group, (3) legendary grenade rarity.
@@ -1181,9 +1295,10 @@ export default function WeaponEditView() {
     // token for the weapon so result stays legendary without unnecessary rarity spam.
     const allNewParts = [
       firstRarityCode,
-      ...(elementToken ? [elementToken] : []),
+      ...altFireTokens,
       bodyToken,
       ...bodyAccessoryStack,
+      ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
       primaryBarrelToken,
       ...samePrefixBarrelParts,
       ...crossParts,
@@ -1192,12 +1307,14 @@ export default function WeaponEditView() {
       ...(gripToken ? [gripToken] : []),
       ...(foregripToken ? [foregripToken] : []),
       ...(scopeToken ? [scopeToken] : []),
+      ...(daedalusAltAmmoToken ? [daedalusAltAmmoToken] : []),
       ...(manufacturerToken ? [manufacturerToken] : []),
       ...damageStacks,
       ...ammoStacks,
       ...fireRateStacks,
       ...(underbarrelToken ? [underbarrelToken] : []),
       ...underbarrelAccessoryStack,
+      ...(shouldUseUnderbarrelAlt ? [underbarrelInfiniteAmmoToken] : []),
       ...grenadeParts,
       ...stalkerStacks,
     ];
@@ -1360,48 +1477,50 @@ export default function WeaponEditView() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
-          <textarea
-            value={serialInput}
-            onChange={(e) => {
-              setSerialInput(e.target.value);
-              setSelectedWeaponPath(null);
-            }}
-            placeholder="Paste @U... serial here"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleDecode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "decode" ? "Decoding…" : "Decode → Deserialized"}
-          </button>
-        </div>
+      {!suppressCodecPanels && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
+            <textarea
+              value={serialInput}
+              onChange={(e) => {
+                setSerialInput(e.target.value);
+                setSelectedWeaponPath(null);
+              }}
+              placeholder="Paste @U... serial here"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleDecode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "decode" ? "Decoding…" : "Decode → Deserialized"}
+            </button>
+          </div>
 
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized (decoded) string</h3>
-          <textarea
-            value={decodedInput}
-            onChange={(e) => setDecodedInput(e.target.value)}
-            placeholder="Paste decoded string (e.g. 255, 0, 1, 50| ... || part1, part2)"
-            rows={4}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
-          />
-          <button
-            type="button"
-            onClick={handleEncode}
-            disabled={loading !== null}
-            className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-          >
-            {loading === "encode" ? "Encoding…" : "Encode → Base85"}
-          </button>
+          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+            <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized (decoded) string</h3>
+            <textarea
+              value={decodedInput}
+              onChange={(e) => setDecodedInput(e.target.value)}
+              placeholder="Paste decoded string (e.g. 255, 0, 1, 50| ... || part1, part2)"
+              rows={4}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleEncode}
+              disabled={loading !== null}
+              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            >
+              {loading === "encode" ? "Encoding…" : "Encode → Base85"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Weapon parts list */}
       {parsedComponents.length > 0 && weaponEditData && currentMfgWtId != null && (

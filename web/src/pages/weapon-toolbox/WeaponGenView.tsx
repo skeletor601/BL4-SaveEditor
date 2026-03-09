@@ -49,6 +49,11 @@ interface WeaponGenData {
   skins: { label: string; value: string }[];
 }
 
+interface WeaponGenViewProps {
+  suppressCodecPanels?: boolean;
+  onCodecChange?: (payload: { base85: string; decoded: string }) => void;
+}
+
 function partIdFromLabel(label: string): string | null {
   if (!label || label === NONE) return null;
   const first = label.split(" - ")[0]?.trim();
@@ -56,7 +61,7 @@ function partIdFromLabel(label: string): string | null {
   return null;
 }
 
-export default function WeaponGenView() {
+export default function WeaponGenView({ suppressCodecPanels = false, onCodecChange }: WeaponGenViewProps = {}) {
   const navigate = useNavigate();
   const { saveData, getYamlText, updateSaveData } = useSave();
   const [data, setData] = useState<WeaponGenData | null>(null);
@@ -81,6 +86,7 @@ export default function WeaponGenView() {
   const [loading, setLoading] = useState<"encode" | "add" | null>(null);
   const [godRollModalOpen, setGodRollModalOpen] = useState(false);
   const [godRollSelectedIndex, setGodRollSelectedIndex] = useState(0);
+  const [autoFillWarning, setAutoFillWarning] = useState<string | null>(null);
 
   const mfgWtId =
     data?.mfgWtIdList.find(
@@ -88,10 +94,35 @@ export default function WeaponGenView() {
     )?.mfgWtId ?? null;
 
   useEffect(() => {
-    if (!data?.mfgWtIdList?.length || mfgWtId) return;
-    setManufacturer(data.mfgWtIdList[0].manufacturer);
-    setWeaponType(data.mfgWtIdList[0].weaponType);
-  }, [data?.mfgWtIdList, mfgWtId]);
+    const list = data?.mfgWtIdList ?? [];
+    if (!list.length) return;
+
+    // Initial load.
+    if (!manufacturer || !weaponType) {
+      setManufacturer(list[0].manufacturer);
+      setWeaponType(list[0].weaponType);
+      return;
+    }
+
+    // Keep user selection stable by auto-fixing only the incompatible side.
+    const exact = list.some((e) => e.manufacturer === manufacturer && e.weaponType === weaponType);
+    if (exact) return;
+
+    const sameManufacturer = list.find((e) => e.manufacturer === manufacturer);
+    if (sameManufacturer) {
+      setWeaponType(sameManufacturer.weaponType);
+      return;
+    }
+
+    const sameWeaponType = list.find((e) => e.weaponType === weaponType);
+    if (sameWeaponType) {
+      setManufacturer(sameWeaponType.manufacturer);
+      return;
+    }
+
+    setManufacturer(list[0].manufacturer);
+    setWeaponType(list[0].weaponType);
+  }, [data?.mfgWtIdList, manufacturer, weaponType]);
 
   useEffect(() => {
     setPartSelections({});
@@ -204,6 +235,10 @@ export default function WeaponGenView() {
     const t = setTimeout(() => encodeAndSet(decoded), 400);
     return () => clearTimeout(t);
   }, [buildDecoded, mfgWtId, seed]);
+
+  useEffect(() => {
+    onCodecChange?.({ base85: encodedSerial, decoded: decodedDisplay });
+  }, [encodedSerial, decodedDisplay, onCodecChange]);
 
   const handleAddToBackpack = useCallback(async () => {
     const serial = encodedSerial.trim();
@@ -329,8 +364,8 @@ export default function WeaponGenView() {
     if (preset?.decoded) {
       setDecodedDisplay(preset.decoded);
       setGodRollModalOpen(false);
-      navigate("/weapon-toolbox/weapon-edit", {
-        state: { pasteDecoded: preset.decoded },
+      navigate("/gear-forge", {
+        state: { tab: "editor", editorKind: "weapon", pasteDecoded: preset.decoded },
       });
     }
   }, [data?.godrolls, godRollSelectedIndex, navigate]);
@@ -414,6 +449,69 @@ export default function WeaponGenView() {
     }
   }, [data]);
 
+  const handleAutoFill = useCallback(() => {
+    if (!data || !mfgWtId) {
+      setAutoFillWarning("Please choose manufacturer, level, weapon type, and rarity first.");
+      return;
+    }
+    const hasManufacturer = manufacturer.trim().length > 0;
+    const hasWeaponType = weaponType.trim().length > 0;
+    const hasValidLevel = /^\d+$/.test(level) && Number(level) > 0;
+    const raritySel = partSelections["Rarity"] ?? NONE;
+    if (!hasManufacturer || !hasWeaponType || !hasValidLevel || raritySel === NONE) {
+      setAutoFillWarning("Please choose manufacturer, level, weapon type, and rarity first.");
+      return;
+    }
+    setAutoFillWarning(null);
+
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const selections: Record<string, string> = { ...partSelections };
+    const legendaryLabels = data.legendaryByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? [];
+    if (raritySel === "Legendary") {
+      selections["Legendary Type"] = legendaryLabels.length ? pick(legendaryLabels) : NONE;
+    } else {
+      selections["Legendary Type"] = NONE;
+    }
+
+    const elementalOptions = data.elemental.map((e) => `${e.partId} - ${e.stat}`);
+    if (elementalOptions.length) {
+      selections["Element 1"] = pick(elementalOptions);
+      selections["Element 2"] = pick(elementalOptions);
+    }
+
+    const partOrder = [
+      { key: "Body", slots: 1 },
+      { key: "Body Accessory", slots: MULTI_SLOTS["Body Accessory"] ?? 1 },
+      { key: "Barrel", slots: 1 },
+      { key: "Barrel Accessory", slots: MULTI_SLOTS["Barrel Accessory"] ?? 1 },
+      { key: "Magazine", slots: 1 },
+      { key: "Stat Modifier", slots: 1 },
+      { key: "Grip", slots: 1 },
+      { key: "Foregrip", slots: 1 },
+      { key: "Manufacturer Part", slots: MULTI_SLOTS["Manufacturer Part"] ?? 1 },
+      { key: "Scope", slots: 1 },
+      { key: "Scope Accessory", slots: MULTI_SLOTS["Scope Accessory"] ?? 1 },
+      { key: "Underbarrel", slots: 1 },
+      { key: "Underbarrel Accessory", slots: MULTI_SLOTS["Underbarrel Accessory"] ?? 1 },
+    ];
+    for (const { key: partType, slots } of partOrder) {
+      const opts = data.partsByMfgTypeId[mfgWtId]?.[partType] ?? [];
+      const choices = opts.length > 0 ? opts.map((o) => o.label) : [NONE];
+      for (let i = 0; i < slots; i++) {
+        const key = slots > 1 ? `${partType}_${i}` : partType;
+        selections[key] = pick(choices);
+      }
+    }
+    setPartSelections(selections);
+
+    if (data.skins.length > 0) {
+      const skinPick = pick(data.skins);
+      setSkinComboValue(skinPick.value);
+      setSkinToken(skinPick.value);
+    }
+    setMessage("Auto-filled parts for selected manufacturer, weapon type, level, and rarity.");
+  }, [data, mfgWtId, manufacturer, weaponType, level, partSelections]);
+
   if (loadError) {
     return (
       <div className="space-y-4">
@@ -455,34 +553,46 @@ export default function WeaponGenView() {
 
   return (
     <div className="space-y-4">
-      {/* Output read-only */}
-      <div className={`${blockClass} grid gap-4 md:grid-cols-2`}>
-        <div>
-          <h3 className={labelClass}>Deserialized</h3>
-          <textarea
-            readOnly
-            value={decodedDisplay}
-            rows={4}
-            className={`${inputClass} font-mono text-xs resize-y`}
-          />
+      {!suppressCodecPanels && (
+        <div className={`${blockClass} grid gap-4 md:grid-cols-2`}>
+          <div>
+            <h3 className={labelClass}>Deserialized</h3>
+            <textarea
+              readOnly
+              value={decodedDisplay}
+              rows={4}
+              className={`${inputClass} font-mono text-xs resize-y`}
+            />
+          </div>
+          <div>
+            <h3 className={labelClass}>Base85</h3>
+            <textarea
+              readOnly
+              value={encodedSerial}
+              rows={4}
+              className={`${inputClass} font-mono text-xs resize-y`}
+            />
+          </div>
         </div>
-        <div>
-          <h3 className={labelClass}>Base85</h3>
-          <textarea
-            readOnly
-            value={encodedSerial}
-            rows={4}
-            className={`${inputClass} font-mono text-xs resize-y`}
-          />
-        </div>
-      </div>
+      )}
 
       {/* Manufacturer, Type, Level, Seed */}
       <div className={`${blockClass} flex flex-wrap items-center gap-3 gap-y-2`}>
         <label className={labelClass}>Manufacturer</label>
         <select
           value={manufacturer}
-          onChange={(e) => setManufacturer(e.target.value)}
+          onChange={(e) => {
+            const nextManufacturer = e.target.value;
+            setManufacturer(nextManufacturer);
+            const list = data?.mfgWtIdList ?? [];
+            const stillValid = list.some(
+              (entry) => entry.manufacturer === nextManufacturer && entry.weaponType === weaponType,
+            );
+            if (!stillValid) {
+              const fallback = list.find((entry) => entry.manufacturer === nextManufacturer);
+              if (fallback) setWeaponType(fallback.weaponType);
+            }
+          }}
           className={inputClass}
           style={{ maxWidth: "12rem" }}
         >
@@ -493,7 +603,18 @@ export default function WeaponGenView() {
         <label className={labelClass}>Weapon Type</label>
         <select
           value={weaponType}
-          onChange={(e) => setWeaponType(e.target.value)}
+          onChange={(e) => {
+            const nextWeaponType = e.target.value;
+            setWeaponType(nextWeaponType);
+            const list = data?.mfgWtIdList ?? [];
+            const stillValid = list.some(
+              (entry) => entry.manufacturer === manufacturer && entry.weaponType === nextWeaponType,
+            );
+            if (!stillValid) {
+              const fallback = list.find((entry) => entry.weaponType === nextWeaponType);
+              if (fallback) setManufacturer(fallback.manufacturer);
+            }
+          }}
           className={inputClass}
           style={{ maxWidth: "12rem" }}
         >
@@ -534,6 +655,14 @@ export default function WeaponGenView() {
           title="Randomize manufacturer, type, level, seed, all parts, and skin"
         >
           Surprise Me
+        </button>
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black min-h-[44px] font-medium"
+          title="Auto-fill remaining parts after you pick manufacturer, type, level, and rarity"
+        >
+          Auto Fill
         </button>
       </div>
 
@@ -687,11 +816,11 @@ export default function WeaponGenView() {
       {/* God Roll modal */}
       {godRollModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg-overlay)]"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[var(--color-bg-overlay)] p-2 sm:p-4"
           onClick={() => setGodRollModalOpen(false)}
         >
           <div
-            className={`${blockClass} max-w-md w-full mx-4 shadow-xl`}
+            className={`${blockClass} max-w-md w-full shadow-xl max-h-[85vh] overflow-y-auto`}
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className={`${labelClass} mb-2`}>Choose God Roll</h3>
@@ -709,11 +838,11 @@ export default function WeaponGenView() {
                 </option>
               ))}
             </select>
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <button
                 type="button"
                 onClick={() => setGodRollModalOpen(false)}
-                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)]"
+                className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] min-h-[44px]"
               >
                 Cancel
               </button>
@@ -721,16 +850,42 @@ export default function WeaponGenView() {
                 type="button"
                 onClick={godRollAddToBackpack}
                 disabled={loading !== null}
-                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium"
+                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium min-h-[44px] disabled:opacity-50"
               >
                 Add to Backpack
               </button>
               <button
                 type="button"
                 onClick={godRollCustomize}
-                className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)]"
+                disabled={loading !== null}
+                className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] min-h-[44px] disabled:opacity-50"
               >
                 Customize God Roll
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Themed warning modal (used by Auto Fill prerequisites) */}
+      {autoFillWarning && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg-overlay)]"
+          onClick={() => setAutoFillWarning(null)}
+        >
+          <div
+            className={`${blockClass} max-w-md w-full mx-4 shadow-xl`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className={`${labelClass} mb-2`}>Missing required selections</h3>
+            <p className="text-sm text-[var(--color-text)]">{autoFillWarning}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={() => setAutoFillWarning(null)}
+                className="px-4 py-2 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-black min-h-[44px]"
+              >
+                OK
               </button>
             </div>
           </div>

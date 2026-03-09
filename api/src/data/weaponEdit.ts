@@ -38,6 +38,18 @@ export interface WeaponEditData {
   elemental: WeaponEditElementalRow[];
 }
 
+function parseCodePair(code: string): { prefix: number; part: number } | null {
+  const s = String(code ?? "").trim();
+  const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
+  if (m2) return { prefix: Number(m2[1]), part: Number(m2[2]) };
+  const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
+  if (m1) {
+    const n = Number(m1[1]);
+    return { prefix: n, part: n };
+  }
+  return null;
+}
+
 function loadWeaponEditParts(): WeaponEditPartRow[] {
   const enPath = getPath("weapon_edit/all_weapon_part_EN.csv");
   const path = existsSync(enPath) ? enPath : getPath("weapon_edit/all_weapon_part.csv");
@@ -100,6 +112,52 @@ function loadWeaponEditParts(): WeaponEditPartRow[] {
 
         parts.push({
           mfgWtId,
+          manufacturer,
+          weaponType,
+          partId,
+          partType,
+          string: stringVal || modelName || stats || partId,
+          stat: statCommon || stats,
+        });
+      }
+
+      // Also merge non-weapon DB rows so Weapon Edit can add them directly.
+      // Current requested categories: grenade + enhancement.
+      const specialTypeMap: Record<string, string> = {
+        grenade: "Grenade",
+        enhancement: "Enhancement",
+        shield: "Shield",
+      };
+      for (const r of rowsUni) {
+        const itemType = String((r as Record<string, unknown>)["Item Type"] ?? "").trim().toLowerCase();
+        const mappedWeaponType = specialTypeMap[itemType];
+        if (!mappedWeaponType) continue;
+
+        const parsed = parseCodePair(String((r as Record<string, unknown>).code ?? ""));
+        if (!parsed) continue;
+
+        const defaultPartType = mappedWeaponType === "Enhancement" ? "Enhancement Part" : "Grenade Part";
+        const partType = String((r as Record<string, unknown>)["Part Type"] ?? "").trim() || defaultPartType;
+        const manufacturer = String((r as Record<string, unknown>).Manufacturer ?? "").trim() || mappedWeaponType;
+        const partIdFromRow = String((r as Record<string, unknown>).ID ?? "").trim();
+        const partId = partIdFromRow || String(parsed.part);
+        const weaponType = mappedWeaponType;
+        if (!partId) continue;
+
+        const exists = parts.some(
+          (p) => p.mfgWtId === String(parsed.prefix) && p.partId === partId && p.partType === partType,
+        );
+        if (exists) continue;
+
+        const stringVal = String((r as Record<string, unknown>).String ?? "").trim();
+        const modelName = String((r as Record<string, unknown>)["Model Name"] ?? "").trim();
+        const statCommon = String(
+          (r as Record<string, unknown>)["Stats (Level 50, Common)"] ?? "",
+        ).trim();
+        const stats = String((r as Record<string, unknown>).Stats ?? "").trim();
+
+        parts.push({
+          mfgWtId: String(parsed.prefix),
           manufacturer,
           weaponType,
           partId,
