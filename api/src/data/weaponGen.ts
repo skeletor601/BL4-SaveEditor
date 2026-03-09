@@ -57,6 +57,7 @@ export interface WeaponGenData {
   /** Key: "mfgWtId". Rarity options (non-Legendary) */
   rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]>;
   legendaryByMfgTypeId: Record<string, { partId: string; description: string }[]>;
+  pearlByMfgTypeId: Record<string, { partId: string; description: string }[]>;
   elemental: { partId: string; stat: string }[];
   godrolls: GodRoll[];
   skins: WeaponSkin[];
@@ -241,11 +242,19 @@ export function getWeaponGenData(): WeaponGenData {
 
   const rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]> = {};
   const legendaryByMfgTypeId: Record<string, { partId: string; description: string }[]> = {};
+  const pearlByMfgTypeId: Record<string, { partId: string; description: string }[]> = {};
   for (const row of rarityRows) {
     if (!row.mfgWtId || !row.partId) continue;
-    if (row.stat === "Legendary") {
+    const rarityStat = String(row.stat ?? "").trim().toLowerCase();
+    if (rarityStat === "legendary") {
       if (!legendaryByMfgTypeId[row.mfgWtId]) legendaryByMfgTypeId[row.mfgWtId] = [];
       legendaryByMfgTypeId[row.mfgWtId].push({
+        partId: row.partId,
+        description: row.description || row.partId,
+      });
+    } else if (rarityStat === "pearl" || rarityStat === "pearlescent") {
+      if (!pearlByMfgTypeId[row.mfgWtId]) pearlByMfgTypeId[row.mfgWtId] = [];
+      pearlByMfgTypeId[row.mfgWtId].push({
         partId: row.partId,
         description: row.description || row.partId,
       });
@@ -266,6 +275,7 @@ export function getWeaponGenData(): WeaponGenData {
     partsByMfgTypeId,
     rarityByMfgTypeId,
     legendaryByMfgTypeId,
+    pearlByMfgTypeId,
     elemental,
     godrolls,
     skins,

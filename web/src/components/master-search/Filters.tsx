@@ -1,4 +1,4 @@
-export type QuickFilterType = "" | "damage" | "ammo";
+export type QuickFilterType = "" | "damage" | "ammo" | "rarity";
 
 export interface FilterState {
   category: string;
@@ -11,7 +11,7 @@ export interface FilterState {
 }
 
 const CATEGORIES = ["All", "Weapon", "Shield", "Class Mod", "Enhancement", "Grenade", "Repkit", "Heavy"];
-const SORT_OPTIONS = ["Default", "Legendary first", "Epic first", "Rare first", "Common first"];
+const SORT_OPTIONS = ["Default", "Pearl first", "Legendary first", "Epic first", "Rare first", "Common first"];
 
 interface FiltersProps {
   filters: FilterState;
@@ -87,6 +87,17 @@ export default function Filters({
       >
         Magazine / Ammo
       </button>
+      <button
+        type="button"
+        onClick={() => update({ quickFilter: filters.quickFilter === "rarity" ? "" : "rarity" })}
+        className={`px-3 py-2 min-h-[44px] rounded-[10px] border text-[11px] touch-manipulation ${
+          filters.quickFilter === "rarity"
+            ? "border-[var(--color-accent)] bg-[var(--color-accent-dim)] text-[var(--color-accent)]"
+            : "border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)]"
+        }`}
+      >
+        Rarity (Leg/Pearl)
+      </button>
 
       <label className="text-[var(--color-text-muted)] text-[11px] mr-1 shrink-0">
         Rarity
@@ -102,6 +113,7 @@ export default function Filters({
         <option value="Uncommon">Uncommon</option>
         <option value="Rare">Rare</option>
         <option value="Epic">Epic</option>
+        <option value="Pearl">Pearl</option>
         <option value="Legendary">Legendary</option>
       </select>
 

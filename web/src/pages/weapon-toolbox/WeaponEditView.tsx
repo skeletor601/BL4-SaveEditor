@@ -878,8 +878,8 @@ export default function WeaponEditView({
       .map((row) => ({ row, parsed: parseCodePair(row.code) }))
       .filter((x): x is { row: UniversalDbPartCode; parsed: { prefix: number; part: number } } => x.parsed != null);
 
-    const isLegendary = (row: { stat?: string; string?: string }) =>
-      /legendary/.test(norm(`${row.stat ?? ""} ${row.string ?? ""}`));
+    const isSpecialRarity = (row: { stat?: string; string?: string }) =>
+      /(legendary|pearl|pearlescent)/.test(norm(`${row.stat ?? ""} ${row.string ?? ""}`));
 
     // Prefer prefixes with legendary barrel+rarity, but never hard-fail generation
     // when DB labeling is inconsistent.
@@ -895,7 +895,7 @@ export default function WeaponEditView({
     for (const c of candidates) {
       const pt = norm(c.row.partType);
       const r = norm(c.row.rarity);
-      if (r !== "legendary") continue;
+      if (r !== "legendary" && r !== "pearl" && r !== "pearlescent") continue;
       if (pt === "barrel") {
         if (!legendaryBarrelIdsByPrefix.has(c.parsed.prefix)) legendaryBarrelIdsByPrefix.set(c.parsed.prefix, new Set());
         legendaryBarrelIdsByPrefix.get(c.parsed.prefix)!.add(c.parsed.part);
@@ -920,10 +920,10 @@ export default function WeaponEditView({
       const raritySet = legendaryRarityIdsByPrefix.get(p) ?? new Set<number>();
       const hasLegendaryBarrel =
         Array.from(barrelSet).some((id) => partIds.has(id)) ||
-        rows.some((r) => norm(r.partType) === "barrel" && isLegendary(r));
+        rows.some((r) => norm(r.partType) === "barrel" && isSpecialRarity(r));
       const hasLegendaryRarity =
         Array.from(raritySet).some((id) => partIds.has(id)) ||
-        rows.some((r) => norm(r.partType) === "rarity" && isLegendary(r));
+        rows.some((r) => norm(r.partType) === "rarity" && isSpecialRarity(r));
       return hasCoreParts(p) && hasLegendaryBarrel && hasLegendaryRarity;
     });
     const validPrefixesFallback = Array.from(weaponRowsByPrefix.keys()).filter((p) => {
@@ -945,7 +945,7 @@ export default function WeaponEditView({
     const weaponRows = weaponEditData.parts.filter((r) => Number(r.mfgWtId) === headerPrefix);
     // Rule 2: first code must be legendary rarity for the weapon prefix.
     const legendaryRarityRows = weaponRows.filter(
-      (r) => norm(r.partType) === "rarity" && /legendary/.test(norm(`${r.stat} ${r.string}`)),
+      (r) => norm(r.partType) === "rarity" && /(legendary|pearl|pearlescent)/.test(norm(`${r.stat} ${r.string}`)),
     );
     const validCurrentPartIds = new Set(weaponRows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)));
     const mappedLegendaryRarityIds = Array.from(legendaryRarityIdsByPrefix.get(headerPrefix) ?? []).filter((id) =>
@@ -1121,7 +1121,7 @@ export default function WeaponEditView({
     const samePrefixBarrels = mappedLegendaryBarrels.length
       ? mappedLegendaryBarrels
       : weaponRows
-          .filter((r) => norm(r.partType) === "barrel" && isLegendary(r))
+          .filter((r) => norm(r.partType) === "barrel" && isSpecialRarity(r))
           .map((r) => Number(r.partId))
           .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
     const anyPrefixBarrels = weaponRows
@@ -1161,7 +1161,7 @@ export default function WeaponEditView({
       const mapped = Array.from(legendaryBarrelIdsByPrefix.get(pfx) ?? []).filter((id) => idsInPrefix.has(id));
       if (mapped.length) return mapped.map((part) => ({ prefix: pfx, part }));
       return rows
-        .filter((r) => norm(r.partType) === "barrel" && isLegendary(r))
+        .filter((r) => norm(r.partType) === "barrel" && isSpecialRarity(r))
         .map((r) => ({ prefix: pfx, part: Number(r.partId) }))
         .filter((x) => Number.isFinite(x.part));
     });
@@ -1246,7 +1246,9 @@ export default function WeaponEditView({
     const grenadeParts: string[] = [];
     const grenadeLegendaryCode = candidates.filter(
       ({ row, parsed }) =>
-        parsed.prefix === 291 && norm(row.rarity) === "legendary" && norm(row.partType) !== "rarity",
+        parsed.prefix === 291 &&
+        (norm(row.rarity) === "legendary" || norm(row.rarity) === "pearl" || norm(row.rarity) === "pearlescent") &&
+        norm(row.partType) !== "rarity",
     );
     const grenadePerkPool = candidates.filter(
       ({ parsed, row }) => parsed.prefix === 245 && norm(row.partType) !== "rarity",
@@ -1254,7 +1256,7 @@ export default function WeaponEditView({
     const grenadeLegendaryRarity = candidates.filter(
       ({ parsed, row }) =>
         [291, 289, 282, 273, 275, 281, 286].includes(parsed.prefix) &&
-        norm(row.rarity) === "legendary" &&
+        (norm(row.rarity) === "legendary" || norm(row.rarity) === "pearl" || norm(row.rarity) === "pearlescent") &&
         norm(row.partType) === "rarity",
     );
     const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");

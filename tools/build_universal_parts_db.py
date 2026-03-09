@@ -63,7 +63,7 @@ CANONICAL_MANUFACTURERS = [
     "Vladof",
 ]
 _CANONICAL_MFG_MAP = {m.lower(): m for m in CANONICAL_MANUFACTURERS}
-_RARITY_VALUES = ("Legendary", "Epic", "Rare", "Uncommon", "Common")
+_RARITY_VALUES = ("Pearl", "Legendary", "Epic", "Rare", "Uncommon", "Common")
 
 # Legendary item names (sync with web/src/data/partsData.ts LEG_NAMES). Rows whose name
 # matches one of these get Rarity = "Legendary" so sort/filter by rarity works without name lookup.
@@ -229,12 +229,16 @@ def _canonical_rarity(row: Dict[str, str]) -> str:
     existing = _safe_str(row.get("canonicalRarity", "")) or _safe_str(row.get("Rarity", ""))
     if existing:
         e = existing.lower()
+        if e in ("pearlescent", "pearl"):
+            return "Pearl"
         for val in _RARITY_VALUES:
             if e == val.lower():
                 return val
+    b = _row_blob(row)
+    if re.search(r"\b(pearlescent|pearl)\b", b):
+        return "Pearl"
     if _is_legendary_by_name(row):
         return "Legendary"
-    b = _row_blob(row)
     if re.search(r"\blegendary\b", b):
         return "Legendary"
     if re.search(r"\bepic\b", b):
@@ -461,7 +465,12 @@ def build_universal_db(project_root: str) -> Tuple[int, str]:
             r["Manufacturer"] = cm
         if not _safe_str(r.get("Part Type", "")) and cp:
             r["Part Type"] = cp
-        if not _safe_str(r.get("Rarity", "")) and cr:
+        rarity_existing = _safe_str(r.get("Rarity", "")).lower()
+        if cr == "Pearl":
+            r["Rarity"] = "Pearl"
+        elif rarity_existing in ("pearlescent", "pearl"):
+            r["Rarity"] = "Pearl"
+        elif not rarity_existing and cr:
             r["Rarity"] = cr
 
     # 8) Backup existing universal DB before overwrite so rollback is one file copy

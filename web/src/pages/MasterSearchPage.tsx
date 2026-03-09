@@ -18,6 +18,10 @@ function isLegendaryItem(item: PartItem): boolean {
   return inferRarity(apiItemToPartRow(item)).toLowerCase() === "legendary";
 }
 
+function isPearlItem(item: PartItem): boolean {
+  return inferRarity(apiItemToPartRow(item)).toLowerCase() === "pearl";
+}
+
 function displayRarity(item: PartItem): string {
   const inferred = inferRarity(apiItemToPartRow(item));
   return inferred ? inferred.charAt(0).toUpperCase() + inferred.slice(1) : (item.rarity ?? "");
@@ -73,7 +77,12 @@ export default function MasterSearchPage() {
   const filtered = useMemo(() => {
     let list = items;
     if (favoritesOnly) list = list.filter((p) => favorites.has(p.code));
-    if (sortRarity === "Legendary first") list = [...list].sort((a, b) => (isLegendaryItem(b) ? 1 : 0) - (isLegendaryItem(a) ? 1 : 0));
+    if (sortRarity === "Legendary first") {
+      list = [...list].sort((a, b) => (isLegendaryItem(b) ? 1 : 0) - (isLegendaryItem(a) ? 1 : 0));
+    }
+    if (sortRarity === "Pearl first") {
+      list = [...list].sort((a, b) => (isPearlItem(b) ? 1 : 0) - (isPearlItem(a) ? 1 : 0));
+    }
     return list;
   }, [items, favoritesOnly, sortRarity, favorites]);
 
@@ -166,6 +175,7 @@ export default function MasterSearchPage() {
                 aria-label="Sort by rarity"
               >
                 <option value="Default">Default order</option>
+                <option value="Pearl first">Pearl first</option>
                 <option value="Legendary first">Legendary first</option>
               </select>
               <select
@@ -233,8 +243,14 @@ export default function MasterSearchPage() {
                 </thead>
                 <tbody>
                   {filtered.map((row) => {
+                    const isPearl = isPearlItem(row);
                     const isLegendary = isLegendaryItem(row);
                     const rarityLabel = displayRarity(row) || "–";
+                    const rarityClass = isPearl
+                      ? "text-sky-300 font-semibold"
+                      : isLegendary
+                        ? "text-[var(--color-legendary)] font-semibold"
+                        : "";
                     return (
                     <tr
                       key={row.code + row.partName}
@@ -254,11 +270,11 @@ export default function MasterSearchPage() {
                           {favorites.has(row.code) ? "★" : "☆"}
                         </button>
                       </td>
-                      <td className={`p-3 font-mono text-xs ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{row.code}</td>
-                      <td className={`p-3 ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{row.itemType}</td>
-                      <td className={`p-3 ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : ""}`}>{rarityLabel}</td>
-                      <td className={`p-3 font-mono text-xs ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : "text-[var(--color-text)]"}`}>{row.partName}</td>
-                      <td className={`p-3 max-w-md truncate ${isLegendary ? "text-[var(--color-legendary)] font-semibold" : "text-[var(--color-text-muted)]"}`}>{row.effect ?? "–"}</td>
+                      <td className={`p-3 font-mono text-xs ${rarityClass}`}>{row.code}</td>
+                      <td className={`p-3 ${rarityClass}`}>{row.itemType}</td>
+                      <td className={`p-3 ${rarityClass}`}>{rarityLabel}</td>
+                      <td className={`p-3 font-mono text-xs ${rarityClass || "text-[var(--color-text)]"}`}>{row.partName}</td>
+                      <td className={`p-3 max-w-md truncate ${rarityClass || "text-[var(--color-text-muted)]"}`}>{row.effect ?? "–"}</td>
                     </tr>
                   );})}
                 </tbody>

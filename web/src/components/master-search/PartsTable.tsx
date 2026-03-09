@@ -120,13 +120,16 @@ export default function PartsTable({
               const key = getRowKey(row);
               const isFav = favorites.has(key);
               const rarity = inferRarity(row);
-              const isLeg = isLegendaryByName(row);
+              const isPearl = rarity === "pearl";
+              const isLeg = rarity === "legendary" || (!isPearl && isLegendaryByName(row));
               const itemTypeStr = (row["Model Name"] ?? (row as Record<string, unknown>).itemType ?? "").toString();
               const code = getCode(row);
               return (
                 <tr
                   key={key}
-                  className={`border-b border-[rgba(60,68,78,0.3)] hover:bg-[var(--color-accent-dim)] ${isLeg ? "legendary-row" : ""}`}
+                  className={`border-b border-[rgba(60,68,78,0.3)] hover:bg-[var(--color-accent-dim)] ${
+                    isPearl ? "bg-sky-400/10" : isLeg ? "legendary-row" : ""
+                  }`}
                 >
                   <td className="w-10 text-center py-2.5 px-3.5">
                     <input
@@ -152,7 +155,7 @@ export default function PartsTable({
                     {itemTypeStr || "—"}
                   </td>
                   <td className="py-2.5 px-3.5 text-xs">
-                    <LegendaryBadge rarity={rarity} isLegendary={isLeg} />
+                    <LegendaryBadge rarity={rarity} isLegendary={isLeg} isPearl={isPearl} />
                   </td>
                   <td className="py-2.5 px-3.5 text-xs font-mono">
                     {getPartName(row)}
@@ -174,13 +177,16 @@ export default function PartsTable({
           const isFav = favorites.has(key);
           const isSelected = selectedKeys.has(key);
           const rarity = inferRarity(row);
-          const isLeg = isLegendaryByName(row);
+          const isPearl = rarity === "pearl";
+          const isLeg = rarity === "legendary" || (!isPearl && isLegendaryByName(row));
           const itemTypeStr = (row["Model Name"] ?? (row as Record<string, unknown>).itemType ?? "").toString();
           const code = getCode(row);
           return (
             <div
               key={key}
-              className={`rounded-xl border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 ${isLeg ? "border-[var(--color-legendary)]" : ""}`}
+              className={`rounded-xl border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 ${
+                isPearl ? "border-sky-300/80 bg-sky-400/10" : isLeg ? "border-[var(--color-legendary)]" : ""
+              }`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <button
@@ -207,7 +213,7 @@ export default function PartsTable({
                 {itemTypeStr || "—"}
               </p>
               <p className="text-[11px] text-[var(--color-text-muted)] mt-1">
-                <LegendaryBadge rarity={rarity} isLegendary={isLeg} />
+                <LegendaryBadge rarity={rarity} isLegendary={isLeg} isPearl={isPearl} />
               </p>
               <p className="font-mono text-[11px] text-[var(--color-text-muted)] mt-1 break-all">
                 {getPartName(row)}

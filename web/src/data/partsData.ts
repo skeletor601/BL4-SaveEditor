@@ -117,11 +117,12 @@ export function normalizeManufacturer(value: string): string {
 }
 
 export const RARITY_ORDER: Record<string, number> = {
-  legendary: 0,
-  epic: 1,
-  rare: 2,
-  uncommon: 3,
-  common: 4,
+  pearl: 0,
+  legendary: 1,
+  epic: 2,
+  rare: 3,
+  uncommon: 4,
+  common: 5,
 };
 
 /** Legendary item names from https://mobalytics.gg/borderlands-4/guides/legendary-weapons-and-gear – update when new legendaries release. */
@@ -190,7 +191,7 @@ export function isLegendaryByName(row: PartRow): boolean {
   return false;
 }
 
-const RARITY_VALUES: Set<string> = new Set(["legendary", "epic", "rare", "uncommon", "common"]);
+const RARITY_VALUES: Set<string> = new Set(["pearl", "pearlescent", "legendary", "epic", "rare", "uncommon", "common"]);
 
 export function inferRarity(row: PartRow): string {
   const raw = row as Record<string, unknown>;
@@ -198,9 +199,10 @@ export function inferRarity(row: PartRow): string {
     .toString()
     .trim()
     .toLowerCase();
-  if (explicit && RARITY_VALUES.has(explicit)) return explicit;
-  if (isLegendaryByName(row)) return "legendary";
+  if (explicit && RARITY_VALUES.has(explicit)) return explicit === "pearlescent" ? "pearl" : explicit;
   const h = blob(row);
+  if (/\bpearlescent\b|\bpearl\b/.test(h)) return "pearl";
+  if (isLegendaryByName(row)) return "legendary";
   if (h.includes("legendary")) return "legendary";
   if (h.includes("epic")) return "epic";
   if (h.includes("rare")) return "rare";

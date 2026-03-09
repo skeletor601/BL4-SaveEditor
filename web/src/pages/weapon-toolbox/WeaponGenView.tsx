@@ -44,6 +44,10 @@ interface WeaponGenData {
     string,
     { partId: string; description: string }[]
   >;
+  pearlByMfgTypeId: Record<
+    string,
+    { partId: string; description: string }[]
+  >;
   elemental: { partId: string; stat: string }[];
   godrolls: { name: string; decoded: string }[];
   skins: { label: string; value: string }[];
@@ -160,9 +164,14 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
 
     const raritySel = partSelections["Rarity"];
     const isLegendary = raritySel === "Legendary";
+    const isPearl = raritySel === "Pearl";
     if (isLegendary) {
       const legSel = partSelections["Legendary Type"];
       const pid = partIdFromLabel(legSel ?? "");
+      if (pid) parts.push(`{${pid}}`);
+    } else if (isPearl) {
+      const pearlSel = partSelections["Pearl Type"];
+      const pid = partIdFromLabel(pearlSel ?? "");
       if (pid) parts.push(`{${pid}}`);
     } else if (raritySel && raritySel !== NONE) {
       const entry = data?.rarityByMfgTypeId[mfgWtId]?.find((r) => r.stat === raritySel);
@@ -175,7 +184,7 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
       if (pid) parts.push(`{1:${pid}}`);
     });
 
-    const specialKeys = new Set(["Rarity", "Legendary Type", "Element 1", "Element 2"]);
+    const specialKeys = new Set(["Rarity", "Legendary Type", "Pearl Type", "Element 1", "Element 2"]);
     Object.entries(partSelections).forEach(([key, label]) => {
       const base = key.split("_")[0];
       if (specialKeys.has(base) || specialKeys.has(key)) return;
@@ -387,8 +396,12 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
     const rarityStats = data.rarityByMfgTypeId[mfgWtId]
       ? [...new Set(data.rarityByMfgTypeId[mfgWtId].map((r) => r.stat).filter(Boolean))].sort()
       : [];
-    const rarityChoices = [...rarityStats.filter((s) => s !== "Legendary"), "Legendary"].filter(Boolean);
+    const nonSpecialRarity = rarityStats.filter((s) => s !== "Legendary" && s !== "Pearl" && s !== "Pearlescent");
+    const rarityChoices = [...nonSpecialRarity];
+    if ((data.pearlByMfgTypeId[mfgWtId]?.length ?? 0) > 0) rarityChoices.push("Pearl");
+    rarityChoices.push("Legendary");
     const legendaryLabels = (data.legendaryByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? []);
+    const pearlLabels = (data.pearlByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? []);
     const elementalOptions = data.elemental.map((e) => `${e.partId} - ${e.stat}`);
 
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -397,6 +410,8 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
     if (rarityChoices.length) selections["Rarity"] = pick(rarityChoices);
     if (selections["Rarity"] === "Legendary" && legendaryLabels.length) {
       selections["Legendary Type"] = pick(legendaryLabels);
+    } else if (selections["Rarity"] === "Pearl" && pearlLabels.length) {
+      selections["Pearl Type"] = pick(pearlLabels);
     }
     if (elementalOptions.length) {
       selections["Element 1"] = pick(elementalOptions);
@@ -467,10 +482,16 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     const selections: Record<string, string> = { ...partSelections };
     const legendaryLabels = data.legendaryByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? [];
+    const pearlLabels = data.pearlByMfgTypeId[mfgWtId]?.map((r) => `${r.partId} - ${r.description}`) ?? [];
     if (raritySel === "Legendary") {
       selections["Legendary Type"] = legendaryLabels.length ? pick(legendaryLabels) : NONE;
+      selections["Pearl Type"] = NONE;
+    } else if (raritySel === "Pearl") {
+      selections["Pearl Type"] = pearlLabels.length ? pick(pearlLabels) : NONE;
+      selections["Legendary Type"] = NONE;
     } else {
       selections["Legendary Type"] = NONE;
+      selections["Pearl Type"] = NONE;
     }
 
     const elementalOptions = data.elemental.map((e) => `${e.partId} - ${e.stat}`);
@@ -531,8 +552,9 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
   const rarityStats = mfgWtId && data.rarityByMfgTypeId[mfgWtId]
     ? [...new Set(data.rarityByMfgTypeId[mfgWtId].map((r) => r.stat).filter(Boolean))].sort()
     : [];
+  const hasPearlOptions = mfgWtId ? (data.pearlByMfgTypeId[mfgWtId]?.length ?? 0) > 0 : false;
   const rarityOptions = mfgWtId
-    ? [NONE, ...rarityStats.filter((s) => s !== "Legendary"), "Legendary"]
+    ? [NONE, ...rarityStats.filter((s) => s !== "Legendary" && s !== "Pearl" && s !== "Pearlescent"), ...(hasPearlOptions ? ["Pearl"] : []), "Legendary"]
     : [NONE];
   const legendaryOptions = mfgWtId
     ? [
@@ -542,8 +564,17 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
         ) ?? []),
       ]
     : [NONE];
+  const pearlOptions = mfgWtId
+    ? [
+        NONE,
+        ...(data.pearlByMfgTypeId[mfgWtId]?.map(
+          (r) => `${r.partId} - ${r.description}`
+        ) ?? []),
+      ]
+    : [NONE];
   const raritySel = partSelections["Rarity"] ?? NONE;
   const showLegendaryType = raritySel === "Legendary";
+  const showPearlType = raritySel === "Pearl";
 
   const inputClass =
     "w-full min-w-0 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] min-h-[44px]";
@@ -678,6 +709,7 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
             {[
               { key: "Rarity", slots: 1 },
               { key: "Legendary Type", slots: 1, show: showLegendaryType },
+              { key: "Pearl Type", slots: 1, show: showPearlType },
               { key: "Element 1", slots: 1 },
               { key: "Element 2", slots: 1 },
               { key: "Body", slots: 1 },
@@ -694,11 +726,13 @@ export default function WeaponGenView({ suppressCodecPanels = false, onCodecChan
               { key: "Underbarrel", slots: 1 },
               { key: "Underbarrel Accessory", slots: MULTI_SLOTS["Underbarrel Accessory"] ?? 1 },
             ].map(({ key: partType, slots, show }) => {
-              if (show === false && partType === "Legendary Type") return null;
+              if (show === false && (partType === "Legendary Type" || partType === "Pearl Type")) return null;
               const opts = partType === "Rarity"
                 ? rarityOptions.map((o) => ({ partId: o, label: o }))
                 : partType === "Legendary Type"
                   ? legendaryOptions.map((o) => ({ partId: o, label: o }))
+                  : partType === "Pearl Type"
+                    ? pearlOptions.map((o) => ({ partId: o, label: o }))
                   : partType === "Element 1" || partType === "Element 2"
                     ? data.elemental.map((e) => ({
                         partId: `${e.partId} - ${e.stat}`,

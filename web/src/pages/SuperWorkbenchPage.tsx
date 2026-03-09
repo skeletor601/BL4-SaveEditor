@@ -33,7 +33,7 @@ interface MiniSearchItem {
   partType?: string;
 }
 
-type MiniQuickFilter = "none" | "legendary-barrels" | "damage-items";
+type MiniQuickFilter = "none" | "legendary-barrels" | "damage-items" | "rarity-items";
 
 function normalize(value: unknown): string {
   return String(value ?? "").trim().toLowerCase();
@@ -292,6 +292,12 @@ export default function SuperWorkbenchPage() {
             `${item.partName} ${item.effect ?? ""} ${item.itemType} ${item.partType ?? ""}`,
           ),
         );
+      } else if (miniQuickFilter === "rarity-items") {
+        list = list.filter((item) => {
+          const partType = normalize(item.partType);
+          const rarity = normalize(item.rarity);
+          return partType === "rarity" && (rarity === "legendary" || rarity === "pearl" || rarity === "pearlescent");
+        });
       }
       if (miniManufacturer !== "All") {
         list = list.filter((item) => normalize(item.manufacturer) === normalize(miniManufacturer));
@@ -581,6 +587,17 @@ export default function SuperWorkbenchPage() {
                 }`}
               >
                 Damage Items
+              </button>
+              <button
+                type="button"
+                onClick={() => setMiniQuickFilter((v) => (v === "rarity-items" ? "none" : "rarity-items"))}
+                className={`px-2 py-1 rounded border text-xs ${
+                  miniQuickFilter === "rarity-items"
+                    ? "border-[var(--color-accent)] text-[var(--color-accent)]"
+                    : "border-[var(--color-panel-border)] text-[var(--color-text-muted)]"
+                }`}
+              >
+                Rarity (Leg/Pearl)
               </button>
             </div>
             <select

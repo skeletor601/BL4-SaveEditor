@@ -161,6 +161,12 @@ export default function MasterSearch() {
       const b = blob(row);
       if (filters.quickFilter === "damage" && !b.includes("damage")) return false;
       if (filters.quickFilter === "ammo" && !b.includes("ammo") && !b.includes("magazine")) return false;
+      if (filters.quickFilter === "rarity") {
+        const pt = normalize(getPartType(row));
+        const rarity = inferRarity(row);
+        const isSpecial = rarity === "legendary" || rarity === "pearl";
+        if (!(pt === "rarity" && isSpecial)) return false;
+      }
       return true;
     });
 
@@ -173,7 +179,12 @@ export default function MasterSearch() {
         const ia = order[ra] ?? emptyOrder;
         const ib = order[rb] ?? emptyOrder;
         let cmp = 0;
-        if (filters.sortRarity === "Legendary first" || filters.sortRarity === "Epic first" || filters.sortRarity === "Rare first") {
+        if (
+          filters.sortRarity === "Pearl first" ||
+          filters.sortRarity === "Legendary first" ||
+          filters.sortRarity === "Epic first" ||
+          filters.sortRarity === "Rare first"
+        ) {
           cmp = ia - ib;
         } else if (filters.sortRarity === "Common first") {
           cmp = ib - ia;

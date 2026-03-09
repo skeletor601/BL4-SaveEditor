@@ -77,6 +77,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 25,Maliwan,Sniper,59,Rarity,Legendary,Complex Root
 25,Maliwan,Sniper,61,Rarity,Legendary,Katagawa's Revenge
 25,Maliwan,Sniper,80,Rarity,Legendary,Asher's Rise
+25,Maliwan,Sniper,82,Rarity,Pearl,Conflux
 15,Order,Assault Rifle,95,Rarity,Common,
 15,Order,Assault Rifle,96,Rarity,Uncommon,
 15,Order,Assault Rifle,97,Rarity,Rare,
@@ -140,6 +141,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 11,Tediore,Shotgun,76,Rarity,Legendary,Anarchy
 11,Tediore,Shotgun,78,Rarity,Legendary,Forsaken Chaos
 11,Tediore,Shotgun,80,Rarity,Legendary,Husky Friend
+11,Tediore,Shotgun,82,Rarity,Pearl,Eigenburst
 17,Torgue,Assault Rifle,95,Rarity,Common,
 17,Torgue,Assault Rifle,96,Rarity,Uncommon,
 17,Torgue,Assault Rifle,97,Rarity,Rare,
@@ -154,6 +156,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 6,Torgue,Pistol,1,Rarity,Legendary,Roach
 6,Torgue,Pistol,53,Rarity,Legendary,Queen's Rest
 6,Torgue,Pistol,59,Rarity,Legendary,Hardpoint
+6,Torgue,Pistol,78,Rarity,Pearl,Handcannon
 12,Torgue,Shotgun,95,Rarity,Common,
 12,Torgue,Shotgun,96,Rarity,Uncommon,
 12,Torgue,Shotgun,97,Rarity,Rare,
