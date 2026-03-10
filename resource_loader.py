@@ -12,7 +12,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 import importlib.resources
-import pkg_resources
 
 def get_ui_localization_file(lang: str) -> str:
     """
