@@ -80,7 +80,11 @@ export const API_UNAVAILABLE_MSG =
   "Service unavailable. Check your connection and try again. If you self-host, ensure the API is running.";
 
 export function isLikelyUnavailable(res: Response): boolean {
-  return res.status >= 500 || res.status === 0;
+  // Treat only clear “backend is down” cases as unavailable:
+  // - status 0: network error
+  // - 502/503: upstream/proxy unavailable
+  // 500-level app errors should surface their real message instead.
+  return res.status === 0 || res.status === 502 || res.status === 503;
 }
 
 export function getApiUnavailableError(): string {
