@@ -15,6 +15,8 @@ import { itemEditRoutes } from "./routes/itemEdit.js";
 import { accessoriesRoutes } from "./routes/accessories.js";
 import { getAllParts } from "./data/parts.js";
 
+const SOCKET_ERROR_LISTENER_FLAG = Symbol("bl4_socket_error_listener_attached");
+
 const fastify = Fastify({
   logger: true,
   bodyLimit: 15 * 1024 * 1024, // 15MB so large .sav base64 payloads aren't truncated
@@ -33,18 +35,18 @@ const fastify = Fastify({
 
 await fastify.register(cors, { origin: true });
 
-// Catch socket errors on every request so writing the response after client disconnect never crashes the server
+// Attach ONE socket error handler per underlying socket to avoid MaxListenersExceededWarning.
 fastify.addHook("onRequest", async (request) => {
-  const socket = request.raw.socket;
-  if (socket) {
-    socket.on("error", (err: NodeJS.ErrnoException) => {
-      if (err.code === "EPIPE" || err.code === "ECONNRESET") {
-        request.log?.info?.({ err, code: err.code }, "Client disconnected before response");
-      } else {
-        request.log?.warn?.({ err }, "Request socket error");
-      }
-    });
-  }
+  const rawSocket = request.raw.socket as NodeJS.Socket & { [SOCKET_ERROR_LISTENER_FLAG]?: boolean };
+  if (!rawSocket || rawSocket[SOCKET_ERROR_LISTENER_FLAG]) return;
+  rawSocket[SOCKET_ERROR_LISTENER_FLAG] = true;
+  rawSocket.on("error", (err: NodeJS.ErrnoException) => {
+    if (err.code === "EPIPE" || err.code === "ECONNRESET") {
+      fastify.log.info({ err, code: err.code }, "Client disconnected before response");
+    } else {
+      fastify.log.warn({ err }, "Request socket error");
+    }
+  });
 });
 
 const STAGING_KEY = process.env.STAGING_KEY?.trim();
