@@ -666,10 +666,6 @@ export default function WeaponGenView({
     setPartSelections((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const setPartQuantity = useCallback((key: string, value: string) => {
-    setPartQuantities((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
   const handleSurpriseMe = useCallback(() => {
     if (!data?.mfgWtIdList?.length) return;
     const list = data.mfgWtIdList;
