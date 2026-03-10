@@ -3,14 +3,12 @@ import { useLocation } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
 import WeaponGenView from "@/pages/weapon-toolbox/WeaponGenView";
 import WeaponEditView from "@/pages/weapon-toolbox/WeaponEditView";
-import ItemEditView from "@/pages/weapon-toolbox/ItemEditView";
 import ClassModBuilderView from "@/pages/accessories/ClassModBuilderView";
 import EnhancementBuilderView from "@/pages/accessories/EnhancementBuilderView";
 import RepkitBuilderView from "@/pages/accessories/RepkitBuilderView";
 import GrenadeBuilderView from "@/pages/accessories/GrenadeBuilderView";
 import ShieldBuilderView from "@/pages/accessories/ShieldBuilderView";
 import HeavyBuilderView from "@/pages/accessories/HeavyBuilderView";
-import AccessoryEditView from "@/pages/accessories/AccessoryEditView";
 
 type WorkMode = "build" | "edit";
 type BuildKind =
@@ -21,7 +19,7 @@ type BuildKind =
   | "grenade"
   | "shield"
   | "heavy";
-type EditKind = "weapon" | "item" | "class-mod" | "enhancement" | "generic";
+type EditKind = "editor";
 
 interface MiniSearchItem {
   code: string;
@@ -50,18 +48,18 @@ const BUILD_OPTIONS: { value: BuildKind; label: string; hint: string }[] = [
 ];
 
 const EDIT_OPTIONS: { value: EditKind; label: string; hint: string }[] = [
-  { value: "weapon", label: "Weapon Editor", hint: "Full weapon serial editor" },
-  { value: "item", label: "Item Editor", hint: "Grenade/Shield/RepKit/Heavy editor" },
-  { value: "class-mod", label: "Class Mod Editor", hint: "Class mod decode/edit/encode" },
-  { value: "enhancement", label: "Enhancement Editor", hint: "Enhancement decode/edit/encode" },
-  { value: "generic", label: "Generic Accessory Editor", hint: "Fallback editor for custom tests" },
+  {
+    value: "editor",
+    label: "Serial Editor",
+    hint: "Decode, edit, and encode any item serial—weapons, grenades, shields, class mods, and more—in one place.",
+  },
 ];
 
 export default function SuperWorkbenchPage() {
   const location = useLocation();
   const [mode, setMode] = useState<WorkMode>("build");
   const [buildKind, setBuildKind] = useState<BuildKind>("weapon");
-  const [editKind, setEditKind] = useState<EditKind>("weapon");
+  const [editKind, setEditKind] = useState<EditKind>("editor");
   const [miniSearch, setMiniSearch] = useState("");
   const [miniResults, setMiniResults] = useState<MiniSearchItem[]>([]);
   const [miniAllItems, setMiniAllItems] = useState<MiniSearchItem[]>([]);
@@ -79,6 +77,7 @@ export default function SuperWorkbenchPage() {
   const [miniCopyModalOpen, setMiniCopyModalOpen] = useState(false);
   const [miniCopyQty, setMiniCopyQty] = useState("1");
   const [miniCopyCode, setMiniCopyCode] = useState("");
+  const [miniInsertForWeapon, setMiniInsertForWeapon] = useState<{ id: number; code: string } | null>(null);
 
   useEffect(() => {
     type GearForgeNavState = {
@@ -103,7 +102,7 @@ export default function SuperWorkbenchPage() {
     }
     if (typeof navState.pasteDecoded === "string" && navState.pasteDecoded.trim()) {
       setMode("edit");
-      setEditKind("weapon");
+      setEditKind("editor");
       setLiveDecoded(navState.pasteDecoded.trim());
       setCodecStatus("Loaded preset decoded code");
     }
@@ -140,6 +139,7 @@ export default function SuperWorkbenchPage() {
           return (
             <WeaponGenView
               suppressCodecPanels
+              externalSuperPartInsert={miniInsertForWeapon}
               onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Weapon Builder")}
             />
           );
@@ -157,61 +157,16 @@ export default function SuperWorkbenchPage() {
           return <HeavyBuilderView />;
       }
     }
-    switch (editKind) {
-      case "weapon":
-        return (
-          <WeaponEditView
-            suppressCodecPanels
-            externalBase85={liveBase85}
-            externalDecoded={liveDecoded}
-            onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Weapon Editor")}
-          />
-        );
-      case "item":
-        return (
-          <ItemEditView
-            suppressCodecPanels
-            externalBase85={liveBase85}
-            externalDecoded={liveDecoded}
-            onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Item Editor")}
-          />
-        );
-      case "class-mod":
-        return (
-          <AccessoryEditView
-            title="Class Mod"
-            description="Decode, edit, and encode class mod serials; add to backpack."
-            suppressCodecPanels
-            externalBase85={liveBase85}
-            externalDecoded={liveDecoded}
-            onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Class Mod Editor")}
-          />
-        );
-      case "enhancement":
-        return (
-          <AccessoryEditView
-            title="Enhancement"
-            description="Decode, edit, and encode enhancement serials; add to backpack."
-            suppressCodecPanels
-            externalBase85={liveBase85}
-            externalDecoded={liveDecoded}
-            onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Enhancement Editor")}
-          />
-        );
-      case "generic":
-      default:
-        return (
-          <AccessoryEditView
-            title="Accessory (Generic)"
-            description="Experimental generic editor for unknown/edge-case accessory serials."
-            suppressCodecPanels
-            externalBase85={liveBase85}
-            externalDecoded={liveDecoded}
-            onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Generic Accessory Editor")}
-          />
-        );
-    }
-  }, [mode, buildKind, editKind, handlePrimaryCodecChange]);
+    return (
+      <WeaponEditView
+        suppressCodecPanels
+        universalMode
+        externalBase85={liveBase85}
+        externalDecoded={liveDecoded}
+        onCodecChange={(payload) => handlePrimaryCodecChange(payload, "Serial Editor")}
+      />
+    );
+  }, [mode, buildKind, editKind, handlePrimaryCodecChange, miniInsertForWeapon]);
 
   useEffect(() => {
     let cancelled = false;
@@ -424,14 +379,41 @@ export default function SuperWorkbenchPage() {
       return;
     }
     const output = formatCodeByQty(miniCopyCode, qtyNum);
+    const canInjectToWeaponBuilder = mode === "build" && buildKind === "weapon";
+    const isEditMode = mode === "edit";
+    if (canInjectToWeaponBuilder) {
+      setMiniInsertForWeapon({ id: Date.now(), code: output });
+    }
+    if (isEditMode) {
+      setLiveDecoded((prev) => {
+        const trimmed = prev.trim();
+        if (!trimmed) return output;
+        const lastPipe = trimmed.lastIndexOf("|");
+        if (lastPipe === -1) return `${trimmed} ${output}`;
+        return `${trimmed.slice(0, lastPipe).trimEnd()} ${output} |${trimmed.slice(lastPipe + 1)}`;
+      });
+      setCodecStatus(`Added ${qtyNum}x part to decoded`);
+    }
     navigator.clipboard
       .writeText(output)
       .then(() => {
-        setMiniStatus(`Copied ${qtyNum}x`);
+        let status = "Copied";
+        if (canInjectToWeaponBuilder) status = "Added to Weapon Builder and copied";
+        else if (isEditMode) status = "Added to build and copied";
+        setMiniStatus(`${status} ${qtyNum}x`);
         setMiniCopyModalOpen(false);
       })
-      .catch(() => setMiniStatus("Copy failed"));
-  }, [miniCopyQty, miniCopyCode, formatCodeByQty]);
+      .catch(() => {
+        if (canInjectToWeaponBuilder) {
+          setMiniStatus(`Added to Weapon Builder (${qtyNum}x). Clipboard copy failed.`);
+        } else if (isEditMode) {
+          setMiniStatus(`Added ${qtyNum}x to build. Clipboard copy failed.`);
+        } else {
+          setMiniStatus("Copy failed");
+        }
+        setMiniCopyModalOpen(false);
+      });
+  }, [miniCopyQty, miniCopyCode, formatCodeByQty, mode, buildKind]);
 
   return (
     <div className="space-y-4">
@@ -482,7 +464,7 @@ export default function SuperWorkbenchPage() {
 
       <section className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] p-3">
         <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
-          {mode === "build" ? "Builder Selector" : "Editor Selector"}
+          {mode === "build" ? "Builder Selector" : "Editor"}
         </p>
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {(mode === "build" ? BUILD_OPTIONS : EDIT_OPTIONS).map((o) => {
@@ -563,7 +545,7 @@ export default function SuperWorkbenchPage() {
               value={miniSearch}
               onChange={(e) => setMiniSearch(e.target.value)}
               placeholder="Type here to search parts..."
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-accent)]"
             />
             <div className="flex flex-wrap gap-2">
               <button
@@ -603,7 +585,8 @@ export default function SuperWorkbenchPage() {
             <select
               value={miniManufacturer}
               onChange={(e) => setMiniManufacturer(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
+              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm focus:outline-none focus:border-[var(--color-accent)]"
+              style={{ accentColor: "var(--color-accent)" }}
               title="Manufacturer filter"
             >
               <option value="All">All manufacturers</option>

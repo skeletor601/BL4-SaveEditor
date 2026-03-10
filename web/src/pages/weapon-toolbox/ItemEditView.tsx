@@ -177,23 +177,24 @@ export default function ItemEditView({
     }
   }, [location.state]);
 
+  // Sync from parent only when external props change (not when we update locally from backpack selection).
   useEffect(() => {
-    if (typeof externalBase85 === "string" && externalBase85 !== serialInput) {
+    if (typeof externalBase85 === "string") {
       applyingExternalRef.current = true;
       setSerialInput(externalBase85);
       setEncodedSerial("");
       setSelectedItemPath(null);
     }
-  }, [externalBase85, serialInput, setSerialInput]);
+  }, [externalBase85, setSerialInput]);
 
   useEffect(() => {
-    if (typeof externalDecoded === "string" && externalDecoded !== decodedInput) {
+    if (typeof externalDecoded === "string") {
       applyingExternalRef.current = true;
       setDecodedInput(externalDecoded);
       setEncodedSerial("");
       setSelectedItemPath(null);
     }
-  }, [externalDecoded, decodedInput, setDecodedInput]);
+  }, [externalDecoded, setDecodedInput]);
 
   useEffect(() => {
     if (applyingExternalRef.current) {
@@ -212,6 +213,7 @@ export default function ItemEditView({
   const [showCleanCode, setShowCleanCode] = useState(false);
   const [skinOptions, setSkinOptions] = useState<{ label: string; value: string }[]>([]);
   const [skinComboValue, setSkinComboValue] = usePersistedState("item-edit.skinComboValue", "");
+  const lastLoadRef = useRef<{ serial: string; at: number }>({ serial: "", at: 0 });
 
   useEffect(() => {
     fetchApi("item-edit/data")
@@ -390,17 +392,52 @@ export default function ItemEditView({
     loadBackpackItems();
   }, [saveData, loadBackpackItems]);
 
-  const handleLoadItem = useCallback((item: DecodedBackpackItem) => {
-    setSerialInput(item.serial);
-    setDecodedInput(item.decodedFull);
+  const handleLoadItem = useCallback(async (item: DecodedBackpackItem) => {
+    const serial = String(item.serial ?? "").trim();
+    setSerialInput(serial);
     setEncodedSerial("");
     setSelectedItemPath(item.slot.path);
-    const typeKey = ITEM_TYPE_FROM_NAME[item.itemType ?? ""] as ItemTypeKey | undefined;
+
+    let decoded = String(item.decodedFull ?? "").trim();
+    let itemType = item.itemType ?? "";
+    if (!decoded && serial.startsWith("@U")) {
+      try {
+        const res = await fetchApi("save/decode-items", {
+          method: "POST",
+          body: JSON.stringify({ serials: [serial] }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          const first = Array.isArray(data?.items) ? data.items[0] : null;
+          if (first && !first.error) {
+            if (typeof first.decodedFull === "string") decoded = first.decodedFull.trim();
+            if (typeof first.itemType === "string") itemType = first.itemType;
+          }
+        }
+      } catch {
+        // Best effort fallback only.
+      }
+    }
+    setDecodedInput(decoded);
+    const typeKey = ITEM_TYPE_FROM_NAME[itemType] as ItemTypeKey | undefined;
     setCurrentTypeKey(typeKey ?? null);
     setMessage(
-      "Item loaded. Edit and click Update Item to save in place, or Encode then Add to Backpack for a copy.",
+      decoded
+        ? "Item loaded. Edit and click Update Item to save in place, or Encode then Add to Backpack for a copy."
+        : "Item serial loaded. Decode to inspect parts, then edit and save.",
     );
   }, []);
+
+  const handleSelectItem = useCallback(
+    (item: DecodedBackpackItem) => {
+      const serial = String(item.serial ?? "").trim();
+      const now = Date.now();
+      if (serial && lastLoadRef.current.serial === serial && now - lastLoadRef.current.at < 400) return;
+      lastLoadRef.current = { serial, at: now };
+      void handleLoadItem(item);
+    },
+    [handleLoadItem],
+  );
 
   const handleDecode = useCallback(async () => {
     const raw = serialInput.trim();
@@ -748,11 +785,11 @@ export default function ItemEditView({
         strings. Then adjust parts and update in place or add a copy to backpack.
       </p>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <button
           type="button"
           onClick={() => setShowCleanCode(true)}
-          className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px] text-sm"
+          className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px] text-sm"
           title="Combine like codes in the decoded serial (e.g. {245:1} {245:2} → {245:[1 2]})"
         >
           Clean Code
@@ -789,8 +826,9 @@ export default function ItemEditView({
                 <button
                   key={it.serial + it.slot.path.join("/")}
                   type="button"
-                  onClick={() => handleLoadItem(it)}
+                  onClick={() => handleSelectItem(it)}
                   className="block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)]"
+                  style={{ touchAction: "manipulation" }}
                 >
                   {it.itemType ?? "Item"} — Lv.{it.level ?? "?"} — {it.slot.slotKey}
                 </button>
@@ -954,12 +992,12 @@ export default function ItemEditView({
       {/* Actions: Update Item, Add to Backpack, Flag */}
       <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
         <h3 className="text-[var(--color-accent)] font-medium mb-2">Actions</h3>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
           <select
             value={flagValue}
             onChange={(e) => setFlagValue(Number(e.target.value))}
-            className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
+            className="w-full sm:w-auto px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
           >
             {FLAG_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -971,7 +1009,7 @@ export default function ItemEditView({
             type="button"
             onClick={handleUpdateItem}
             disabled={loading !== null || !selectedItemPath?.length}
-            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
           >
             {loading === "update" ? "Updating…" : "Update Item"}
           </button>
@@ -979,7 +1017,7 @@ export default function ItemEditView({
             type="button"
             onClick={handleAddToBackpack}
             disabled={loading !== null || !saveData}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
           >
             {loading === "add" ? "Adding…" : "Add to Backpack"}
           </button>
@@ -1006,8 +1044,8 @@ export default function ItemEditView({
 
       {/* Add Part modal: checkbox list + qty, same pattern as Weapon Edit */}
       {showAddPart && itemEditData && currentTypeKey && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40">
-          <div className="max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-40 p-2 sm:p-4">
+          <div className="max-h-[88vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
             <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
               <h3 className="text-[var(--color-accent)] font-medium text-sm">Add Parts</h3>
               <button
@@ -1020,11 +1058,31 @@ export default function ItemEditView({
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 text-sm space-y-1">
               {addPartSelections.map((s, idx) => (
-                <div key={idx} className="flex items-center gap-2">
+                <div
+                  key={idx}
+                  role="button"
+                  tabIndex={0}
+                  className={`flex flex-wrap items-center gap-2 rounded px-2 py-1 border cursor-pointer ${
+                    s.checked
+                      ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                      : "border-transparent hover:border-[var(--color-panel-border)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--color-text)]"
+                  }`}
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest("input")) return;
+                    handleToggleAddPartSelection(idx);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter" && e.key !== " ") return;
+                    e.preventDefault();
+                    handleToggleAddPartSelection(idx);
+                  }}
+                >
                   <input
                     type="checkbox"
                     checked={s.checked}
                     onChange={() => handleToggleAddPartSelection(idx)}
+                    className="w-4 h-4 shrink-0 cursor-pointer"
+                    style={{ accentColor: "var(--color-accent)" }}
                   />
                   <span className="flex-1 flex items-center gap-1.5">
                     <span className="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 py-0.5 rounded text-xs font-mono border border-[var(--color-panel-border)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] shrink-0">
@@ -1040,7 +1098,8 @@ export default function ItemEditView({
                       max={99}
                       value={s.qty}
                       onChange={(e) => handleAddPartQtyChange(idx, e.target.value)}
-                      className="w-16 px-1 py-0.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs"
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-16 px-1 py-0.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs focus:outline-none focus:border-[var(--color-accent)]"
                     />
                   )}
                 </div>

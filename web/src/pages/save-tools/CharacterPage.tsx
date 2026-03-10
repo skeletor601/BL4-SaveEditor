@@ -212,6 +212,8 @@ export default function CharacterPage() {
           let msg: string;
           if (res.status === 502 || res.status === 503) {
             msg = "API is starting up or busy. Wait 30 seconds and try again.";
+          } else if (res.status === 504) {
+            msg = "Request timed out. Try again.";
           } else if (isLikelyUnavailable(res)) {
             msg = getApiUnavailableError();
           } else {

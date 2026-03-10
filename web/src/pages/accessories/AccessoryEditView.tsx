@@ -234,12 +234,12 @@ export default function AccessoryEditView({
             rows={2}
             className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs font-mono"
           />
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
+          <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-2">
+            <label className="text-sm text-[var(--color-text-muted)] sm:mr-1">Flag:</label>
             <select
               value={flagValue}
               onChange={(e) => setFlagValue(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
+              className="w-full sm:w-auto px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
             >
               {FLAG_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -249,12 +249,12 @@ export default function AccessoryEditView({
               type="button"
               onClick={handleAddToBackpack}
               disabled={loading !== null || !saveData}
-              className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
             >
               {loading === "add" ? "Adding…" : "Add to Backpack"}
             </button>
             {!saveData && (
-              <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">
+              <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline w-full sm:w-auto">
                 Load a save first
               </Link>
             )}

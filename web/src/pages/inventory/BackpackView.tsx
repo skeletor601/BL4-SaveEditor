@@ -4,6 +4,11 @@ import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { getInventorySlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import {
+  type PartLookupItem,
+  collectLookupCodesFromDecoded,
+  preferItemNameFromDecoded,
+} from "@/lib/backpackNaming";
 
 export interface DecodedItem {
   name: string;
@@ -12,18 +17,6 @@ export interface DecodedItem {
   manufacturer: string;
   /** Full deserialized string (header||parts) from decoder */
   decodedFull?: string;
-}
-
-interface PartLookupItem {
-  code: string;
-  itemType: string;
-  partName: string;
-  effect?: string;
-  category?: string;
-  manufacturer?: string;
-  partType?: string;
-  weaponType?: string;
-  rarity?: string;
 }
 
 const FLAG_OPTIONS = [
@@ -59,59 +52,6 @@ interface TreeItem {
   path: string[];
 }
 
-/** Generic words we should not use as the display name (keep decoder's "Manufacturer Type" instead). */
-const GENERIC_NAME_WORDS = new Set([
-  "rarity", "common", "uncommon", "rare", "epic", "legendary",
-  "barrel", "body", "element", "firmware", "model", "skin", "part",
-]);
-
-function getPartByCodeOrPrefixed(
-  code: string,
-  itemTypeId: number | undefined,
-  partsByCode: Map<string, PartLookupItem>
-): PartLookupItem | undefined {
-  const part = partsByCode.get(code);
-  if (part) return part;
-  // Decoded string often has single-number codes {95} {2}; DB has {itemType:part} e.g. {3:2}. Resolve.
-  const single = code.match(/^\{(\d+)\}$/);
-  if (single && itemTypeId != null) {
-    const n = single[1];
-    return partsByCode.get(`{${itemTypeId}:${n}}`) ?? undefined;
-  }
-  return undefined;
-}
-
-function preferItemNameFromParts(decoded: DecodedItem | undefined, partsByCode: Map<string, PartLookupItem>): string | undefined {
-  if (!decoded?.decodedFull) return undefined;
-  const str = decoded.decodedFull;
-  // Header is "itemTypeId, 0, 1, level| ..." - first number is item type for resolving {n} -> {itemTypeId:n}
-  const headerMatch = str.match(/^(\d+),/);
-  const itemTypeId = headerMatch ? parseInt(headerMatch[1], 10) : undefined;
-
-  const rarityCandidates: string[] = [];
-  const barrelCandidates: string[] = [];
-  // Match both {x:y} and {n} (single number)
-  const re = /\{(\d+)(?::(\d+))?\}/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(str)) !== null) {
-    const code = m[2] != null ? `{${m[1]}:${m[2]}}` : `{${m[1]}}`;
-    const part = getPartByCodeOrPrefixed(code, itemTypeId, partsByCode);
-    if (!part) continue;
-    const type = (part.partType ?? "").toLowerCase();
-    const isRarity = type.includes("rarity");
-    const isBarrel = type.includes("barrel");
-    if (!isRarity && !isBarrel) continue;
-    const raw = (part.effect || "").trim();
-    if (!raw) continue;
-    const base = raw.split(",")[0]?.split(" -")[0]?.trim() ?? "";
-    if (!base || base.length < 3 || base.length > 40 || !/[a-zA-Z]/.test(base)) continue;
-    if (GENERIC_NAME_WORDS.has(base.toLowerCase())) continue;
-    if (isRarity) rarityCandidates.push(base);
-    else if (isBarrel) barrelCandidates.push(base);
-  }
-  return rarityCandidates[0] ?? barrelCandidates[0];
-}
-
 function buildTreeItems(
   slots: { backpack: ItemSlotWithPath[]; equipped: ItemSlotWithPath[]; lostLoot: ItemSlotWithPath[] },
   decodeMap: Map<string, DecodedItem>,
@@ -121,7 +61,7 @@ function buildTreeItems(
   const add = (container: ContainerKey, list: ItemSlotWithPath[]) => {
     for (const s of list) {
       const decoded = s.serial ? decodeMap.get(s.serial) : undefined;
-      const prettyName = decoded ? preferItemNameFromParts(decoded, partsByCode) : undefined;
+      const prettyName = decoded?.decodedFull ? preferItemNameFromDecoded(decoded.decodedFull, partsByCode) : undefined;
       out.push({
         container,
         slotKey: s.slotKey,
@@ -215,24 +155,10 @@ export default function BackpackView() {
   }, [serialsToDecode.join("\n")]);
 
   useEffect(() => {
-    // Collect all part codes from decoded strings: {x:y} and {n}. For single-number {n}, also request
-    // {itemTypeId:n} because the DB stores prefixed codes (e.g. {3:2}, {20:62}) and decoded often omits the prefix.
     const codes = new Set<string>();
     decodeMap.forEach((decoded) => {
       if (!decoded.decodedFull) return;
-      const str = decoded.decodedFull;
-      const headerMatch = str.match(/^(\d+),/);
-      const itemTypeId = headerMatch ? parseInt(headerMatch[1], 10) : undefined;
-      const re = /\{(\d+)(?::(\d+))?\}/g;
-      let m: RegExpExecArray | null;
-      while ((m = re.exec(str)) !== null) {
-        if (m[2] != null) {
-          codes.add(`{${m[1]}:${m[2]}}`);
-        } else {
-          codes.add(`{${m[1]}}`);
-          if (itemTypeId != null) codes.add(`{${itemTypeId}:${m[1]}}`);
-        }
-      }
+      collectLookupCodesFromDecoded(decoded.decodedFull).forEach((code) => codes.add(code));
     });
     if (codes.size === 0) {
       setPartsByCode(new Map());
@@ -438,23 +364,11 @@ export default function BackpackView() {
       setContextItem(null);
       setContextPos(null);
       const typeLabel = item.typeLabel || "";
-      if (WEAPON_TYPES.has(typeLabel)) {
+      if (WEAPON_TYPES.has(typeLabel) || ITEM_EDIT_TYPES.has(typeLabel)) {
         navigate("/gear-forge", {
           state: {
             tab: "editor",
-            editorKind: "weapon",
-            loadItem: {
-              serial: item.serial,
-              decodedFull: item.decodedFull,
-              path: item.path,
-            },
-          },
-        });
-      } else if (ITEM_EDIT_TYPES.has(typeLabel)) {
-        navigate("/gear-forge", {
-          state: {
-            tab: "editor",
-            editorKind: "item",
+            editorKind: "editor",
             loadItem: {
               serial: item.serial,
               decodedFull: item.decodedFull,
@@ -463,7 +377,7 @@ export default function BackpackView() {
           },
         });
       } else {
-        setAddMessage(`Unknown item type "${typeLabel}". Use Weapon Edit for weapons, Item Edit for Shield/Grenade/Repkit/Heavy.`);
+        setAddMessage(`Unknown item type "${typeLabel}". Open in Gear Forge > Serial Editor to edit.`);
       }
     },
     [navigate]

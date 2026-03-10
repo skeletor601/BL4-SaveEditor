@@ -18,9 +18,34 @@ import { getAllParts } from "./data/parts.js";
 const fastify = Fastify({
   logger: true,
   bodyLimit: 15 * 1024 * 1024, // 15MB so large .sav base64 payloads aren't truncated
+  keepAliveTimeout: 65_000, // 65s; helps with proxies (e.g. Render) without holding connections forever
+  requestTimeout: 100_000, // 100s so long save ops can finish; socket error handler prevents crash on client disconnect
+  // Prevent client disconnect (EPIPE/ECONNRESET) from crashing the process
+  clientErrorHandler: (err: NodeJS.ErrnoException, socket) => {
+    if (err.code === "EPIPE" || err.code === "ECONNRESET") {
+      fastify.log.info({ err, code: err.code }, "Client connection closed");
+    } else {
+      fastify.log.warn({ err }, "Client connection error");
+    }
+    if (socket && !socket.destroyed) socket.destroy();
+  },
 });
 
 await fastify.register(cors, { origin: true });
+
+// Catch socket errors on every request so writing the response after client disconnect never crashes the server
+fastify.addHook("onRequest", async (request) => {
+  const socket = request.raw.socket;
+  if (socket) {
+    socket.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EPIPE" || err.code === "ECONNRESET") {
+        request.log?.info?.({ err, code: err.code }, "Client disconnected before response");
+      } else {
+        request.log?.warn?.({ err }, "Request socket error");
+      }
+    });
+  }
+});
 
 const STAGING_KEY = process.env.STAGING_KEY?.trim();
 if (STAGING_KEY) {

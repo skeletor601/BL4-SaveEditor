@@ -30,11 +30,11 @@ function AppRoutes() {
         />
         <Route
           path="/weapon-toolbox/weapon-edit"
-          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "weapon" }} />}
+          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "editor" }} />}
         />
         <Route
           path="/weapon-toolbox/item-edit"
-          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "item" }} />}
+          element={<Navigate to="/gear-forge" replace state={{ tab: "editor", editorKind: "editor" }} />}
         />
         <Route path="/weapon-toolbox/*" element={<Navigate to="/gear-forge" replace />} />
         <Route

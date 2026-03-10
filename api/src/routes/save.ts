@@ -10,6 +10,9 @@ const DECODE_SCRIPT = join(REPO_ROOT, "scripts", "decode_serials.py");
 const SAVE_MUTATE_SCRIPT = join(REPO_ROOT, "scripts", "save_mutate.py");
 const ENCODE_SCRIPT = join(REPO_ROOT, "scripts", "encode_serial.py");
 
+/** Max time for save_mutate.py so one stuck request doesn't tie up the server (e.g. on free-tier Render). */
+const SAVE_MUTATE_TIMEOUT_MS = 90_000;
+
 type SaveMutatePayload = {
   yaml_content: string;
   action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item";
@@ -35,12 +38,40 @@ function runSaveMutate(payload: SaveMutatePayload): Promise<SaveMutateResult> {
     const input = JSON.stringify(payload);
     let stdout = "";
     let stderr = "";
+    let settled = false;
+    const finish = (result: SaveMutateResult) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      resolve(result);
+    };
+    const fail = (err: Error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      try {
+        child.kill(process.platform === "win32" ? undefined : "SIGKILL");
+      } catch {
+        /* ignore */
+      }
+      reject(err);
+    };
+    const timeoutId = setTimeout(() => {
+      fail(new Error(`save_mutate.py timed out after ${SAVE_MUTATE_TIMEOUT_MS / 1000}s`));
+    }, SAVE_MUTATE_TIMEOUT_MS);
     child.stdout.setEncoding("utf8");
-    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
     child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
-    child.on("error", (err) => reject(err));
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", (err) => fail(err));
     child.on("close", (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
       try {
         const result = JSON.parse(stdout) as SaveMutateResult;
         resolve(result);
@@ -454,6 +485,7 @@ export async function saveRoutes(
     if (!presetName) {
       return reply.code(400).send({ success: false, error: "preset_name is required" });
     }
+
     const params: Record<string, unknown> = { preset_name: presetName };
     if (classKey) params.class_key = classKey;
     try {
@@ -462,14 +494,19 @@ export async function saveRoutes(
         action: "apply_preset",
         params,
       });
+      if (reply.sent) return;
       if (!result.success) {
         return reply.code(400).send({ success: false, error: result.error ?? "Apply preset failed" });
       }
       return reply.send({ success: true, yaml_content: result.yaml_content });
     } catch (e) {
+      if (reply.sent) return;
       const message = e instanceof Error ? e.message : "Apply preset failed";
+      const isTimeout = message.includes("timed out");
       fastify.log.warn({ err: e }, "save/apply-preset failed");
-      return reply.code(500).send({ success: false, error: message });
+      return reply
+        .code(isTimeout ? 504 : 500)
+        .send({ success: false, error: isTimeout ? "Request timed out. Try again." : message });
     }
   });
 }

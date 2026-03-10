@@ -121,12 +121,14 @@ function loadWeaponEditParts(): WeaponEditPartRow[] {
         });
       }
 
-      // Also merge non-weapon DB rows so Weapon Edit can add them directly.
-      // Current requested categories: grenade + enhancement.
+      // Also merge non-weapon DB rows so the unified editor can add them directly.
       const specialTypeMap: Record<string, string> = {
         grenade: "Grenade",
         enhancement: "Enhancement",
         shield: "Shield",
+        repkit: "Repkit",
+        "class mod": "Class Mod",
+        classmod: "Class Mod",
       };
       for (const r of rowsUni) {
         const itemType = String((r as Record<string, unknown>)["Item Type"] ?? "").trim().toLowerCase();
@@ -136,7 +138,16 @@ function loadWeaponEditParts(): WeaponEditPartRow[] {
         const parsed = parseCodePair(String((r as Record<string, unknown>).code ?? ""));
         if (!parsed) continue;
 
-        const defaultPartType = mappedWeaponType === "Enhancement" ? "Enhancement Part" : "Grenade Part";
+        const defaultPartType =
+          mappedWeaponType === "Enhancement"
+            ? "Enhancement Part"
+            : mappedWeaponType === "Class Mod"
+              ? "Class Mod Part"
+              : mappedWeaponType === "Repkit"
+                ? "Repkit Part"
+                : mappedWeaponType === "Shield"
+                  ? "Shield Part"
+                  : "Grenade Part";
         const partType = String((r as Record<string, unknown>)["Part Type"] ?? "").trim() || defaultPartType;
         const manufacturer = String((r as Record<string, unknown>).Manufacturer ?? "").trim() || mappedWeaponType;
         const partIdFromRow = String((r as Record<string, unknown>).ID ?? "").trim();

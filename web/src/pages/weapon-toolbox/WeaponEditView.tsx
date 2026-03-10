@@ -2,9 +2,15 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
-import { getBackpackSlotsWithPaths, type ItemSlotWithPath } from "@/lib/inventoryData";
+import { getBackpackSlotsWithPaths, getInventorySlots, type ItemSlotWithPath } from "@/lib/inventoryData";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 import { usePersistedState } from "@/lib/usePersistedState";
+import {
+  type PartLookupItem,
+  collectLookupCodesFromDecoded,
+  preferItemNameFromDecoded,
+  toBackpackGroupLabel,
+} from "@/lib/backpackNaming";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
@@ -21,12 +27,13 @@ const FLAG_OPTIONS = [
 ];
 
 interface DecodedBackpackWeapon {
-  slot: ItemSlotWithPath;
+  slot: ItemSlotWithPath | (Omit<ItemSlotWithPath, "path"> & { path: string[] });
   serial: string;
   decodedFull: string;
   manufacturer?: string;
   itemType?: string;
   name?: string;
+  displayName?: string;
   level?: number;
 }
 
@@ -93,6 +100,7 @@ interface WeaponEditViewProps {
   onCodecChange?: (payload: { base85: string; decoded: string }) => void;
   externalBase85?: string;
   externalDecoded?: string;
+  universalMode?: boolean;
 }
 
 function parseComponentString(componentStr: string): ParsedComponent[] {
@@ -184,6 +192,7 @@ export default function WeaponEditView({
   onCodecChange,
   externalBase85,
   externalDecoded,
+  universalMode = false,
 }: WeaponEditViewProps = {}) {
   const location = useLocation();
   const { saveData, getYamlText, updateSaveData } = useSave();
@@ -214,6 +223,7 @@ export default function WeaponEditView({
   const [showCleanCode, setShowCleanCode] = useState(false);
   const [universalPartCodes, setUniversalPartCodes] = useState<UniversalDbPartCode[]>([]);
   const applyingExternalRef = useRef(false);
+  const lastLoadRef = useRef<{ serial: string; at: number }>({ serial: "", at: 0 });
 
   useEffect(() => {
     const state = location.state as { pasteDecoded?: string; loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null;
@@ -237,23 +247,24 @@ export default function WeaponEditView({
     }
   }, [location.state]);
 
+  // Sync from parent only when external props change (not when we update locally from backpack selection).
   useEffect(() => {
-    if (typeof externalBase85 === "string" && externalBase85 !== serialInput) {
+    if (typeof externalBase85 === "string") {
       applyingExternalRef.current = true;
       setSerialInput(externalBase85);
       setEncodedSerial("");
       setSelectedWeaponPath(null);
     }
-  }, [externalBase85, serialInput, setSerialInput]);
+  }, [externalBase85, setSerialInput]);
 
   useEffect(() => {
-    if (typeof externalDecoded === "string" && externalDecoded !== decodedInput) {
+    if (typeof externalDecoded === "string") {
       applyingExternalRef.current = true;
       setDecodedInput(externalDecoded);
       setEncodedSerial("");
       setSelectedWeaponPath(null);
     }
-  }, [externalDecoded, decodedInput, setDecodedInput]);
+  }, [externalDecoded, setDecodedInput]);
 
   useEffect(() => {
     if (applyingExternalRef.current) {
@@ -420,11 +431,39 @@ export default function WeaponEditView({
   const loadBackpackWeapons = useCallback(async () => {
     if (!saveData) {
       setBackpackWeapons([]);
-      setMessage("Load a save first (Character → Select Save) to list backpack weapons.");
+      setMessage(
+        universalMode
+          ? "Load a save first (Character to Select Save) to list backpack items."
+          : "Load a save first (Character to Select Save) to list backpack weapons.",
+      );
       return;
     }
-    const slots = getBackpackSlotsWithPaths(saveData);
-    const serials = slots.map((s) => s.serial).filter((s) => s?.trim().startsWith("@U"));
+    const slots = universalMode
+      ? (() => {
+          const withPaths = getBackpackSlotsWithPaths(saveData);
+          const fallback = getInventorySlots(saveData).backpack;
+          const byKey = new Map<string, ItemSlotWithPath | (Omit<ItemSlotWithPath, "path"> & { path: string[] })>();
+          withPaths.forEach((s) => {
+            byKey.set(`${s.slotKey}|${s.serial}`, s);
+          });
+          fallback.forEach((s) => {
+            const key = `${s.slotKey}|${s.serial}`;
+            if (!byKey.has(key)) {
+              byKey.set(key, { ...s, path: [] });
+            }
+          });
+          return Array.from(byKey.values());
+        })()
+      : getBackpackSlotsWithPaths(saveData);
+    const serials = slots
+      .map((s) => s.serial)
+      .filter((s) => {
+        const serial = String(s ?? "").trim();
+        if (!serial) return false;
+        // Universal preview should list every backpack serial, not only @U.
+        if (universalMode) return true;
+        return serial.startsWith("@U");
+      });
     if (serials.length === 0) {
       setBackpackWeapons([]);
       setMessage("No items in backpack.");
@@ -443,33 +482,85 @@ export default function WeaponEditView({
         setBackpackWeapons([]);
         return;
       }
-      const items = data?.items ?? [];
-      const slotBySerial = new Map(slots.map((s) => [s.serial, s]));
+      const items = Array.isArray(data?.items) ? data.items : [];
       const weapons: DecodedBackpackWeapon[] = [];
-      items.forEach((item: { serial?: string; error?: string; decodedFull?: string; itemType?: string; manufacturer?: string; name?: string; level?: number }, i: number) => {
-        if (item.error || !item.serial) return;
-        if (!WEAPON_TYPES.has(String(item.itemType ?? ""))) return;
-        const slot = slotBySerial.get(item.serial) ?? slots[i];
-        if (!slot || !("path" in slot)) return;
-        weapons.push({
-          slot: slot as ItemSlotWithPath,
-          serial: item.serial,
-          decodedFull: item.decodedFull ?? "",
-          manufacturer: item.manufacturer,
-          itemType: item.itemType,
-          name: item.name,
-          level: item.level,
+      if (universalMode) {
+        const decodedQueues = new Map<string, Array<{ serial?: string; error?: string; decodedFull?: string; itemType?: string; manufacturer?: string; name?: string; level?: number }>>();
+        items.forEach((item: { serial?: string; error?: string; decodedFull?: string; itemType?: string; manufacturer?: string; name?: string; level?: number }) => {
+          const serial = String(item?.serial ?? "");
+          if (!serial) return;
+          if (!decodedQueues.has(serial)) decodedQueues.set(serial, []);
+          decodedQueues.get(serial)!.push(item);
         });
-      });
+        // In universal mode, show every serial backpack slot even if decode metadata fails.
+        slots.forEach((slot) => {
+          const slotSerial = String(slot.serial ?? "").trim();
+          const queue = decodedQueues.get(slot.serial) ?? [];
+          const decoded = queue.length ? queue.shift() : undefined;
+          weapons.push({
+            slot,
+            serial: slotSerial,
+            decodedFull: decoded?.error ? "" : (decoded?.decodedFull ?? ""),
+            manufacturer: decoded?.manufacturer ?? "Unknown",
+            itemType: decoded?.itemType ?? "Unknown",
+            name: decoded?.name ?? (slotSerial ? "Unknown item" : "Empty slot"),
+            level: decoded?.level,
+          });
+        });
+        // Mirror BackpackView naming logic so names are meaningful in Universal Editor list.
+        const codes = new Set<string>();
+        weapons.forEach((w) => {
+          if (!w.decodedFull) return;
+          collectLookupCodesFromDecoded(w.decodedFull).forEach((code) => codes.add(code));
+        });
+        const partsByCode = new Map<string, PartLookupItem>();
+        if (codes.size > 0) {
+          try {
+            const lookupRes = await fetchApi("parts/lookup-bulk", {
+              method: "POST",
+              body: JSON.stringify({ codes: Array.from(codes) }),
+            });
+            const lookupJson = await lookupRes.json().catch(() => ({}));
+            if (lookupRes.ok && lookupJson && typeof lookupJson === "object") {
+              Object.entries(lookupJson as Record<string, PartLookupItem | null>).forEach(([code, part]) => {
+                if (part) partsByCode.set(code, part);
+              });
+            }
+          } catch {
+            // Best effort naming enrichment only.
+          }
+        }
+        weapons.forEach((w) => {
+          const preferred = w.decodedFull ? preferItemNameFromDecoded(w.decodedFull, partsByCode) : undefined;
+          w.displayName = preferred ?? w.name ?? "Unknown item";
+        });
+      } else {
+        const slotBySerial = new Map(slots.map((s) => [s.serial, s]));
+        items.forEach((item: { serial?: string; error?: string; decodedFull?: string; itemType?: string; manufacturer?: string; name?: string; level?: number }, i: number) => {
+          if (item.error || !item.serial) return;
+          if (!WEAPON_TYPES.has(String(item.itemType ?? ""))) return;
+          const slot = slotBySerial.get(item.serial) ?? slots[i];
+          if (!slot || !("path" in slot)) return;
+          weapons.push({
+            slot: slot as ItemSlotWithPath,
+            serial: item.serial,
+            decodedFull: item.decodedFull ?? "",
+            manufacturer: item.manufacturer,
+            itemType: item.itemType,
+            name: item.name,
+            level: item.level,
+          });
+        });
+      }
       setBackpackWeapons(weapons);
-      setMessage(weapons.length === 0 ? "No weapons in backpack." : null);
+      setMessage(weapons.length === 0 ? (universalMode ? "No serial items in backpack." : "No weapons in backpack.") : null);
     } catch {
       setMessage(getApiUnavailableError());
       setBackpackWeapons([]);
     } finally {
       setLoading(null);
     }
-  }, [saveData]);
+  }, [saveData, universalMode]);
 
   useEffect(() => {
     if (!saveData) {
@@ -479,13 +570,49 @@ export default function WeaponEditView({
     loadBackpackWeapons();
   }, [saveData, loadBackpackWeapons]);
 
-  const handleLoadWeapon = useCallback((w: DecodedBackpackWeapon) => {
-    setSerialInput(w.serial);
-    setDecodedInput(w.decodedFull);
+  const handleLoadWeapon = useCallback(async (w: DecodedBackpackWeapon) => {
+    const serial = String(w.serial ?? "").trim();
+    setSerialInput(serial);
     setEncodedSerial("");
-    setSelectedWeaponPath(w.slot.path);
-    setMessage("Weapon loaded. Edit and click Update Weapon to save in place, or Encode then Add to Backpack for a copy.");
+    setSelectedWeaponPath(Array.isArray(w.slot.path) && w.slot.path.length ? w.slot.path : null);
+
+    let decoded = String(w.decodedFull ?? "").trim();
+    if (!decoded && serial.startsWith("@U")) {
+      try {
+        const res = await fetchApi("save/decode-items", {
+          method: "POST",
+          body: JSON.stringify({ serials: [serial] }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          const first = Array.isArray(data?.items) ? data.items[0] : null;
+          if (first && !first.error && typeof first.decodedFull === "string") {
+            decoded = first.decodedFull.trim();
+          }
+        }
+      } catch {
+        // Best effort only; keep loaded serial even if decode fallback fails.
+      }
+    }
+
+    setDecodedInput(decoded);
+    setMessage(
+      decoded
+        ? "Item loaded. Edit and click Update Item to save in place, or Encode then Add to Backpack for a copy."
+        : "Item serial loaded. Decode to inspect parts, then edit and save.",
+    );
   }, []);
+
+  const handleSelectWeapon = useCallback(
+    (w: DecodedBackpackWeapon) => {
+      const serial = String(w.serial ?? "").trim();
+      const now = Date.now();
+      if (serial && lastLoadRef.current.serial === serial && now - lastLoadRef.current.at < 400) return;
+      lastLoadRef.current = { serial, at: now };
+      void handleLoadWeapon(w);
+    },
+    [handleLoadWeapon],
+  );
 
   const handleDecode = useCallback(async () => {
     const raw = serialInput.trim();
@@ -1426,10 +1553,23 @@ export default function WeaponEditView({
     return "";
   }, [weaponEditData, universalPartCodes.length]);
 
+  const groupedBackpackWeapons = useMemo(() => {
+    const map = new Map<string, DecodedBackpackWeapon[]>();
+    backpackWeapons.forEach((w) => {
+      const key = toBackpackGroupLabel(w.itemType);
+      const list = map.get(key) ?? [];
+      list.push(w);
+      map.set(key, list);
+    });
+    return Array.from(map.entries());
+  }, [backpackWeapons]);
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-[var(--color-text-muted)]">
-        Load a weapon from your backpack, or paste Base85/decoded strings. Edit and update in place or add a copy to backpack.
+        {universalMode
+          ? "Load any serial item from your backpack, or paste Base85/decoded strings. Edit parts in one place, update in place, or add a copy to backpack."
+          : "Load a weapon from your backpack, or paste Base85/decoded strings. Edit and update in place or add a copy to backpack."}
       </p>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -1448,7 +1588,7 @@ export default function WeaponEditView({
         <h3 className="text-[var(--color-accent)] font-medium mb-2">Load from backpack</h3>
         {!saveData ? (
           <p className="text-sm text-[var(--color-text-muted)]">
-            <Link to="/character/select-save" className="text-[var(--color-accent)] hover:underline">Load a save</Link> to list weapons.
+            <Link to="/character/select-save" className="text-[var(--color-accent)] hover:underline">Load a save</Link> {universalMode ? "to list items." : "to list weapons."}
           </p>
         ) : (
           <>
@@ -1462,18 +1602,42 @@ export default function WeaponEditView({
             </button>
             <div className="max-h-48 overflow-y-auto space-y-1">
               {backpackWeapons.length === 0 && loading !== "backpack" && (
-                <p className="text-sm text-[var(--color-text-muted)]">No weapons in backpack.</p>
+                <p className="text-sm text-[var(--color-text-muted)]">{universalMode ? "No serial items in backpack." : "No weapons in backpack."}</p>
               )}
-              {backpackWeapons.map((w) => (
-                <button
-                  key={w.serial + w.slot.path.join("/")}
-                  type="button"
-                  onClick={() => handleLoadWeapon(w)}
-                  className="block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)]"
-                >
-                  {w.manufacturer ?? "?"} {w.itemType ?? "Weapon"} — Lv.{w.level ?? "?"} — {w.slot.slotKey}
-                </button>
-              ))}
+              {universalMode ? (
+                groupedBackpackWeapons.map(([typeLabel, rows]) => (
+                  <div key={typeLabel} className="space-y-1">
+                    <p className="text-xs text-[var(--color-text-muted)] px-1">{typeLabel}</p>
+                    {rows.map((w) => (
+                      <button
+                        key={`${typeLabel}|${w.slot.slotKey}|${w.serial}|${w.slot.path.join("/")}`}
+                        type="button"
+                        onClick={() => handleSelectWeapon(w)}
+                        disabled={!w.serial}
+                        className="block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 min-h-[44px] touch-manipulation"
+                        style={{ touchAction: "manipulation" }}
+                      >
+                        {(w.displayName ?? w.name ?? "Unknown item")} level {w.level ?? "?"} slot {w.slot.slotKey}
+                        {!w.serial ? " — (no serial detected)" : ""}
+                      </button>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                backpackWeapons.map((w) => (
+                    <button
+                      key={`${w.slot.slotKey}|${w.serial}|${w.slot.path.join("/")}`}
+                      type="button"
+                      onClick={() => handleSelectWeapon(w)}
+                      disabled={!w.serial}
+                      className="block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 min-h-[44px] touch-manipulation"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                    {(w.itemType ?? "Item")} — {(w.displayName ?? w.name ?? "Unknown item")} — Lv.{w.level ?? "?"} — {w.slot.slotKey}
+                    {!w.serial ? " — (no serial detected)" : ""}
+                  </button>
+                ))
+              )}
             </div>
           </>
         )}
@@ -1528,97 +1692,99 @@ export default function WeaponEditView({
       {parsedComponents.length > 0 && weaponEditData && currentMfgWtId != null && (
         <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[var(--color-accent)] font-medium">Weapon Parts</h3>
+            <h3 className="text-[var(--color-accent)] font-medium">{universalMode ? "Item Parts" : "Weapon Parts"}</h3>
             <button
               type="button"
               onClick={handleOpenAddPart}
-              className="px-3 py-1 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] text-sm min-h-[32px]"
+              className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] text-sm min-h-[44px] touch-manipulation"
             >
               + Add Part
             </button>
           </div>
-          <div className="max-h-72 overflow-y-auto text-sm">
-            {parsedComponents
-              .map((p, idx) => ({ p, idx }))
-              .filter(({ p }) => typeof p !== "string")
-              .map(({ p, idx }) => {
-                if (typeof p === "string") return null;
-                let idLabel = "";
-                let typeLabel = "";
-                let textLabel = "";
-                let statLabel = "";
-                if (p.type === "skin") {
-                  idLabel = String(p.id);
-                  typeLabel = "Skin";
-                } else if (p.type === "elemental") {
-                  idLabel = `${p.id}:${p.subId}`;
-                  typeLabel = "Elemental";
-                  const found = weaponEditData.elemental.find((e) => Number(e.partId) === p.subId);
-                  const elemCode = `{1:${p.subId}}`;
-                  const elemFallback = universalFallback[elemCode];
-                  if (found) textLabel = found.stat;
-                  else if (elemFallback) {
-                    textLabel = elemFallback.string;
-                    statLabel = elemFallback.stat;
+          <div className="max-h-72 overflow-auto text-sm">
+            <div className="min-w-0 overflow-x-auto">
+              {parsedComponents
+                .map((p, idx) => ({ p, idx }))
+                .filter(({ p }) => typeof p !== "string")
+                .map(({ p, idx }) => {
+                  if (typeof p === "string") return null;
+                  let idLabel = "";
+                  let typeLabel = "";
+                  let textLabel = "";
+                  let statLabel = "";
+                  if (p.type === "skin") {
+                    idLabel = String(p.id);
+                    typeLabel = "Skin";
+                  } else if (p.type === "elemental") {
+                    idLabel = `${p.id}:${p.subId}`;
+                    typeLabel = "Elemental";
+                    const found = weaponEditData.elemental.find((e) => Number(e.partId) === p.subId);
+                    const elemCode = `{1:${p.subId}}`;
+                    const elemFallback = universalFallback[elemCode];
+                    if (found) textLabel = found.stat;
+                    else if (elemFallback) {
+                      textLabel = elemFallback.string;
+                      statLabel = elemFallback.stat;
+                    }
+                  } else if (p.type === "simple" || p.type === "part") {
+                    const mfgId = p.type === "part" ? p.mfgId : currentMfgWtId;
+                    const row = weaponEditData.parts.find(
+                      (r) => Number(r.mfgWtId) === mfgId && Number(r.partId) === p.id,
+                    );
+                    idLabel = String(p.id);
+                    const partCode = mfgId != null ? `{${mfgId}:${p.id}}` : "";
+                    const partFallback = partCode ? universalFallback[partCode] : undefined;
+                    typeLabel = row?.partType ?? partFallback?.partType ?? "";
+                    textLabel = row?.string ?? partFallback?.string ?? "";
+                    statLabel = row?.stat ?? partFallback?.stat ?? "";
+                  } else if (p.type === "group") {
+                    idLabel = String(p.id);
+                    typeLabel = "Group";
+                    textLabel = p.subIds.join(", ");
                   }
-                } else if (p.type === "simple" || p.type === "part") {
-                  const mfgId = p.type === "part" ? p.mfgId : currentMfgWtId;
-                  const row = weaponEditData.parts.find(
-                    (r) => Number(r.mfgWtId) === mfgId && Number(r.partId) === p.id,
+                  return (
+                    <div
+                      key={`${idx}-${idLabel}-${typeLabel}`}
+                      className="grid grid-cols-[auto_auto_1fr_auto] sm:grid-cols-[auto_auto_1fr_auto_auto] gap-2 items-center py-2 sm:py-1 border-b border-[rgba(255,255,255,0.03)] min-w-[280px]"
+                    >
+                      <span className="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 py-0.5 rounded text-xs font-mono border border-[var(--color-panel-border)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] shrink-0">
+                        {idLabel}
+                      </span>
+                      <span className="text-xs text-[var(--color-text-muted)] truncate">{typeLabel}</span>
+                      <span className="truncate min-w-0" title={textLabel || statLabel}>{textLabel}</span>
+                      <span className="text-xs text-[var(--color-text-muted)] truncate hidden sm:inline">
+                        {statLabel}
+                      </span>
+                      <span className="flex gap-1 justify-end shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleMovePart(idx, -1)}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-sm border border-[var(--color-panel-border)] touch-manipulation"
+                          title="Move up"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleMovePart(idx, 1)}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-sm border border-[var(--color-panel-border)] touch-manipulation"
+                          title="Move down"
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePart(idx)}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[firebrick] text-white text-sm border border-[firebrick] touch-manipulation"
+                          title="Delete part"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    </div>
                   );
-                  idLabel = String(p.id);
-                  const partCode = mfgId != null ? `{${mfgId}:${p.id}}` : "";
-                  const partFallback = partCode ? universalFallback[partCode] : undefined;
-                  typeLabel = row?.partType ?? partFallback?.partType ?? "";
-                  textLabel = row?.string ?? partFallback?.string ?? "";
-                  statLabel = row?.stat ?? partFallback?.stat ?? "";
-                } else if (p.type === "group") {
-                  idLabel = String(p.id);
-                  typeLabel = "Group";
-                  textLabel = p.subIds.join(", ");
-                }
-                return (
-                  <div
-                    key={`${idx}-${idLabel}-${typeLabel}`}
-                    className="grid grid-cols-[auto,auto,1fr,auto,auto] gap-2 items-center py-1 border-b border-[rgba(255,255,255,0.03)]"
-                  >
-                    <span className="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 py-0.5 rounded text-xs font-mono border border-[var(--color-panel-border)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] shrink-0">
-                      {idLabel}
-                    </span>
-                    <span className="text-xs text-[var(--color-text-muted)]">{typeLabel}</span>
-                    <span className="truncate">{textLabel}</span>
-                    <span className="text-xs text-[var(--color-text-muted)] ml-2">
-                      {statLabel}
-                    </span>
-                    <span className="flex gap-1 justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleMovePart(idx, -1)}
-                        className="px-1.5 py-0.5 rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-xs border border-[var(--color-panel-border)]"
-                        title="Move up"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleMovePart(idx, 1)}
-                        className="px-1.5 py-0.5 rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-xs border border-[var(--color-panel-border)]"
-                        title="Move down"
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeletePart(idx)}
-                        className="px-1.5 py-0.5 rounded bg-[firebrick] text-white text-xs border border-[firebrick]"
-                        title="Delete part"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  </div>
-                );
-              })}
+                })}
+            </div>
           </div>
         </div>
       )}
@@ -1644,7 +1810,7 @@ export default function WeaponEditView({
               onClick={handleSkinAddToGun}
               className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px]"
             >
-              Add to Gun
+              {universalMode ? "Add to Item" : "Add to Gun"}
             </button>
           </div>
           {skinComboValue && (
@@ -1661,8 +1827,8 @@ export default function WeaponEditView({
       {/* Actions: Update Weapon, Add to Backpack, Flag */}
       <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
         <h3 className="text-[var(--color-accent)] font-medium mb-2">Actions</h3>
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="text-sm text-[var(--color-text-muted)]">New Weapon Level:</label>
+        <div className="flex flex-wrap items-center gap-2 gap-y-3">
+          <label className="text-sm text-[var(--color-text-muted)] w-full sm:w-auto">New Weapon Level:</label>
           <input
             type="number"
             min={1}
@@ -1697,16 +1863,16 @@ export default function WeaponEditView({
             type="button"
             onClick={handleUpdateWeapon}
             disabled={loading !== null || !selectedWeaponPath?.length}
-            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-            title={selectedWeaponPath ? "Save changes to the weapon loaded from backpack" : "Load a weapon from backpack first"}
+            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px] touch-manipulation"
+            title={selectedWeaponPath ? (universalMode ? "Save changes to the item loaded from backpack" : "Save changes to the weapon loaded from backpack") : (universalMode ? "Load an item from backpack first" : "Load a weapon from backpack first")}
           >
-            {loading === "update" ? "Updating…" : "Update Weapon"}
+            {loading === "update" ? "Updating…" : (universalMode ? "Update Item" : "Update Weapon")}
           </button>
           <button
             type="button"
             onClick={handleAddToBackpack}
             disabled={loading !== null || !saveData}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
+            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px] touch-manipulation"
           >
             {loading === "add" ? "Adding…" : "Add to Backpack"}
           </button>
@@ -1714,10 +1880,10 @@ export default function WeaponEditView({
             type="button"
             onClick={handleRandomModdedWeapon}
             disabled={loading !== null}
-            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
-            title={randomModReadyReason || "Generate a brand-new modded weapon with a fresh header and legendary-first part stack"}
+            className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px] touch-manipulation"
+            title={randomModReadyReason || (universalMode ? "Generate a brand-new modded item with a fresh header and legendary-first part stack" : "Generate a brand-new modded weapon with a fresh header and legendary-first part stack")}
           >
-            Generate New Modded Weapon
+            {universalMode ? "Generate New Modded Item" : "Generate New Modded Weapon"}
           </button>
           {!saveData && (
             <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">
@@ -1740,34 +1906,34 @@ export default function WeaponEditView({
 
       {/* Add Part dialog (simple inline modal) */}
       {showAddPart && weaponEditData && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-40">
-          <div className="max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
-            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-40 p-2 sm:p-4">
+          <div className="max-h-[85dvh] sm:max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
+            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
               <h3 className="text-[var(--color-accent)] font-medium text-sm">Add Parts</h3>
               <button
                 type="button"
                 onClick={() => setShowAddPart(false)}
-                className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm touch-manipulation"
               >
                 Close
               </button>
             </div>
-            <div className="flex-1 px-4 py-3 text-sm flex gap-4 overflow-hidden">
-              {/* Left: weapon type + manufacturer filters */}
-              <div className="w-56 flex-shrink-0 flex flex-col gap-3 overflow-y-auto pr-2 border-r border-[var(--color-panel-border)]">
+            <div className="flex-1 flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 py-3 text-sm overflow-hidden min-h-0">
+              {/* Left: weapon type + manufacturer filters (stack on mobile) */}
+              <div className="w-full sm:w-56 flex-shrink-0 flex flex-col gap-3 overflow-y-auto sm:pr-2 sm:border-r border-[var(--color-panel-border)]">
                 <div>
                   <div className="text-xs text-[var(--color-text-muted)] mb-1">Weapon Type</div>
-                  <div className="space-y-1">
+                  <div className="flex flex-wrap gap-1 sm:flex-col sm:flex-nowrap sm:space-y-1">
                     <button
                       type="button"
                       onClick={() => {
                         setSelectedWeaponTypeFilter("Elemental");
                         setSelectedManufacturerFilter(null);
                       }}
-                      className={`w-full text-left px-2 py-1 rounded text-xs ${
+                      className={`min-h-[44px] px-3 py-2 rounded text-sm touch-manipulation ${
                         selectedWeaponTypeFilter === "Elemental"
                           ? "bg-[var(--color-accent)] text-black"
-                          : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
+                          : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] border border-[var(--color-panel-border)]"
                       }`}
                     >
                       Elemental
@@ -1784,10 +1950,10 @@ export default function WeaponEditView({
                           setSelectedWeaponTypeFilter(wt);
                           setSelectedManufacturerFilter(null);
                         }}
-                        className={`w-full text-left px-2 py-1 rounded text-xs ${
+                        className={`min-h-[44px] px-3 py-2 rounded text-sm touch-manipulation ${
                           selectedWeaponTypeFilter === wt
                             ? "bg-[var(--color-accent)] text-black"
-                            : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
+                            : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] border border-[var(--color-panel-border)]"
                         }`}
                       >
                         {wt}
@@ -1801,7 +1967,7 @@ export default function WeaponEditView({
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">
                       Manufacturer
                     </div>
-                    <div className="space-y-1">
+                    <div className="flex flex-wrap gap-1 sm:flex-col sm:flex-nowrap sm:space-y-1">
                       {Array.from(
                         new Set(
                           weaponEditData.parts
@@ -1814,10 +1980,10 @@ export default function WeaponEditView({
                           key={mfg}
                           type="button"
                           onClick={() => setSelectedManufacturerFilter(mfg)}
-                          className={`w-full text-left px-2 py-1 rounded text-xs ${
+                          className={`min-h-[44px] px-3 py-2 rounded text-sm touch-manipulation ${
                             selectedManufacturerFilter === mfg
                               ? "bg-[var(--color-accent)] text-black"
-                              : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
+                              : "bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] border border-[var(--color-panel-border)]"
                           }`}
                         >
                           {mfg}
@@ -1829,7 +1995,7 @@ export default function WeaponEditView({
               </div>
 
               {/* Right: parts list for current filters */}
-              <div className="flex-1 overflow-y-auto space-y-1 pl-1">
+              <div className="flex-1 overflow-y-auto space-y-1 min-h-0 sm:pl-1">
                 {addPartSelections
                   .map((s, idx) => ({ s, idx }))
                   .filter(({ s }) => {
@@ -1844,11 +2010,31 @@ export default function WeaponEditView({
                     return true;
                   })
                   .map(({ s, idx }) => (
-                    <div key={idx} className="flex items-center gap-2">
+                    <div
+                      key={idx}
+                      role="button"
+                      tabIndex={0}
+                      className={`flex items-center gap-2 rounded px-3 py-2 min-h-[44px] cursor-pointer border touch-manipulation ${
+                        s.checked
+                          ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                          : "border-transparent hover:border-[var(--color-panel-border)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--color-text)]"
+                      }`}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest("input")) return;
+                        handleToggleSelection(idx);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter" && e.key !== " ") return;
+                        e.preventDefault();
+                        handleToggleSelection(idx);
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={s.checked}
                         onChange={() => handleToggleSelection(idx)}
+                        className="w-4 h-4 shrink-0 cursor-pointer"
+                        style={{ accentColor: "var(--color-accent)" }}
                       />
                       <span className="flex-1">{s.label}</span>
                       {s.checked && (
@@ -1858,25 +2044,26 @@ export default function WeaponEditView({
                           max={99}
                           value={s.qty}
                           onChange={(e) => handleQtyChange(idx, e.target.value)}
-                          className="w-16 px-1 py-0.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs"
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-16 px-1 py-0.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs focus:outline-none focus:border-[var(--color-accent)]"
                         />
                       )}
                     </div>
                   ))}
               </div>
             </div>
-            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex justify-end gap-2">
+            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex flex-wrap justify-end gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setShowAddPart(false)}
-                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[40px] text-sm"
+                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px] text-sm touch-manipulation"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmAddParts}
-                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[40px] text-sm"
+                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[44px] text-sm touch-manipulation"
               >
                 Confirm Add
               </button>
