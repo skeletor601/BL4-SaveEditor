@@ -739,8 +739,6 @@ export default function UnifiedItemBuilderPage() {
   const [category, setCategory] = useState<ItemCategory>("weapon");
   const [level, setLevel] = useState(50);
   const [seed, setSeed] = useState(1);
-  const [firmwareLock, setFirmwareLock] = useState(false);
-  const [buybackFlag, setBuybackFlag] = useState(false);
   const [liveBase85, setLiveBase85] = useState("");
   const [liveDecoded, setLiveDecoded] = useState("");
   const [lastEditedCodecSide, setLastEditedCodecSide] = useState<"base85" | "decoded" | null>(null);
@@ -2635,7 +2633,8 @@ export default function UnifiedItemBuilderPage() {
                 const elementOptions = grenadeData.element.map((e) => ({ partId: String(e.partId), label: `${e.partId} - ${e.stat}` }));
                 const firmwareOptions = grenadeData.firmware.map((f) => ({ partId: String(f.partId), label: `${f.partId} - ${f.stat}` }));
                 const mfgPerksList = grenadeData.mfgPerks[grenadeMfgId] ?? [];
-                return GRENADE_PART_ORDER.flatMap(({ key: partType, slots }) => {
+                return GRENADE_PART_ORDER.flatMap(({ key, slots }) => {
+                  const partType = key as string;
                   let opts: { partId: string; label: string; value?: string }[];
                   if (partType === "Rarity") {
                     opts = rarities.map((r) => ({ partId: String(r.id), label: r.label, value: r.label }));
@@ -2745,8 +2744,6 @@ export default function UnifiedItemBuilderPage() {
                   } else {
                     return [];
                   }
-                  if (partType === "Legendary") return [];
-                  if (partType === "Universal Perk") return [];
                   return Array.from({ length: slots }, (_, i) => {
                     const key = slots > 1 ? `${partType}_${i}` : partType;
                     const value = grenadeSlotSelections[key] ?? NONE;
@@ -3345,7 +3342,8 @@ export default function UnifiedItemBuilderPage() {
                 const elementOptions = shieldData.element.map((e) => ({ partId: String(e.partId), label: `${e.partId} - ${e.stat}` }));
                 const firmwareOptions = shieldData.firmware.map((f) => ({ partId: String(f.partId), label: `${f.partId} - ${f.stat}` }));
                 const shieldType = shieldData.mfgTypeById[shieldMfgId] ?? "Energy";
-                return SHIELD_PART_ORDER.flatMap(({ key: partType }) => {
+                return SHIELD_PART_ORDER.flatMap(({ key }) => {
+                  const partType = key as string;
                   if (partType === "Universal perks") {
                     return [(
                       <div key="Shield Universal" className="space-y-1 sm:col-span-2 lg:col-span-3">
