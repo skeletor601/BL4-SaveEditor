@@ -55,6 +55,100 @@ const EDIT_OPTIONS: { value: EditKind; label: string; hint: string }[] = [
   },
 ];
 
+function GearForgeIcon({ kind }: { kind: BuildKind | EditKind }) {
+  const base = "w-7 h-7 text-[var(--color-accent)]";
+  switch (kind) {
+    case "weapon":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="34" y="54" width="52" height="22" rx="4" />
+            <rect x="76" y="48" width="20" height="14" rx="2" />
+            <path d="M50 76 L46 96" />
+            <path d="M70 76 L74 96" />
+          </g>
+        </svg>
+      );
+    case "class-mod":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="30" y="32" width="68" height="64" rx="10" />
+            <path d="M42 50 H86" />
+            <path d="M42 64 H76" />
+            <circle cx="52" cy="82" r="4" />
+            <circle cx="72" cy="82" r="4" />
+          </g>
+        </svg>
+      );
+    case "enhancement":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="28" y="36" width="44" height="56" rx="8" />
+            <rect x="56" y="44" width="44" height="48" rx="8" />
+            <path d="M40 52 H60" />
+            <path d="M40 66 H56" />
+            <path d="M68 58 H92" />
+          </g>
+        </svg>
+      );
+    case "repkit":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="30" y="42" width="68" height="44" rx="10" />
+            <path d="M46 42 L46 32 H82 V42" />
+            <path d="M60 58 H68" />
+            <path d="M64 54 V62" />
+          </g>
+        </svg>
+      );
+    case "grenade":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="50" y="30" width="28" height="18" rx="4" />
+            <rect x="44" y="46" width="40" height="46" rx="16" />
+            <path d="M50 46 L42 38" />
+            <path d="M78 46 L86 38" />
+          </g>
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M64 22 L94 34 V64 C94 80 82 96 64 104 C46 96 34 80 34 64 V34 Z" />
+          </g>
+        </svg>
+      );
+    case "heavy":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="32" y="54" width="64" height="24" rx="4" />
+            <rect x="80" y="46" width="22" height="16" rx="2" />
+            <path d="M40 78 L40 96" />
+            <path d="M56 78 L56 100" />
+            <path d="M72 78 L72 96" />
+          </g>
+        </svg>
+      );
+    case "editor":
+      return (
+        <svg className={base} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="28" y="28" width="72" height="72" rx="10" />
+            <path d="M40 46 H88" />
+            <path d="M40 62 H72" />
+            <path d="M40 78 H64" />
+          </g>
+        </svg>
+      );
+  }
+}
+
 export default function SuperWorkbenchPage() {
   const location = useLocation();
   const [mode, setMode] = useState<WorkMode>("build");
@@ -478,14 +572,19 @@ export default function SuperWorkbenchPage() {
                     ? setBuildKind(o.value as BuildKind)
                     : setEditKind(o.value as EditKind)
                 }
-                className={`text-left rounded-lg border px-3 py-2 min-h-[56px] ${
+                className={`text-left rounded-lg border px-3 py-2 min-h-[64px] flex gap-3 items-center ${
                   selected
-                    ? "border-[var(--color-accent)] bg-[rgba(24,28,34,0.95)] text-[var(--color-accent)]"
+                    ? "border-[var(--color-accent)] bg-[rgba(24,28,34,0.95)] text-[var(--color-accent)] shadow-[0_8px_22px_rgba(0,0,0,0.45)]"
                     : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:bg-[rgba(24,28,34,0.8)]"
                 }`}
               >
-                <div className="font-medium text-sm">{o.label}</div>
-                <div className="text-xs opacity-85">{o.hint}</div>
+                <div className="shrink-0">
+                  {mode === "build" ? <GearForgeIcon kind={o.value as BuildKind} /> : <GearForgeIcon kind="editor" />}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-medium text-sm truncate">{o.label}</div>
+                  <div className="text-xs opacity-85 truncate">{o.hint}</div>
+                </div>
               </button>
             );
           })}

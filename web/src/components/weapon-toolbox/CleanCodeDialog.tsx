@@ -5,12 +5,14 @@ interface CleanCodeDialogProps {
   initialDecoded: string;
   initialBase85?: string;
   onClose: () => void;
+  confirmPrompt?: string;
 }
 
 export default function CleanCodeDialog({
   initialDecoded,
   initialBase85 = "",
   onClose,
+  confirmPrompt = "Are you sure? Click again to clean",
 }: CleanCodeDialogProps) {
   const [decodedInput, setDecodedInput] = useState(initialDecoded);
   const [base85Input, setBase85Input] = useState(initialBase85);
@@ -91,7 +93,7 @@ export default function CleanCodeDialog({
             onClick={handleClean}
             className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[40px] text-sm"
           >
-            {confirmOpen ? "Are you sure? Click again to clean" : "Clean Code"}
+            {confirmOpen ? confirmPrompt : "Clean Code"}
           </button>
           {confirmOpen && (
             <button

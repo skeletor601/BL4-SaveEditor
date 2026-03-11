@@ -14,6 +14,9 @@ Then open Master Search (Scarlett) — it loads db/universal_parts_db.json
 (and falls back to community_parts_db.json if universal is missing).
 
 Column mapping (incoming -> universal):
+  Code, code -> code (use as-is when value is like {1:55} or {13:90})
+  name -> String; rarity -> canonicalRarity; weapon_type -> Weapon Type
+  element -> Elemental; part_type -> Part Type; description -> Stats (Level 50, Common)
   Part ID, Part_ID -> ID
   Part Type, Part_type -> Part Type
   Stat, Stats -> Stats (Level 50, Common)

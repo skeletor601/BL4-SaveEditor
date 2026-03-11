@@ -8,6 +8,7 @@ const nav = [
   { to: "/inventory", label: "Inventory" },
   { to: "/gear-forge", label: "Gear Forge" },
   { to: "/master-search", label: "Master Search" },
+  { to: "/beta", label: "Beta" },
   { to: "/settings", label: "Settings" },
 ];
 

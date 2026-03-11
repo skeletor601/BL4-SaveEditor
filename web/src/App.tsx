@@ -9,13 +9,16 @@ import CharacterSectionPage from "@/pages/CharacterSectionPage";
 import InventoryPage from "@/pages/InventoryPage";
 import SettingsPage from "@/pages/SettingsPage";
 import SuperWorkbenchPage from "@/pages/SuperWorkbenchPage";
+import BetaPage from "@/pages/BetaPage";
+import UnifiedItemBuilderPage from "@/pages/beta/UnifiedItemBuilderPage";
 
 function AppRoutes() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/beta" element={<Dashboard />} />
+        <Route path="/beta" element={<BetaPage />} />
+        <Route path="/beta/unified-item-builder" element={<UnifiedItemBuilderPage />} />
         <Route path="/character" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/character/*" element={<CharacterSectionPage />} />
         <Route path="/inventory/*" element={<InventoryPage />} />

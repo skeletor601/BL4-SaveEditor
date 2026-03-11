@@ -147,9 +147,19 @@ def _is_legendary_by_name(row: Dict[str, str]) -> bool:
                     return True
     return False
 
+# Regex for BL modding code already present in source (e.g. {1:55}, {13:90})
+_CODE_PATTERN = re.compile(r"^\s*\{\s*\d+\s*:\s*\d+\s*\}\s*$")
+
 # Map alternate column names into our schema
 COLUMN_ALIASES: Dict[str, str] = {
     "Code": "code",
+    "code": "code",  # preserve when already in {n:m} form
+    "name": "String",
+    "rarity": "canonicalRarity",
+    "weapon_type": "Weapon Type",
+    "element": "Elemental",
+    "part_type": "Part Type",
+    "description": "Stats (Level 50, Common)",
     "Part_ID": "ID",
     "Part ID": "ID",
     "Part_type": "Part Type",
@@ -281,7 +291,11 @@ def _normalize_row(raw: Dict[str, Any], source_name: str) -> Dict[str, str]:
     """Convert a raw row into a row with UNIVERSAL_COLUMNS. Adds 'code' from Type ID + ID (or similar)."""
     out: Dict[str, str] = {c: "" for c in UNIVERSAL_COLUMNS}
     out["source"] = source_name
-    out["code"] = _build_code(raw)
+    existing_code = _safe_str(raw.get("code", "") or raw.get("Code", ""))
+    if existing_code and _CODE_PATTERN.match(existing_code):
+        out["code"] = existing_code
+    else:
+        out["code"] = _build_code(raw)
 
     for key, value in raw.items():
         if value is None or (isinstance(value, str) and not value.strip()):

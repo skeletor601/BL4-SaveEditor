@@ -262,6 +262,12 @@ export default function WeaponGenView({
   const [showSuperAddParts, setShowSuperAddParts] = useState(false);
   const [pendingQtyPart, setPendingQtyPart] = useState<{ key: string; value: string; label: string; previousValue: string } | null>(null);
   const [pendingQtyInput, setPendingQtyInput] = useState("1");
+  const [dragPartsMeta, setDragPartsMeta] = useState<{
+    header: string;
+    suffix: string;
+    parts: string[];
+  } | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const mfgWtId =
     data?.mfgWtIdList.find(
@@ -515,6 +521,48 @@ export default function WeaponGenView({
       }
     },
     []
+  );
+
+  // Keep a parsed view of the decoded string so we can reorder {xx}, {xx:yy}, {xx:[...]} blocks.
+  useEffect(() => {
+    const text = decodedDisplay;
+    const trimmed = text.trim();
+    if (!trimmed) {
+      setDragPartsMeta(null);
+      return;
+    }
+    const headerMatch = trimmed.match(/^(.*\|\|)/);
+    if (!headerMatch) {
+      setDragPartsMeta(null);
+      return;
+    }
+    const header = headerMatch[1].trimEnd();
+    const rest = trimmed.slice(headerMatch[1].length);
+    const lastBrace = rest.lastIndexOf("}");
+    if (lastBrace === -1) {
+      setDragPartsMeta(null);
+      return;
+    }
+    const partsSection = rest.slice(0, lastBrace + 1);
+    const suffix = rest.slice(lastBrace + 1);
+    const partMatches = Array.from(partsSection.matchAll(/\{[^}]+\}/g)).map((m) => m[0]);
+    if (partMatches.length <= 1) {
+      setDragPartsMeta(null);
+      return;
+    }
+    setDragPartsMeta({ header, suffix, parts: partMatches });
+  }, [decodedDisplay]);
+
+  const applyReorderedParts = useCallback(
+    (nextParts: string[]) => {
+      if (!dragPartsMeta) return;
+      const rebuilt = `${dragPartsMeta.header} ${nextParts.join(" ")}${dragPartsMeta.suffix}`;
+      setDragPartsMeta({ ...dragPartsMeta, parts: nextParts });
+      setDecodedDisplay(rebuilt);
+      // Also re-encode so Base85 and downstream flows stay in sync.
+      encodeAndSet(rebuilt);
+    },
+    [dragPartsMeta, encodeAndSet]
   );
 
   useEffect(() => {
@@ -939,26 +987,73 @@ export default function WeaponGenView({
   return (
     <div className="space-y-4">
       {!suppressCodecPanels && (
-        <div className={`${blockClass} grid gap-4 md:grid-cols-2`}>
-          <div>
-            <h3 className={labelClass}>Deserialized</h3>
-            <textarea
-              readOnly
-              value={decodedDisplay}
-              rows={4}
-              className={`${inputClass} font-mono text-xs resize-y`}
-            />
+        <>
+          <div className={`${blockClass} grid gap-4 md:grid-cols-2`}>
+            <div>
+              <h3 className={labelClass}>Deserialized</h3>
+              <textarea
+                readOnly
+                value={decodedDisplay}
+                rows={4}
+                className={`${inputClass} font-mono text-xs resize-y`}
+              />
+            </div>
+            <div>
+              <h3 className={labelClass}>Base85</h3>
+              <textarea
+                readOnly
+                value={encodedSerial}
+                rows={4}
+                className={`${inputClass} font-mono text-xs resize-y`}
+              />
+            </div>
           </div>
-          <div>
-            <h3 className={labelClass}>Base85</h3>
-            <textarea
-              readOnly
-              value={encodedSerial}
-              rows={4}
-              className={`${inputClass} font-mono text-xs resize-y`}
-            />
-          </div>
-        </div>
+          {dragPartsMeta && dragPartsMeta.parts.length > 1 && (
+            <div className={blockClass}>
+              <p className="text-xs text-[var(--color-text-muted)] mb-2">
+                Part order (drag blocks to rearrange). This updates the deserialized string and Base85 above.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {dragPartsMeta.parts.map((token, idx) => (
+                  <button
+                    key={`${token}-${idx}`}
+                    type="button"
+                    draggable
+                    onDragStart={(e) => {
+                      setDragIndex(idx);
+                      try {
+                        e.dataTransfer?.setData("text/plain", String(idx));
+                        e.dataTransfer!.effectAllowed = "move";
+                      } catch {
+                        // ignore
+                      }
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const from =
+                        dragIndex ?? Number(e.dataTransfer?.getData("text/plain") ?? "-1");
+                      const to = idx;
+                      if (!Number.isFinite(from) || from < 0 || from === to) return;
+                      const next = [...dragPartsMeta.parts];
+                      const [moved] = next.splice(from, 1);
+                      next.splice(to, 0, moved);
+                      setDragIndex(null);
+                      applyReorderedParts(next);
+                    }}
+                    onDragEnd={() => setDragIndex(null)}
+                    className="px-2.5 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs font-mono cursor-grab active:cursor-grabbing touch-manipulation min-h-[32px]"
+                    title={token}
+                  >
+                    {token}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Manufacturer, Type, Level, Seed */}
