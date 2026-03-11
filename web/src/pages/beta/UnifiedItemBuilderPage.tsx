@@ -3338,12 +3338,9 @@ export default function UnifiedItemBuilderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[50vh] overflow-y-auto pr-2">
               {(() => {
                 const rarities = shieldData.raritiesByMfg[shieldMfgId] ?? [];
-                const legendaryOptions = shieldData.legendaryPerks.map((l) => ({ value: `${l.mfgId}:${l.partId}`, label: `${l.partId} - ${l.mfgName}: ${l.stat}` }));
-                const elementOptions = shieldData.element.map((e) => ({ partId: String(e.partId), label: `${e.partId} - ${e.stat}` }));
                 const firmwareOptions = shieldData.firmware.map((f) => ({ partId: String(f.partId), label: `${f.partId} - ${f.stat}` }));
-                const shieldType = shieldData.mfgTypeById[shieldMfgId] ?? "Energy";
-                return SHIELD_PART_ORDER.flatMap(({ key }) => {
-                  const partType = key as string;
+                return SHIELD_PART_ORDER.flatMap(({ key: shieldPartKey }) => {
+                  const partType = shieldPartKey as string;
                   if (partType === "Universal perks") {
                     return [(
                       <div key="Shield Universal" className="space-y-1 sm:col-span-2 lg:col-span-3">
