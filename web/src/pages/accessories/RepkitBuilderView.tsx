@@ -43,10 +43,6 @@ interface RepkitBuilderData {
 type LegendarySelection = { partId: number; mfgId: number; mfgName: string; stat: string; description?: string; checked: boolean; qty: string };
 type UniversalSelection = { partId: number; stat: string; description?: string; checked: boolean; qty: string };
 
-function copyToClipboard(text: string): void {
-  navigator.clipboard.writeText(text).catch(() => {});
-}
-
 // Elemental groups used for Model+ logic (IDs from desktop repkit tab).
 const COMBUSTION_IDS = [24, 50, 29, 44];
 const RADIATION_IDS = [23, 47, 28, 43];

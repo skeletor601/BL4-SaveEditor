@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
