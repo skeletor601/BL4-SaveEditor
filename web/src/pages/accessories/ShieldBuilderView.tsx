@@ -1,18 +1,17 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
-
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3" },
-  { value: 5, label: "5" },
-  { value: 17, label: "17" },
-  { value: 33, label: "33" },
-  { value: 65, label: "65" },
-  { value: 129, label: "129" },
-];
+import ThemedSelect from "@/components/weapon-toolbox/ThemedSelect";
+import {
+  blockClass,
+  labelClass,
+  inputClass,
+  buttonSecondaryClass,
+  buttonPrimaryClass,
+  FLAG_OPTIONS,
+} from "@/components/weapon-toolbox/builderStyles";
 
 interface ShieldBuilderPart {
   partId: number;
@@ -43,10 +42,8 @@ interface ShieldBuilderData {
   modelsByMfg: Record<number, number | null>;
 }
 
-type LegendaryEntry = { partId: number; mfgId: number };
-type UniversalEntry = { partId: number; count: number };
-type EnergyEntry = { partId: number; count: number };
-type ArmorEntry = { partId: number; count: number };
+type LegendarySelection = { partId: number; mfgId: number; mfgName: string; stat: string; description?: string; checked: boolean; qty: string };
+type UniversalSelection = { partId: number; stat: string; description?: string; checked: boolean; qty: string };
 
 function copyToClipboard(text: string): void {
   navigator.clipboard.writeText(text).catch(() => {});
@@ -60,23 +57,16 @@ export default function ShieldBuilderView() {
   const [rarityId, setRarityId] = useState<number | null>(null);
   const [elementPartId, setElementPartId] = useState<number | null>(null);
   const [firmwarePartId, setFirmwarePartId] = useState<number | null>(null);
-  const [legendarySelected, setLegendarySelected] = useState<LegendaryEntry[]>([]);
-  const [universalSelected, setUniversalSelected] = useState<UniversalEntry[]>([]);
-  const [energySelected, setEnergySelected] = useState<EnergyEntry[]>([]);
-  const [armorSelected, setArmorSelected] = useState<ArmorEntry[]>([]);
-  const [universalMultiplier, setUniversalMultiplier] = useState(1);
-  const [energyMultiplier, setEnergyMultiplier] = useState(1);
-  const [armorMultiplier, setArmorMultiplier] = useState(1);
+  const [legendarySelections, setLegendarySelections] = useState<LegendarySelection[]>([]);
+  const [universalSelections, setUniversalSelections] = useState<UniversalSelection[]>([]);
+  const [energySelections, setEnergySelections] = useState<UniversalSelection[]>([]);
+  const [armorSelections, setArmorSelections] = useState<UniversalSelection[]>([]);
   const [rawOutput, setRawOutput] = useState("");
   const [b85Output, setB85Output] = useState("");
   const [manualOutputMode, setManualOutputMode] = useState(false);
   const [flagValue, setFlagValue] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"data" | "encode" | "add" | null>(null);
-  const legendaryAvailableRef = useRef<HTMLSelectElement>(null);
-  const universalAvailableRef = useRef<HTMLSelectElement>(null);
-  const energyAvailableRef = useRef<HTMLSelectElement>(null);
-  const armorAvailableRef = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +77,44 @@ export default function ShieldBuilderView() {
         if (!cancelled) {
           setBuilderData(data);
           setRarityId(null);
+          setLegendarySelections(
+            (data.legendaryPerks ?? []).map((p) => ({
+              partId: p.partId,
+              mfgId: p.mfgId,
+              mfgName: p.mfgName,
+              stat: p.stat,
+              description: p.description,
+              checked: false,
+              qty: "1",
+            }))
+          );
+          setUniversalSelections(
+            (data.universalPerks ?? []).map((p) => ({
+              partId: p.partId,
+              stat: p.stat,
+              description: p.description,
+              checked: false,
+              qty: "1",
+            }))
+          );
+          setEnergySelections(
+            (data.energyPerks ?? []).map((p) => ({
+              partId: p.partId,
+              stat: p.stat,
+              description: p.description,
+              checked: false,
+              qty: "1",
+            }))
+          );
+          setArmorSelections(
+            (data.armorPerks ?? []).map((p) => ({
+              partId: p.partId,
+              stat: p.stat,
+              description: p.description,
+              checked: false,
+              qty: "1",
+            }))
+          );
         }
       })
       .catch(() => {
@@ -101,7 +129,6 @@ export default function ShieldBuilderView() {
   }, []);
 
   const rarities = builderData?.raritiesByMfg[mfgId] ?? [];
-  const legendaryAvailableAll = builderData?.legendaryPerks ?? [];
   const currentShieldType = builderData?.mfgTypeById[mfgId] ?? "Energy";
   const isEnergyShield = currentShieldType === "Energy";
   const isArmorShield = currentShieldType === "Armor";
@@ -117,17 +144,22 @@ export default function ShieldBuilderView() {
     const modelId = builderData.modelsByMfg[mfgId];
 
     const otherMfgPerks: Record<number, number[]> = {};
-    if (legendarySelected.length === 0) {
+    const hasLegendary = legendarySelections.some((s) => s.checked);
+    if (!hasLegendary) {
       if (modelId != null) {
         skillParts.push(`{${modelId}}`);
       }
     } else {
-      for (const { partId, mfgId: itemMfgId } of legendarySelected) {
-        if (itemMfgId === mfgId) {
-          skillParts.push(`{${partId}}`);
-        } else {
-          if (!otherMfgPerks[itemMfgId]) otherMfgPerks[itemMfgId] = [];
-          otherMfgPerks[itemMfgId].push(partId);
+      for (const sel of legendarySelections) {
+        if (!sel.checked) continue;
+        const count = Math.max(1, Math.min(99, parseInt(sel.qty.trim(), 10) || 1));
+        for (let i = 0; i < count; i++) {
+          if (sel.mfgId === mfgId) {
+            skillParts.push(`{${sel.partId}}`);
+          } else {
+            if (!otherMfgPerks[sel.mfgId]) otherMfgPerks[sel.mfgId] = [];
+            otherMfgPerks[sel.mfgId].push(sel.partId);
+          }
         }
       }
       for (const [itemMfgId, ids] of Object.entries(otherMfgPerks)) {
@@ -154,9 +186,21 @@ export default function ShieldBuilderView() {
       for (let i = 0; i < count; i += 1) secondary[typeId].push(pid);
     };
 
-    for (const { partId, count } of universalSelected) addMany(partId, count, 246);
-    for (const { partId, count } of energySelected) addMany(partId, count, 248);
-    for (const { partId, count } of armorSelected) addMany(partId, count, 237);
+    for (const s of universalSelections) {
+      if (!s.checked) continue;
+      const count = Math.max(1, Math.min(99, parseInt(s.qty.trim(), 10) || 1));
+      addMany(s.partId, count, 246);
+    }
+    for (const s of energySelections) {
+      if (!s.checked) continue;
+      const count = Math.max(1, Math.min(99, parseInt(s.qty.trim(), 10) || 1));
+      addMany(s.partId, count, 248);
+    }
+    for (const s of armorSelections) {
+      if (!s.checked) continue;
+      const count = Math.max(1, Math.min(99, parseInt(s.qty.trim(), 10) || 1));
+      addMany(s.partId, count, 237);
+    }
 
     for (const [k, v] of Object.entries(secondary)) {
       if (v.length === 0) continue;
@@ -197,10 +241,10 @@ export default function ShieldBuilderView() {
     rarityId,
     elementPartId,
     firmwarePartId,
-    legendarySelected,
-    universalSelected,
-    energySelected,
-    armorSelected,
+    legendarySelections,
+    universalSelections,
+    energySelections,
+    armorSelections,
   ]);
 
   useEffect(() => {
@@ -315,7 +359,7 @@ export default function ShieldBuilderView() {
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage("Shield added to backpack. Use Download .sav on Select Save to export.");
+        setMessage("Shield added to backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(data?.error ?? "Add failed");
       }
@@ -326,55 +370,29 @@ export default function ShieldBuilderView() {
     }
   }, [b85Output, saveData, flagValue, getYamlText, updateSaveData]);
 
-  const moveToLegendarySelected = () => {
-    const sel = legendaryAvailableRef.current;
-    if (!sel?.selectedOptions?.length) return;
-    const toAdd: LegendaryEntry[] = [];
-    for (let i = 0; i < sel.selectedOptions.length; i += 1) {
-      const opt = sel.selectedOptions[i] as HTMLOptionElement;
-      const [mfgIdStr, partIdStr] = String(opt.value).split(",");
-      const partId = Number(partIdStr);
-      const itemMfgId = Number(mfgIdStr);
-      if (!Number.isFinite(partId) || !Number.isFinite(itemMfgId)) continue;
-      if (legendarySelected.some((s) => s.partId === partId && s.mfgId === itemMfgId)) continue;
-      toAdd.push({ partId, mfgId: itemMfgId });
-    }
-    if (toAdd.length > 0) setLegendarySelected((prev) => [...prev, ...toAdd]);
+  const toggleLegendary = (index: number) => {
+    setLegendarySelections((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, checked: !s.checked } : s))
+    );
   };
-
-  const clearLegendary = () => setLegendarySelected([]);
-
-  const addFromSelect = <T extends { partId: number; count: number }>(
-    ref: React.RefObject<HTMLSelectElement>,
-    multiplier: number,
-    list: T[],
-  ): T[] => {
-    const sel = ref.current;
-    if (!sel?.selectedOptions?.length) return list;
-    const next = [...list];
-    for (let i = 0; i < sel.selectedOptions.length; i += 1) {
-      const partId = Number((sel.selectedOptions[i] as HTMLOptionElement).value);
-      if (!Number.isFinite(partId)) continue;
-      const existing = next.find((s) => s.partId === partId);
-      if (existing) existing.count += multiplier;
-      else next.push({ partId, count: multiplier } as T);
-    }
-    return next;
+  const setLegendaryQty = (index: number, qty: string) => {
+    setLegendarySelections((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, qty } : s))
+    );
   };
-
-  const moveUniversalSelected = () => {
-    setUniversalSelected((prev) => addFromSelect(universalAvailableRef, universalMultiplier, prev));
+  const toggleList = (
+    setter: React.Dispatch<React.SetStateAction<UniversalSelection[]>>,
+    index: number
+  ) => {
+    setter((prev) => prev.map((s, i) => (i === index ? { ...s, checked: !s.checked } : s)));
   };
-  const moveEnergySelected = () => {
-    setEnergySelected((prev) => addFromSelect(energyAvailableRef, energyMultiplier, prev));
+  const setListQty = (
+    setter: React.Dispatch<React.SetStateAction<UniversalSelection[]>>,
+    index: number,
+    qty: string
+  ) => {
+    setter((prev) => prev.map((s, i) => (i === index ? { ...s, qty } : s)));
   };
-  const moveArmorSelected = () => {
-    setArmorSelected((prev) => addFromSelect(armorAvailableRef, armorMultiplier, prev));
-  };
-
-  const clearUniversal = () => setUniversalSelected([]);
-  const clearEnergy = () => setEnergySelected([]);
-  const clearArmor = () => setArmorSelected([]);
 
   if (loading === "data" || !builderData) {
     return (
@@ -384,15 +402,70 @@ export default function ShieldBuilderView() {
     );
   }
 
-  const mapWithStat = (entries: { partId: number; count: number }[], src: ShieldBuilderPart[]) =>
-    entries.map((s) => {
-      const p = src.find((u) => u.partId === s.partId);
-      return { ...s, stat: p?.stat ?? `Part ${s.partId}` };
-    });
+  const elementOptions = [
+    { value: "", label: "None" },
+    ...builderData.element.map((p) => ({ value: String(p.partId), label: p.stat + (p.description ? ` - ${p.description}` : "") })),
+  ];
+  const firmwareOptions = [
+    { value: "", label: "None" },
+    ...builderData.firmware.map((p) => ({ value: String(p.partId), label: p.stat + (p.description ? ` - ${p.description}` : "") })),
+  ];
 
-  const universalSelectedWithStat = mapWithStat(universalSelected, builderData.universalPerks);
-  const energySelectedWithStat = mapWithStat(energySelected, builderData.energyPerks);
-  const armorSelectedWithStat = mapWithStat(armorSelected, builderData.armorPerks);
+  function renderCheckList(
+    list: UniversalSelection[],
+    setList: React.Dispatch<React.SetStateAction<UniversalSelection[]>>,
+    title: string
+  ) {
+    return (
+      <div>
+        <h4 className={`${labelClass} mb-2`}>{title}</h4>
+        <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] p-1">
+          {list.map((s, idx) => (
+            <div
+              key={s.partId}
+              role="button"
+              tabIndex={0}
+              className={`flex items-center gap-2 rounded px-3 py-2 min-h-[44px] cursor-pointer border touch-manipulation ${
+                s.checked
+                  ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                  : "border-transparent hover:bg-[var(--color-accent)]/5 text-[var(--color-text)]"
+              }`}
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest("input")?.getAttribute("type") === "number") return;
+                toggleList(setList, idx);
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                e.preventDefault();
+                toggleList(setList, idx);
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={s.checked}
+                onChange={() => toggleList(setList, idx)}
+                className="w-5 h-5 shrink-0 cursor-pointer"
+                style={{ accentColor: "var(--color-accent)" }}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="flex-1 min-w-0 truncate">{s.stat}{s.description ? ` - ${s.description}` : ""}</span>
+              {s.checked && (
+                <input
+                  type="number"
+                  min={1}
+                  max={99}
+                  value={s.qty}
+                  onChange={(e) => setListQty(setList, idx, e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-16 px-2 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -400,439 +473,120 @@ export default function ShieldBuilderView() {
         Build a shield from manufacturer, level, rarity, and perks. Output syncs to Base85 for adding to backpack.
       </p>
 
-      {/* Output */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-2">Output</h3>
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-2`}>Output</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Raw (decoded)</label>
+            <label className={`${labelClass} block mb-1`}>Deserialized</label>
             <textarea
               value={rawOutput}
               onChange={(e) => handleRawChange(e.target.value)}
               placeholder="Decoded string"
               rows={3}
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono resize-y"
+              className={`${inputClass} font-mono text-sm resize-y`}
             />
-            <div className="flex gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => copyToClipboard(rawOutput)}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                onClick={handleEncodeFromRaw}
-                disabled={loading !== null}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50"
-              >
-                Encode
-              </button>
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <button type="button" onClick={() => copyToClipboard(rawOutput)} className={buttonSecondaryClass}>Copy</button>
+              <button type="button" onClick={handleEncodeFromRaw} disabled={loading !== null} className={`${buttonSecondaryClass} disabled:opacity-50`}>Encode</button>
             </div>
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Base85</label>
+            <label className={`${labelClass} block mb-1`}>Base85</label>
             <textarea
               value={b85Output}
               onChange={(e) => handleB85Change(e.target.value)}
               placeholder="@U..."
               rows={3}
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono resize-y"
+              className={`${inputClass} font-mono text-sm resize-y`}
             />
-            <div className="flex gap-2 mt-1 flex-wrap items-center">
-              <button
-                type="button"
-                onClick={() => copyToClipboard(b85Output)}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                Copy
-              </button>
-              <button
-                type="button"
-                onClick={handleDecodeFromB85}
-                disabled={loading !== null}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50"
-              >
-                Decode
-              </button>
-              <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
-              <select
-                value={flagValue}
-                onChange={(e) => setFlagValue(Number(e.target.value))}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)]"
-              >
-                {FLAG_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleAddToBackpack}
-                disabled={loading !== null || !saveData}
-                className="px-3 py-1 rounded bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50"
-              >
+            <div className="flex flex-wrap items-center gap-2 mt-2 gap-y-2">
+              <button type="button" onClick={() => copyToClipboard(b85Output)} className={buttonSecondaryClass}>Copy</button>
+              <button type="button" onClick={handleDecodeFromB85} disabled={loading !== null} className={`${buttonSecondaryClass} disabled:opacity-50`}>Decode</button>
+              <label className={labelClass}>Flag</label>
+              <ThemedSelect
+                value={String(flagValue)}
+                onChange={(v) => setFlagValue(Number(v))}
+                options={FLAG_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+                className={inputClass}
+                style={{ width: "10rem" }}
+              />
+              <button type="button" onClick={handleAddToBackpack} disabled={loading !== null || !saveData} className={buttonPrimaryClass}>
                 {loading === "add" ? "Adding…" : "Add to Backpack"}
               </button>
-              {!saveData && (
-                <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">
-                  Load a save first
-                </Link>
-              )}
+              {!saveData && <Link to="/character/select-save" className="text-sm text-[var(--color-accent)] hover:underline">Load a save first</Link>}
             </div>
           </div>
         </div>
-        {manualOutputMode && (
-          <p className="text-xs text-[var(--color-text-muted)] mt-2">
-            Manual edit mode: clear both boxes to let the builder control output again.
-          </p>
-        )}
+        {manualOutputMode && <p className="text-xs text-[var(--color-text-muted)] mt-2">Manual edit mode: clear both boxes to let the builder control output again.</p>}
       </section>
 
-      {/* Base attributes */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-3">Base attributes</h3>
-        <div className="flex flex-wrap gap-4 items-end">
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-3`}>Base attributes</h3>
+        <div className="flex flex-wrap gap-4 items-end gap-y-2">
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Manufacturer</label>
-            <select
-              value={mfgId}
-              onChange={(e) => {
-                setMfgId(Number(e.target.value));
-                setRarityId(null);
-                setManualOutputMode(false);
-              }}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-w-[180px]"
-            >
-              {builderData.mfgs.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name} ({builderData.mfgTypeById[m.id] ?? "Unknown"}) - {m.id}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Level</label>
-            <input
-              type="number"
-              min={1}
-              max={99}
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] w-20"
+            <label className={`${labelClass} block mb-1`}>Manufacturer</label>
+            <ThemedSelect
+              value={String(mfgId)}
+              onChange={(v) => { setMfgId(Number(v)); setRarityId(null); setManualOutputMode(false); }}
+              options={builderData.mfgs.map((m) => ({ value: String(m.id), label: `${m.name} (${builderData.mfgTypeById[m.id] ?? "Unknown"}) - ${m.id}` }))}
+              className={inputClass}
+              style={{ minWidth: "12rem" }}
             />
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Rarity</label>
-            <select
-              value={rarityId ?? ""}
-              onChange={(e) => setRarityId(e.target.value === "" ? null : Number(e.target.value))}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-w-[200px]"
-            >
-              <option value="">—</option>
-              {rarities.map((r) => (
-                <option key={r.id} value={r.id}>{r.label}</option>
-              ))}
-            </select>
+            <label className={`${labelClass} block mb-1`}>Level</label>
+            <input type="number" min={1} max={99} value={level} onChange={(e) => setLevel(e.target.value)} className={inputClass} style={{ width: "5rem" }} />
+          </div>
+          <div>
+            <label className={`${labelClass} block mb-1`}>Rarity</label>
+            <ThemedSelect
+              value={rarityId != null ? String(rarityId) : ""}
+              onChange={(v) => setRarityId(v === "" ? null : Number(v))}
+              options={[{ value: "", label: "—" }, ...rarities.map((r) => ({ value: String(r.id), label: r.label }))]}
+              className={inputClass}
+              style={{ minWidth: "12rem" }}
+            />
           </div>
         </div>
       </section>
 
-      {/* Perks */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-3">Perks</h3>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Element */}
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-3`}>Perks</h3>
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Element</h4>
-            <div className="flex flex-col gap-1 max-h-56 overflow-y-auto">
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  name="shield-element"
-                  checked={elementPartId === null}
-                  onChange={() => setElementPartId(null)}
-                />
-                None
-              </label>
-              {builderData.element.map((p) => (
-                <label key={p.partId} className="flex items-center gap-2 cursor-pointer text-sm">
-                  <input
-                    type="radio"
-                    name="shield-element"
-                    checked={elementPartId === p.partId}
-                    onChange={() => setElementPartId(p.partId)}
-                  />
-                  {p.stat}
-                  {p.description ? ` - ${p.description}` : ""}
-                </label>
-              ))}
-            </div>
+            <h4 className={`${labelClass} mb-2`}>Element</h4>
+            <ThemedSelect value={elementPartId != null ? String(elementPartId) : ""} onChange={(v) => setElementPartId(v === "" ? null : Number(v))} options={elementOptions} className={inputClass} />
           </div>
-
-          {/* Firmware */}
           <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Firmware</h4>
-            <div className="flex flex-col gap-1 max-h-56 overflow-y-auto">
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  name="shield-firmware"
-                  checked={firmwarePartId === null}
-                  onChange={() => setFirmwarePartId(null)}
-                />
-                None
-              </label>
-              {builderData.firmware.map((p) => (
-                <label key={p.partId} className="flex items-center gap-2 cursor-pointer text-sm">
-                  <input
-                    type="radio"
-                    name="shield-firmware"
-                    checked={firmwarePartId === p.partId}
-                    onChange={() => setFirmwarePartId(p.partId)}
-                  />
-                  {p.stat}
-                  {p.description ? ` - ${p.description}` : ""}
-                </label>
-              ))}
-            </div>
+            <h4 className={`${labelClass} mb-2`}>Firmware</h4>
+            <ThemedSelect value={firmwarePartId != null ? String(firmwarePartId) : ""} onChange={(v) => setFirmwarePartId(v === "" ? null : Number(v))} options={firmwareOptions} className={inputClass} />
           </div>
         </div>
 
-        {/* Legendary dual list */}
         <div className="mt-6">
-          <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Legendary</h4>
-          <div className="flex gap-4 items-start">
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Available (all mfg)</label>
-              <select
-                ref={legendaryAvailableRef}
-                multiple
-                size={6}
-                className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
+          <h4 className={`${labelClass} mb-2`}>Legendary</h4>
+          <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] p-1">
+            {legendarySelections.map((s, idx) => (
+              <div
+                key={`${s.mfgId}-${s.partId}`}
+                role="button"
+                tabIndex={0}
+                className={`flex items-center gap-2 rounded px-3 py-2 min-h-[44px] cursor-pointer border touch-manipulation ${s.checked ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)]" : "border-transparent hover:bg-[var(--color-accent)]/5 text-[var(--color-text)]"}`}
+                onClick={(e) => { if ((e.target as HTMLElement).closest("input")?.getAttribute("type") === "number") return; toggleLegendary(idx); }}
+                onKeyDown={(e) => { if (e.key !== "Enter" && e.key !== " ") return; e.preventDefault(); toggleLegendary(idx); }}
               >
-                {legendaryAvailableAll.map((p) => (
-                  <option key={`${p.mfgId}-${p.partId}`} value={`${p.mfgId},${p.partId}`}>
-                    {p.mfgName} - {p.stat}
-                    {p.description ? ` - ${p.description}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1 justify-center">
-              <button
-                type="button"
-                onClick={moveToLegendarySelected}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                »
-              </button>
-              <button
-                type="button"
-                onClick={clearLegendary}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                Clear
-              </button>
-            </div>
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Selected</label>
-              <ul className="mt-1 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-32 overflow-y-auto">
-                {legendarySelected.map((s) => {
-                  const p = legendaryAvailableAll.find((x) => x.partId === s.partId && x.mfgId === s.mfgId);
-                  return (
-                    <li key={`${s.mfgId}-${s.partId}`}>
-                      {p?.mfgName ?? s.mfgId} - {p?.stat ?? s.partId}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+                <input type="checkbox" checked={s.checked} onChange={() => toggleLegendary(idx)} className="w-5 h-5 shrink-0 cursor-pointer" style={{ accentColor: "var(--color-accent)" }} onClick={(e) => e.stopPropagation()} />
+                <span className="flex-1 min-w-0 truncate">{s.mfgName} - {s.stat}{s.description ? ` - ${s.description}` : ""}</span>
+                {s.checked && <input type="number" min={1} max={99} value={s.qty} onChange={(e) => setLegendaryQty(idx, e.target.value)} onClick={(e) => e.stopPropagation()} className="w-16 px-2 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]" />}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Universal / Energy / Armor dual lists */}
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {/* Universal */}
-          <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Universal (246)</h4>
-            <div className="flex gap-3 items-start">
-              <div className="flex-1 min-w-0">
-                <label className="text-xs text-[var(--color-text-muted)]">Available</label>
-                <select
-                  ref={universalAvailableRef}
-                  multiple
-                  size={8}
-                  className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                >
-                  {builderData.universalPerks.map((p) => (
-                    <option key={p.partId} value={p.partId}>
-                      {p.stat}{p.description ? ` - ${p.description}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-2 justify-center">
-                <label className="text-xs text-[var(--color-text-muted)]">Qty</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={universalMultiplier}
-                  onChange={(e) =>
-                    setUniversalMultiplier(Math.max(1, Math.min(999, Number(e.target.value) || 1)))
-                  }
-                  className="w-14 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={moveUniversalSelected}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  »
-                </button>
-                <button
-                  type="button"
-                  onClick={clearUniversal}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-            <ul className="mt-2 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-40 overflow-y-auto">
-              {universalSelectedWithStat.map((s) => (
-                <li key={s.partId}>
-                  {s.count > 1 ? `(${s.count}) ` : ""}{s.stat}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Energy */}
-          <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Energy (248)</h4>
-            {!isEnergyShield ? (
-              <div className="mt-1 border border-[var(--color-panel-border)] rounded px-3 py-4 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text-muted)]">
-                Current shield type is Armor. Cannot add Energy type perks.
-              </div>
-            ) : (
-              <div className="flex gap-3 items-start">
-              <div className="flex-1 min-w-0">
-                <label className="text-xs text-[var(--color-text-muted)]">Available</label>
-                <select
-                  ref={energyAvailableRef}
-                  multiple
-                  size={8}
-                  className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                >
-                  {builderData.energyPerks.map((p) => (
-                    <option key={p.partId} value={p.partId}>
-                      {p.stat}{p.description ? ` - ${p.description}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-2 justify-center">
-                <label className="text-xs text-[var(--color-text-muted)]">Qty</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={energyMultiplier}
-                  onChange={(e) =>
-                    setEnergyMultiplier(Math.max(1, Math.min(999, Number(e.target.value) || 1)))
-                  }
-                  className="w-14 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={moveEnergySelected}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  »
-                </button>
-                <button
-                  type="button"
-                  onClick={clearEnergy}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-            )}
-            <ul className="mt-2 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-40 overflow-y-auto">
-              {energySelectedWithStat.map((s) => (
-                <li key={s.partId}>
-                  {s.count > 1 ? `(${s.count}) ` : ""}{s.stat}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Armor */}
-          <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Armor (237)</h4>
-            {!isArmorShield ? (
-              <div className="mt-1 border border-[var(--color-panel-border)] rounded px-3 py-4 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text-muted)]">
-                Current shield type is Energy. Cannot add Armor type perks.
-              </div>
-            ) : (
-              <div className="flex gap-3 items-start">
-              <div className="flex-1 min-w-0">
-                <label className="text-xs text-[var(--color-text-muted)]">Available</label>
-                <select
-                  ref={armorAvailableRef}
-                  multiple
-                  size={8}
-                  className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                >
-                  {builderData.armorPerks.map((p) => (
-                    <option key={p.partId} value={p.partId}>
-                      {p.stat}{p.description ? ` - ${p.description}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-2 justify-center">
-                <label className="text-xs text-[var(--color-text-muted)]">Qty</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={armorMultiplier}
-                  onChange={(e) =>
-                    setArmorMultiplier(Math.max(1, Math.min(999, Number(e.target.value) || 1)))
-                  }
-                  className="w-14 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={moveArmorSelected}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  »
-                </button>
-                <button
-                  type="button"
-                  onClick={clearArmor}
-                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-            )}
-            <ul className="mt-2 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-40 overflow-y-auto">
-              {armorSelectedWithStat.map((s) => (
-                <li key={s.partId}>
-                  {s.count > 1 ? `(${s.count}) ` : ""}{s.stat}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {renderCheckList(universalSelections, setUniversalSelections, "Universal (246)")}
+          {isEnergyShield ? renderCheckList(energySelections, setEnergySelections, "Energy (248)") : <div><h4 className={`${labelClass} mb-2`}>Energy (248)</h4><p className="text-sm text-[var(--color-text-muted)]">Current shield type is Armor. Cannot add Energy perks.</p></div>}
+          {isArmorShield ? renderCheckList(armorSelections, setArmorSelections, "Armor (237)") : <div><h4 className={`${labelClass} mb-2`}>Armor (237)</h4><p className="text-sm text-[var(--color-text-muted)]">Current shield type is Energy. Cannot add Armor perks.</p></div>}
         </div>
       </section>
 

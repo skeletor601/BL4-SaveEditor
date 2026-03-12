@@ -1,18 +1,17 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
-
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3" },
-  { value: 5, label: "5" },
-  { value: 17, label: "17" },
-  { value: 33, label: "33" },
-  { value: 65, label: "65" },
-  { value: 129, label: "129" },
-];
+import ThemedSelect from "@/components/weapon-toolbox/ThemedSelect";
+import {
+  blockClass,
+  labelClass,
+  inputClass,
+  buttonSecondaryClass,
+  buttonPrimaryClass,
+  FLAG_OPTIONS,
+} from "@/components/weapon-toolbox/builderStyles";
 
 interface GrenadeBuilderPart {
   partId: number;
@@ -40,8 +39,28 @@ interface GrenadeBuilderData {
   mfgPerks: Record<number, GrenadeBuilderPart[]>;
 }
 
-type LegendaryEntry = { partId: number; mfgId: number };
-type UniversalEntry = { partId: number; count: number };
+type SelectedPart = {
+  /** Outer type ID. For grenade: header mfgId (main), or 245 (element/firmware/universal), or other mfg IDs for legendary cross-mfg. */
+  typeId: number;
+  /** Inner part ID. */
+  partId: number;
+  /** Display label. */
+  label: string;
+  /** Quantity for repeat stacking. */
+  qty: string;
+};
+
+type SuperExtraPartSelection = {
+  code: string;
+  label: string;
+  effect?: string;
+  itemType?: string;
+  manufacturer?: string;
+  partType?: string;
+  rarity?: string;
+  checked: boolean;
+  qty: string;
+};
 
 function copyToClipboard(text: string): void {
   navigator.clipboard.writeText(text).catch(() => {});
@@ -52,21 +71,26 @@ export default function GrenadeBuilderView() {
   const [builderData, setBuilderData] = useState<GrenadeBuilderData | null>(null);
   const [mfgId, setMfgId] = useState<number>(263);
   const [level, setLevel] = useState("50");
-  const [rarityId, setRarityId] = useState<number | null>(null);
   const [mfgPerkChecked, setMfgPerkChecked] = useState<Set<number>>(new Set());
-  const [elementPartId, setElementPartId] = useState<number | null>(null);
-  const [firmwarePartId, setFirmwarePartId] = useState<number | null>(null);
-  const [legendarySelected, setLegendarySelected] = useState<LegendaryEntry[]>([]);
-  const [universalSelected, setUniversalSelected] = useState<UniversalEntry[]>([]);
-  const [universalMultiplier, setUniversalMultiplier] = useState(1);
+  const [selectedParts, setSelectedParts] = useState<SelectedPart[]>([]);
   const [rawOutput, setRawOutput] = useState("");
   const [b85Output, setB85Output] = useState("");
   const [manualOutputMode, setManualOutputMode] = useState(false);
   const [flagValue, setFlagValue] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"data" | "encode" | "add" | null>(null);
-  const legendaryAvailableRef = useRef<HTMLSelectElement>(null);
-  const universalAvailableRef = useRef<HTMLSelectElement>(null);
+
+  const [pendingQtyPart, setPendingQtyPart] = useState<{ next: SelectedPart } | null>(null);
+  const [pendingQtyInput, setPendingQtyInput] = useState("1");
+
+  // "Add other parts…" (universal DB picker)
+  const [superParts, setSuperParts] = useState<SuperExtraPartSelection[]>([]);
+  const [superSearch, setSuperSearch] = useState("");
+  const [superManufacturerFilter, setSuperManufacturerFilter] = useState("");
+  const [superRarityFilter, setSuperRarityFilter] = useState("");
+  const [showSuperAddParts, setShowSuperAddParts] = useState(false);
+
+  const ADD_OTHER_OPTION = "__ADD_OTHER_PARTS__";
 
   useEffect(() => {
     let cancelled = false;
@@ -76,7 +100,7 @@ export default function GrenadeBuilderView() {
       .then((data: GrenadeBuilderData) => {
         if (!cancelled) {
           setBuilderData(data);
-          setRarityId(null);
+          setSelectedParts([]);
         }
       })
       .catch(() => {
@@ -90,66 +114,144 @@ export default function GrenadeBuilderView() {
     };
   }, []);
 
+  // Load universal part metadata for "Add other parts…" picker (same source as Weapon Gen).
+  useEffect(() => {
+    let cancelled = false;
+    fetchApi("parts/data")
+      .then((r) => r.json())
+      .then((d: { items?: unknown[] }) => {
+        if (cancelled) return;
+        const items = Array.isArray(d?.items) ? d.items : [];
+        const next: SuperExtraPartSelection[] = [];
+        for (const it of items) {
+          if (!it || typeof it !== "object") continue;
+          const raw = it as Record<string, unknown>;
+          const code = String(raw.code ?? raw.Code ?? "").trim();
+          if (!code) continue;
+          const label =
+            String(raw.partName ?? raw.name ?? raw.String ?? raw["Canonical Name"] ?? "").trim() ||
+            code;
+          const effect = [
+            raw.effect,
+            raw.Effect,
+            raw["Stats (Level 50, Common)"],
+            raw.Stats,
+            raw["Search Text"],
+            raw.Description,
+          ]
+            .map((v) => String(v ?? "").trim())
+            .filter(Boolean)
+            .join(" ") || undefined;
+          next.push({
+            code,
+            label,
+            effect,
+            itemType: String(raw.itemType ?? raw["Item Type"] ?? "").trim() || undefined,
+            manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? "").trim() || undefined,
+            partType: String(raw.partType ?? raw["Part Type"] ?? "").trim() || undefined,
+            rarity: String(raw.rarity ?? raw.Rarity ?? "").trim() || undefined,
+            checked: false,
+            qty: "1",
+          });
+        }
+        setSuperParts(next);
+      })
+      .catch(() => {
+        if (!cancelled) setSuperParts([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function normalizeSuperRarity(r: string | undefined): string {
+    if (!r) return "";
+    const lower = r.trim().toLowerCase();
+    if (lower === "pearl" || lower === "pearlescent") return "Pearl";
+    return r.trim();
+  }
+
+  function superPartMatchesRarity(partRarity: string | undefined, filterValue: string): boolean {
+    if (!filterValue) return true;
+    return normalizeSuperRarity(partRarity) === filterValue;
+  }
+
+  function parseCodePair(code: string): { typeId: number; partId: number } | null {
+    const s = code.trim();
+    const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
+    if (m2) return { typeId: Number(m2[1]), partId: Number(m2[2]) };
+    const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
+    if (m1) {
+      const n = Number(m1[1]);
+      return { typeId: n, partId: n };
+    }
+    return null;
+  }
+
   const rarities = builderData?.raritiesByMfg[mfgId] ?? [];
   const mfgPerksList = builderData?.mfgPerks[mfgId] ?? [];
 
+  const requestQtyForSelection = useCallback(
+    (next: SelectedPart) => {
+      setPendingQtyPart({ next });
+      setPendingQtyInput(next.qty?.trim() ? next.qty : "1");
+    },
+    [],
+  );
+
+  const addSelectedPart = useCallback(
+    (next: SelectedPart) => {
+      setSelectedParts((prev) => [...prev, next]);
+    },
+    [],
+  );
+
+  const removeSelectedPartAt = useCallback((index: number) => {
+    setSelectedParts((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const clearSelectedPartsByTypeId = useCallback((typeId: number) => {
+    setSelectedParts((prev) => prev.filter((p) => p.typeId !== typeId));
+  }, []);
+
   const rebuildOutput = useCallback(async () => {
     if (manualOutputMode || !builderData) return;
-    const mainParts = [`${mfgId}, 0, 1, ${level}| 2, 305||`];
-    const skillParts: string[] = [];
-    const secondary: Record<number, number[]> = {};
+    const header = `${mfgId}, 0, 1, ${level}| 2, 305||`;
 
-    if (rarityId != null) skillParts.push(`{${rarityId}}`);
+    // Base mfg perks (checkboxes) are always "selected parts" under header mfgId.
+    const mfgCheckedParts: SelectedPart[] = Array.from(mfgPerkChecked).map((pid) => ({
+      typeId: mfgId,
+      partId: pid,
+      label: `Mfg perk ${pid}`,
+      qty: "1",
+    }));
 
-    const otherMfgPerks: Record<number, number[]> = {};
-    for (const { partId, mfgId: itemMfgId } of legendarySelected) {
-      if (itemMfgId === mfgId) {
-        skillParts.push(`{${partId}}`);
-      } else {
-        if (!otherMfgPerks[itemMfgId]) otherMfgPerks[itemMfgId] = [];
-        otherMfgPerks[itemMfgId].push(partId);
-      }
+    const allSelected = [...selectedParts, ...mfgCheckedParts];
+
+    // Expand quantities into a per-typeId list
+    const byType = new Map<number, number[]>();
+    const add = (typeId: number, partId: number) => {
+      if (!byType.has(typeId)) byType.set(typeId, []);
+      byType.get(typeId)!.push(partId);
+    };
+    for (const s of allSelected) {
+      const count = Math.max(1, Math.min(99, parseInt(s.qty.trim(), 10) || 1));
+      for (let i = 0; i < count; i++) add(s.typeId, s.partId);
     }
-    for (const [itemMfgId, ids] of Object.entries(otherMfgPerks)) {
+
+    const tokens: string[] = [];
+    for (const [typeId, ids] of byType.entries()) {
+      if (!ids.length) continue;
       const sorted = [...ids].sort((a, b) => a - b);
       if (sorted.length === 1) {
-        skillParts.push(`{${itemMfgId}:${sorted[0]}}`);
+        if (typeId === mfgId) tokens.push(`{${sorted[0]}}`);
+        else tokens.push(`{${typeId}:${sorted[0]}}`);
       } else {
-        skillParts.push(`{${itemMfgId}:[${sorted.join(" ")}]}`);
+        tokens.push(`{${typeId}:[${sorted.join(" ")}]}`);
       }
     }
 
-    if (elementPartId != null) {
-      if (!secondary[245]) secondary[245] = [];
-      secondary[245].push(elementPartId);
-    }
-    if (firmwarePartId != null) {
-      if (!secondary[245]) secondary[245] = [];
-      secondary[245].push(firmwarePartId);
-    }
-
-    for (const partId of mfgPerkChecked) {
-      skillParts.push(`{${partId}}`);
-    }
-
-    for (const { partId, count } of universalSelected) {
-      if (!secondary[245]) secondary[245] = [];
-      for (let i = 0; i < count; i++) secondary[245].push(partId);
-    }
-
-    for (const [k, v] of Object.entries(secondary)) {
-      if (v.length > 0) {
-        const key = Number(k);
-        if (v.length === 1) {
-          skillParts.push(`{${key}:${v[0]}}`);
-        } else {
-          const sorted = [...v].sort((a, b) => a - b);
-          skillParts.push(`{${key}:[${sorted.join(" ")}]}`);
-        }
-      }
-    }
-
-    const finalStr = mainParts.join(" ") + " " + skillParts.join(" ") + " |";
+    const finalStr = `${header} ${tokens.join(" ")} |`;
     setRawOutput(finalStr);
 
     setLoading("encode");
@@ -174,12 +276,8 @@ export default function GrenadeBuilderView() {
     builderData,
     mfgId,
     level,
-    rarityId,
     mfgPerkChecked,
-    elementPartId,
-    firmwarePartId,
-    legendarySelected,
-    universalSelected,
+    selectedParts,
   ]);
 
   useEffect(() => {
@@ -294,7 +392,7 @@ export default function GrenadeBuilderView() {
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage("Grenade added to backpack. Use Download .sav on Select Save to export.");
+        setMessage("Grenade added to backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(data?.error ?? "Add failed");
       }
@@ -314,44 +412,6 @@ export default function GrenadeBuilderView() {
     });
   };
 
-  const legendaryAvailableAll = builderData?.legendaryPerks ?? [];
-
-  const moveToLegendarySelected = () => {
-    const sel = legendaryAvailableRef.current;
-    if (!sel?.selectedOptions?.length) return;
-    const toAdd: LegendaryEntry[] = [];
-    for (let i = 0; i < sel.selectedOptions.length; i++) {
-      const opt = sel.selectedOptions[i] as HTMLOptionElement;
-      const [mfgIdStr, partIdStr] = String(opt.value).split(",");
-      const partId = Number(partIdStr);
-      const itemMfgId = Number(mfgIdStr);
-      if (!Number.isFinite(partId) || !Number.isFinite(itemMfgId)) continue;
-      if (legendarySelected.some((s) => s.partId === partId && s.mfgId === itemMfgId)) continue;
-      toAdd.push({ partId, mfgId: itemMfgId });
-    }
-    if (toAdd.length > 0) setLegendarySelected((prev) => [...prev, ...toAdd]);
-  };
-
-  const clearLegendary = () => setLegendarySelected([]);
-
-  const moveToUniversalSelected = () => {
-    const sel = universalAvailableRef.current;
-    if (!sel?.selectedOptions?.length) return;
-    setUniversalSelected((prev) => {
-      const next = [...prev];
-      for (let i = 0; i < sel.selectedOptions.length; i++) {
-        const partId = Number((sel.selectedOptions[i] as HTMLOptionElement).value);
-        if (!Number.isFinite(partId)) continue;
-        const existing = next.find((s) => s.partId === partId);
-        if (existing) existing.count += universalMultiplier;
-        else next.push({ partId, count: universalMultiplier });
-      }
-      return next;
-    });
-  };
-
-  const clearUniversal = () => setUniversalSelected([]);
-
   if (loading === "data" || !builderData) {
     return (
       <div className="text-[var(--color-text-muted)]">
@@ -360,10 +420,37 @@ export default function GrenadeBuilderView() {
     );
   }
 
-  const universalSelectedWithStat = universalSelected.map((s) => {
-    const p = builderData.universalPerks.find((u) => u.partId === s.partId);
-    return { ...s, stat: p?.stat ?? `Part ${s.partId}` };
-  });
+  const rarityOptions = [
+    { value: "", label: "Add rarity…" },
+    { value: ADD_OTHER_OPTION, label: "Add other parts…" },
+    ...rarities.map((r) => ({ value: `R:${r.id}`, label: r.label })),
+  ];
+  const elementOptions = [
+    { value: "", label: "Add element…" },
+    { value: ADD_OTHER_OPTION, label: "Add other parts…" },
+    ...builderData.element.map((p) => ({ value: `245:${p.partId}`, label: p.stat })),
+  ];
+  const firmwareOptions = [
+    { value: "", label: "Add firmware…" },
+    { value: ADD_OTHER_OPTION, label: "Add other parts…" },
+    ...builderData.firmware.map((p) => ({ value: `245:${p.partId}`, label: p.stat })),
+  ];
+  const legendaryOptions = [
+    { value: "", label: "Add legendary…" },
+    { value: ADD_OTHER_OPTION, label: "Add other parts…" },
+    ...builderData.legendaryPerks.map((p) => ({
+      value: `${p.mfgId}:${p.partId}`,
+      label: `${p.mfgName} - ${p.stat}${p.description ? ` - ${p.description}` : ""}`,
+    })),
+  ];
+  const universalOptions = [
+    { value: "", label: "Add universal…" },
+    { value: ADD_OTHER_OPTION, label: "Add other parts…" },
+    ...builderData.universalPerks.map((p) => ({
+      value: `245:${p.partId}`,
+      label: `${p.stat}${p.description ? ` - ${p.description}` : ""}`,
+    })),
+  ];
 
   return (
     <div className="space-y-4">
@@ -372,76 +459,66 @@ export default function GrenadeBuilderView() {
       </p>
 
       {/* Output */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-2">Output</h3>
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-2`}>Output</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Raw (decoded)</label>
+            <label className={`${labelClass} block mb-1`}>Deserialized</label>
             <textarea
               value={rawOutput}
               onChange={(e) => handleRawChange(e.target.value)}
               placeholder="Decoded string"
               rows={3}
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono resize-y"
+              className={`${inputClass} font-mono text-sm resize-y`}
             />
-            <div className="flex gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => copyToClipboard(rawOutput)}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <button type="button" onClick={() => copyToClipboard(rawOutput)} className={buttonSecondaryClass}>
                 Copy
               </button>
               <button
                 type="button"
                 onClick={handleEncodeFromRaw}
                 disabled={loading !== null}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50"
+                className={`${buttonSecondaryClass} disabled:opacity-50`}
               >
                 Encode
               </button>
             </div>
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Base85</label>
+            <label className={`${labelClass} block mb-1`}>Base85</label>
             <textarea
               value={b85Output}
               onChange={(e) => handleB85Change(e.target.value)}
               placeholder="@U..."
               rows={3}
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono resize-y"
+              className={`${inputClass} font-mono text-sm resize-y`}
             />
-            <div className="flex gap-2 mt-1 flex-wrap items-center">
-              <button
-                type="button"
-                onClick={() => copyToClipboard(b85Output)}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
+            <div className="flex flex-wrap items-center gap-2 mt-2 gap-y-2">
+              <button type="button" onClick={() => copyToClipboard(b85Output)} className={buttonSecondaryClass}>
                 Copy
               </button>
               <button
                 type="button"
                 onClick={handleDecodeFromB85}
                 disabled={loading !== null}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50"
+                className={`${buttonSecondaryClass} disabled:opacity-50`}
               >
                 Decode
               </button>
-              <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
-              <select
-                value={flagValue}
-                onChange={(e) => setFlagValue(Number(e.target.value))}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)]"
-              >
-                {FLAG_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
+              <label className={labelClass}>Flag</label>
+              <ThemedSelect
+                value={String(flagValue)}
+                onChange={(v) => setFlagValue(Number(v))}
+                options={FLAG_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+                className={inputClass}
+                style={{ width: "10rem" }}
+              />
               <button
                 type="button"
                 onClick={handleAddToBackpack}
                 disabled={loading !== null || !saveData}
-                className="px-3 py-1 rounded bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50"
+                className={buttonPrimaryClass}
               >
                 {loading === "add" ? "Adding…" : "Add to Backpack"}
               </button>
@@ -461,70 +538,60 @@ export default function GrenadeBuilderView() {
       </section>
 
       {/* Base attributes */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-3">Base attributes</h3>
-        <div className="flex flex-wrap gap-4 items-end">
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-3`}>Base attributes</h3>
+        <div className="flex flex-wrap gap-4 items-end gap-y-2">
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Manufacturer</label>
-            <select
-              value={mfgId}
-              onChange={(e) => {
-                setMfgId(Number(e.target.value));
-                setRarityId(null);
+            <label className={`${labelClass} block mb-1`}>Manufacturer</label>
+            <ThemedSelect
+              value={String(mfgId)}
+              onChange={(v) => {
+                setMfgId(Number(v));
                 setMfgPerkChecked(new Set());
+                setSelectedParts([]);
               }}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-w-[180px]"
-            >
-              {builderData.mfgs.map((m) => (
-                <option key={m.id} value={m.id}>{m.name} - {m.id}</option>
-              ))}
-            </select>
+              options={builderData.mfgs.map((m) => ({ value: String(m.id), label: `${m.name} - ${m.id}` }))}
+              className={inputClass}
+              style={{ minWidth: "12rem" }}
+            />
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Level</label>
+            <label className={`${labelClass} block mb-1`}>Level</label>
             <input
               type="number"
               min={1}
               max={99}
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] w-20"
+              className={inputClass}
+              style={{ width: "5rem" }}
             />
-          </div>
-          <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-1">Rarity</label>
-            <select
-              value={rarityId ?? ""}
-              onChange={(e) => setRarityId(e.target.value === "" ? null : Number(e.target.value))}
-              className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-w-[200px]"
-            >
-              <option value="">—</option>
-              {rarities.map((r) => (
-                <option key={r.id} value={r.id}>{r.label}</option>
-              ))}
-            </select>
           </div>
         </div>
       </section>
 
       {/* Perks */}
-      <section className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-3">Perks</h3>
+      <section className={blockClass}>
+        <h3 className={`${labelClass} mb-3`}>Perks</h3>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Mfg Perks */}
+          {/* Mfg Perks (checkbox multi select stays as-is) */}
           <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Mfg Perks</h4>
-            <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
+            <h4 className={`${labelClass} mb-2`}>Mfg Perks</h4>
+            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
               {mfgPerksList.map((p) => (
-                <label key={p.partId} className="flex items-start gap-2 cursor-pointer text-sm">
+                <label
+                  key={p.partId}
+                  className="flex items-center gap-2 cursor-pointer text-sm min-h-[44px] rounded px-2 py-1 hover:bg-[var(--color-accent)]/5 touch-manipulation"
+                >
                   <input
                     type="checkbox"
                     checked={mfgPerkChecked.has(p.partId)}
                     onChange={() => toggleMfgPerk(p.partId)}
-                    className="mt-1"
+                    className="w-5 h-5 shrink-0 cursor-pointer"
+                    style={{ accentColor: "var(--color-accent)" }}
                   />
-                  <span>
+                  <span className="text-[var(--color-text)]">
                     {p.stat}
                     {p.description ? ` - ${p.description}` : ""}
                   </span>
@@ -533,172 +600,438 @@ export default function GrenadeBuilderView() {
             </div>
           </div>
 
-          {/* Element */}
-          <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Element</h4>
-            <div className="flex flex-col gap-1">
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  name="element"
-                  checked={elementPartId === null}
-                  onChange={() => setElementPartId(null)}
-                />
-                None
-              </label>
-              {builderData.element.map((p) => (
-                <label key={p.partId} className="flex items-center gap-2 cursor-pointer text-sm">
-                  <input
-                    type="radio"
-                    name="element"
-                    checked={elementPartId === p.partId}
-                    onChange={() => setElementPartId(p.partId)}
-                  />
-                  {p.stat}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Firmware */}
-          <div>
-            <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Firmware</h4>
-            <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  name="firmware"
-                  checked={firmwarePartId === null}
-                  onChange={() => setFirmwarePartId(null)}
-                />
-                None
-              </label>
-              {builderData.firmware.map((p) => (
-                <label key={p.partId} className="flex items-center gap-2 cursor-pointer text-sm">
-                  <input
-                    type="radio"
-                    name="firmware"
-                    checked={firmwarePartId === p.partId}
-                    onChange={() => setFirmwarePartId(p.partId)}
-                  />
-                  {p.stat}
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Legendary dual list */}
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Legendary</h4>
-          <div className="flex gap-4 items-start">
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Available (all mfg)</label>
-              <select
-                ref={legendaryAvailableRef}
-                multiple
-                size={6}
-                className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-              >
-                {legendaryAvailableAll.map((p) => (
-                  <option key={`${p.mfgId}-${p.partId}`} value={`${p.mfgId},${p.partId}`}>
-                    {p.mfgName} - {p.stat}
-                    {p.description ? ` - ${p.description}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1 justify-center">
-              <button
-                type="button"
-                onClick={moveToLegendarySelected}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                »
-              </button>
-              <button
-                type="button"
-                onClick={clearLegendary}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                Clear
-              </button>
-            </div>
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Selected</label>
-              <ul className="mt-1 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[120px] max-h-32 overflow-y-auto">
-                {legendarySelected.map((s) => {
-                  const p = legendaryAvailableAll.find((x) => x.partId === s.partId && x.mfgId === s.mfgId);
-                  return (
-                    <li key={`${s.mfgId}-${s.partId}`}>
-                      {p?.mfgName ?? s.mfgId} - {p?.stat ?? s.partId}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Universal dual list with multiplier */}
-        <div className="mt-6">
-          <h4 className="text-sm font-medium text-[var(--color-text)] mb-2">Universal (quantity)</h4>
-          <div className="flex gap-4 items-start">
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Available</label>
-              <select
-                ref={universalAvailableRef}
-                multiple
-                size={8}
-                className="w-full mt-1 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
-              >
-                {builderData.universalPerks.map((p) => (
-                  <option key={p.partId} value={p.partId}>
-                    {p.stat}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-2 justify-center">
-              <label className="text-xs text-[var(--color-text-muted)]">Qty</label>
-              <input
-                type="number"
-                min={1}
-                max={999}
-                value={universalMultiplier}
-                onChange={(e) => setUniversalMultiplier(Math.max(1, Math.min(999, Number(e.target.value) || 1)))}
-                className="w-14 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
+          {/* Add-from-dropdown sections (weapon-builder style + qty confirm) */}
+          <div className="space-y-3">
+            <h4 className={`${labelClass} mb-1`}>Add parts</h4>
+            <div className="space-y-2">
+              <ThemedSelect
+                value=""
+                onChange={(v) => {
+                  if (!v) return;
+                  if (v === ADD_OTHER_OPTION) {
+                    setShowSuperAddParts(true);
+                    return;
+                  }
+                  // Rarity uses current header mfgId as typeId, partId parsed from "R:<id>"
+                  if (v.startsWith("R:")) {
+                    const pid = Number(v.slice(2));
+                    if (!Number.isFinite(pid)) return;
+                    requestQtyForSelection({ typeId: mfgId, partId: pid, label: `Rarity: ${rarities.find((r) => r.id === pid)?.label ?? pid}`, qty: "1" });
+                    return;
+                  }
+                  const parsed = v.match(/^(\d+)\:(\d+)$/);
+                  if (!parsed) return;
+                  const typeId = Number(parsed[1]);
+                  const partId = Number(parsed[2]);
+                  if (!Number.isFinite(typeId) || !Number.isFinite(partId)) return;
+                  requestQtyForSelection({ typeId, partId, label: v, qty: "1" });
+                }}
+                options={rarityOptions}
+                className={inputClass}
+                title="Add rarity (multi-select)"
               />
-              <button
-                type="button"
-                onClick={moveToUniversalSelected}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                »
-              </button>
-              <button
-                type="button"
-                onClick={clearUniversal}
-                className="px-2 py-1 rounded border border-[var(--color-panel-border)] text-sm text-[var(--color-text)] hover:bg-[var(--color-panel-border)]"
-              >
-                Clear
-              </button>
+              <ThemedSelect
+                value=""
+                onChange={(v) => {
+                  if (!v) return;
+                  if (v === ADD_OTHER_OPTION) {
+                    setShowSuperAddParts(true);
+                    return;
+                  }
+                  const parsed = v.match(/^(\d+)\:(\d+)$/);
+                  if (!parsed) return;
+                  const typeId = Number(parsed[1]);
+                  const partId = Number(parsed[2]);
+                  if (!Number.isFinite(typeId) || !Number.isFinite(partId)) return;
+                  const lbl = builderData.element.find((p) => p.partId === partId)?.stat ?? `Element ${partId}`;
+                  requestQtyForSelection({ typeId, partId, label: `Element: ${lbl}`, qty: "1" });
+                }}
+                options={elementOptions}
+                className={inputClass}
+                title="Add element (multi-select)"
+              />
+              <ThemedSelect
+                value=""
+                onChange={(v) => {
+                  if (!v) return;
+                  if (v === ADD_OTHER_OPTION) {
+                    setShowSuperAddParts(true);
+                    return;
+                  }
+                  const parsed = v.match(/^(\d+)\:(\d+)$/);
+                  if (!parsed) return;
+                  const typeId = Number(parsed[1]);
+                  const partId = Number(parsed[2]);
+                  if (!Number.isFinite(typeId) || !Number.isFinite(partId)) return;
+                  const lbl = builderData.firmware.find((p) => p.partId === partId)?.stat ?? `Firmware ${partId}`;
+                  requestQtyForSelection({ typeId, partId, label: `Firmware: ${lbl}`, qty: "1" });
+                }}
+                options={firmwareOptions}
+                className={inputClass}
+                title="Add firmware (multi-select)"
+              />
+              <ThemedSelect
+                value=""
+                onChange={(v) => {
+                  if (!v) return;
+                  if (v === ADD_OTHER_OPTION) {
+                    setShowSuperAddParts(true);
+                    return;
+                  }
+                  const parsed = v.match(/^(\d+)\:(\d+)$/);
+                  if (!parsed) return;
+                  const typeId = Number(parsed[1]);
+                  const partId = Number(parsed[2]);
+                  if (!Number.isFinite(typeId) || !Number.isFinite(partId)) return;
+                  const match = builderData.legendaryPerks.find((p) => p.partId === partId && p.mfgId === typeId);
+                  requestQtyForSelection({
+                    typeId,
+                    partId,
+                    label: match ? `Legendary: ${match.mfgName} - ${match.stat}` : `Legendary ${typeId}:${partId}`,
+                    qty: "1",
+                  });
+                }}
+                options={legendaryOptions}
+                className={inputClass}
+                title="Add legendary (multi-select)"
+              />
+              <ThemedSelect
+                value=""
+                onChange={(v) => {
+                  if (!v) return;
+                  if (v === ADD_OTHER_OPTION) {
+                    setShowSuperAddParts(true);
+                    return;
+                  }
+                  const parsed = v.match(/^(\d+)\:(\d+)$/);
+                  if (!parsed) return;
+                  const typeId = Number(parsed[1]);
+                  const partId = Number(parsed[2]);
+                  if (!Number.isFinite(typeId) || !Number.isFinite(partId)) return;
+                  const match = builderData.universalPerks.find((p) => p.partId === partId);
+                  requestQtyForSelection({
+                    typeId,
+                    partId,
+                    label: match ? `Universal: ${match.stat}` : `Universal ${typeId}:${partId}`,
+                    qty: "1",
+                  });
+                }}
+                options={universalOptions}
+                className={inputClass}
+                title="Add universal (multi-select)"
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <button type="button" className={buttonSecondaryClass} onClick={() => setShowSuperAddParts(true)}>
+                  Add other parts…
+                </button>
+                <button
+                  type="button"
+                  className={buttonSecondaryClass}
+                  onClick={() => {
+                    setSelectedParts([]);
+                    setMfgPerkChecked(new Set());
+                  }}
+                  title="Clear all selected parts (dropdown selections and mfg perk checkboxes)"
+                >
+                  Clear all
+                </button>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <label className="text-xs text-[var(--color-text-muted)]">Selected</label>
-              <ul className="mt-1 border border-[var(--color-panel-border)] rounded px-2 py-1 bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] min-h-[140px] max-h-48 overflow-y-auto">
-                {universalSelectedWithStat.map((s) => (
-                  <li key={s.partId}>
-                    {s.count > 1 ? `(${s.count}) ` : ""}{s.stat}
-                  </li>
+          </div>
+
+          {/* Selected list */}
+          <div>
+            <h4 className={`${labelClass} mb-2`}>Selected parts</h4>
+            {selectedParts.length === 0 ? (
+              <p className="text-sm text-[var(--color-text-muted)]">No parts selected yet.</p>
+            ) : (
+              <div className="max-h-56 overflow-y-auto space-y-1 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] p-1">
+                {selectedParts.map((p, idx) => (
+                  <div
+                    key={`${p.typeId}:${p.partId}:${idx}`}
+                    className="flex items-center gap-2 rounded px-3 py-2 min-h-[44px] border border-transparent hover:border-[var(--color-panel-border)] hover:bg-[rgba(255,255,255,0.04)]"
+                  >
+                    <span className="text-xs text-[var(--color-text-muted)] font-mono">{`{${p.typeId}:${p.partId}}`}</span>
+                    <span className="flex-1 min-w-0 truncate text-sm text-[var(--color-text)]" title={p.label}>{p.label}</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={p.qty}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setSelectedParts((prev) => prev.map((x, i) => (i === idx ? { ...x, qty: v } : x)));
+                      }}
+                      className="w-16 px-2 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeSelectedPartAt(idx)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[firebrick] text-white text-sm border border-[firebrick] touch-manipulation"
+                      title="Remove"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
-              </ul>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button type="button" className={buttonSecondaryClass} onClick={() => clearSelectedPartsByTypeId(245)} title="Remove all element/firmware/universal (245) selections">
+                Clear 245
+              </button>
+              <button type="button" className={buttonSecondaryClass} onClick={() => clearSelectedPartsByTypeId(mfgId)} title="Remove all selections under the current manufacturer typeId">
+                Clear mfg
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {message && <p className="text-sm text-[var(--color-accent)]">{message}</p>}
+
+      {/* Quantity confirmation modal (same pattern as Weapon Gen) */}
+      {pendingQtyPart && (
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-40 p-4">
+          <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl p-4 w-full max-w-sm">
+            <p className="text-sm text-[var(--color-text)] mb-2">
+              Quantity for{" "}
+              <span className="text-[var(--color-accent)] truncate block">{pendingQtyPart.next.label}</span>
+            </p>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={pendingQtyInput}
+              onChange={(e) => setPendingQtyInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const qty = Math.max(1, Math.min(99, parseInt(pendingQtyInput.trim(), 10) || 1));
+                  addSelectedPart({ ...pendingQtyPart.next, qty: String(qty) });
+                  setPendingQtyPart(null);
+                }
+                if (e.key === "Escape") {
+                  setPendingQtyPart(null);
+                }
+              }}
+              className={`${inputClass} mb-3`}
+              autoFocus
+            />
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPendingQtyPart(null)}
+                className={`${buttonSecondaryClass} text-sm`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const qty = Math.max(1, Math.min(99, parseInt(pendingQtyInput.trim(), 10) || 1));
+                  addSelectedPart({ ...pendingQtyPart.next, qty: String(qty) });
+                  setPendingQtyPart(null);
+                }}
+                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[44px] text-sm touch-manipulation"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Super parts modal (DB-backed picker) */}
+      {showSuperAddParts && (
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-40 p-2 sm:p-4">
+          <div className="max-h-[85dvh] sm:max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
+            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+              <h3 className="text-[var(--color-accent)] font-medium text-sm">Add Other Parts</h3>
+              <button
+                type="button"
+                onClick={() => setShowSuperAddParts(false)}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm touch-manipulation"
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex-1 px-4 py-3 text-sm flex flex-col gap-3 overflow-hidden min-h-0">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <input
+                  type="text"
+                  value={superSearch}
+                  onChange={(e) => setSuperSearch(e.target.value)}
+                  placeholder="Search by name, effect, manufacturer, or code…"
+                  className={inputClass}
+                />
+                <button type="button" onClick={() => setSuperSearch("")} className={buttonSecondaryClass}>
+                  Clear
+                </button>
+              </div>
+              {(() => {
+                const manufacturers = [...new Set(superParts.map((p) => p.manufacturer).filter(Boolean))].sort();
+                const raritySet = new Set<string>();
+                superParts.forEach((p) => {
+                  const n = normalizeSuperRarity(p.rarity);
+                  if (n) raritySet.add(n);
+                });
+                const rarities = [...raritySet].sort();
+                return (
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <span className="text-[var(--color-text-muted)] text-xs shrink-0">Quick filters:</span>
+                    <select
+                      value={superManufacturerFilter}
+                      onChange={(e) => setSuperManufacturerFilter(e.target.value)}
+                      className={inputClass}
+                      title="Filter by manufacturer"
+                      style={{ width: "13rem" }}
+                    >
+                      <option value="">All manufacturers</option>
+                      {manufacturers.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={superRarityFilter}
+                      onChange={(e) => setSuperRarityFilter(e.target.value)}
+                      className={inputClass}
+                      title="Filter by rarity"
+                      style={{ width: "10rem" }}
+                    >
+                      <option value="">All rarities</option>
+                      {rarities.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
+              <div className="flex-1 overflow-y-auto space-y-1 pr-1 min-h-0">
+                {superParts
+                  .map((p, realIdx) => ({ p, realIdx }))
+                  .filter(({ p }) => {
+                    if (superManufacturerFilter && (p.manufacturer ?? "") !== superManufacturerFilter) return false;
+                    if (!superPartMatchesRarity(p.rarity, superRarityFilter)) return false;
+                    const q = superSearch.trim().toLowerCase();
+                    if (!q) return true;
+                    const haystack = [
+                      p.label,
+                      p.code,
+                      p.effect ?? "",
+                      p.itemType ?? "",
+                      p.manufacturer ?? "",
+                      p.partType ?? "",
+                      p.rarity ?? "",
+                    ]
+                      .join(" ")
+                      .toLowerCase();
+                    return haystack.includes(q);
+                  })
+                  .map(({ p, realIdx }) => (
+                    <div
+                      key={`${p.code}-${realIdx}`}
+                      role="button"
+                      tabIndex={0}
+                      className="flex items-center gap-2 cursor-pointer rounded px-3 py-2 -mx-1 hover:bg-[rgba(255,255,255,0.06)] focus:outline-none focus:bg-[rgba(255,255,255,0.06)] min-h-[44px] touch-manipulation"
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest("input")) return;
+                        setSuperParts((prev) =>
+                          prev.map((s, i) => (i === realIdx ? { ...s, checked: !s.checked } : s)),
+                        );
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key !== "Enter" && e.key !== " ") return;
+                        e.preventDefault();
+                        setSuperParts((prev) =>
+                          prev.map((s, i) => (i === realIdx ? { ...s, checked: !s.checked } : s)),
+                        );
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={p.checked}
+                        onChange={() =>
+                          setSuperParts((prev) =>
+                            prev.map((s, i) => (i === realIdx ? { ...s, checked: !s.checked } : s)),
+                          )
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        className="shrink-0 w-5 h-5 cursor-pointer"
+                        style={{ accentColor: "var(--color-accent)" }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">
+                          {p.label}{" "}
+                          <span className="text-[var(--color-text-muted)]">
+                            ({p.code}
+                            {p.rarity ? ` · ${p.rarity}` : ""}{p.itemType ? ` · ${p.itemType}` : ""}
+                            {p.manufacturer ? ` · ${p.manufacturer}` : ""})
+                          </span>
+                        </div>
+                        {p.effect && (
+                          <div className="text-xs text-[var(--color-accent)] mt-0.5 truncate" title={p.effect}>
+                            {p.effect.length > 90 ? `…${p.effect.slice(-86)}` : p.effect}
+                          </div>
+                        )}
+                      </div>
+                      {p.checked && (
+                        <input
+                          type="number"
+                          min={1}
+                          max={99}
+                          value={p.qty}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setSuperParts((prev) => prev.map((s, i) => (i === realIdx ? { ...s, qty: v } : s)));
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-16 px-2 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                        />
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex flex-wrap justify-end gap-2 shrink-0">
+              <button type="button" onClick={() => setShowSuperAddParts(false)} className={buttonSecondaryClass}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const checked = superParts.filter((p) => p.checked);
+                  if (checked.length) {
+                    const additions: SelectedPart[] = [];
+                    for (const p of checked) {
+                      const parsed = parseCodePair(p.code);
+                      if (!parsed) continue;
+                      const qty = Math.max(1, Math.min(99, parseInt(p.qty.trim(), 10) || 1));
+                      additions.push({
+                        typeId: parsed.typeId,
+                        partId: parsed.partId,
+                        label: `DB: ${p.label}`,
+                        qty: String(qty),
+                      });
+                    }
+                    if (additions.length) setSelectedParts((prev) => [...prev, ...additions]);
+                  }
+                  setShowSuperAddParts(false);
+                }}
+                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[44px] text-sm touch-manipulation"
+              >
+                Confirm Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

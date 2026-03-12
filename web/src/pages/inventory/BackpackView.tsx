@@ -239,7 +239,7 @@ export default function BackpackView() {
       const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
       updateSaveData(parsed);
       setItemSerial("");
-      setAddMessage("Item added to backpack. Use \"Download .sav\" on Select Save to export.");
+      setAddMessage("Item added to backpack. Use \"Overwrite save\" on Select Save to export.");
     } catch {
       setAddMessage(getApiUnavailableError());
     } finally {
@@ -349,7 +349,7 @@ export default function BackpackView() {
       setAddMessage(
         fail > 0
           ? `Set ${ok} item(s) to level ${level}; ${fail} failed.`
-          : `All backpack items set to level ${level}. Use "Download .sav" on Select Save to export.`
+          : `All backpack items set to level ${level}. Use "Overwrite save" on Select Save to export.`
       );
       setGearLevelDialog(null);
     } catch {

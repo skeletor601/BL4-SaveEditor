@@ -168,7 +168,7 @@ export default function AccessoryEditView({
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage(`${title} added to backpack. Use Download .sav on Select Save to export.`);
+        setMessage(`${title} added to backpack. Use Overwrite save on Select Save to export.`);
       } else {
         setMessage(data?.error ?? "Add failed");
       }

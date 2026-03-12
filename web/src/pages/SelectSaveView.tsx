@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { useSave } from "@/contexts/SaveContext";
 
 const USER_ID_STORAGE_KEY = "bl4-save-user-id";
+const OVERWRITE_TIP_STORAGE_KEY = "bl4-save-hide-overwrite-tip";
 
 function getStoredUserId(): string {
   try {
@@ -14,11 +15,18 @@ function getStoredUserId(): string {
 export default function SelectSaveView() {
   const inputRef = useRef<HTMLInputElement>(null);
   const savInputRef = useRef<HTMLInputElement>(null);
-  const [savBytes, setSavBytes] = useState<Uint8Array | null>(null);
+  const [, setSavBytes] = useState<Uint8Array | null>(null);
   const [savFileName, setSavFileName] = useState<string | null>(null);
   const [userIdInput, setUserIdInput] = useState(getStoredUserId);
-  const [isDecrypting, setIsDecrypting] = useState(false);
+  const [, setIsDecrypting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [hideOverwriteTip, setHideOverwriteTip] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(OVERWRITE_TIP_STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
   const {
     saveData,
     saveFileName,
@@ -45,28 +53,30 @@ export default function SelectSaveView() {
     [loadFromFile]
   );
 
-  const onSavFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    f.arrayBuffer().then((buf) => {
-      setSavBytes(new Uint8Array(buf));
-      setSavFileName(f.name);
-    });
-    e.target.value = "";
-  }, []);
-
-  const onDecryptSav = useCallback(async () => {
-    if (!savBytes || !userIdInput.trim()) return;
-    setIsDecrypting(true);
-    try {
-      await decryptSav(savBytes, userIdInput.trim(), savFileName);
-      try {
-        localStorage.setItem(USER_ID_STORAGE_KEY, userIdInput.trim());
-      } catch {}
-    } finally {
-      setIsDecrypting(false);
-    }
-  }, [savBytes, userIdInput, savFileName, decryptSav]);
+  const onSavFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      f.arrayBuffer().then(async (buf) => {
+        const bytes = new Uint8Array(buf);
+        setSavBytes(bytes);
+        setSavFileName(f.name);
+        const uid = userIdInput.trim();
+        if (!uid) return;
+        setIsDecrypting(true);
+        try {
+          await decryptSav(bytes, uid, f.name);
+          try {
+            localStorage.setItem(USER_ID_STORAGE_KEY, uid);
+          } catch {}
+        } finally {
+          setIsDecrypting(false);
+        }
+      });
+      e.target.value = "";
+    },
+    [decryptSav, userIdInput],
+  );
 
   const saveUserIdToStorage = useCallback(() => {
     const v = userIdInput.trim();
@@ -126,16 +136,13 @@ export default function SelectSaveView() {
               Clear saved ID
             </button>
           )}
-          <button
-            type="button"
-            onClick={onDecryptSav}
-            disabled={!savBytes || !userIdInput.trim() || isDecrypting}
-            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDecrypting ? "Decrypting…" : "Decrypt"}
-          </button>
         </div>
         {savFileName && <p className="mt-2 text-sm text-[var(--color-text-muted)]">Selected: {savFileName}</p>}
+        {!userIdInput.trim() && (
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+            Enter your User ID first; when you choose a .sav it will decrypt automatically.
+          </p>
+        )}
       </div>
 
       <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
@@ -187,7 +194,27 @@ export default function SelectSaveView() {
             disabled={!saveData || !savePlatform || isDownloading}
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isDownloading ? "Downloading…" : "Download .sav"}
+            {isDownloading ? "Saving…" : "Overwrite save"}
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!saveData || !savePlatform) return;
+              const base =
+                saveFileName?.replace(/\.(json|yaml|yml|txt)$/i, ".sav") ?? "bl4-save.sav";
+              const name = window.prompt("Save as filename", base);
+              if (!name) return;
+              setIsDownloading(true);
+              try {
+                await downloadAsSav(name);
+              } finally {
+                setIsDownloading(false);
+              }
+            }}
+            disabled={!saveData || !savePlatform || isDownloading}
+            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isDownloading ? "Saving…" : "Save As…"}
           </button>
           <button
             type="button"
@@ -228,6 +255,33 @@ export default function SelectSaveView() {
             <p>Character: {summary.charName}</p>
             <p>Level: {summary.level}</p>
             {summary.difficulty !== "—" && <p>Difficulty: {summary.difficulty}</p>}
+          </div>
+        )}
+        {!hideOverwriteTip && (
+          <div className="mt-3 text-[11px] text-[var(--color-text-muted)] space-y-1 border-t border-[var(--color-panel-border)] pt-2">
+            <p>
+              <strong className="text-[var(--color-text)]">Tip:</strong> To truly overwrite your save, choose the same folder your
+              .sav came from and accept your browser&apos;s &quot;Replace?&quot; prompt. &quot;Overwrite save&quot; always uses the
+              original filename so this is just a two-click flow.
+            </p>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hideOverwriteTip}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  setHideOverwriteTip(next);
+                  try {
+                    if (next) localStorage.setItem(OVERWRITE_TIP_STORAGE_KEY, "1");
+                    else localStorage.removeItem(OVERWRITE_TIP_STORAGE_KEY);
+                  } catch {
+                    // ignore storage errors
+                  }
+                }}
+                className="rounded border-[var(--color-panel-border)]"
+              />
+              <span>Don&apos;t show this tip again</span>
+            </label>
           </div>
         )}
       </div>

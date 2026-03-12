@@ -88,7 +88,7 @@ export default function YamlPage() {
 
       {viewMode === "yaml" && (
         <>
-          <p className="text-xs text-[var(--color-text-muted)]">Edit raw YAML (as-is). Apply to update the save; Download .sav from Select Save to export.</p>
+          <p className="text-xs text-[var(--color-text-muted)]">Edit raw YAML (as-is). Apply to update the save; use Overwrite save from Select Save to export.</p>
           <textarea
             value={yamlText}
             onChange={(e) => setYamlText(e.target.value)}

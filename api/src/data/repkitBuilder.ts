@@ -129,19 +129,26 @@ export function getRepkitBuilderData(): RepkitBuilderData {
       const partId = parseInt(trim(r["Part_ID"]), 10);
       if (!Number.isFinite(partId)) continue;
       const partType = trim(r["Part_type"]);
-      const stat = trim(r["Stat"]);
+      const name = trim(r["Name"]);
+      const statFromCsv = trim(r["Stat"]);
       const desc = trim(r["Description"]);
+
+      // Treat "Name" as the short perk name; treat Stat/Description as longer effect text.
+      const stat = name || statFromCsv;
+      const description = desc || statFromCsv;
+
+      const base: RepkitBuilderPart = description ? { partId, stat, description } : { partId, stat };
 
       // Prefix group (typo \"Perfix\" is used in some datasets).
       if (partType === "Perfix" || partType === "Prefix") {
-        prefix.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+        prefix.push(base);
       } else if (partType === "Firmware") {
-        firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+        firmware.push(base);
       } else if (partType === "Resistance" || partType === "Immunity") {
-        resistance.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+        resistance.push(base);
       } else {
         // Everything else (Perk, Splat, Nova, Part, etc.) goes into the universal list.
-        universalPerks.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+        universalPerks.push(base);
       }
     }
   }
@@ -165,8 +172,12 @@ export function getRepkitBuilderData(): RepkitBuilderData {
       for (const p of list) {
         const m = masterById.get(p.partId);
         if (!m) continue;
-        if (m.stat) p.stat = m.stat;
-        if (m.desc) p.description = m.desc;
+        // Preserve the short name already in p.stat; use master data to enrich description only.
+        const pieces: string[] = [];
+        if (m.stat) pieces.push(m.stat);
+        if (m.desc) pieces.push(m.desc);
+        const combined = pieces.join(" ");
+        if (combined) p.description = combined;
       }
     };
 

@@ -33,3 +33,14 @@ dist/
 # Logs (optional)
 *.log
 logs/
+
+# External reference HTML/data source directories (desktop save editor)
+# These live outside or alongside this repo and should never be checked in.
+Borderlands4-SaveEditor-3.4.5.2/
+**/reference htmls/
+
+# One-off local scraping/merge helpers for reference HTML/CSVs
+tools/export_embedded_parts_to_csv.py
+tools/merge_bl4_master_database_into_db.py
+tools/merge_embedded_parts_into_databases.py
+tools/merge_reference_save_editor_into_db.py

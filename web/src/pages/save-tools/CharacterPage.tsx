@@ -226,7 +226,7 @@ export default function CharacterPage() {
           const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
           updateSaveData(parsed);
           const label = actionLabel ?? presetName;
-          setMutationMessage(`Preset "${label}" applied and saved to loaded YAML. Use Download .sav on Select Save to export.`);
+          setMutationMessage(`Preset "${label}" applied and saved to loaded YAML. Use Overwrite save on Select Save to export.`);
           stampYamlWrite(`Preset: ${label}`);
         } else {
           setMutationMessage(data?.error ?? "Preset failed");
@@ -269,7 +269,7 @@ export default function CharacterPage() {
       </Link>
       <h1 className="text-xl font-semibold text-[var(--color-text)]">Character</h1>
       <p className="text-sm text-[var(--color-text-muted)]">
-        Edit character and currency. Click Apply to update the loaded save. Then use &quot;Download .sav&quot; on Select Save to export.
+        Edit character and currency. Click Apply to update the loaded save. Then use &quot;Overwrite save&quot; on Select Save to export.
       </p>
       {yamlWriteMessage && (
         <div className="max-w-4xl rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
@@ -374,7 +374,7 @@ export default function CharacterPage() {
           Apply Character Currency Changes
         </button>
         {applied && (
-          <span className="text-sm text-[var(--color-accent)]">Saved. Use &quot;Download .sav&quot; on Select Save to export.</span>
+          <span className="text-sm text-[var(--color-accent)]">Saved. Use &quot;Overwrite save&quot; on Select Save to export.</span>
         )}
       </div>
 

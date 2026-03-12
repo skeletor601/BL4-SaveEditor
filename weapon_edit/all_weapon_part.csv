@@ -3014,3 +3014,146 @@ Model: Rare"
 275,Ripper,Heavy Weapon,10,Rarity,Jelly Skin,Can be used for skin
 23,Ripper,Sniper,57,Rarity,Rainmaker,Legendary
 10,Maliwan,Shotgun,80,Rarity,Mantra,Legendary
+312,Daedalus,shields,6,Shield,dad_shield.part_body_angel,"4040, 3855/s, 0.7"
+312,Daedalus,shields,8,Shield,dad_shield.part_unique_SuperSoldier,"15007, 2570/s, 2.9"
+312,Daedalus,shields,10,Shield,dad_shield.part_body_energy,"8551, 2677/s, 4.3"
+306,Jakobs,shields,7,Shield,jak_shield.part_body_barrelAged,"8783, 1, 24%"
+306,Jakobs,shields,8,Shield,jak_shield.part_body_armor_OnionLayeredGuard,"8783, 4, 24%"
+306,Jakobs,shields,10,Shield,jak_shield.part_body_armor,"6506, 3, 21%"
+279,Maliwan,shields,1,Shield,mal_shield.part_unique_supernova,"14054, 2650/s, 4.3"
+279,Maliwan,shields,2,Shield,mal_shield.part_body_energy,"10410, 2208/s, 5.2"
+279,Maliwan,shields,8,Shield,mal_shield.part_unique_momento,"14054, 2650/s, 4.3"
+293,Order,shields,1,Shield,ord_shield.part_unique_cindershelly,"17065, 1606/s, 2.8"
+293,Order,shields,2,Shield,ord_shield.part_body_energy_ProteanCell,"20478, 964/s, 3.4"
+293,Order,shields,4,Shield,ord_shield.part_body_energy,"12641, 1338/s, 3.4"
+300,Ripper,shields,6,Shield,bor_shield.part_body_energy_lightning,"10979, 602/s, 0.6"
+300,Ripper,shields,8,Shield,bor_shield.part_body_energy_Watts4Dinner,"7905, 723/s. 1.5"
+300,Ripper,shields,10,Shield,bor_shield.part_body_energy,"6506, 669/s, 0.7"
+300,Ripper,shields,11,Shield,bor_shield.part_body_energy_firewall,"6588, 803/s, 1.2"
+287,Tediore,shields,6,Shield,ted_shield.part_body_ShieldBoi,"12046, 2, 29%"
+287,Tediore,shields,9,Shield,ted_shield.part_body_timekeeper,",,"
+287,Tediore,shields,10,Shield,ted_shield.part_body_armor,"8923, 2, 25%"
+321,Torgue,shields,6,Shield,tor_shield.part_unique_firewerks,"10038, 3, 26%"
+321,Torgue,shields,9,Shield,tor_shield.part_body_armor_compleat,"12548, 5, 26%"
+321,Torgue,shields,10,Shield,tor_shield.part_body_armor,"7436, 3, 23%"
+283,Vladof,shields,6,Shield,vla_shield.part_body_armor_Hoarder,"7529, 4, 22%"
+283,Vladof,shields,8,Shield,vla_shield.part_body_armor_HeavyWeight,"7529, 4, 22%"
+283,Vladof,shields,10,Shield,vla_shield.part_body_armor,"5577, 4, 19%"
+283,Vladof,shields,11,Shield,vla_shield.part_body_armor_undershield,
+277,Daedalus,repkits,1,Augment,dad_repair_kit.part_augment_unique_Pacemaker,
+277,Daedalus,repkits,8,Augment,dad_repair_kit.part_augment_unique_healthraiser,
+277,Daedalus,repkits,2,Base,dad_repair_kit.part_dad,"1562, 2900 8s, 20s CD"
+265,Jakobs,repkits,6,Augment,jak_repair_kit.part_augment_unique_Defibrillator,
+265,Jakobs,repkits,7,Base,jak_repair_kit.part_jak,"4461, , 24s CD"
+266,Maliwan,repkits,6,Augment,mal_repair_kit.part_augment_unique_BloodAnalyzer,
+266,Maliwan,repkits,7,Base,mal_repair_kit.part_mal,"2900, 1562 8s, 20s CD"
+285,Order,repkits,1,Augment,ord_repair_kit.part_augment_unique_TripleBypass,
+285,Order,repkits,2,Base,ord_repair_kit.part_ord,"2082, 2082 8s, 24s CD"
+274,Ripper,repkits,1,Augment,bor_repair_kit.part_augment_unique_augmenter,
+274,Ripper,repkits,2,Base,bor_repair_kit.part_borg,", 5949 10s, 20s CD"
+290,Tediore,repkits,1,Augment,ted_repair_kit.part_augment_unique_KillSpring,
+290,Tediore,repkits,2,Base,ted_repair_kit.part_ted,", 2974 8s, 16s CD"
+261,Torgue,repkits,6,Augment,tor_repair_kit.part_augment_unique_ShinyWarPaint,
+261,Torgue,repkits,7,Base,tor_repair_kit.part_tor,"1190, 1190 6s, 16s CD"
+269,Vladof,repkits,6,Augment,vla_repair_kit.part_augment_unique_AdrenalinePump,
+269,Vladof,repkits,7,Base,vla_repair_kit.part_vla,"2082, , 16s CD"
+270,Daedalus,grenades,10,Base,dad_grenade_gadget.part_dad,
+270,Daedalus,grenades,6,Payload,dad_grenade_gadget.part_payload_Axe,
+270,Daedalus,grenades,8,Payload,dad_grenade_gadget.part_payload_Fuse,
+270,Daedalus,grenades,1,Rarities,,
+270,Daedalus,grenades,2,Rarities,,
+270,Daedalus,grenades,3,Rarities,,
+270,Daedalus,grenades,4,Rarities,,
+270,Daedalus,grenades,7,Rarities,,
+270,Daedalus,grenades,9,Rarities,,
+267,Jakobs,grenades,1,Base,jak_grenade_gadget.part_jak,
+267,Jakobs,grenades,9,Base,jak_grenade_gadget.part_spinning_blade,
+267,Jakobs,grenades,11,Base,jak_grenade_gadget.part_ShoKunai,
+267,Jakobs,grenades,4,Rarities,,
+267,Jakobs,grenades,5,Rarities,,
+267,Jakobs,grenades,6,Rarities,,
+267,Jakobs,grenades,7,Rarities,,
+267,Jakobs,grenades,12,Rarities,,
+267,Jakobs,grenades,10,Rarities,,
+263,Maliwan,grenades,3,Base,mal_grenade_gadget.part_mal,"Plasma Grenade, 16s CD, 5949 Damage, 300cm Radius, 2 Charges"
+263,Maliwan,grenades,10,Base,mal_grenade_gadget.part_disco_disc,
+263,Maliwan,grenades,12,Base,mal_grenade_gadget.part_recursive,
+263,Maliwan,grenades,4,Rarities,,
+263,Maliwan,grenades,5,Rarities,,
+263,Maliwan,grenades,6,Rarities,,
+263,Maliwan,grenades,7,Rarities,,
+263,Maliwan,grenades,9,Rarities,,
+263,Maliwan,grenades,11,Rarities,,
+272,Order,grenades,1,Base,ord_grenade_gadget.part_ord,
+272,Order,grenades,7,Base,ord_grenade_gadget.part_01_mirv_05_swarm,
+272,Order,grenades,9,Base,ord_grenade_gadget.part_aggrovator,
+272,Order,grenades,11,Base,ord_grenade_gadget.part_skully,
+272,Order,grenades,2,Rarities,,
+272,Order,grenades,3,Rarities,,
+272,Order,grenades,4,Rarities,,
+272,Order,grenades,5,Rarities,,
+272,Order,grenades,10,Rarities,,
+272,Order,grenades,12,Rarities,,
+272,Order,grenades,8,Rarities,,
+278,Ripper,grenades,2,Base,borg_grenade_gadget.part_borg,
+278,Ripper,grenades,10,Payload,borg_grenade_gadget.part_payload_unique_rubber,
+278,Ripper,grenades,11,Payload,borg_grenade_gadget.part_payload_unique_buoy,
+278,Ripper,grenades,14,Payload,borg_grenade_gadget.part_payload_unique_transmission,
+278,Ripper,grenades,4,Rarities,,
+278,Ripper,grenades,5,Rarities,,
+278,Ripper,grenades,6,Rarities,,
+278,Ripper,grenades,7,Rarities,,
+278,Ripper,grenades,12,Rarities,,
+278,Ripper,grenades,9,Rarities,,
+278,Ripper,grenades,15,Rarities,,
+311,Tediore,grenades,6,Base,ted_grenade_gadget.part_FaultyDetonator,
+311,Tediore,grenades,8,Base,ted_grenade_gadget.part_PredatorDrone,
+311,Tediore,grenades,10,Base,ted_grenade_gadget.part_ted,
+311,Tediore,grenades,11,Base,ted_grenade_gadget.part_urchin,
+311,Tediore,grenades,1,Rarities,,
+311,Tediore,grenades,2,Rarities,,
+311,Tediore,grenades,3,Rarities,,
+311,Tediore,grenades,4,Rarities,,
+311,Tediore,grenades,7,Rarities,,
+311,Tediore,grenades,9,Rarities,,
+298,Torgue,grenades,8,Base,tor_grenade_gadget.part_tor_slippy,
+298,Torgue,grenades,10,Base,tor_grenade_gadget.part_tor,
+298,Torgue,grenades,6,Payload,tor_grenade_gadget.part_payload_firepot,
+298,Torgue,grenades,1,Rarities,,
+298,Torgue,grenades,2,Rarities,,
+298,Torgue,grenades,3,Rarities,,
+298,Torgue,grenades,4,Rarities,,
+298,Torgue,grenades,7,Rarities,,
+298,Torgue,grenades,9,Rarities,,
+291,Vladof,grenades,6,Base,vla_grenade_gadget.part_Blockbuster,
+291,Vladof,grenades,8,Base,vla_grenade_gadget.part_vla_Waterfall,
+291,Vladof,grenades,10,Base,vla_grenade_gadget.part_vla,
+291,Vladof,grenades,1,Rarities,,
+291,Vladof,grenades,2,Rarities,,
+291,Vladof,grenades,3,Rarities,,
+291,Vladof,grenades,4,Rarities,,
+291,Vladof,grenades,7,Rarities,,
+291,Vladof,grenades,9,Rarities,,
+244,Maliwan,heavy_weapons,11,Firmware,heavy_weapon_gadget.part_firmware_action_fist,
+244,Maliwan,heavy_weapons,4,Firmware,heavy_weapon_gadget.part_firmware_airstrike,
+244,Maliwan,heavy_weapons,13,Firmware,heavy_weapon_gadget.part_firmware_atlas_ex,
+244,Maliwan,heavy_weapons,14,Firmware,heavy_weapon_gadget.part_firmware_atlas_infinum,
+244,Maliwan,heavy_weapons,7,Firmware,heavy_weapon_gadget.part_firmware_baker,
+244,Maliwan,heavy_weapons,19,Firmware,heavy_weapon_gadget.part_firmware_bullets_to_spare,
+244,Maliwan,heavy_weapons,20,Firmware,heavy_weapon_gadget.part_firmware_daeddy_o,
+244,Maliwan,heavy_weapons,10,Firmware,heavy_weapon_gadget.part_firmware_deadeye,
+244,Maliwan,heavy_weapons,6,Firmware,heavy_weapon_gadget.part_firmware_gadget_ahoy,
+244,Maliwan,heavy_weapons,17,Firmware,heavy_weapon_gadget.part_firmware_get_throwin,
+244,Maliwan,heavy_weapons,1,Firmware,heavy_weapon_gadget.part_firmware_god_killer,
+244,Maliwan,heavy_weapons,12,Firmware,heavy_weapon_gadget.part_firmware_goojfc,
+244,Maliwan,heavy_weapons,18,Firmware,heavy_weapon_gadget.part_firmware_heating_up,
+244,Maliwan,heavy_weapons,5,Firmware,heavy_weapon_gadget.part_firmware_high_caliber,
+244,Maliwan,heavy_weapons,16,Firmware,heavy_weapon_gadget.part_firmware_jacked,
+244,Maliwan,heavy_weapons,3,Firmware,heavy_weapon_gadget.part_firmware_lifeblood,
+244,Maliwan,heavy_weapons,8,Firmware,heavy_weapon_gadget.part_firmware_oscar_mike,
+244,Maliwan,heavy_weapons,2,Firmware,heavy_weapon_gadget.part_firmware_reel_big_fist,
+244,Maliwan,heavy_weapons,26,Firmware,heavy_weapon_gadget.part_firmware_risky_boots,
+244,Maliwan,heavy_weapons,9,Firmware,heavy_weapon_gadget.part_firmware_rubberband_man,
+244,Maliwan,heavy_weapons,15,Firmware,heavy_weapon_gadget.part_firmware_trickshot,
+244,Maliwan,heavy_weapons,27,Firmware,heavy_weapon_gadget.part_firmware_skillcraft,
+275,Ripper,heavy_weapons,35,Barrel,BOR_HW.part_barrel_02_jetset,Frequent Flyer

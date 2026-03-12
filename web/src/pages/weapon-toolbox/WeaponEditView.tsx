@@ -734,7 +734,7 @@ export default function WeaponEditView({
         updateSaveData(parsed);
         setSerialInput(encData.serial);
         setEncodedSerial(encData.serial);
-        setMessage("Weapon updated in backpack. Use Download .sav on Select Save to export.");
+        setMessage("Weapon updated in backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(updateJson?.error ?? "Update failed");
       }
@@ -799,7 +799,7 @@ export default function WeaponEditView({
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage("Item added to backpack. Use Download .sav on Select Save to export.");
+        setMessage("Item added to backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(data?.error ?? "Add failed");
       }

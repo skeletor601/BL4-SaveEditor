@@ -7,16 +7,15 @@ import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/api
 import { usePersistedState } from "@/lib/usePersistedState";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
-
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3" },
-  { value: 5, label: "5" },
-  { value: 17, label: "17" },
-  { value: 33, label: "33" },
-  { value: 65, label: "65" },
-  { value: 129, label: "129" },
-];
+import ThemedSelect from "@/components/weapon-toolbox/ThemedSelect";
+import {
+  blockClass,
+  labelClass,
+  inputClass,
+  buttonSecondaryClass,
+  buttonPrimaryClass,
+  FLAG_OPTIONS,
+} from "@/components/weapon-toolbox/builderStyles";
 
 type ItemTypeKey = "grenade" | "shield" | "repkit" | "heavy";
 
@@ -560,7 +559,7 @@ export default function ItemEditView({
         updateSaveData(parsed);
         setSerialInput(encData.serial);
         setEncodedSerial(encData.serial);
-        setMessage("Item updated in backpack. Use Download .sav on Select Save to export.");
+        setMessage("Item updated in backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(updateJson?.error ?? "Update failed");
       }
@@ -605,7 +604,7 @@ export default function ItemEditView({
       if (data?.success && typeof data?.yaml_content === "string") {
         const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
         updateSaveData(parsed);
-        setMessage("Item added to backpack. Use Download .sav on Select Save to export.");
+        setMessage("Item added to backpack. Use Overwrite save on Select Save to export.");
       } else {
         setMessage(data?.error ?? "Add failed");
       }
@@ -789,7 +788,7 @@ export default function ItemEditView({
         <button
           type="button"
           onClick={() => setShowCleanCode(true)}
-          className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px] text-sm"
+          className={`w-full sm:w-auto ${buttonSecondaryClass} text-sm`}
           title="Combine like codes in the decoded serial (e.g. {245:1} {245:2} → {245:[1 2]})"
         >
           Clean Code
@@ -797,8 +796,8 @@ export default function ItemEditView({
       </div>
 
       {/* Load from backpack */}
-      <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-2">Load from backpack</h3>
+      <div className={blockClass}>
+        <h3 className={`${labelClass} mb-2`}>Load from backpack</h3>
         {!saveData ? (
           <p className="text-sm text-[var(--color-text-muted)]">
             <Link to="/character/select-save" className="text-[var(--color-accent)] hover:underline">
@@ -812,7 +811,7 @@ export default function ItemEditView({
               type="button"
               onClick={loadBackpackItems}
               disabled={loading === "backpack"}
-              className="mb-3 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+              className={`mb-3 ${buttonSecondaryClass} disabled:opacity-50`}
             >
               {loading === "backpack" ? "Refreshing…" : "Refresh list"}
             </button>
@@ -827,7 +826,7 @@ export default function ItemEditView({
                   key={it.serial + it.slot.path.join("/")}
                   type="button"
                   onClick={() => handleSelectItem(it)}
-                  className="block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)]"
+                  className={`block w-full text-left px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm text-[var(--color-text)] hover:border-[var(--color-accent)] min-h-[44px] touch-manipulation`}
                   style={{ touchAction: "manipulation" }}
                 >
                   {it.itemType ?? "Item"} — Lv.{it.level ?? "?"} — {it.slot.slotKey}
@@ -840,39 +839,39 @@ export default function ItemEditView({
 
       {!suppressCodecPanels && (
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-            <h3 className="text-[var(--color-accent)] font-medium mb-2">Base85 / Serial</h3>
+          <div className={blockClass}>
+            <h3 className={`${labelClass} mb-2`}>Base85 / Serial</h3>
             <textarea
               value={serialInput}
               onChange={(e) => setSerialInput(e.target.value)}
               placeholder="Paste @U... serial"
               rows={4}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+              className={`${inputClass} text-sm font-mono resize-y`}
             />
             <button
               type="button"
               onClick={handleDecode}
               disabled={loading !== null}
-              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+              className={`mt-2 ${buttonSecondaryClass} disabled:opacity-50`}
             >
               {loading === "decode" ? "Decoding…" : "Decode → Deserialized"}
             </button>
           </div>
 
-          <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-            <h3 className="text-[var(--color-accent)] font-medium mb-2">Deserialized (decoded) string</h3>
+          <div className={blockClass}>
+            <h3 className={`${labelClass} mb-2`}>Deserialized (decoded) string</h3>
             <textarea
               value={decodedInput}
               onChange={(e) => setDecodedInput(e.target.value)}
               placeholder="Paste decoded string (e.g. 270, 0, 1, 50| ... || {245:1} {245:2})"
               rows={4}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+              className={`${inputClass} text-sm font-mono resize-y`}
             />
             <button
               type="button"
               onClick={handleEncode}
               disabled={loading !== null}
-              className="mt-2 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+              className={`mt-2 ${buttonSecondaryClass} disabled:opacity-50`}
             >
               {loading === "encode" ? "Encoding…" : "Encode → Base85"}
             </button>
@@ -880,27 +879,19 @@ export default function ItemEditView({
         </div>
       )}
 
-      {/* Skin - same as Weapon Edit: preview/paster, add to build */}
+      {/* Skin - same as Weapon Edit: ThemedSelect + preview, add to build */}
       {skinOptions.length > 0 && (
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-          <h3 className="text-[var(--color-accent)] font-medium mb-2">Skin</h3>
+        <div className={blockClass}>
+          <h3 className={`${labelClass} mb-2`}>Skin</h3>
           <div className="flex flex-wrap items-center gap-2">
-            <select
+            <ThemedSelect
               value={skinComboValue}
-              onChange={(e) => setSkinComboValue(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
+              onChange={(v) => setSkinComboValue(v)}
+              options={[{ value: "", label: "None" }, ...skinOptions.map((s) => ({ value: s.value, label: s.label }))]}
+              className={inputClass}
               style={{ maxWidth: "20rem" }}
-            >
-              <option value="">None</option>
-              {skinOptions.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={handleSkinAddToItem}
-              className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[44px]"
-            >
+            />
+            <button type="button" onClick={handleSkinAddToItem} className={buttonSecondaryClass}>
               Add to Item
             </button>
           </div>
@@ -917,14 +908,10 @@ export default function ItemEditView({
 
       {/* Item parts list + Add Part (simplified, using app CSV data) */}
       {parsedComponents.length > 0 && itemEditData && currentTypeKey && (
-        <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
+        <div className={blockClass}>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[var(--color-accent)] font-medium">Item Parts</h3>
-            <button
-              type="button"
-              onClick={handleOpenAddPart}
-              className="px-3 py-1 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] text-sm min-h-[32px]"
-            >
+            <h3 className={labelClass}>Item Parts</h3>
+            <button type="button" onClick={handleOpenAddPart} className={`${buttonSecondaryClass} text-sm`}>
               + Add Part
             </button>
           </div>
@@ -957,30 +944,9 @@ export default function ItemEditView({
                   </span>
                   <span className="truncate text-[var(--color-text-muted)] text-xs">{partStringLabel}</span>
                   <span className="flex gap-1 justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleMoveItemLayer(groupIndex, -1)}
-                      className="px-1.5 py-0.5 rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-xs border border-[var(--color-panel-border)]"
-                      title="Move up"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleMoveItemLayer(groupIndex, 1)}
-                      className="px-1.5 py-0.5 rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-xs border border-[var(--color-panel-border)]"
-                      title="Move down"
-                    >
-                      ↓
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteItemLayer(groupIndex)}
-                      className="px-1.5 py-0.5 rounded bg-[firebrick] text-white text-xs border border-[firebrick]"
-                      title="Remove"
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => handleMoveItemLayer(groupIndex, -1)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-sm border border-[var(--color-panel-border)] touch-manipulation" title="Move up">↑</button>
+                    <button type="button" onClick={() => handleMoveItemLayer(groupIndex, 1)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[rgba(40,40,40,0.9)] text-[var(--color-text)] text-sm border border-[var(--color-panel-border)] touch-manipulation" title="Move down">↓</button>
+                    <button type="button" onClick={() => handleDeleteItemLayer(groupIndex)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded bg-[firebrick] text-white text-sm border border-[firebrick] touch-manipulation" title="Remove">×</button>
                   </span>
                 </div>
               );
@@ -990,26 +956,22 @@ export default function ItemEditView({
       )}
 
       {/* Actions: Update Item, Add to Backpack, Flag */}
-      <div className="border border-[var(--color-panel-border)] rounded-lg p-4 bg-[rgba(24,28,34,0.6)]">
-        <h3 className="text-[var(--color-accent)] font-medium mb-2">Actions</h3>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <label className="text-sm text-[var(--color-text-muted)]">Flag:</label>
-          <select
-            value={flagValue}
-            onChange={(e) => setFlagValue(Number(e.target.value))}
-            className="w-full sm:w-auto px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] min-h-[44px]"
-          >
-            {FLAG_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
+      <div className={blockClass}>
+        <h3 className={`${labelClass} mb-2`}>Actions</h3>
+        <div className="flex flex-wrap items-center gap-2 gap-y-3">
+          <label className={labelClass}>Flag</label>
+          <ThemedSelect
+            value={String(flagValue)}
+            onChange={(v) => setFlagValue(Number(v))}
+            options={FLAG_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+            className={inputClass}
+            style={{ width: "10rem" }}
+          />
           <button
             type="button"
             onClick={handleUpdateItem}
             disabled={loading !== null || !selectedItemPath?.length}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] disabled:opacity-50 min-h-[44px]"
+            className={`w-full sm:w-auto ${buttonSecondaryClass} disabled:opacity-50 touch-manipulation`}
           >
             {loading === "update" ? "Updating…" : "Update Item"}
           </button>
@@ -1017,7 +979,7 @@ export default function ItemEditView({
             type="button"
             onClick={handleAddToBackpack}
             disabled={loading !== null || !saveData}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
+            className={`w-full sm:w-auto ${buttonPrimaryClass} touch-manipulation`}
           >
             {loading === "add" ? "Adding…" : "Add to Backpack"}
           </button>
@@ -1030,12 +992,7 @@ export default function ItemEditView({
         {encodedSerial && (
           <div className="mt-3">
             <p className="text-xs text-[var(--color-text-muted)] mb-1">Encoded serial</p>
-            <textarea
-              readOnly
-              value={encodedSerial}
-              rows={2}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs font-mono"
-            />
+            <textarea readOnly value={encodedSerial} rows={2} className={`${inputClass} text-xs font-mono`} />
           </div>
         )}
       </div>
@@ -1045,13 +1002,13 @@ export default function ItemEditView({
       {/* Add Part modal: checkbox list + qty, same pattern as Weapon Edit */}
       {showAddPart && itemEditData && currentTypeKey && (
         <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-40 p-2 sm:p-4">
-          <div className="max-h-[88vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
-            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+          <div className="max-h-[85dvh] sm:max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl flex flex-col">
+            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
               <h3 className="text-[var(--color-accent)] font-medium text-sm">Add Parts</h3>
               <button
                 type="button"
                 onClick={() => setShowAddPart(false)}
-                className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm touch-manipulation"
               >
                 Close
               </button>
@@ -1062,7 +1019,7 @@ export default function ItemEditView({
                   key={idx}
                   role="button"
                   tabIndex={0}
-                  className={`flex flex-wrap items-center gap-2 rounded px-2 py-1 border cursor-pointer ${
+                  className={`flex flex-wrap items-center gap-2 rounded px-3 py-2 min-h-[44px] border cursor-pointer touch-manipulation ${
                     s.checked
                       ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
                       : "border-transparent hover:border-[var(--color-panel-border)] hover:bg-[rgba(255,255,255,0.04)] text-[var(--color-text)]"
@@ -1077,13 +1034,13 @@ export default function ItemEditView({
                     handleToggleAddPartSelection(idx);
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={s.checked}
-                    onChange={() => handleToggleAddPartSelection(idx)}
-                    className="w-4 h-4 shrink-0 cursor-pointer"
-                    style={{ accentColor: "var(--color-accent)" }}
-                  />
+                    <input
+                      type="checkbox"
+                      checked={s.checked}
+                      onChange={() => handleToggleAddPartSelection(idx)}
+                      className="w-5 h-5 shrink-0 cursor-pointer"
+                      style={{ accentColor: "var(--color-accent)" }}
+                    />
                   <span className="flex-1 flex items-center gap-1.5">
                     <span className="inline-flex items-center justify-center min-w-[1.25rem] px-1.5 py-0.5 rounded text-xs font-mono border border-[var(--color-panel-border)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] shrink-0">
                       {s.row.partId}
@@ -1105,19 +1062,11 @@ export default function ItemEditView({
                 </div>
               ))}
             </div>
-            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowAddPart(false)}
-                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:bg-[var(--color-panel-border)] min-h-[40px] text-sm"
-              >
+            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex flex-wrap justify-end gap-2 shrink-0">
+              <button type="button" onClick={() => setShowAddPart(false)} className={`${buttonSecondaryClass} text-sm`}>
                 Cancel
               </button>
-              <button
-                type="button"
-                onClick={handleConfirmAddParts}
-                className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[40px] text-sm"
-              >
+              <button type="button" onClick={handleConfirmAddParts} className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 min-h-[44px] text-sm touch-manipulation">
                 Confirm Add
               </button>
             </div>

@@ -136,7 +136,7 @@ function SaveToolsHub() {
             disabled={!saveData || !savePlatform}
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Download .sav
+            Overwrite save
           </button>
           <button
             type="button"
@@ -182,7 +182,7 @@ function SaveToolsHub() {
       </div>
 
       <p className="text-[10px] text-[var(--color-text-muted)]">
-        Use &quot;No-Edit Roundtrip&quot; after decrypt to download a rebuilt .sav (no YAML touch). Use &quot;Download .sav&quot; for edited or JSON/YAML-opened saves. Use “Open .sav” + your Epic or Steam User ID to load a save; edit in Character/Inventory/etc., then “Download .sav” to get an encrypted file back. You never need a PC or another site.
+        Use &quot;No-Edit Roundtrip&quot; after decrypt to download a rebuilt .sav (no YAML touch). Use &quot;Overwrite save&quot; for edited or JSON/YAML-opened saves. Use “Open .sav” + your Epic or Steam User ID to load a save; edit in Character/Inventory/etc., then “Overwrite save” to get an encrypted file back. You never need a PC or another site.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

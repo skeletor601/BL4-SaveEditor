@@ -122,4 +122,4 @@ Daedalus,Pacemaker,dad_repair_kit.part_augment_unique_Pacemaker,277,1,,Pulseomet
 Order,Triple Bypass,ord_repair_kit.part_augment_unique_TripleBypass,285,1,,Heart Pump,
 Order,Recorporator,ord_repair_kit.part_ord,285,2,"2082, 2082 8s, 24s CD",,
 Tediore,Kill Spring,ted_repair_kit.part_augment_unique_KillSpring,290,1,,Blood Siphon,
-Tediore,Pocket Doc,ted_repair_kit.part_ted,290,2,", 2974 8s, 16s CD",,
+Tediore,Pocket Doc,ted_repair_kit.part_ted,290,2,", 2974 8s, 16s CD",,Universal,Skillcraft,repair_kit.part_firmware_skillcraft,243,113,Skillcraft,,Skillcraft mod

@@ -185,6 +185,17 @@ export function getWeaponGenData(): WeaponGenData {
   const godrolls = loadGodrolls();
   const skins = loadSkins();
 
+  const partTypesWeWantList = [
+    "Body", "Body Accessory", "Barrel", "Barrel Accessory", "Magazine", "Stat Modifier",
+    "Grip", "Foregrip", "Manufacturer Part", "Scope", "Scope Accessory", "Underbarrel", "Underbarrel Accessory",
+  ];
+  const partTypesWeWant = new Set(partTypesWeWantList);
+  const partTypeNorm = (pt: string): string => {
+    const lower = pt.trim().toLowerCase();
+    const found = partTypesWeWantList.find((c) => c.toLowerCase() === lower);
+    return found ?? pt.trim();
+  };
+
   const mfgWtIdSet = new Map<string, string>();
   for (const r of partRows) {
     if (r.mfgWtId && r.manufacturer && r.weaponType) {
@@ -192,6 +203,31 @@ export function getWeaponGenData(): WeaponGenData {
       if (!mfgWtIdSet.has(key)) mfgWtIdSet.set(key, r.mfgWtId);
     }
   }
+  // Add mfgWtIds from universal so Master Unlock can show all parts (including from sources not in weapon CSV)
+  const universalPath = getPath("master_search/db/universal_parts_db.json");
+  if (existsSync(universalPath)) {
+    try {
+      const raw = JSON.parse(readFileSync(universalPath, "utf-8"));
+      const rows = (raw?.rows ?? []) as Record<string, unknown>[];
+      for (const r of rows) {
+        const code = String(r.code ?? "").trim();
+        const partTypeRaw = String(r["Part Type"] ?? "").trim();
+        const partTypeCanon = partTypeNorm(partTypeRaw);
+        if (!partTypesWeWant.has(partTypeCanon)) continue;
+        const codeMatch = code.match(/^\s*\{\s*(\d+)\s*:/);
+        const typeId = codeMatch ? codeMatch[1] : "";
+        if (!typeId) continue;
+        const manufacturer = String(r.Manufacturer ?? "").trim();
+        const weaponType = String(r["Weapon Type"] ?? r.WeaponType ?? "").trim();
+        if (!manufacturer || !weaponType) continue;
+        const key = `${manufacturer}\t${weaponType}`;
+        if (!mfgWtIdSet.has(key)) mfgWtIdSet.set(key, typeId);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   const mfgWtIdList: MfgTypeIdEntry[] = Array.from(mfgWtIdSet.entries()).map(([key, mfgWtId]) => {
     const [manufacturer, weaponType] = key.split("\t");
     return { manufacturer, weaponType, mfgWtId };
@@ -200,21 +236,17 @@ export function getWeaponGenData(): WeaponGenData {
   const weaponTypes = [...new Set(mfgWtIdList.map((e) => e.weaponType))].sort();
 
   const partsByMfgTypeId: Record<string, Record<string, { partId: string; label: string }[]>> = {};
-  const partTypesWeWant = new Set([
-    "Body", "Body Accessory", "Barrel", "Barrel Accessory", "Magazine", "Stat Modifier",
-    "Grip", "Foregrip", "Manufacturer Part", "Scope", "Scope Accessory", "Underbarrel", "Underbarrel Accessory",
-  ]);
   for (const row of partRows) {
     if (!row.mfgWtId || !row.partId || row.partType === "Rarity") continue;
     if (!partsByMfgTypeId[row.mfgWtId]) partsByMfgTypeId[row.mfgWtId] = {};
-    const pt = row.partType;
+    const pt = partTypeNorm(row.partType);
+    if (!partTypesWeWant.has(pt)) continue;
     if (!partsByMfgTypeId[row.mfgWtId][pt]) partsByMfgTypeId[row.mfgWtId][pt] = [];
     const label = row.stat ? `${row.partId} - ${row.stat}` : row.partId;
     partsByMfgTypeId[row.mfgWtId][pt].push({ partId: row.partId, label });
   }
   const mfgWtIdByKey = new Map<string, string>();
   mfgWtIdList.forEach((e) => mfgWtIdByKey.set(`${e.manufacturer}\t${e.weaponType}`, e.mfgWtId));
-  const universalPath = getPath("master_search/db/universal_parts_db.json");
   if (existsSync(universalPath)) {
     try {
       const raw = JSON.parse(readFileSync(universalPath, "utf-8"));
@@ -222,7 +254,8 @@ export function getWeaponGenData(): WeaponGenData {
       for (const r of rows) {
         const manufacturer = String(r.Manufacturer ?? "").trim();
         const weaponType = String(r["Weapon Type"] ?? r.WeaponType ?? "").trim();
-        const partType = String(r["Part Type"] ?? "").trim();
+        const partTypeRaw = String(r["Part Type"] ?? "").trim();
+        const partType = partTypeNorm(partTypeRaw);
         const partId = String(r.ID ?? r.Id ?? "").trim();
         if (!manufacturer || !weaponType || !partType || !partId || !partTypesWeWant.has(partType)) continue;
         const key = `${manufacturer}\t${weaponType}`;
