@@ -25,6 +25,8 @@ export interface TranslatedLine {
   name: string;
   stats: string;
   qty: number;
+  /** First position this part appeared in the decoded build (for left-to-right ordering). */
+  firstIndex: number;
 }
 
 /** Extract parts list from decoded string/body with {tid:pid}, {tid}, "c", skinId/string. */
@@ -127,20 +129,17 @@ export function translateParts(
   elementalNames?: Map<number, string>
 ): TranslatedLine[] {
   const counts = new Map<string, TranslatedLine>();
-  for (const part of parts) {
+  parts.forEach((part, idx) => {
     const { partType, name, stats, codeKey: key } = lookupPart(part, byCode, elementalNames);
     const entry = counts.get(key);
     if (entry) {
       entry.qty += 1;
     } else {
-      counts.set(key, { codeKey: key, partType, name, stats, qty: 1 });
+      counts.set(key, { codeKey: key, partType, name, stats, qty: 1, firstIndex: idx });
     }
-  }
-  return Array.from(counts.values()).sort((a, b) => {
-    if (b.qty !== a.qty) return b.qty - a.qty;
-    if (a.partType !== b.partType) return a.partType.localeCompare(b.partType);
-    return a.name.localeCompare(b.name);
   });
+  // Preserve build order: sort by firstIndex (left-to-right, top-to-bottom in the decoded string).
+  return Array.from(counts.values()).sort((a, b) => a.firstIndex - b.firstIndex);
 }
 
 /** Format one translated line for display (desktop-style). */

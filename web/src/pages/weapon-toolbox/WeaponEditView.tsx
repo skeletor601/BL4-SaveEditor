@@ -91,6 +91,8 @@ interface UniversalDbPartCode {
   itemType?: string;
   manufacturer?: string;
   statText?: string;
+  string?: string;
+  partName?: string;
   uniqueEffect?: boolean;
   visualUniqueBarrel?: boolean;
 }
@@ -225,8 +227,15 @@ export default function WeaponEditView({
   const applyingExternalRef = useRef(false);
   const lastLoadRef = useRef<{ serial: string; at: number }>({ serial: "", at: 0 });
 
+  const autoGenerateModdedRanRef = useRef(false);
   useEffect(() => {
-    const state = location.state as { pasteDecoded?: string; loadItem?: { serial?: string; decodedFull?: string; path?: string[] } } | null;
+    const state = location.state as {
+      pasteDecoded?: string;
+      loadItem?: { serial?: string; decodedFull?: string; path?: string[] };
+      autoGenerateModded?: boolean;
+      modPowerMode?: "stable" | "op" | "insane";
+      level?: number;
+    } | null;
     const paste = state?.pasteDecoded;
     if (typeof paste === "string" && paste.trim()) {
       setDecodedInput(paste.trim());
@@ -244,6 +253,13 @@ export default function WeaponEditView({
       }
       setEncodedSerial("");
       setMessage("Item loaded from backpack. Edit and click Update Weapon to save.");
+    }
+    if (state?.autoGenerateModded) {
+      autoGenerateModdedRanRef.current = false;
+      if (state.modPowerMode) setModPowerMode(state.modPowerMode);
+      if (typeof state.level === "number" && state.level >= 1 && state.level <= 255) {
+        setNewWeaponLevel(String(state.level));
+      }
     }
   }, [location.state]);
 
@@ -972,6 +988,7 @@ export default function WeaponEditView({
         grenadePerkRange: [16, 52] as const,
         underAccRange: [1, 3] as const,
         statRange: [2, 6] as const,
+        enhancementRepeatRange: [0, 6] as const,
       },
       op: {
         exemplarCycleRepeats: [16, 72] as const,
@@ -985,6 +1002,7 @@ export default function WeaponEditView({
         grenadePerkRange: [24, 120] as const,
         underAccRange: [1, 6] as const,
         statRange: [3, 10] as const,
+        enhancementRepeatRange: [8, 48] as const,
       },
       insane: {
         exemplarCycleRepeats: [56, 180] as const,
@@ -998,8 +1016,23 @@ export default function WeaponEditView({
         grenadePerkRange: [80, 280] as const,
         underAccRange: [3, 10] as const,
         statRange: [8, 20] as const,
+        enhancementRepeatRange: [24, 120] as const,
       },
     }[modPowerMode];
+
+    /** Legacy enhancement prefixes (no longer used after simplified rules, kept for reference). */
+    // const ENHANCEMENT_PREFIXES = [234, 246, 268, 271, 275, 281, 287, 292, 299] as const;
+    // const GUN_BENEFICIAL_PREFIXES = [234, 246, 247] as const;
+    /** Underbarrels that do nothing - never pick these (Atlas Tracker Dart, Tracker Grenade). */
+    const UNDERBARREL_EXCLUDED = /\batlas\b.*\btracker\b.*\bdart\b|\btracker\s*dart\b|\btracker\s+grenade\b|\bgrenade\s+tracker\b/i;
+    /** Only pick underbarrels that match these (Seamstress, Spread Launcher, Grenade Launcher, etc.). */
+    const UNDERBARREL_ALLOWED =
+      /seamstress|needle\s*launcher|spread\s*launcher|beam\s*tosser|energy\s*disc|fragcendiary|singularity|grenade\s*launcher|missile\s*launcher|micro\s*rocket|gravity\s*well|death\s*sphere|airstrike|flame\s*thrower|flamethrower|underbarrel\s*launcher|rocket\s*launcher|frag\s*launcher/i;
+    const isAllowedUnderbarrel = (row: WeaponEditPartRow) => {
+      const t = `${(row.stat ?? "").trim()} ${(row.string ?? "").trim()}`.toLowerCase();
+      if (UNDERBARREL_EXCLUDED.test(t)) return false;
+      return UNDERBARREL_ALLOWED.test(t);
+    };
 
     const candidates = universalPartCodes
       .map((row) => ({ row, parsed: parseCodePair(row.code) }))
@@ -1017,6 +1050,7 @@ export default function WeaponEditView({
       if (!weaponRowsByPrefix.has(pfx)) weaponRowsByPrefix.set(pfx, []);
       weaponRowsByPrefix.get(pfx)!.push(row);
     }
+    const isBarrelExcluded = (text: string) => /\bnoisy\s*cricket\b|kaleidosplode/.test(norm(text));
     const legendaryBarrelIdsByPrefix = new Map<number, Set<number>>();
     const legendaryRarityIdsByPrefix = new Map<number, Set<number>>();
     for (const c of candidates) {
@@ -1024,6 +1058,8 @@ export default function WeaponEditView({
       const r = norm(c.row.rarity);
       if (r !== "legendary" && r !== "pearl" && r !== "pearlescent") continue;
       if (pt === "barrel") {
+        const barrelText = norm(`${c.row.statText ?? ""} ${c.row.string ?? ""} ${c.row.partName ?? ""}`);
+        if (isBarrelExcluded(barrelText)) continue;
         if (!legendaryBarrelIdsByPrefix.has(c.parsed.prefix)) legendaryBarrelIdsByPrefix.set(c.parsed.prefix, new Set());
         legendaryBarrelIdsByPrefix.get(c.parsed.prefix)!.add(c.parsed.part);
       } else if (pt === "rarity") {
@@ -1070,6 +1106,7 @@ export default function WeaponEditView({
     const level = Number.isFinite(parsedLevel) ? Math.max(1, Math.min(255, Math.trunc(parsedLevel))) : 50;
 
     const weaponRows = weaponEditData.parts.filter((r) => Number(r.mfgWtId) === headerPrefix);
+    const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");
     // Rule 2: first code must be legendary rarity for the weapon prefix.
     const legendaryRarityRows = weaponRows.filter(
       (r) => norm(r.partType) === "rarity" && /(legendary|pearl|pearlescent)/.test(norm(`${r.stat} ${r.string}`)),
@@ -1096,8 +1133,34 @@ export default function WeaponEditView({
         .map((r) => Number(r.partId))
         .filter((n) => Number.isFinite(n));
     };
+    // Prefer magazines that are not charge-up (avoid "charge time", "maximum charge", etc.).
+    const toPartIdsMagazineNoCharge = (): number[] => {
+      const magRows = weaponRows.filter((r) => norm(r.partType) === "magazine");
+      const noCharge = magRows.filter(
+        (r) => !/\bcharge\s*time\b|\bmaximum\s*charge\b|\bcharge\s*up\b|\bcharging\b/.test(norm(`${r.stat} ${r.string}`)),
+      );
+      const ids = (noCharge.length ? noCharge : magRows)
+        .map((r) => Number(r.partId))
+        .filter((n) => Number.isFinite(n));
+      return ids;
+    };
     const pickToken = (types: string[]): string | null => {
       const ids = toPartIds(types);
+      if (!ids.length) return null;
+      return `{${pick(ids)}}`;
+    };
+    const toPartIdsAllowedUnderbarrel = (): number[] =>
+      weaponRows
+        .filter((r) => norm(r.partType) === "underbarrel" && isAllowedUnderbarrel(r))
+        .map((r) => Number(r.partId))
+        .filter((n) => Number.isFinite(n));
+    const pickUnderbarrelToken = (): string | null => {
+      const ids = toPartIdsAllowedUnderbarrel();
+      if (!ids.length) return null;
+      return `{${pick(ids)}}`;
+    };
+    const pickMagazineToken = (): string | null => {
+      const ids = toPartIdsMagazineNoCharge();
       if (!ids.length) return null;
       return `{${pick(ids)}}`;
     };
@@ -1114,24 +1177,14 @@ export default function WeaponEditView({
     // -> barrels -> magazine/grip/foregrip/scope/(optional manufacturer) -> stat stacks
     // -> grenade (for Tediore-style reload setups) -> stalker stack -> skin.
     const elementPool = weaponEditData.elemental ?? [];
-    const elementalIds = elementPool
+    const nonSwitchElementIds = elementPool
+      .filter((e) => !/\bswitch\s+between\b/.test(norm(e.stat ?? "")))
       .map((e) => Number(e.partId))
       .filter((n) => Number.isFinite(n));
     let altFireTokens: string[] = [];
-    let shouldUseUnderbarrelAlt = false;
-    const canUseMultiElement = elementalIds.length >= 2;
-    if (canUseMultiElement && Math.random() < 0.55) {
-      const first = pick(elementalIds);
-      const secondPool = elementalIds.filter((id) => id !== first);
-      const second = secondPool.length ? pick(secondPool) : null;
-      if (second != null) {
-        altFireTokens = [`{1:${first}}`, `{1:${second}}`];
-      } else {
-        shouldUseUnderbarrelAlt = true;
-      }
-    } else {
-      shouldUseUnderbarrelAlt = true;
-    }
+    let shouldUseUnderbarrelAlt = true;
+    const canUseMultiElement = nonSwitchElementIds.length >= 2;
+    // Always prefer underbarrel + underbarrel accessories; use dual-element only if no underbarrel available.
     const bodyToken = pickToken(["body"]);
     if (!bodyToken) {
       setMessage("Could not build stock weapon core: missing Body.");
@@ -1226,9 +1279,12 @@ export default function WeaponEditView({
     const ammoStacks = [
       exemplarAmmoGroup,
       ...addStatStacks(
-      (text) => /\bmag\b|\bmagazine\b|\bammo\b|\bshots?\b/.test(text),
-      modeCfg.statRange[0],
-      modeCfg.statRange[1],
+        (text) =>
+          // Prefer ammo/shot count, but avoid explicit magazine size perks.
+          (/\bammo\b|\bshots?\b/.test(text)) &&
+          !/\bmag(azine)?\s*size\b|\bmagsize\b/.test(text),
+        modeCfg.statRange[0],
+        modeCfg.statRange[1],
       ),
     ];
     const fireRateStacks = [
@@ -1241,18 +1297,23 @@ export default function WeaponEditView({
       ),
     ];
 
-    // Rule 3: heavy barrels can be used (cross-prefix grouped barrel parts).
+    // Rule 3: heavy barrels can be used (cross-prefix grouped barrel parts). Never use Kaleidosplode or Noisy Cricket barrels.
+    const barrelRowOk = (r: WeaponEditPartRow) =>
+      !isBarrelExcluded(norm(`${r.stat ?? ""} ${r.string ?? ""}`));
     const mappedLegendaryBarrels = Array.from(legendaryBarrelIdsByPrefix.get(headerPrefix) ?? []).filter((id) =>
       validCurrentPartIds.has(id),
     );
     const samePrefixBarrels = mappedLegendaryBarrels.length
       ? mappedLegendaryBarrels
       : weaponRows
-          .filter((r) => norm(r.partType) === "barrel" && isSpecialRarity(r))
+          .filter(
+            (r) =>
+              norm(r.partType) === "barrel" && isSpecialRarity(r) && barrelRowOk(r),
+          )
           .map((r) => Number(r.partId))
           .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
     const anyPrefixBarrels = weaponRows
-      .filter((r) => norm(r.partType) === "barrel")
+      .filter((r) => norm(r.partType) === "barrel" && barrelRowOk(r))
       .map((r) => Number(r.partId))
       .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
     const usableSamePrefixBarrels = samePrefixBarrels.length ? samePrefixBarrels : anyPrefixBarrels;
@@ -1261,9 +1322,13 @@ export default function WeaponEditView({
       return;
     }
     const uniqueEffectBarrels = candidates.filter(
-      ({ row }) =>
-        norm(row.partType) === "barrel" &&
-        (row.visualUniqueBarrel === true || row.uniqueEffect === true),
+      ({ row }) => {
+        if (norm(row.partType) !== "barrel") return false;
+        if (row.visualUniqueBarrel === true || row.uniqueEffect === true) return true;
+        const t = norm(`${row.statText ?? ""} ${row.string ?? ""} ${row.partName ?? ""}`);
+        if (isBarrelExcluded(t)) return false;
+        return /\bunique\b|\balt(ernate)?\s*(fire|barrel)?\b|\bappearance\b|\bvisual\b|\bdifferent\s*look\b/i.test(t);
+      },
     );
     const samePrefixUniqueBarrels = uniqueEffectBarrels.filter(
       ({ parsed }) => parsed.prefix === headerPrefix && validCurrentPartIds.has(parsed.part),
@@ -1271,12 +1336,13 @@ export default function WeaponEditView({
     const crossUniqueBarrels = uniqueEffectBarrels.filter(
       ({ parsed }) => parsed.prefix !== headerPrefix,
     );
-    const uniqueFirstBarrelToken = samePrefixUniqueBarrels.length
-      ? `{${pick(samePrefixUniqueBarrels).parsed.part}}`
-      : crossUniqueBarrels.length
+    const allUniqueBarrels = [...samePrefixUniqueBarrels, ...crossUniqueBarrels];
+    const useUniqueBarrel = allUniqueBarrels.length > 0 && Math.random() < 0.85;
+    const uniqueFirstBarrelToken =
+      useUniqueBarrel && allUniqueBarrels.length
         ? (() => {
-            const u = pick(crossUniqueBarrels);
-            return `{${u.parsed.prefix}:${u.parsed.part}}`;
+            const u = pick(allUniqueBarrels);
+            return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
           })()
         : "";
     const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
@@ -1288,7 +1354,10 @@ export default function WeaponEditView({
       const mapped = Array.from(legendaryBarrelIdsByPrefix.get(pfx) ?? []).filter((id) => idsInPrefix.has(id));
       if (mapped.length) return mapped.map((part) => ({ prefix: pfx, part }));
       return rows
-        .filter((r) => norm(r.partType) === "barrel" && isSpecialRarity(r))
+        .filter(
+          (r) =>
+            norm(r.partType) === "barrel" && isSpecialRarity(r) && barrelRowOk(r),
+        )
         .map((r) => ({ prefix: pfx, part: Number(r.partId) }))
         .filter((x) => Number.isFinite(x.part));
     });
@@ -1319,14 +1388,45 @@ export default function WeaponEditView({
       return;
     }
 
-    const magazineToken = pickToken(["magazine"]);
+    const magazineToken = pickMagazineToken();
     if (!magazineToken) {
       setMessage("Could not build stock weapon core: missing Magazine.");
       return;
     }
     const gripToken = pickToken(["grip"]);
     const scopeToken = pickToken(["scope"]);
-    const manufacturerToken = pickToken(["manufacturer part"]);
+    // Grenade-reload / Tediore-style builds get multiple manufacturer parts (e.g. Jakobs, Tediore reload, Hyperion).
+    const manufacturerPartsCount =
+      (weaponManufacturer.includes("tediore") ||
+        candidates.some(
+          ({ row, parsed }) =>
+            parsed.prefix === headerPrefix && /\btediore\b|\breload\b/.test(norm(row.statText)),
+        ))
+        ? randInt(2, 5)
+        : 1;
+    const baseManufacturerTokens =
+      manufacturerPartsCount <= 1
+        ? (() => {
+            const t = pickToken(["manufacturer part"]);
+            return t ? [t] : [];
+          })()
+        : stackTokens(["manufacturer part"], manufacturerPartsCount, manufacturerPartsCount);
+    // Tediore reload options: ensure at least one such part on every gun.
+    const tedioreReloadCandidates = candidates.filter(({ row }) => {
+      const t = norm(row.statText ?? "");
+      return /\btediore\b/.test(t) && /\breload\b|\bthrown\b|\bthrow\b/.test(t);
+    });
+    const manufacturerTokens =
+      tedioreReloadCandidates.length > 0
+        ? (() => {
+            const chosen = pick(tedioreReloadCandidates);
+            const reloadToken =
+              chosen.parsed.prefix === headerPrefix
+                ? `{${chosen.parsed.part}}`
+                : `{${chosen.parsed.prefix}:${chosen.parsed.part}}`;
+            return [...baseManufacturerTokens, reloadToken];
+          })()
+        : baseManufacturerTokens;
     const currentWeaponTypeNorm = norm(weaponRows[0]?.weaponType ?? "");
     const daedalusAltAmmoCandidates = candidates.filter(
       ({ row }) =>
@@ -1341,16 +1441,41 @@ export default function WeaponEditView({
           return c.parsed.prefix === headerPrefix ? `{${c.parsed.part}}` : `{${c.parsed.prefix}:${c.parsed.part}}`;
         })()
       : "";
-    const foregripToken = shouldUseDaedalusAltAmmo ? null : pickToken(["foregrip"]);
+    // Never select a foregrip part for these modded builds.
+    const foregripToken: string | null = null;
 
+    // Cross-prefix underbarrel pool (e.g. Order 26:77 Seamstress on a Daedalus gun). Exclude non-functional (Tracker Dart, Tracker Grenade).
+    const crossPrefixUnderbarrels: { prefix: number; part: number }[] = [];
+    const crossPrefixUnderbarrelAccessories: { prefix: number; part: number }[] = [];
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      for (const r of rows) {
+        const pt = norm(r.partType);
+        const part = Number(r.partId);
+        if (!Number.isFinite(part)) continue;
+        if (pt === "underbarrel" && isAllowedUnderbarrel(r)) {
+          crossPrefixUnderbarrels.push({ prefix: pfx, part });
+        } else if (pt === "underbarrel accessory") {
+          crossPrefixUnderbarrelAccessories.push({ prefix: pfx, part });
+        }
+      }
+    }
     let underbarrelToken = "";
     let underbarrelAccessoryStack: string[] = [];
-    const underbarrelInfiniteAmmoToken = "{27:[74 74 74 74 74 74 74]}";
+    const underbarrelInfiniteAmmoToken = "{27:[75 75 75 75 75 75 75]}";
     if (shouldUseUnderbarrelAlt) {
-      underbarrelToken = pickToken(["underbarrel"]) ?? "";
+      const preferCross = crossPrefixUnderbarrels.length > 0 && Math.random() < 0.65;
+      if (preferCross && crossPrefixUnderbarrels.length > 0) {
+        const u = pick(crossPrefixUnderbarrels);
+        underbarrelToken = `{${u.prefix}:${u.part}}`;
+      }
+      if (!underbarrelToken) underbarrelToken = pickUnderbarrelToken() ?? "";
+      if (!underbarrelToken && crossPrefixUnderbarrels.length > 0) {
+        const u = pick(crossPrefixUnderbarrels);
+        underbarrelToken = `{${u.prefix}:${u.part}}`;
+      }
       if (!underbarrelToken && canUseMultiElement) {
-        const first = pick(elementalIds);
-        const secondPool = elementalIds.filter((id) => id !== first);
+        const first = pick(nonSwitchElementIds);
+        const secondPool = nonSwitchElementIds.filter((id) => id !== first);
         const second = secondPool.length ? pick(secondPool) : null;
         if (second != null) {
           altFireTokens = [`{1:${first}}`, `{1:${second}}`];
@@ -1361,64 +1486,126 @@ export default function WeaponEditView({
         setMessage("Could not apply alt-fire mode: no underbarrel available and no dual-element fallback.");
         return;
       }
-      underbarrelAccessoryStack = stackTokens(
-        ["underbarrel accessory"],
-        Math.max(1, modeCfg.underAccRange[0]),
-        Math.max(1, modeCfg.underAccRange[1]),
+      // Exactly one underbarrel accessory, but ONLY if it clearly complements the chosen underbarrel.
+      const parseCodePairLocal = (code: string): { prefix: number; part: number } | null => {
+        const s = code.trim();
+        const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
+        if (m2) return { prefix: Number(m2[1]), part: Number(m2[2]) };
+        const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
+        if (m1) {
+          const n = Number(m1[1]);
+          return { prefix: n, part: n };
+        }
+        return null;
+      };
+      const ubParsed = parseCodePairLocal(underbarrelToken);
+      if (ubParsed) {
+        const ubRow = weaponEditData.parts.find(
+          (r) => Number(r.mfgWtId) === ubParsed.prefix && Number(r.partId) === ubParsed.part,
+        );
+        if (ubRow) {
+          const ubText = norm(`${ubRow.stat ?? ""} ${ubRow.string ?? ""}`);
+          const ubWords = new Set(
+            ubText
+              .split(/\W+/)
+              .filter((w) => w.length >= 4),
+          );
+          const samePrefixUnderbarrelAcc = weaponRows.filter((r) => norm(r.partType) === "underbarrel accessory");
+          const complementaryAccIds = samePrefixUnderbarrelAcc
+            .filter((r) => {
+              const t = norm(`${r.stat ?? ""} ${r.string ?? ""}`);
+              const words = new Set(
+                t
+                  .split(/\W+/)
+                  .filter((w) => w.length >= 4),
+              );
+              for (const w of ubWords) {
+                if (words.has(w)) return true;
+              }
+              return false;
+            })
+            .map((r) => Number(r.partId))
+            .filter((n) => Number.isFinite(n));
+          if (complementaryAccIds.length) {
+            underbarrelAccessoryStack = [`{${pick(complementaryAccIds)}}`];
+          } else {
+            underbarrelAccessoryStack = [];
+          }
+        }
+      }
+    }
+    // Multi-projectile (add projectiles to shot): 289:17 or {289:[17 17 17 17 17]}.
+    const multiProjectileToken = "{289:[17 17 17 17 17]}";
+    const isNeedleLauncherUnderbarrel = ((): boolean => {
+      if (!underbarrelToken) return false;
+      const colonMatch = underbarrelToken.match(/\{(\d+):(\d+)\}/);
+      const pfx = colonMatch ? Number(colonMatch[1]) : Number(underbarrelToken.match(/\{(\d+)\}/)?.[1]);
+      const part = colonMatch ? Number(colonMatch[2]) : Number(underbarrelToken.match(/\{(\d+)\}/)?.[1]);
+      const ubPrefix = Number.isFinite(pfx) && Number.isFinite(part) && colonMatch ? pfx : headerPrefix;
+      const ubPart = colonMatch ? part : (Number(underbarrelToken.match(/\{(\d+)\}/)?.[1]) || part);
+      if (!Number.isFinite(ubPrefix) || !Number.isFinite(ubPart)) return false;
+      const row = weaponEditData.parts.find(
+        (r) => Number(r.mfgWtId) === ubPrefix && Number(r.partId) === ubPart && norm(r.partType) === "underbarrel",
       );
+      if (!row) return false;
+      const t = norm(`${row.stat ?? ""} ${row.string ?? ""}`);
+      return /\bseamstress\b|\bneedle\s*launcher\b/.test(t);
+    })();
+    const daedalusShotgunAmmoToken = (() => {
+      if (!isNeedleLauncherUnderbarrel) return "";
+      const c = candidates.find(
+        ({ row }) =>
+          norm(row.partType) === "manufacturer part" &&
+          /\bdaedalus\b/.test(norm(row.manufacturer ?? "")) &&
+          /\bshotgun\b.*\bammo\b|\bammo\b.*\bshotgun\b/.test(norm(row.statText ?? "")),
+      );
+      if (!c) return "";
+      return c.parsed.prefix === headerPrefix ? `{${c.parsed.part}}` : `{${c.parsed.prefix}:${c.parsed.part}}`;
+    })();
+    const homingStacks273 = isNeedleLauncherUnderbarrel
+      ? [groupedToken(273, Array.from({ length: randInt(8, 24) }, () => 1))]
+      : [];
+
+    // With underbarrel we always add element(s): one base element or combine multiple; never "element switch".
+    if (underbarrelToken && nonSwitchElementIds.length > 0) {
+      const wantMultiple = nonSwitchElementIds.length >= 2 && Math.random() < 0.5;
+      const count = wantMultiple ? randInt(2, Math.min(nonSwitchElementIds.length, 4)) : 1;
+      const chosen: number[] = [];
+      const pool = [...nonSwitchElementIds];
+      for (let i = 0; i < count && pool.length; i += 1) {
+        const idx = Math.floor(Math.random() * pool.length);
+        chosen.push(pool[idx]!);
+        pool.splice(idx, 1);
+      }
+      altFireTokens = chosen.map((id) => `{1:${id}}`);
     }
 
-    // Structured grenade sequence:
-    // (1) legendary grenade code, (2) grenade perks group, (3) legendary grenade rarity.
+    // Grenade reload block: always add on every gun.
+    // Pattern: {267:1} {245:[...grenade perks...]} {267:3} OR {291:8} {245:[...]} {291:9}
     const grenadeParts: string[] = [];
-    const grenadeLegendaryCode = candidates.filter(
-      ({ row, parsed }) =>
-        parsed.prefix === 291 &&
-        (norm(row.rarity) === "legendary" || norm(row.rarity) === "pearl" || norm(row.rarity) === "pearlescent") &&
-        norm(row.partType) !== "rarity",
-    );
     const grenadePerkPool = candidates.filter(
       ({ parsed, row }) => parsed.prefix === 245 && norm(row.partType) !== "rarity",
     );
-    const grenadeLegendaryRarity = candidates.filter(
-      ({ parsed, row }) =>
-        [291, 289, 282, 273, 275, 281, 286].includes(parsed.prefix) &&
-        (norm(row.rarity) === "legendary" || norm(row.rarity) === "pearl" || norm(row.rarity) === "pearlescent") &&
-        norm(row.partType) === "rarity",
-    );
-    const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");
-    const shouldAddGrenadeReloadParts =
-      weaponManufacturer.includes("tediore") ||
-      candidates.some(
-        ({ row, parsed }) =>
-          parsed.prefix === headerPrefix && /\btediore\b|\breload\b/.test(norm(row.statText)),
-      );
-    if (shouldAddGrenadeReloadParts && grenadeLegendaryCode.length) {
-      const g = pick(grenadeLegendaryCode);
-      grenadeParts.push(`{${g.parsed.prefix}:${g.parsed.part}}`);
-    }
-    if (shouldAddGrenadeReloadParts && grenadePerkPool.length) {
-      const n = randInt(modeCfg.grenadePerkRange[0], modeCfg.grenadePerkRange[1]);
+    // Filter 245 perks down to ones mentioning fire or corrosive/acid, so we only use those elements.
+    const grenadePerkFireCorrosivePool = grenadePerkPool.filter(({ row }) => {
+      const t = norm(row.statText ?? "");
+      return /\bfire\b|\bincendiary\b|\bburning\b|\bignite\b|\bflame\b/.test(t) ||
+        /\bcorrosive\b|\bacid\b|\bcorrode\b|\btoxic\b/.test(t);
+    });
+    const perkSource = grenadePerkFireCorrosivePool.length ? grenadePerkFireCorrosivePool : grenadePerkPool;
+    const grenadePrefix = Math.random() < 0.5 ? 267 : 291;
+    const grenadeCode = grenadePrefix === 267 ? "{267:1}" : "{291:8}";
+    const grenadeRarityCode = grenadePrefix === 267 ? "{267:3}" : "{291:9}";
+    grenadeParts.push(grenadeCode);
+    if (perkSource.length) {
+      const count = randInt(modeCfg.grenadePerkRange[0], modeCfg.grenadePerkRange[1]);
       const perkIds: number[] = [];
-      for (let i = 0; i < n; i += 1) perkIds.push(pick(grenadePerkPool).parsed.part);
+      for (let i = 0; i < count; i += 1) perkIds.push(pick(perkSource).parsed.part);
       grenadeParts.push(`{245:[${perkIds.join(" ")}]}`);
     }
-    if (shouldAddGrenadeReloadParts && grenadeLegendaryRarity.length) {
-      const gr = pick(grenadeLegendaryRarity);
-      grenadeParts.push(`{${gr.parsed.prefix}:${gr.parsed.part}}`);
-    }
+    grenadeParts.push(grenadeRarityCode);
 
-    const stalkerCandidates = candidates.filter(
-      ({ row, parsed }) =>
-        parsed.prefix === headerPrefix &&
-        validCurrentPartIds.has(parsed.part) &&
-        /\bstalker\b|\browan'?s charge\b/.test(norm(row.statText)),
-    );
-    const stalkerStacks: string[] = [];
-    if (stalkerCandidates.length) {
-      const stalkerPart = pick(stalkerCandidates).parsed.part;
-      for (let i = 0; i < 7; i += 1) stalkerStacks.push(`{${stalkerPart}}`);
-    }
+    // Other heavy enhancement stacks were cleared as part of the simplified rules; no generic enhancement/stalker stacks.
 
     // Do not stack extra rarity tokens. We only enforce one legendary rarity
     // token for the weapon so result stays legendary without unnecessary rarity spam.
@@ -1432,20 +1619,23 @@ export default function WeaponEditView({
       ...samePrefixBarrelParts,
       ...crossParts,
       ...barrelAccessoryStack,
+      multiProjectileToken,
+      ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
+      ...homingStacks273,
       magazineToken,
       ...(gripToken ? [gripToken] : []),
       ...(foregripToken ? [foregripToken] : []),
       ...(scopeToken ? [scopeToken] : []),
       ...(daedalusAltAmmoToken ? [daedalusAltAmmoToken] : []),
-      ...(manufacturerToken ? [manufacturerToken] : []),
+      ...manufacturerTokens,
       ...damageStacks,
       ...ammoStacks,
       ...fireRateStacks,
-      ...(underbarrelToken ? [underbarrelToken] : []),
       ...underbarrelAccessoryStack,
       ...(shouldUseUnderbarrelAlt ? [underbarrelInfiniteAmmoToken] : []),
       ...grenadeParts,
-      ...stalkerStacks,
+      // Underbarrel must always be the last code.
+      ...(underbarrelToken ? [underbarrelToken] : []),
     ];
     if (!allNewParts.length) {
       setMessage("Could not build random modded parts.");
@@ -1457,7 +1647,14 @@ export default function WeaponEditView({
       .join(" ")
       .replace(/\s{2,}/g, " ")
       .trim();
-    const chosenSkin = skinComboValue?.trim() || (skinOptions.length ? pick(skinOptions).value.trim() : "");
+    // When auto-picking a skin, skip wood grain and Christmas-themed skins.
+    const excludedSkinPattern = /\bwood\s*grain\b|christmas|xmas|\bholiday\b|festive|snow\s*theme|winter\s*theme/i;
+    const skinOptionsForPick = skinOptions.filter(
+      (s) =>
+        !excludedSkinPattern.test(String(s.label ?? "")) && !excludedSkinPattern.test(String(s.value ?? "")),
+    );
+    const chosenSkin =
+      skinComboValue?.trim() || (skinOptionsForPick.length ? pick(skinOptionsForPick).value.trim() : "");
     const safeSkin = chosenSkin.replace(/"/g, '\\"');
     const updatedDecoded = safeSkin
       ? `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} | "c", "${safeSkin}" |`
@@ -1504,6 +1701,15 @@ export default function WeaponEditView({
       setLoading(null);
     }
   }, [weaponEditData, universalPartCodes, parseCodePair, newWeaponLevel, modPowerMode, skinComboValue, skinOptions]);
+
+  // When opened from Unified Builder with "Generate modded weapon", run the generator once when data is ready.
+  useEffect(() => {
+    const state = location.state as { autoGenerateModded?: boolean } | null;
+    if (!state?.autoGenerateModded || autoGenerateModdedRanRef.current) return;
+    if (!weaponEditData || !universalPartCodes.length) return;
+    autoGenerateModdedRanRef.current = true;
+    void handleRandomModdedWeapon();
+  }, [location.state, weaponEditData, universalPartCodes.length, handleRandomModdedWeapon]);
 
   const rebuildDecodedFromComponents = useCallback(
     (components: ParsedComponent[]): string => {

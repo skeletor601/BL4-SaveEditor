@@ -372,6 +372,51 @@ def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: st
         return None
 
 
+def _find_backpack_node(yaml_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Find backpack dict by dotted path or recursive search (same logic as add_item_to_backpack)."""
+    for dotted in (
+        "state.inventory.backpack",
+        "inventory.backpack",
+        "state.inventory.Backpack",
+        "inventory.Backpack",
+        "State.Inventory.Backpack",
+        "State.Inventory.backpack",
+    ):
+        node = find_node_by_path(yaml_data, dotted)
+        if isinstance(node, dict):
+            return node
+    # Recursive fallback: any dict with key "backpack"/"Backpack" whose value has slot_* keys
+    candidates: List[Dict[str, Any]] = []
+
+    def _collect(node: Any) -> None:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if isinstance(k, str) and k.lower() == "backpack" and isinstance(v, dict):
+                    if any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys()):
+                        candidates.append(v)
+                _collect(v)
+        elif isinstance(node, list):
+            for v in node:
+                _collect(v)
+
+    _collect(yaml_data)
+    return candidates[0] if candidates else None
+
+
+def clear_backpack(yaml_data: Dict[str, Any]) -> bool:
+    """
+    Removes all items from the backpack (deletes all slot_* keys).
+    Returns True if backpack was found and cleared, False otherwise.
+    """
+    backpack_node = _find_backpack_node(yaml_data)
+    if not isinstance(backpack_node, dict):
+        return False
+    keys_to_remove = [k for k in list(backpack_node.keys()) if isinstance(k, str) and k.startswith("slot_")]
+    for k in keys_to_remove:
+        del backpack_node[k]
+    return True
+
+
 def remove_item_by_original_path(yaml_data: dict, original_path):
     """Remove an item from yaml_data by its stored original_path.
 

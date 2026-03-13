@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useSave } from "@/contexts/SaveContext";
+import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
 const USER_ID_STORAGE_KEY = "bl4-save-user-id";
 const OVERWRITE_TIP_STORAGE_KEY = "bl4-save-hide-overwrite-tip";
@@ -15,6 +16,7 @@ function getStoredUserId(): string {
 export default function SelectSaveView() {
   const inputRef = useRef<HTMLInputElement>(null);
   const savInputRef = useRef<HTMLInputElement>(null);
+  const savFileHandleRef = useRef<any | null>(null);
   const [, setSavBytes] = useState<Uint8Array | null>(null);
   const [savFileName, setSavFileName] = useState<string | null>(null);
   const [userIdInput, setUserIdInput] = useState(getStoredUserId);
@@ -33,14 +35,13 @@ export default function SelectSaveView() {
     loadError,
     summary,
     savePlatform,
+    saveUserId,
     loadFromFile,
     decryptSav,
     clearSave,
-    exportAsJson,
     exportAsYaml,
     downloadAsSav,
-    downloadRebuiltSavNoEdit,
-    hasRawBytesForRoundtrip,
+    getYamlText,
   } = useSave();
 
   const onFileChange = useCallback(
@@ -60,6 +61,7 @@ export default function SelectSaveView() {
       f.arrayBuffer().then(async (buf) => {
         const bytes = new Uint8Array(buf);
         setSavBytes(bytes);
+        savFileHandleRef.current = null;
         setSavFileName(f.name);
         const uid = userIdInput.trim();
         if (!uid) return;
@@ -77,6 +79,114 @@ export default function SelectSaveView() {
     },
     [decryptSav, userIdInput],
   );
+
+  const handleChooseSav = useCallback(async () => {
+    const uid = userIdInput.trim();
+    if (!uid) {
+      alert("Enter your Epic or Steam User ID first.");
+      return;
+    }
+    const anyWindow: any = window as any;
+    if ("showOpenFilePicker" in anyWindow) {
+      try {
+        const [handle] = await anyWindow.showOpenFilePicker({
+          types: [
+            {
+              description: "BL4 Save File",
+              accept: {
+                "application/octet-stream": [".sav"],
+              },
+            },
+          ],
+          multiple: false,
+        });
+        const file = await handle.getFile();
+        const buf = await file.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        savFileHandleRef.current = handle;
+        setSavFileName(file.name);
+        setIsDecrypting(true);
+        try {
+          await decryptSav(bytes, uid, file.name);
+          try {
+            localStorage.setItem(USER_ID_STORAGE_KEY, uid);
+          } catch {
+            // ignore
+          }
+        } finally {
+          setIsDecrypting(false);
+        }
+      } catch (err: any) {
+        if (err && err.name === "AbortError") {
+          return;
+        }
+        console.warn("showOpenFilePicker failed, falling back to classic file input:", err);
+        savInputRef.current?.click();
+      }
+    } else {
+      savInputRef.current?.click();
+    }
+  }, [decryptSav, userIdInput]);
+
+  const overwriteSaveSmart = useCallback(async () => {
+    if (!saveData || !savePlatform || !saveUserId) {
+      alert("Decrypt a .sav first (with User ID and platform) before overwriting.");
+      return;
+    }
+
+    const defaultName =
+      saveFileName?.replace(/\.(json|yaml|yml|txt)$/i, ".sav") ?? "bl4-save.sav";
+
+    const body: Record<string, unknown> = {
+      user_id: saveUserId,
+      platform: savePlatform,
+      filename: defaultName,
+      yaml_content: getYamlText(),
+    };
+
+    try {
+      const res = await fetchApi("save/encrypt", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg =
+          isLikelyUnavailable(res)
+            ? getApiUnavailableError()
+            : (typeof (data as any).error === "string" ? (data as any).error : "Encrypt failed.");
+        alert(msg);
+        return;
+      }
+
+      const buf = await res.arrayBuffer();
+      const blob = new Blob([buf], { type: "application/octet-stream" });
+
+      const handle: any = savFileHandleRef.current;
+      if (handle && typeof handle.createWritable === "function") {
+        try {
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          alert("Save file encrypted and overwritten successfully.");
+          return;
+        } catch (err) {
+          console.warn("Writing via original file handle failed, falling back to download:", err);
+        }
+      }
+
+      // Fallback: regular download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = defaultName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : getApiUnavailableError();
+      alert(msg);
+    }
+  }, [saveData, savePlatform, saveUserId, saveFileName, getYamlText]);
 
   const saveUserIdToStorage = useCallback(() => {
     const v = userIdInput.trim();
@@ -111,7 +221,7 @@ export default function SelectSaveView() {
           />
           <button
             type="button"
-            onClick={() => savInputRef.current?.click()}
+            onClick={handleChooseSav}
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-dim)]"
           >
             Choose .sav file
@@ -166,32 +276,15 @@ export default function SelectSaveView() {
           <button
             type="button"
             onClick={async () => {
-              if (!hasRawBytesForRoundtrip) return;
+              if (!saveData || !savePlatform || !saveUserId) return;
               setIsDownloading(true);
               try {
-                await downloadRebuiltSavNoEdit();
+                await overwriteSaveSmart();
               } finally {
                 setIsDownloading(false);
               }
             }}
-            disabled={!hasRawBytesForRoundtrip || isDownloading}
-            title="Re-encrypt decrypted bytes without editing (for round-trip validation)."
-            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDownloading ? "Downloading…" : "No-Edit Roundtrip"}
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
-              if (!saveData || !savePlatform) return;
-              setIsDownloading(true);
-              try {
-                await downloadAsSav();
-              } finally {
-                setIsDownloading(false);
-              }
-            }}
-            disabled={!saveData || !savePlatform || isDownloading}
+            disabled={!saveData || !savePlatform || !saveUserId || isDownloading}
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDownloading ? "Saving…" : "Overwrite save"}
@@ -215,14 +308,6 @@ export default function SelectSaveView() {
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDownloading ? "Saving…" : "Save As…"}
-          </button>
-          <button
-            type="button"
-            onClick={() => exportAsJson()}
-            disabled={!saveData}
-            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Export as JSON
           </button>
           <button
             type="button"

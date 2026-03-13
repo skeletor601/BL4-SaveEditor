@@ -160,7 +160,12 @@ def merge_into_db(project_root: str) -> Tuple[int, int, int]:
     Returns (updated_count, added_count, total_db_rows).
     """
     root = Path(project_root)
+    # Prefer HTML alongside DB if present; fall back to reference htmls copy.
     html_path = root / "master_search" / "db" / "Borderlands Item Editor and Save Editor.html"
+    if not html_path.exists():
+        alt = root / "reference htmls" / "Borderlands Item Editor and Save Editor.html"
+        if alt.exists():
+            html_path = alt
     db_path = root / "master_search" / "db" / "universal_parts_db.json"
 
     if not html_path.exists():

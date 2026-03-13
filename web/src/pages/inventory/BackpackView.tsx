@@ -111,6 +111,8 @@ export default function BackpackView() {
   const [duplicateDialog, setDuplicateDialog] = useState<{ item: TreeItem; qty: string } | null>(null);
   const [gearLevelDialog, setGearLevelDialog] = useState<{ level: number } | null>(null);
   const [gearLevelLoading, setGearLevelLoading] = useState(false);
+  const [clearBackpackLoading, setClearBackpackLoading] = useState(false);
+  const [showClearBackpackConfirm, setShowClearBackpackConfirm] = useState(false);
   const navigate = useNavigate();
 
   const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
@@ -359,6 +361,45 @@ export default function BackpackView() {
     }
   }, [gearLevelDialog, saveData, getYamlText, updateSaveData]);
 
+  const handleClearBackpackClick = useCallback(() => {
+    setShowClearBackpackConfirm(true);
+  }, []);
+
+  const handleClearBackpackConfirm = useCallback(async () => {
+    if (!saveData) return;
+    setShowClearBackpackConfirm(false);
+    const yamlContent = getYamlText();
+    if (!yamlContent?.trim()) {
+      setAddMessage("No save YAML loaded. Load a save first (Character → Select Save).");
+      return;
+    }
+    setClearBackpackLoading(true);
+    setAddMessage(null);
+    try {
+      const res = await fetchApi("save/clear-backpack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ yaml_content: yamlContent }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+        const msg = isLikelyUnavailable(res)
+          ? getApiUnavailableError()
+          : (data?.error ?? "Failed to clear backpack.");
+        setAddMessage(msg);
+        return;
+      }
+      const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
+      updateSaveData(parsed);
+      setSelected(null);
+      setAddMessage("Backpack cleared. Use \"Overwrite save\" on Select Save to export.");
+    } catch {
+      setAddMessage(getApiUnavailableError());
+    } finally {
+      setClearBackpackLoading(false);
+    }
+  }, [saveData, getYamlText, updateSaveData]);
+
   const handleUpgradeItem = useCallback(
     (item: TreeItem) => {
       setContextItem(null);
@@ -445,7 +486,29 @@ export default function BackpackView() {
         >
           Change Gear Level
         </button>
+        <button
+          type="button"
+          onClick={handleClearBackpackClick}
+          disabled={clearBackpackLoading}
+          className="px-4 py-2 rounded-lg border border-red-500/60 text-red-400 text-sm hover:bg-red-500/10 disabled:opacity-50 min-h-[44px]"
+          title="Remove all items from the backpack"
+        >
+          {clearBackpackLoading ? "Clearing…" : "Clear backpack"}
+        </button>
       </div>
+      {showClearBackpackConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowClearBackpackConfirm(false)}>
+          <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
+            <p className="text-sm text-[var(--color-text)] mb-4">
+              Remove all items from the backpack? This cannot be undone (until you reload the save).
+            </p>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setShowClearBackpackConfirm(false)} className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] text-sm">Cancel</button>
+              <button type="button" onClick={() => void handleClearBackpackConfirm()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-500">Clear all</button>
+            </div>
+          </div>
+        </div>
+      )}
       {addMessage && (
         <p className="text-xs text-[var(--color-accent)] max-w-xl">
           {addMessage}

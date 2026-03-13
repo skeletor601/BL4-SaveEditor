@@ -15,7 +15,7 @@ const SAVE_MUTATE_TIMEOUT_MS = 90_000;
 
 type SaveMutatePayload = {
   yaml_content: string;
-  action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item";
+  action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item" | "clear_backpack";
   params?: Record<string, unknown>;
 };
 
@@ -468,6 +468,32 @@ export async function saveRoutes(
     } catch (e) {
       const message = e instanceof Error ? e.message : "Remove item failed";
       fastify.log.warn({ err: e }, "save/remove-item failed");
+      return reply.code(500).send({ success: false, error: message });
+    }
+  });
+
+  fastify.post<{
+    Body: { yaml_content?: string };
+  }>("/save/clear-backpack", async (request, reply) => {
+    const body = request.body as { yaml_content?: string } | undefined;
+    const yamlContent = body?.yaml_content;
+    if (!yamlContent || typeof yamlContent !== "string") {
+      return reply.code(400).send({ success: false, error: "yaml_content is required" });
+    }
+    try {
+      const result = await runSaveMutate({
+        yaml_content: yamlContent,
+        action: "clear_backpack",
+        params: {},
+      });
+      if (reply.sent) return;
+      if (!result.success) {
+        return reply.code(400).send({ success: false, error: result.error ?? "Clear backpack failed" });
+      }
+      return reply.send({ success: true, yaml_content: result.yaml_content });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Clear backpack failed";
+      fastify.log.warn({ err: e }, "save/clear-backpack failed");
       return reply.code(500).send({ success: false, error: message });
     }
   });

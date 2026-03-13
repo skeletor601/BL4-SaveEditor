@@ -7,10 +7,15 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import {
+  generateModdedWeapon,
+  type WeaponEditData,
+  type UniversalDbPartCode,
+} from "@/lib/generateModdedWeapon";
 import { usePersistedState } from "@/lib/usePersistedState";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
@@ -168,6 +173,66 @@ interface RepkitBuilderData {
   godrolls?: { name: string; decoded: string }[];
 }
 
+/** Heavy builder data (from accessories/heavy/builder-data). */
+interface HeavyBuilderPart {
+  partId: number;
+  stat: string;
+  description?: string;
+  mfgId?: number;
+}
+interface HeavyBuilderRarity {
+  id: number;
+  label: string;
+}
+interface HeavyBuilderData {
+  mfgs: { id: number; name: string }[];
+  raritiesByMfg: Record<number, HeavyBuilderRarity[]>;
+  barrel: HeavyBuilderPart[];
+  element: HeavyBuilderPart[];
+  firmware: HeavyBuilderPart[];
+  barrelAccPerks: HeavyBuilderPart[];
+  bodyAccPerks: HeavyBuilderPart[];
+  bodiesByMfg: Record<number, number | null>;
+  godrolls?: { name: string; decoded: string }[];
+}
+
+/** Class Mod builder data (from accessories/class-mod/builder-data). */
+interface ClassModNameOption {
+  nameCode: number;
+  nameEN: string;
+}
+interface ClassModSkill {
+  skillNameEN: string;
+  skillIds: number[]; // 1–5 IDs
+}
+interface ClassModPerk {
+  perkId: number;
+  perkNameEN: string;
+}
+interface ClassModBuilderData {
+  classNames: string[];
+  rarities: string[];
+  namesByClassRarity: Record<string, ClassModNameOption[]>;
+  skillsByClass: Record<string, ClassModSkill[]>;
+  perks: ClassModPerk[];
+  legendaryMap: Record<string, number>;
+}
+
+const CLASS_MOD_CLASS_IDS: Record<string, number> = {
+  Amon: 255,
+  Harlowe: 259,
+  Rafa: 256,
+  Vex: 254,
+};
+
+// Per-class rarity part IDs for non-legendary (Common/Uncommon/Rare/Epic), mirrored from api/src/data/classModBuilder.ts
+const CLASS_MOD_PER_CLASS_RARITIES: Record<string, Record<string, number>> = {
+  Vex: { Common: 217, Uncommon: 218, Rare: 219, Epic: 220 },
+  Rafa: { Common: 66, Uncommon: 67, Rare: 68, Epic: 69 },
+  Harlowe: { Common: 224, Uncommon: 223, Rare: 222, Epic: 221 },
+  Amon: { Common: 70, Uncommon: 69, Rare: 68, Epic: 67 },
+};
+
 const GRENADE_PART_ORDER: { key: string; slots: number }[] = [
   { key: "Rarity", slots: 1 },
   { key: "Legendary", slots: 1 },
@@ -195,6 +260,53 @@ const REPKIT_PART_ORDER: { key: string; slots: number }[] = [
   { key: "Resistance", slots: 1 },
   { key: "Legendary", slots: 1 },
   { key: "Universal perks", slots: 1 },
+];
+
+const HEAVY_TYPE_ID = 244;
+const HEAVY_PART_ORDER: { key: string; slots: number }[] = [
+  { key: "Rarity", slots: 1 },
+  { key: "Barrel", slots: 1 },
+  { key: "Element", slots: 1 },
+  { key: "Firmware", slots: 1 },
+  { key: "Barrel Accessory", slots: 1 },
+  { key: "Body Accessory", slots: 1 },
+];
+
+/** Enhancement builder data (from accessories/enhancement/builder-data). */
+interface EnhancementMfgPerk {
+  index: number;
+  name: string;
+}
+interface EnhancementManufacturer {
+  code: number;
+  name: string;
+  perks: EnhancementMfgPerk[];
+  rarities: Record<string, number>;
+}
+interface Enhancement247Perk {
+  code: number;
+  name: string;
+}
+interface EnhancementBuilderData {
+  manufacturers: Record<string, EnhancementManufacturer>;
+  rarityMap247: Record<string, number>;
+  secondary247: Enhancement247Perk[];
+  godrolls?: { name: string; decoded: string }[];
+}
+
+const ENHANCEMENT_RARITY_ORDER = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+const ENHANCEMENT_PERK_ORDER = [1, 2, 3, 9];
+
+const ENHANCEMENT_PART_ORDER: { key: string; slots: number }[] = [
+  { key: "Rarity", slots: 1 },
+  { key: "Manufacturer perks", slots: 1 },
+  { key: "Stacked perks", slots: 1 }, // shown as "Legendary Perks"
+  { key: "Builder 247", slots: 1 }, // shown as "Universal Perks"
+];
+
+const CLASS_MOD_PART_ORDER: { key: string; slots: number }[] = [
+  { key: "Legendary names", slots: 1 },
+  { key: "Perks", slots: 1 },
 ];
 
 function partIdFromLabel(label: string): string | null {
@@ -772,6 +884,216 @@ function buildDecodedFromRepkitSelections(
   return `${header} ${parts.join(" ")} |`;
 }
 
+function buildDecodedFromHeavySelections(
+  data: HeavyBuilderData,
+  mfgId: number,
+  level: number,
+  seed: number,
+  selections: Record<string, { label: string; qty: string }[]>,
+  extraTokens: string[],
+): string {
+  const header = `${mfgId}, 0, 1, ${level}| 2, ${HEAVY_TYPE_ID}||`;
+  const parts: string[] = [];
+
+  const rarities = data.raritiesByMfg[mfgId] ?? [];
+  const rarityLabel = (selections["Rarity"]?.[0]?.label ?? "").trim();
+  const rarityEntry = rarities.find((r) => r.label === rarityLabel);
+  if (rarityEntry) parts.push(`{${rarityEntry.id}}`);
+
+  const bodyId = data.bodiesByMfg[mfgId];
+  if (bodyId != null) parts.push(`{${bodyId}}`);
+
+  const barrelSel = selections["Barrel"]?.[0]?.label ?? "";
+  const barrelPid = partIdFromLabel(barrelSel);
+  if (barrelPid) parts.push(`{${barrelPid}}`);
+
+  const elementSel = selections["Element"]?.[0]?.label ?? "";
+  const elementPid = partIdFromLabel(elementSel);
+  if (elementPid) parts.push(`{1:${elementPid}}`);
+
+  const firmwareSel = selections["Firmware"]?.[0]?.label ?? "";
+  const firmwarePid = partIdFromLabel(firmwareSel);
+  if (firmwarePid) parts.push(`{244:${firmwarePid}}`);
+
+  const pushAcc = (key: string) => {
+    (selections[key] ?? []).forEach((s) => {
+      const pidStr = partIdFromLabel(s.label);
+      if (!pidStr) return;
+      const pid = Number(pidStr);
+      const qty = Math.max(1, Math.min(99, parseInt((s.qty ?? "1").trim() || "1", 10) || 1));
+      for (let i = 0; i < qty; i++) parts.push(`{${pid}}`);
+    });
+  };
+  pushAcc("Barrel Accessory");
+  pushAcc("Body Accessory");
+
+  extraTokens.forEach((t) => parts.push(t));
+  return `${header} ${parts.join(" ")} |`;
+}
+
+function buildDecodedFromEnhancementSelections(
+  data: EnhancementBuilderData,
+  mfgName: string,
+  level: number,
+  seed: number,
+  selections: Record<string, { label: string; qty: string }[]>,
+  extraTokens: string[],
+): string {
+  const mfg = data.manufacturers[mfgName];
+  if (!mfg) return "";
+
+  const header = `${mfg.code}, 0, 1, ${level}| 2, ${seed}||`;
+  const parts: string[] = [];
+
+  const rarityLabel = (selections["Rarity"]?.[0]?.label ?? "").trim();
+  const rarityCode = mfg.rarities[rarityLabel];
+  if (rarityCode != null) parts.push(`{${rarityCode}}`);
+
+  const rarity247 = data.rarityMap247[rarityLabel];
+  if (rarity247 != null) parts.push(`{247:${rarity247}}`);
+
+  const mfgPerkSelections = selections["Manufacturer perks"] ?? [];
+  const indices = new Set<number>();
+  for (const s of mfgPerkSelections) {
+    const m = s.label.match(/\[(\d+)\]/);
+    const idx = m ? parseInt(m[1], 10) : NaN;
+    if (Number.isFinite(idx)) indices.add(idx);
+  }
+  for (const idx of Array.from(indices).sort((a, b) => a - b)) {
+    parts.push(`{${idx}}`);
+  }
+
+  const stacked = selections["Stacked perks"] ?? [];
+  const stackedPerks: Record<number, number[]> = {};
+  for (const s of stacked) {
+    const key = s.label.split(" - ")[0]?.trim() ?? "";
+    const [mfgCodeStr, idxStr] = key.split(":", 2);
+    const mfgCode = parseInt(mfgCodeStr ?? "", 10);
+    const idx = parseInt(idxStr ?? "", 10);
+    const qty = Math.max(1, Math.min(99, parseInt(s.qty.trim() || "1", 10) || 1));
+    if (!Number.isFinite(mfgCode) || !Number.isFinite(idx)) continue;
+    if (!stackedPerks[mfgCode]) stackedPerks[mfgCode] = [];
+    for (let i = 0; i < qty; i++) stackedPerks[mfgCode].push(idx);
+  }
+  for (const [codeStr, indicesArr] of Object.entries(stackedPerks)) {
+    const code = parseInt(codeStr, 10);
+    const sorted = [...indicesArr].sort((a, b) => a - b);
+    parts.push(`{${code}:[${sorted.join(" ")}]}`);
+  }
+
+  const statsSel = selections["Builder 247"] ?? [];
+  const stats247: number[] = [];
+  for (const s of statsSel) {
+    const first = s.label.split(" - ")[0]?.trim() ?? "";
+    const code = parseInt(first, 10);
+    const qty = Math.max(1, Math.min(99, parseInt(s.qty.trim() || "1", 10) || 1));
+    if (!Number.isFinite(code)) continue;
+    for (let i = 0; i < qty; i++) stats247.push(code);
+  }
+  if (stats247.length > 0) {
+    parts.push(`{247:[${stats247.join(" ")}]}`);
+  }
+
+  extraTokens.forEach((t) => parts.push(t));
+  return `${header} ${parts.join(" ")} |`;
+}
+
+function buildDecodedFromClassModSelections(
+  data: ClassModBuilderData,
+  className: string,
+  rarity: string,
+  level: number,
+  seed: number,
+  selections: Record<string, { label: string; qty: string }[]>,
+  extraTokens: string[],
+  skillPoints: Record<string, number>,
+): string {
+  const classId = CLASS_MOD_CLASS_IDS[className] ?? 255;
+  const classIdStr = String(classId);
+  const header = `${classId}, 0, 1, ${level}| 2, ${seed}||`;
+  const parts: string[] = [];
+
+  const qtyNum = (raw: string): number => {
+    const s = String(raw ?? "").trim();
+    const n = parseInt(s, 10);
+    if (!Number.isFinite(n)) return 1;
+    return Math.max(1, Math.min(99, n));
+  };
+
+  // Name chunk: selections["Name"] should have one entry with label "code - Name".
+  const nameSel = selections["Name"]?.[0];
+  let nameCode: number | null = null;
+  if (nameSel?.label) {
+    const first = nameSel.label.split(" - ")[0]?.trim() ?? "";
+    const parsed = parseInt(first, 10);
+    if (Number.isFinite(parsed)) nameCode = parsed;
+  }
+
+  // Rarity chunk
+  if (rarity === "Legendary") {
+    if (nameCode != null) {
+      const mapKey = `${classIdStr},${nameCode}`;
+      const itemCardId = data.legendaryMap?.[mapKey];
+      if (itemCardId != null) parts.push(`{${itemCardId}}`);
+    }
+  } else {
+    const perClass = CLASS_MOD_PER_CLASS_RARITIES[className];
+    const rc = perClass?.[rarity];
+    if (rc != null) parts.push(`{${rc}}`);
+  }
+
+  if (nameCode != null) {
+    parts.push(`{${nameCode}}`);
+  }
+
+  // Legendary extra names (other legendary titles)
+  (selections["Legendary names"] ?? []).forEach((s) => {
+    const first = (s.label ?? "").split(" - ")[0]?.trim() ?? "";
+    const code = parseInt(first, 10);
+    if (!Number.isFinite(code)) return;
+    const qty = qtyNum(s.qty);
+    for (let i = 0; i < qty; i++) parts.push(`{${code}}`);
+  });
+
+  // Skills: each entry label is the skillNameEN; qty = points (0–5)
+  const skills = data.skillsByClass[classIdStr] ?? [];
+  for (const skill of skills) {
+    const points = Math.max(0, Math.min(5, skillPoints[skill.skillNameEN] ?? 0));
+    if (points <= 0) continue;
+    const ids = skill.skillIds.slice(0, points);
+    ids.forEach((id) => {
+      if (Number.isFinite(id)) parts.push(`{${id}}`);
+    });
+  }
+
+  // Perks: grouped into {234:[...]} with qty as stack count
+  const perkIds: number[] = [];
+  const perkList = data.perks ?? [];
+  const perkById = new Map<number, ClassModPerk>();
+  perkList.forEach((p) => {
+    perkById.set(p.perkId, p);
+  });
+  (selections["Perks"] ?? []).forEach((s) => {
+    const first = (s.label ?? "").split(" - ")[0]?.trim() ?? "";
+    let pid = parseInt(first, 10);
+    if (!Number.isFinite(pid)) {
+      // fallback: match by name if label is just the perk name
+      const found = perkList.find((p) => p.perkNameEN === s.label);
+      if (!found) return;
+      pid = found.perkId;
+    }
+    if (!perkById.has(pid)) return;
+    const count = Math.max(1, Math.min(99, qtyNum(s.qty)));
+    for (let i = 0; i < count; i++) perkIds.push(pid);
+  });
+  if (perkIds.length > 0) {
+    parts.push(` {234:[${perkIds.join(" ")}]}`);
+  }
+
+  extraTokens.forEach((t) => parts.push(t));
+  return `${header} ${parts.join(" ")} |`;
+}
+
 export default function UnifiedItemBuilderPage() {
   const [category, setCategory] = useState<ItemCategory>("weapon");
   const [level, setLevel] = useState(50);
@@ -785,6 +1107,7 @@ export default function UnifiedItemBuilderPage() {
   const [showCleanCodeDialog, setShowCleanCodeDialog] = useState(false);
   const codecRequestId = useRef(0);
   const { saveData, getYamlText, updateSaveData } = useSave();
+  const navigate = useNavigate();
   const [flagValue, setFlagValue] = usePersistedState("unified-item-builder.flagValue", 1);
   const [masterUnlockGuidelines, setMasterUnlockGuidelines] = usePersistedState("unified-item-builder.masterUnlock", false);
   const [descriptiveIdsGuidelines, setDescriptiveIdsGuidelines] = usePersistedState("unified-item-builder.descriptiveIds", true);
@@ -817,6 +1140,9 @@ export default function UnifiedItemBuilderPage() {
   const [weaponPartPickerShowQty, setWeaponPartPickerShowQty] = useState(false);
   const [weaponPartPickerQty, setWeaponPartPickerQty] = useState("1");
   const [weaponSkinValue, setWeaponSkinValue] = useState("");
+  const [moddedWeaponPowerMode, setModdedWeaponPowerMode] = useState<"stable" | "op" | "insane">("op");
+  const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
+  const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
 
   // Grenade (when category === "grenade")
   const [grenadeData, setGrenadeData] = useState<GrenadeBuilderData | null>(null);
@@ -902,6 +1228,47 @@ export default function UnifiedItemBuilderPage() {
   const [repkitResistanceSelectedIds, setRepkitResistanceSelectedIds] = useState<Set<number>>(new Set());
   const [repkitResistanceApplyQty, setRepkitResistanceApplyQty] = useState("1");
 
+  // Heavy (when category === "heavy")
+  const [heavyData, setHeavyData] = useState<HeavyBuilderData | null>(null);
+  const [heavyMfgId, setHeavyMfgId] = useState<number | null>(null);
+  const [showHeavyMfgModal, setShowHeavyMfgModal] = useState(false);
+  const [heavyPartSelections, setHeavyPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [heavyPartPickerPartType, setHeavyPartPickerPartType] = useState<string | null>(null);
+  const [heavyPartPickerChecked, setHeavyPartPickerChecked] = useState<Set<string>>(new Set());
+  const [heavyPartPickerShowQty, setHeavyPartPickerShowQty] = useState(false);
+  const [heavyPartPickerQty, setHeavyPartPickerQty] = useState("1");
+  const [heavyExtraTokens, setHeavyExtraTokens] = useState<string[]>([]);
+  const [showHeavyGodRollModal, setShowHeavyGodRollModal] = useState(false);
+
+  // Enhancement (when category === "enhancement")
+  const [enhancementData, setEnhancementData] = useState<EnhancementBuilderData | null>(null);
+  const [enhancementMfgName, setEnhancementMfgName] = useState<string | null>(null);
+  const [showEnhancementMfgModal, setShowEnhancementMfgModal] = useState(false);
+  const [enhancementPartSelections, setEnhancementPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [enhancementPartPickerPartType, setEnhancementPartPickerPartType] = useState<string | null>(null);
+  const [enhancementPartPickerChecked, setEnhancementPartPickerChecked] = useState<Set<string>>(new Set());
+  const [enhancementPartPickerShowQty, setEnhancementPartPickerShowQty] = useState(false);
+  const [enhancementPartPickerQty, setEnhancementPartPickerQty] = useState("1");
+  const [enhancementExtraTokens, setEnhancementExtraTokens] = useState<string[]>([]);
+  const [showEnhancementGodRollModal, setShowEnhancementGodRollModal] = useState(false);
+
+  // Class Mod (when category === "class-mod")
+  const [classModData, setClassModData] = useState<ClassModBuilderData | null>(null);
+  const [classModClassName, setClassModClassName] = useState("Amon");
+  const [classModRarity, setClassModRarity] = useState("Legendary");
+  const [classModNameOption, setClassModNameOption] = useState<ClassModNameOption | null>(null);
+  const [classModSelections, setClassModSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [classModSkillPoints, setClassModSkillPoints] = useState<Record<string, number>>({});
+  const [classModSkillSearch, setClassModSkillSearch] = useState("");
+  const [classModExtraTokens, setClassModExtraTokens] = useState<string[]>([]);
+  const [showClassModClassModal, setShowClassModClassModal] = useState(false);
+  const [showClassModRarityModal, setShowClassModRarityModal] = useState(false);
+  const [showClassModNameModal, setShowClassModNameModal] = useState(false);
+  const [classModPartPickerKey, setClassModPartPickerKey] = useState<string | null>(null);
+  const [classModPartPickerChecked, setClassModPartPickerChecked] = useState<Set<string>>(new Set());
+  const [classModPartPickerShowQty, setClassModPartPickerShowQty] = useState(false);
+  const [classModPartPickerQty, setClassModPartPickerQty] = useState("1");
+
   const weaponMfgWtId = useMemo(() => {
     if (!weaponData?.mfgWtIdList?.length) return null;
     return weaponData.mfgWtIdList.find(
@@ -984,6 +1351,74 @@ export default function UnifiedItemBuilderPage() {
       })
       .catch(() => {
         if (!cancelled) setRepkitData(null);
+      });
+    return () => { cancelled = true; };
+  }, [category]);
+
+  useEffect(() => {
+    if (category !== "heavy") return;
+    let cancelled = false;
+    fetchApi("accessories/heavy/builder-data")
+      .then((r) => r.json())
+      .then((d: HeavyBuilderData) => {
+        if (cancelled) return;
+        setHeavyData(d);
+        if (d.mfgs?.length) {
+          setHeavyMfgId((prev) => (prev != null && d.mfgs.some((m) => m.id === prev) ? prev : d.mfgs[0].id));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setHeavyData(null);
+      });
+    return () => { cancelled = true; };
+  }, [category]);
+
+  useEffect(() => {
+    if (category !== "class-mod") return;
+    let cancelled = false;
+    fetchApi("accessories/class-mod/builder-data")
+      .then((r) => r.json())
+      .then((d: ClassModBuilderData) => {
+        if (cancelled) return;
+        setClassModData(d);
+        const firstClass = d.classNames?.[0];
+        if (firstClass) {
+          setClassModClassName((prev) => (d.classNames.includes(prev) ? prev : firstClass));
+        }
+        setClassModRarity("Legendary");
+        setClassModNameOption(null);
+        // Reset skill points when data or class-mod category loads
+        const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
+        const skills = d.skillsByClass[classIdStr] ?? [];
+        const nextPoints: Record<string, number> = {};
+        skills.forEach((s) => {
+          nextPoints[s.skillNameEN] = 0;
+        });
+        setClassModSkillPoints(nextPoints);
+      })
+      .catch(() => {
+        if (!cancelled) setClassModData(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [category]);
+
+  useEffect(() => {
+    if (category !== "enhancement") return;
+    let cancelled = false;
+    fetchApi("accessories/enhancement/builder-data")
+      .then((r) => r.json())
+      .then((d: EnhancementBuilderData) => {
+        if (cancelled) return;
+        setEnhancementData(d);
+        const names = Object.keys(d.manufacturers || {}).sort();
+        if (names.length) {
+          setEnhancementMfgName((prev) => (prev && names.includes(prev) ? prev : names[0]));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setEnhancementData(null);
       });
     return () => { cancelled = true; };
   }, [category]);
@@ -1104,6 +1539,100 @@ export default function UnifiedItemBuilderPage() {
     rebuildRepkitDecoded,
   ]);
 
+  const rebuildHeavyDecoded = useCallback(() => {
+    if (!heavyData || heavyMfgId == null) return;
+    const decoded = buildDecodedFromHeavySelections(
+      heavyData,
+      heavyMfgId,
+      level,
+      seed,
+      heavyPartSelections,
+      heavyExtraTokens,
+    );
+    setLiveDecoded(decoded);
+    setLastEditedCodecSide("decoded");
+    setCodecStatus("Heavy build updated; encoding…");
+  }, [heavyData, heavyMfgId, level, seed, heavyPartSelections, heavyExtraTokens]);
+
+  useEffect(() => {
+    if (category !== "heavy" || heavyMfgId == null || !heavyData) return;
+    const hasHeavyConfig =
+      heavyExtraTokens.length > 0 ||
+      Object.keys(heavyPartSelections).some((k) => (heavyPartSelections[k]?.length ?? 0) > 0);
+    if (!hasHeavyConfig) return;
+    rebuildHeavyDecoded();
+  }, [
+    category,
+    heavyMfgId,
+    heavyData,
+    heavyPartSelections,
+    heavyExtraTokens,
+    level,
+    seed,
+    rebuildHeavyDecoded,
+  ]);
+
+  const rebuildEnhancementDecoded = useCallback(() => {
+    if (!enhancementData || !enhancementMfgName) return;
+    const decoded = buildDecodedFromEnhancementSelections(
+      enhancementData,
+      enhancementMfgName,
+      level,
+      seed,
+      enhancementPartSelections,
+      enhancementExtraTokens,
+    );
+    setLiveDecoded(decoded);
+    setLastEditedCodecSide("decoded");
+    setCodecStatus("Enhancement build updated; encoding…");
+  }, [enhancementData, enhancementMfgName, level, seed, enhancementPartSelections, enhancementExtraTokens]);
+
+  useEffect(() => {
+    if (category !== "enhancement" || !enhancementMfgName || !enhancementData) return;
+    const hasEnhancementConfig =
+      enhancementExtraTokens.length > 0 ||
+      Object.keys(enhancementPartSelections).some((k) => (enhancementPartSelections[k]?.length ?? 0) > 0);
+    if (!hasEnhancementConfig) return;
+    rebuildEnhancementDecoded();
+  }, [
+    category,
+    enhancementMfgName,
+    enhancementData,
+    enhancementPartSelections,
+    enhancementExtraTokens,
+    level,
+    seed,
+    rebuildEnhancementDecoded,
+  ]);
+
+  const rebuildClassModDecoded = useCallback(() => {
+    if (!classModData) return;
+    const decoded = buildDecodedFromClassModSelections(
+      classModData,
+      classModClassName,
+      classModRarity,
+      level,
+      seed,
+      classModSelections,
+      classModExtraTokens,
+      classModSkillPoints,
+    );
+    if (!decoded) return;
+    setLiveDecoded(decoded);
+    setLastEditedCodecSide("decoded");
+    setCodecStatus("Class Mod build updated; encoding…");
+  }, [classModData, classModClassName, classModRarity, level, seed, classModSelections, classModExtraTokens, classModSkillPoints]);
+
+  useEffect(() => {
+    if (category !== "class-mod" || !classModData) return;
+    const hasConfig =
+      classModExtraTokens.length > 0 ||
+      Object.keys(classModSelections).some((k) => (classModSelections[k]?.length ?? 0) > 0) ||
+      Object.values(classModSkillPoints).some((v) => v > 0);
+    if (!hasConfig) return;
+    rebuildClassModDecoded();
+  }, [category, classModData, classModSelections, classModExtraTokens, classModSkillPoints, level, seed, rebuildClassModDecoded]);
+
   const handleRandomWeapon = useCallback(() => {
     if (!weaponData?.mfgWtIdList?.length) return;
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -1171,6 +1700,12 @@ export default function UnifiedItemBuilderPage() {
     setLastEditedCodecSide("decoded");
     setCodecStatus("God roll loaded; encoding…");
     setShowRepkitGodRollModal(false);
+  }, []);
+  const handleEnhancementGodRollSelect = useCallback((decoded: string) => {
+    setLiveDecoded(decoded.trim());
+    setLastEditedCodecSide("decoded");
+    setCodecStatus("God roll loaded; encoding…");
+    setShowEnhancementGodRollModal(false);
   }, []);
 
   const handleRandomGrenade = useCallback(() => {
@@ -1440,6 +1975,111 @@ export default function UnifiedItemBuilderPage() {
     setRepkitPartSelections(selections);
   }, [repkitData]);
 
+  const handleRandomHeavy = useCallback(() => {
+    if (!heavyData?.mfgs?.length) return;
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const mfg = pick(heavyData.mfgs);
+    setHeavyMfgId(mfg.id);
+    setLevel(Math.floor(1 + Math.random() * 50));
+    setSeed(Math.floor(100 + Math.random() * 9900));
+    setHeavyExtraTokens([]);
+    const selections: Record<string, { label: string; qty: string }[]> = {};
+
+    const rarities = heavyData.raritiesByMfg[mfg.id] ?? [];
+    if (rarities.length) {
+      const r = pick(rarities);
+      selections["Rarity"] = [{ label: r.label, qty: "1" }];
+    }
+    const barrelOpts = heavyData.barrel.filter((p) => p.mfgId === mfg.id);
+    if (barrelOpts.length) {
+      const b = pick(barrelOpts);
+      selections["Barrel"] = [{ label: `${b.partId} - ${b.stat}`, qty: "1" }];
+    }
+    if (heavyData.element.length) {
+      const e = pick(heavyData.element);
+      selections["Element"] = [{ label: `${e.partId} - ${e.stat}`, qty: "1" }];
+    }
+    if (heavyData.firmware.length) {
+      const f = pick(heavyData.firmware);
+      selections["Firmware"] = [{ label: `${f.partId} - ${f.stat}`, qty: "1" }];
+    }
+    const randQty = (min: number, max: number): string =>
+      String(Math.max(1, Math.min(5, Math.floor(min + Math.random() * (max - min + 1)))));
+    const barrelAcc = heavyData.barrelAccPerks.filter((p) => p.mfgId === mfg.id);
+    if (barrelAcc.length) {
+      const target = Math.max(1, Math.min(5, Math.floor(1 + Math.random() * 5)));
+      const shuffled = [...barrelAcc].sort(() => Math.random() - 0.5);
+      selections["Barrel Accessory"] = shuffled
+        .slice(0, Math.min(target, shuffled.length))
+        .map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: randQty(1, 5) }));
+    }
+    const bodyAcc = heavyData.bodyAccPerks.filter((p) => p.mfgId === mfg.id);
+    if (bodyAcc.length) {
+      const target = Math.max(1, Math.min(5, Math.floor(1 + Math.random() * 5)));
+      const shuffled = [...bodyAcc].sort(() => Math.random() - 0.5);
+      selections["Body Accessory"] = shuffled
+        .slice(0, Math.min(target, shuffled.length))
+        .map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: randQty(1, 5) }));
+    }
+
+    setHeavyPartSelections(selections);
+  }, [heavyData]);
+
+  const handleRandomEnhancement = useCallback(() => {
+    if (!enhancementData) return;
+    const names = Object.keys(enhancementData.manufacturers).sort();
+    if (!names.length) return;
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+    const mfgName = pick(names);
+    const mfg = enhancementData.manufacturers[mfgName];
+    if (!mfg) return;
+    setEnhancementMfgName(mfgName);
+    setLevel(Math.floor(1 + Math.random() * 50));
+    setSeed(Math.floor(100 + Math.random() * 9900));
+    setEnhancementExtraTokens([]);
+    const selections: Record<string, { label: string; qty: string }[]> = {};
+    const randQty = (): string => String(Math.max(1, Math.min(5, Math.floor(1 + Math.random() * 5))));
+
+    const rarities = ENHANCEMENT_RARITY_ORDER.filter((r) => r in (mfg.rarities || {}));
+    if (rarities.length) {
+      selections["Rarity"] = [{ label: pick(rarities), qty: "1" }];
+    }
+    const mfgPerks = (mfg.perks || []).filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.index));
+    if (mfgPerks.length) {
+      const count = Math.max(0, Math.min(mfgPerks.length, Math.floor(Math.random() * (mfgPerks.length + 1))));
+      const shuffled = [...mfgPerks].sort(() => Math.random() - 0.5);
+      selections["Manufacturer perks"] = shuffled.slice(0, count).map((p) => ({
+        label: `[${p.index}] ${p.name}`,
+        qty: "1",
+      }));
+    }
+    const stackOptions: { label: string; qty: string }[] = [];
+    for (const [otherName, otherMfg] of Object.entries(enhancementData.manufacturers)) {
+      if (otherName === mfgName) continue;
+      for (const p of otherMfg.perks || []) {
+        if (!ENHANCEMENT_PERK_ORDER.includes(p.index)) continue;
+        stackOptions.push({
+          label: `${otherMfg.code}:${p.index} - ${p.name} — ${otherName}`,
+          qty: randQty(),
+        });
+      }
+    }
+    if (stackOptions.length) {
+      const count = Math.max(0, Math.min(5, Math.floor(Math.random() * 6)));
+      const shuffled = [...stackOptions].sort(() => Math.random() - 0.5);
+      selections["Stacked perks"] = shuffled.slice(0, count);
+    }
+    if (enhancementData.secondary247?.length) {
+      const target = Math.max(0, Math.min(8, Math.floor(Math.random() * 9)));
+      const shuffled = [...enhancementData.secondary247].sort(() => Math.random() - 0.5);
+      selections["Builder 247"] = shuffled.slice(0, target).map((s) => ({
+        label: `${s.code} - ${s.name}`,
+        qty: randQty(),
+      }));
+    }
+    setEnhancementPartSelections(selections);
+  }, [enhancementData]);
+
   const handleRepkitAutoFill = useCallback(() => {
     setRepkitAutoFillWarning(null);
     if (!repkitData || repkitMfgId == null) {
@@ -1489,6 +2129,75 @@ export default function UnifiedItemBuilderPage() {
 
     setRepkitPartSelections(selections);
   }, [repkitData, repkitMfgId, repkitPartSelections]);
+
+  const handleGenerateModdedWeapon = useCallback(async () => {
+    setGenerateModdedError(null);
+    setGenerateModdedLoading(true);
+    try {
+      const [editRes, partsRes] = await Promise.all([
+        fetchApi("weapon-edit/data"),
+        fetchApi("parts/data"),
+      ]);
+      const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
+      const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
+      const items = Array.isArray(partsPayload?.items) ? partsPayload.items : [];
+      const universalPartCodes: UniversalDbPartCode[] = [];
+      for (const it of items) {
+        if (!it || typeof it !== "object") continue;
+        const raw = it as Record<string, unknown>;
+        const code = String(raw.code ?? raw.Code ?? "").trim();
+        if (!code) continue;
+        universalPartCodes.push({
+          code,
+          partType: String(raw.partType ?? raw["Part Type"] ?? raw.canonicalPartType ?? "").trim(),
+          rarity: String(raw.rarity ?? raw.Rarity ?? raw.canonicalRarity ?? "").trim(),
+          itemType: String(raw.itemType ?? raw["Item Type"] ?? raw["Weapon Type"] ?? "").trim(),
+          manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? raw.canonicalManufacturer ?? "").trim(),
+          uniqueEffect: /^(true|1|yes)$/i.test(String(raw.uniqueEffect ?? raw["Unique Effect"] ?? "").trim()),
+          visualUniqueBarrel: /^(true|1|yes)$/i.test(
+            String(raw.visualUniqueBarrel ?? raw["Visual Unique Barrel"] ?? "").trim(),
+          ),
+          statText: [
+            raw.effect,
+            raw.Effect,
+            raw.stat,
+            raw.Stat,
+            raw.stats,
+            raw.Stats,
+            raw.string,
+            raw.String,
+            raw.partName,
+            raw.name,
+            raw["Search Text"],
+          ]
+            .map((v) => String(v ?? "").trim())
+            .filter(Boolean)
+            .join(" "),
+        });
+      }
+      if (!editData?.parts?.length) {
+        setGenerateModdedError("Weapon edit data failed to load. Try again.");
+        return;
+      }
+      if (!universalPartCodes.length) {
+        setGenerateModdedError("Parts data failed to load. Try again.");
+        return;
+      }
+      const weaponLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
+      const decoded = generateModdedWeapon(editData, universalPartCodes, {
+        level: weaponLevel,
+        modPowerMode: moddedWeaponPowerMode,
+        skin: weaponSkinValue.trim() || undefined,
+      });
+      setLiveDecoded(decoded.trim());
+      setLastEditedCodecSide("decoded");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Generate modded weapon failed.";
+      setGenerateModdedError(msg);
+    } finally {
+      setGenerateModdedLoading(false);
+    }
+  }, [level, moddedWeaponPowerMode, weaponSkinValue]);
 
   const handleAutoFill = useCallback(() => {
     setAutoFillWarning(null);
@@ -2149,12 +2858,18 @@ export default function UnifiedItemBuilderPage() {
       setShieldExtraTokens((prev) => [...prev, token]);
     } else if (category === "repkit" && repkitMfgId != null) {
       setRepkitExtraTokens((prev) => [...prev, token]);
+    } else if (category === "enhancement" && enhancementMfgName) {
+      setEnhancementExtraTokens((prev) => [...prev, token]);
+    } else if (category === "heavy" && heavyMfgId != null) {
+      setHeavyExtraTokens((prev) => [...prev, token]);
+    } else if (category === "class-mod" && classModData) {
+      setClassModExtraTokens((prev) => [...prev, token]);
     } else {
       appendToDecoded([token]);
     }
     setPendingAddPart(null);
     setPendingAddQty("1");
-  }, [pendingAddPart, pendingAddQty, appendToDecoded, category, weaponMfgWtId, grenadeMfgId, shieldMfgId, repkitMfgId]);
+  }, [pendingAddPart, pendingAddQty, appendToDecoded, category, weaponMfgWtId, grenadeMfgId, shieldMfgId, repkitMfgId, enhancementMfgName, heavyMfgId]);
 
   const currentBuildParts = useMemo(() => {
     const segment = getPartsSegmentFromFirstLine(liveDecoded);
@@ -2512,6 +3227,32 @@ export default function UnifiedItemBuilderPage() {
                 >
                   Auto fill
                 </button>
+                <span className="self-center text-[var(--color-text-muted)] text-xs mx-1">|</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[var(--color-text-muted)] text-sm">Generate modded:</span>
+                  <select
+                    value={moddedWeaponPowerMode}
+                    onChange={(e) => setModdedWeaponPowerMode(e.target.value as "stable" | "op" | "insane")}
+                    className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                    title="Power level for random modded weapon"
+                  >
+                    <option value="stable">Stable</option>
+                    <option value="op">OP</option>
+                    <option value="insane">Insane</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => void handleGenerateModdedWeapon()}
+                    disabled={generateModdedLoading}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 disabled:opacity-60 text-sm min-h-[44px] touch-manipulation"
+                    title="Generate a random modded weapon in-place (underbarrel, multi-projectile, needle homing when applicable). Result appears in Current build parts."
+                  >
+                    {generateModdedLoading ? "Generating…" : "Generate modded weapon"}
+                  </button>
+                  {generateModdedError && (
+                    <span className="text-red-400 text-xs">{generateModdedError}</span>
+                  )}
+                </div>
               </div>
             </div>
             {autoFillWarning && (
@@ -4947,6 +5688,891 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
+      {/* Heavy: Manufacturer + Level + Seed + Add other parts + part groups (weapon-style) */}
+      {category === "heavy" && heavyData && heavyMfgId != null && (
+        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
+            <span>Heavy build</span>
+            <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-3 pb-3 pt-0">
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              Pick manufacturer, level, and seed; then select parts from each group. Use &quot;Add other parts&quot; to add any part from the database.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Manufacturer</label>
+                <button
+                  type="button"
+                  onClick={() => setShowHeavyMfgModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[10rem] text-left"
+                  title="Select manufacturer"
+                >
+                  {heavyData.mfgs.find((m) => m.id === heavyMfgId)?.name ?? `Mfg ${heavyMfgId}`}
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Level</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={level}
+                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Seed</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={9999}
+                  value={seed}
+                  onChange={(e) => setSeed(Number(e.target.value) || 1)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddPartsModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Add other parts
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRandomHeavy}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Random item
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowHeavyGodRollModal(true)}
+                  disabled={!heavyData?.godrolls?.length}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={heavyData?.godrolls?.length ? "Pick a god roll preset" : "No god rolls loaded"}
+                >
+                  God roll
+                </button>
+              </div>
+            </div>
+
+            {showHeavyMfgModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowHeavyMfgModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Manufacturer</h3>
+                    <button type="button" onClick={() => setShowHeavyMfgModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
+                      {heavyData.mfgs.map((m) => {
+                        const active = m.id === heavyMfgId;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setHeavyMfgId(m.id);
+                              setShowHeavyMfgModal(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${active ? "bg-[var(--color-accent)]/10" : ""}`}
+                          >
+                            <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
+                            <span className="text-sm text-[var(--color-text)]">{m.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showHeavyGodRollModal && heavyData?.godrolls?.length && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowHeavyGodRollModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items(center) justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">God roll preset</h3>
+                    <button type="button" onClick={() => setShowHeavyGodRollModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                    {heavyData.godrolls.map((g, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          setLiveDecoded(g.decoded.trim());
+                          setLastEditedCodecSide("decoded");
+                          setCodecStatus("God roll loaded; encoding…");
+                          setShowHeavyGodRollModal(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm"
+                      >
+                        {g.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {HEAVY_PART_ORDER.map(({ key: partType }) => {
+                const list = heavyPartSelections[partType] ?? [];
+                return (
+                  <div key={partType} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="block text-xs text-[var(--color-accent)]">{partType}</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHeavyPartPickerPartType(partType);
+                          setHeavyPartPickerChecked(new Set());
+                          setHeavyPartPickerShowQty(false);
+                        }}
+                        className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                      >
+                        Select parts…
+                      </button>
+                    </div>
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] p-2 min-h-[44px]">
+                      {list.length === 0 ? (
+                        <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
+                      ) : (
+                        <div className="space-y-2">
+                          {list.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-2 flex-wrap">
+                              <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
+                              {partType !== "Rarity" && partType !== "Barrel" && partType !== "Element" && partType !== "Firmware" && (
+                                <input
+                                  type="number"
+                                  min={1}
+                                  max={99}
+                                  value={item.qty}
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    setHeavyPartSelections((prev) => {
+                                      const arr = [...(prev[partType] ?? [])];
+                                      arr[idx] = { ...arr[idx], qty: v };
+                                      return { ...prev, [partType]: arr };
+                                    });
+                                  }}
+                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                />
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setHeavyPartSelections((prev) => {
+                                    const arr = (prev[partType] ?? []).filter((_, i) => i !== idx);
+                                    return { ...prev, [partType]: arr };
+                                  });
+                                }}
+                                className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {heavyPartPickerPartType && !heavyPartPickerShowQty && (() => {
+              if (heavyMfgId == null || !heavyData) return null;
+              const opts: { partId: string; label: string }[] = [];
+              if (heavyPartPickerPartType === "Rarity") {
+                (heavyData.raritiesByMfg[heavyMfgId] ?? []).forEach((r) => {
+                  opts.push({ partId: String(r.id), label: r.label });
+                });
+              } else if (heavyPartPickerPartType === "Barrel") {
+                heavyData.barrel.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                });
+              } else if (heavyPartPickerPartType === "Element") {
+                heavyData.element.forEach((p) => {
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                });
+              } else if (heavyPartPickerPartType === "Firmware") {
+                heavyData.firmware.forEach((p) => {
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                });
+              } else if (heavyPartPickerPartType === "Barrel Accessory") {
+                heavyData.barrelAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                });
+              } else if (heavyPartPickerPartType === "Body Accessory") {
+                heavyData.bodyAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                });
+              }
+              return (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setHeavyPartPickerPartType(null)}>
+                  <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                    <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                      <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {heavyPartPickerPartType}</h3>
+                      <button type="button" onClick={() => setHeavyPartPickerPartType(null)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-3">
+                      <button
+                        type="button"
+                        onClick={() => { setHeavyPartPickerPartType(null); setShowAddPartsModal(true); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm mb-2"
+                      >
+                        ➕ Add part from database…
+                      </button>
+                      <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
+                        {opts.map((o) => (
+                          <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                            <input
+                              type="checkbox"
+                              checked={heavyPartPickerChecked.has(o.label)}
+                              onChange={(e) => {
+                                setHeavyPartPickerChecked((prev) => {
+                                  const next = new Set(prev);
+                                  if (e.target.checked) next.add(o.label);
+                                  else next.delete(o.label);
+                                  return next;
+                                });
+                              }}
+                              className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
+                            />
+                            <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex gap-2 justify-end shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setHeavyPartPickerPartType(null)}
+                        className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:text-[var(--color-accent)] text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (heavyPartPickerChecked.size === 0) return;
+                          const partType = heavyPartPickerPartType;
+                          if (partType === "Rarity" || partType === "Barrel" || partType === "Element" || partType === "Firmware") {
+                            const toAdd = Array.from(heavyPartPickerChecked).map((label) => ({ label, qty: "1" }));
+                            setHeavyPartSelections((prev) => ({
+                              ...prev,
+                              [partType]: [...(prev[partType] ?? []), ...toAdd],
+                            }));
+                            setHeavyPartPickerPartType(null);
+                            setHeavyPartPickerChecked(new Set());
+                          } else {
+                            setHeavyPartPickerShowQty(true);
+                          }
+                        }}
+                        disabled={heavyPartPickerChecked.size === 0}
+                        className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Add selected ({heavyPartPickerChecked.size})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {heavyPartPickerPartType && heavyPartPickerShowQty && (
+              <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => { setHeavyPartPickerPartType(null); setHeavyPartPickerShowQty(false); }}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-[var(--color-accent)] font-medium text-sm mb-2">Quantity</h3>
+                  <p className="text-xs text-[var(--color-text-muted)] mb-3">This quantity will be applied to all {heavyPartPickerChecked.size} selected parts.</p>
+                  <input
+                    type="number"
+                    min={1}
+                    max={99}
+                    value={heavyPartPickerQty}
+                    onChange={(e) => setHeavyPartPickerQty(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => { setHeavyPartPickerPartType(null); setHeavyPartPickerShowQty(false); }}
+                      className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const partType = heavyPartPickerPartType;
+                        const qty = String(Math.max(1, Math.min(99, parseInt(heavyPartPickerQty.trim(), 10) || 1)));
+                        const toAdd = Array.from(heavyPartPickerChecked).map((label) => ({ label, qty }));
+                        setHeavyPartSelections((prev) => ({
+                          ...prev,
+                          [partType]: [...(prev[partType] ?? []), ...toAdd],
+                        }));
+                        setHeavyPartPickerPartType(null);
+                        setHeavyPartPickerChecked(new Set());
+                        setHeavyPartPickerShowQty(false);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </details>
+      )}
+
+      {/* Class Mod: Class + Rarity + Name + skills/perks (weapon-style groups) */}
+      {category === "class-mod" && classModData && (
+        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
+            <span>Class Mod build</span>
+            <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-3 pb-3 pt-0">
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              Pick class, rarity, and name; then select skills and perks. Use &quot;Add other parts&quot; to add any part from the database.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Class</label>
+                <button
+                  type="button"
+                  onClick={() => setShowClassModClassModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[10rem] text-left"
+                  title="Select class"
+                >
+                  {classModClassName || "Select…"}
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Rarity</label>
+                <button
+                  type="button"
+                  onClick={() => setShowClassModRarityModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[8rem] text-left"
+                  title="Select rarity"
+                >
+                  {classModRarity}
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Name</label>
+                <button
+                  type="button"
+                  onClick={() => setShowClassModNameModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[12rem] text-left"
+                  title="Select name"
+                >
+                  {classModNameOption?.nameEN ?? "Select…"}
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Level</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={level}
+                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Seed</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={9999}
+                  value={seed}
+                  onChange={(e) => setSeed(Number(e.target.value) || 1)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddPartsModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Add other parts
+                </button>
+              </div>
+            </div>
+
+            {showClassModClassModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowClassModClassModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Class</h3>
+                    <button type="button" onClick={() => setShowClassModClassModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">
+                      Close
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
+                      {classModData.classNames.map((name) => {
+                        const active = name === classModClassName;
+                        return (
+                          <button
+                            key={name}
+                            type="button"
+                            onClick={() => {
+                              setClassModClassName(name);
+                              setShowClassModClassModal(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${
+                              active ? "bg-[var(--color-accent)]/10" : ""
+                            }`}
+                          >
+                            <span
+                              className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${
+                                active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"
+                              }`}
+                            />
+                            <span className="text-sm text-[var(--color-text)]">{name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showClassModRarityModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowClassModRarityModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Rarity</h3>
+                    <button type="button" onClick={() => setShowClassModRarityModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">
+                      Close
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
+                      {classModData.rarities.map((r) => {
+                        const active = r === classModRarity;
+                        return (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={() => {
+                              setClassModRarity(r);
+                              setShowClassModRarityModal(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${
+                              active ? "bg-[var(--color-accent)]/10" : ""
+                            }`}
+                          >
+                            <span
+                              className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${
+                                active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"
+                              }`}
+                            />
+                            <span className="text-sm text-[var(--color-text)]">{r}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showClassModNameModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowClassModNameModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Name</h3>
+                    <button type="button" onClick={() => setShowClassModNameModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">
+                      Close
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
+                      {(() => {
+                        const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
+                        const rarityKey = classModRarity === "Legendary" ? "legendary" : "normal";
+                        const namesKey = `${classIdStr},${rarityKey}`;
+                        const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
+                        return nameOptions.map((opt) => {
+                          const active = classModNameOption?.nameCode === opt.nameCode;
+                          const label = `${opt.nameCode} - ${opt.nameEN}`;
+                          return (
+                            <button
+                              key={opt.nameCode}
+                              type="button"
+                              onClick={() => {
+                                setClassModNameOption(opt);
+                                setClassModSelections((prev) => ({
+                                  ...prev,
+                                  Name: [{ label, qty: "1" }],
+                                }));
+                                setShowClassModNameModal(false);
+                              }}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${
+                                active ? "bg-[var(--color-accent)]/10" : ""
+                              }`}
+                            >
+                              <span
+                                className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${
+                                  active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"
+                                }`}
+                              />
+                              <span className="text-sm text-[var(--color-text)]">{label}</span>
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {(() => {
+              const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
+              const skills = classModData.skillsByClass[classIdStr] ?? [];
+
+              const list = (partType: string) => classModSelections[partType] ?? [];
+              const setEntries = (partType: string, entries: { label: string; qty: string }[]) => {
+                setClassModSelections((prev) => ({ ...prev, [partType]: entries }));
+              };
+
+              return (
+                <>
+                  {/* Skills list with Min / - / input / + / Max controls */}
+                  <div className="mb-4 rounded-xl border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.25)] p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <span className="text-sm font-medium text-[var(--color-accent)]">Skills</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next: Record<string, number> = { ...classModSkillPoints };
+                            skills.forEach((s) => {
+                              next[s.skillNameEN] = 5;
+                            });
+                            setClassModSkillPoints(next);
+                          }}
+                          className="px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-[11px] min-h-[32px]"
+                        >
+                          Max All
+                        </button>
+                        <input
+                          type="text"
+                          placeholder="Search…"
+                          value={classModSkillSearch}
+                          onChange={(e) => setClassModSkillSearch(e.target.value)}
+                          className="px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs min-w-[10rem]"
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[260px] overflow-y-auto space-y-1">
+                      {skills
+                        .filter((s) =>
+                          classModSkillSearch.trim()
+                            ? s.skillNameEN.toLowerCase().includes(classModSkillSearch.toLowerCase())
+                            : true,
+                        )
+                        .map((skill) => {
+                          const val = classModSkillPoints[skill.skillNameEN] ?? 0;
+                          const setVal = (v: number) => {
+                            const clamped = Math.max(0, Math.min(5, v));
+                            setClassModSkillPoints((prev) => ({ ...prev, [skill.skillNameEN]: clamped }));
+                          };
+                          return (
+                            <div
+                              key={skill.skillNameEN}
+                              className="flex items-center gap-3 px-2 py-1.5 rounded border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.7)]"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm text-[var(--color-text)] truncate">{skill.skillNameEN}</div>
+                                <div className="text-[10px] text-[var(--color-text-muted)]">
+                                  {`{${skill.skillIds.join(", ")}}`}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-[10px] disabled:opacity-40"
+                                  onClick={() => setVal(0)}
+                                  disabled={val <= 0}
+                                >
+                                  Min
+                                </button>
+                                <button
+                                  type="button"
+                                  className="w-7 h-7 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs disabled:opacity-40"
+                                  onClick={() => setVal(val - 1)}
+                                  disabled={val <= 0}
+                                >
+                                  −
+                                </button>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={5}
+                                  value={val}
+                                  onChange={(e) => {
+                                    const n = parseInt(e.target.value, 10);
+                                    if (!Number.isNaN(n)) setVal(n);
+                                  }}
+                                  className="w-10 h-7 text-center rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs"
+                                />
+                                <button
+                                  type="button"
+                                  className="w-7 h-7 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs disabled:opacity-40"
+                                  onClick={() => setVal(val + 1)}
+                                  disabled={val >= 5}
+                                >
+                                  +
+                                </button>
+                                <button
+                                  type="button"
+                                  className="px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-[10px] disabled:opacity-40"
+                                  onClick={() => setVal(5)}
+                                  disabled={val >= 5}
+                                >
+                                  Max
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {CLASS_MOD_PART_ORDER.map(({ key: partType }) => {
+                      const entries = list(partType);
+                      return (
+                        <div key={partType} className="space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <label className="block text-xs text-[var(--color-accent)]">{partType}</label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setClassModPartPickerKey(partType);
+                                setClassModPartPickerChecked(new Set());
+                                setClassModPartPickerShowQty(false);
+                                setClassModPartPickerQty("1");
+                              }}
+                              className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                            >
+                              Select parts…
+                            </button>
+                          </div>
+                          <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] p-2 min-h-[44px]">
+                            {entries.length === 0 ? (
+                              <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
+                            ) : (
+                              <div className="space-y-2">
+                                {entries.map((item, idx) => (
+                                  <div key={idx} className="flex items-center gap-2 flex-wrap">
+                                    <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
+                                    <input
+                                      type="number"
+                                      min={partType === "Legendary names" ? 1 : 0}
+                                      max={partType === "Skills" ? 5 : 99}
+                                      value={item.qty}
+                                      onChange={(e) => {
+                                        const v = e.target.value;
+                                        setEntries(
+                                          partType,
+                                          entries.map((e2, i2) => (i2 === idx ? { ...e2, qty: v } : e2)),
+                                        );
+                                      }}
+                                      className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEntries(
+                                          partType,
+                                          entries.filter((_, i2) => i2 !== idx),
+                                        );
+                                      }}
+                                      className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {classModPartPickerKey && !classModPartPickerShowQty && (() => {
+                    const opts: { id: string; label: string }[] = [];
+                    if (classModPartPickerKey === "Legendary names") {
+                      const rarityKey = "legendary";
+                      const namesKey = `${classIdStr},${rarityKey}`;
+                      const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
+                      const currentNameCode = classModNameOption?.nameCode;
+                      nameOptions.forEach((opt) => {
+                        if (opt.nameCode === currentNameCode) return;
+                        opts.push({ id: String(opt.nameCode), label: `${opt.nameCode} - ${opt.nameEN}` });
+                      });
+                    } else if (classModPartPickerKey === "Skills") {
+                      skills.forEach((s) => {
+                        opts.push({ id: s.skillNameEN, label: s.skillNameEN });
+                      });
+                    } else if (classModPartPickerKey === "Perks") {
+                      classModData.perks.forEach((p) => {
+                        opts.push({ id: String(p.perkId), label: `${p.perkId} - ${p.perkNameEN}` });
+                      });
+                    }
+                    return (
+                      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setClassModPartPickerKey(null)}>
+                        <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                          <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                            <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {classModPartPickerKey}</h3>
+                            <button type="button" onClick={() => setClassModPartPickerKey(null)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">
+                              Close
+                            </button>
+                          </div>
+                          <div className="flex-1 overflow-y-auto p-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setClassModPartPickerKey(null);
+                                setShowAddPartsModal(true);
+                              }}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm mb-2"
+                            >
+                              ➕ Add part from database…
+                            </button>
+                            <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
+                              {opts.map((o) => (
+                                <label key={o.id + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                                  <input
+                                    type="checkbox"
+                                    checked={classModPartPickerChecked.has(o.label)}
+                                    onChange={(e) => {
+                                      setClassModPartPickerChecked((prev) => {
+                                        const next = new Set(prev);
+                                        if (e.target.checked) next.add(o.label);
+                                        else next.delete(o.label);
+                                        return next;
+                                      });
+                                    }}
+                                    className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
+                                  />
+                                  <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex gap-2 justify-end shrink-0">
+                            <button type="button" onClick={() => setClassModPartPickerKey(null)} className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:text-[var(--color-accent)] text-sm">
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (classModPartPickerChecked.size === 0) return;
+                                if (classModPartPickerKey === "Skills") {
+                                  const toAdd = Array.from(classModPartPickerChecked).map((label) => ({ label, qty: "0" }));
+                                  setEntries("Skills", [...list("Skills"), ...toAdd]);
+                                  setClassModPartPickerKey(null);
+                                  setClassModPartPickerChecked(new Set());
+                                } else if (classModPartPickerKey === "Legendary names") {
+                                  const toAdd = Array.from(classModPartPickerChecked).map((label) => ({ label, qty: "1" }));
+                                  setEntries("Legendary names", [...list("Legendary names"), ...toAdd]);
+                                  setClassModPartPickerKey(null);
+                                  setClassModPartPickerChecked(new Set());
+                                } else {
+                                  setClassModPartPickerShowQty(true);
+                                }
+                              }}
+                              disabled={classModPartPickerChecked.size === 0}
+                              className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Add selected ({classModPartPickerChecked.size})
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {classModPartPickerKey && classModPartPickerShowQty && (
+                    <div
+                      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 p-4"
+                      onClick={() => {
+                        setClassModPartPickerKey(null);
+                        setClassModPartPickerShowQty(false);
+                      }}
+                    >
+                      <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-[var(--color-accent)] font-medium text-sm mb-2">Quantity</h3>
+                        <p className="text-xs text-[var(--color-text-muted)] mb-3">
+                          This quantity will be applied to all {classModPartPickerChecked.size} selected parts.
+                        </p>
+                        <input
+                          type="number"
+                          min={1}
+                          max={99}
+                          value={classModPartPickerQty}
+                          onChange={(e) => setClassModPartPickerQty(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-4"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setClassModPartPickerKey(null);
+                              setClassModPartPickerShowQty(false);
+                            }}
+                            className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] text-sm"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!classModPartPickerKey) return;
+                              const qty = String(Math.max(1, Math.min(99, parseInt(classModPartPickerQty.trim(), 10) || 1)));
+                              const toAdd = Array.from(classModPartPickerChecked).map((label) => ({ label, qty }));
+                              setEntries(classModPartPickerKey, [...list(classModPartPickerKey), ...toAdd]);
+                              setClassModPartPickerKey(null);
+                              setClassModPartPickerShowQty(false);
+                              setClassModPartPickerChecked(new Set());
+                            }}
+                            className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm"
+                          >
+                            Add to build
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </details>
+      )}
+
       {/* RepKit: old dropdown-based UI (disabled, kept for reference) */}
       {category === "repkit" && repkitData && repkitMfgId != null && false && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
@@ -5572,6 +7198,331 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
+      {/* Enhancement: Manufacturer + Level + Seed + part groups (weapon-style) */}
+      {category === "enhancement" && enhancementData && enhancementMfgName && (
+        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
+            <span>Enhancement build</span>
+            <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-3 pb-3 pt-0">
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              Pick manufacturer, level, and seed; then select parts from each group. Use &quot;Add other parts&quot; to add any part from the database.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Manufacturer</label>
+                <button
+                  type="button"
+                  onClick={() => setShowEnhancementMfgModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[10rem] text-left"
+                  title="Select manufacturer"
+                >
+                  {enhancementData.manufacturers[enhancementMfgName]?.name ?? enhancementMfgName}
+                </button>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Level</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={level}
+                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Seed</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={9999}
+                  value={seed}
+                  onChange={(e) => setSeed(Number(e.target.value) || 1)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddPartsModal(true)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Add other parts
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRandomEnhancement}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Random item
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEnhancementGodRollModal(true)}
+                  disabled={!enhancementData?.godrolls?.length}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={enhancementData?.godrolls?.length ? "Pick a god roll preset" : "No god rolls loaded"}
+                >
+                  God roll
+                </button>
+              </div>
+            </div>
+
+            {showEnhancementMfgModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowEnhancementMfgModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Manufacturer</h3>
+                    <button type="button" onClick={() => setShowEnhancementMfgModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3">
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
+                      {Object.keys(enhancementData.manufacturers).sort().map((name) => {
+                        const active = name === enhancementMfgName;
+                        return (
+                          <button
+                            key={name}
+                            type="button"
+                            onClick={() => {
+                              setEnhancementMfgName(name);
+                              setShowEnhancementMfgModal(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm ${active ? "bg-[rgba(63,203,255,0.16)] text-[var(--color-accent)]" : "text-[var(--color-text)] hover:bg-[rgba(63,203,255,0.08)]"}`}
+                          >
+                            <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 flex-shrink-0 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
+                            <span>{enhancementData.manufacturers[name].name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showEnhancementGodRollModal && enhancementData?.godrolls?.length ? (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowEnhancementGodRollModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                    <h3 className="text-[var(--color-accent)] font-medium text-sm">God roll preset</h3>
+                    <button type="button" onClick={() => setShowEnhancementGodRollModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                    {enhancementData.godrolls.map((g, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleEnhancementGodRollSelect(g.decoded)}
+                        className="w-full text-left px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm"
+                      >
+                        {g.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {ENHANCEMENT_PART_ORDER.map(({ key: partType }) => {
+                const displayLabel =
+                  partType === "Stacked perks"
+                    ? "Legendary Perks"
+                    : partType === "Builder 247"
+                    ? "Universal Perks"
+                    : partType;
+                const list = enhancementPartSelections[partType] ?? [];
+                return (
+                  <div key={partType} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="block text-xs text-[var(--color-accent)]">{displayLabel}</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEnhancementPartPickerPartType(partType);
+                          setEnhancementPartPickerChecked(new Set());
+                          setEnhancementPartPickerShowQty(false);
+                        }}
+                        className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                      >
+                        Select parts…
+                      </button>
+                    </div>
+                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] p-2 min-h-[44px]">
+                      {list.length === 0 ? (
+                        <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
+                      ) : (
+                        <div className="space-y-2">
+                          {list.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-2 flex-wrap">
+                              <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
+                              {partType !== "Rarity" && (
+                                <input
+                                  type="number"
+                                  min={1}
+                                  max={99}
+                                  value={item.qty}
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    setEnhancementPartSelections((prev) => {
+                                      const arr = [...(prev[partType] ?? [])];
+                                      arr[idx] = { ...arr[idx], qty: v };
+                                      return { ...prev, [partType]: arr };
+                                    });
+                                  }}
+                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                />
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEnhancementPartSelections((prev) => {
+                                    const arr = (prev[partType] ?? []).filter((_, i) => i !== idx);
+                                    return { ...prev, [partType]: arr };
+                                  });
+                                }}
+                                className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Enhancement part picker modal */}
+            {enhancementPartPickerPartType && !enhancementPartPickerShowQty && (() => {
+              const mfg = enhancementMfgName ? enhancementData.manufacturers[enhancementMfgName] : null;
+              const pickerLabel =
+                enhancementPartPickerPartType === "Stacked perks"
+                  ? "Legendary Perks"
+                  : enhancementPartPickerPartType === "Builder 247"
+                  ? "Universal Perks"
+                  : enhancementPartPickerPartType;
+              let opts: { partId: string; label: string }[] = [];
+              if (mfg && enhancementPartPickerPartType === "Rarity") {
+                opts = ENHANCEMENT_RARITY_ORDER.filter((r) => r in (mfg.rarities || {})).map((r) => ({ partId: r, label: r }));
+              } else if (mfg && enhancementPartPickerPartType === "Manufacturer perks") {
+                opts = (mfg.perks || []).filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.index)).map((p) => ({ partId: String(p.index), label: `[${p.index}] ${p.name}` }));
+              } else if (enhancementPartPickerPartType === "Stacked perks" && enhancementMfgName) {
+                for (const [name, om] of Object.entries(enhancementData.manufacturers)) {
+                  if (name === enhancementMfgName) continue;
+                  for (const p of om.perks || []) {
+                    if (!ENHANCEMENT_PERK_ORDER.includes(p.index)) continue;
+                    opts.push({ partId: `${om.code}:${p.index}`, label: `${om.code}:${p.index} - ${p.name} — ${name}` });
+                  }
+                }
+              } else if (enhancementPartPickerPartType === "Builder 247") {
+                opts = (enhancementData.secondary247 || []).map((s) => ({ partId: String(s.code), label: `${s.code} - ${s.name}` }));
+              }
+              return (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setEnhancementPartPickerPartType(null)}>
+                  <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                    <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+                      <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {pickerLabel}</h3>
+                      <button type="button" onClick={() => setEnhancementPartPickerPartType(null)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-3">
+                      <button
+                        type="button"
+                        onClick={() => { setEnhancementPartPickerPartType(null); setShowAddPartsModal(true); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm mb-2"
+                      >
+                        ➕ Add part from database…
+                      </button>
+                      <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
+                        {opts.map((o) => (
+                          <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                            <input
+                              type="checkbox"
+                              checked={enhancementPartPickerChecked.has(o.label)}
+                              onChange={(e) => {
+                                setEnhancementPartPickerChecked((prev) => {
+                                  const next = new Set(prev);
+                                  if (e.target.checked) next.add(o.label); else next.delete(o.label);
+                                  return next;
+                                });
+                              }}
+                              className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
+                            />
+                            <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex gap-2 justify-end shrink-0">
+                      <button type="button" onClick={() => setEnhancementPartPickerPartType(null)} className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:text-[var(--color-accent)] text-sm">Cancel</button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (enhancementPartPickerChecked.size === 0) return;
+                          const partType = enhancementPartPickerPartType;
+                          if (partType === "Rarity") {
+                            const toAdd = Array.from(enhancementPartPickerChecked).map((label) => ({ label, qty: "1" }));
+                            setEnhancementPartSelections((prev) => ({ ...prev, [partType]: [...(prev[partType] ?? []), ...toAdd] }));
+                            setEnhancementPartPickerPartType(null);
+                            setEnhancementPartPickerChecked(new Set());
+                          } else {
+                            setEnhancementPartPickerShowQty(true);
+                          }
+                        }}
+                        disabled={enhancementPartPickerChecked.size === 0}
+                        className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Add selected ({enhancementPartPickerChecked.size})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Enhancement quantity popup */}
+            {enhancementPartPickerPartType && enhancementPartPickerShowQty && (
+              <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => { setEnhancementPartPickerPartType(null); setEnhancementPartPickerShowQty(false); }}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-[var(--color-accent)] font-medium text-sm mb-2">Quantity</h3>
+                  <p className="text-xs text-[var(--color-text-muted)] mb-3">This quantity will be applied to all {enhancementPartPickerChecked.size} selected parts.</p>
+                  <input
+                    type="number"
+                    min={1}
+                    max={99}
+                    value={enhancementPartPickerQty}
+                    onChange={(e) => setEnhancementPartPickerQty(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button type="button" onClick={() => { setEnhancementPartPickerPartType(null); setEnhancementPartPickerShowQty(false); }} className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] text-sm">Cancel</button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const partType = enhancementPartPickerPartType;
+                        const qty = String(Math.max(1, Math.min(99, parseInt(enhancementPartPickerQty.trim(), 10) || 1)));
+                        const toAdd = Array.from(enhancementPartPickerChecked).map((label) => ({ label, qty }));
+                        setEnhancementPartSelections((prev) => ({ ...prev, [partType]: [...(prev[partType] ?? []), ...toAdd] }));
+                        setEnhancementPartPickerPartType(null);
+                        setEnhancementPartPickerChecked(new Set());
+                        setEnhancementPartPickerShowQty(false);
+                      }}
+                      className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </details>
+      )}
+
       <section className="grid gap-4 xl:grid-cols-[1fr_340px]">
         <div />
 
@@ -5631,6 +7582,8 @@ export default function UnifiedItemBuilderPage() {
                           ? grenadeExtraLabels
                           : category === "repkit"
                           ? repkitExtraLabels
+                          : category === "enhancement"
+                          ? null
                           : null,
                       );
 

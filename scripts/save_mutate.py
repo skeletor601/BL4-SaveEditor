@@ -117,8 +117,8 @@ def main() -> None:
     if not isinstance(yaml_content, str) or not yaml_content.strip():
         print(json.dumps({"success": False, "error": "yaml_content is required"}))
         sys.exit(0)
-    if action not in ("sync_levels", "set_backpack_level", "add_item", "apply_preset", "update_item", "remove_item"):
-        print(json.dumps({"success": False, "error": "action must be sync_levels, set_backpack_level, add_item, apply_preset, update_item, or remove_item"}))
+    if action not in ("sync_levels", "set_backpack_level", "add_item", "apply_preset", "update_item", "remove_item", "clear_backpack"):
+        print(json.dumps({"success": False, "error": "action must be sync_levels, set_backpack_level, add_item, apply_preset, update_item, remove_item, or clear_backpack"}))
         sys.exit(0)
 
     try:
@@ -230,6 +230,14 @@ def main() -> None:
             print(json.dumps({"success": True, "yaml_content": out_yaml}))
         else:
             print(json.dumps({"success": False, "error": "Item not found or could not remove"}))
+        sys.exit(0)
+
+    if action == "clear_backpack":
+        if bl4f.clear_backpack(data):
+            out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+            print(json.dumps({"success": True, "yaml_content": out_yaml}))
+        else:
+            print(json.dumps({"success": False, "error": "Backpack not found or could not clear"}))
         sys.exit(0)
 
     if action == "apply_preset":

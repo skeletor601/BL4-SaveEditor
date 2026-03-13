@@ -50,6 +50,20 @@ body {
   outline-offset: 2px;
 }
 
+/* Native select dropdown: use theme colors so open list isn't system blue */
+select {
+  color-scheme: dark;
+}
+select option {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+select option:checked,
+select option:hover {
+  background: var(--color-accent-dim);
+  color: var(--color-text);
+}
+
 /* Master Search: legendary row – orange text only, no background */
 tbody tr.legendary-row td {
   color: var(--color-legendary) !important;

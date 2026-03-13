@@ -50,7 +50,20 @@ function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
   return {
     code: pickStr(raw, "code", "Code"),
     itemType: pickStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name", "Weapon Type"),
-    partName: pickStr(raw, "Canonical Name", "partName", "part_name", "Part Name", "String", "Name"),
+    // Prefer explicit canonical/name fields, but fall back to short perk / effect
+    // text when no dedicated name is present (common for heavy/grenade/repkit perks).
+    partName: pickStr(
+      raw,
+      "Canonical Name",
+      "partName",
+      "part_name",
+      "Part Name",
+      "String",
+      "Name",
+      "Effects",
+      "effect",
+      "Effect",
+    ),
     effect: pickStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats", "Description", "Search Text"),
     category: pickStr(raw, "category", "Category", "General Category") || undefined,
     rarity: pickStr(raw, "canonicalRarity", "Canonical Rarity", "rarity", "Rarity") || undefined,

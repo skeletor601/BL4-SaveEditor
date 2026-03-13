@@ -27,11 +27,8 @@ function SaveToolsHub() {
     loadFromFile,
     decryptSav,
     clearSave,
-    exportAsJson,
     exportAsYaml,
     downloadAsSav,
-    downloadRebuiltSavNoEdit,
-    hasRawBytesForRoundtrip,
   } = useSave();
 
   const onFileChange = useCallback(
@@ -123,28 +120,11 @@ function SaveToolsHub() {
           </button>
           <button
             type="button"
-            onClick={() => downloadRebuiltSavNoEdit()}
-            disabled={!hasRawBytesForRoundtrip}
-            title="Re-encrypt decrypted bytes without editing (for round-trip validation)."
-            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-accent)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            No-Edit Roundtrip
-          </button>
-          <button
-            type="button"
             onClick={() => downloadAsSav()}
             disabled={!saveData || !savePlatform}
             className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Overwrite save
-          </button>
-          <button
-            type="button"
-            onClick={() => exportAsJson()}
-            disabled={!saveData}
-            className="px-4 py-2 min-h-[44px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Export as JSON
           </button>
           <button
             type="button"
@@ -180,10 +160,6 @@ function SaveToolsHub() {
           </div>
         )}
       </div>
-
-      <p className="text-[10px] text-[var(--color-text-muted)]">
-        Use &quot;No-Edit Roundtrip&quot; after decrypt to download a rebuilt .sav (no YAML touch). Use &quot;Overwrite save&quot; for edited or JSON/YAML-opened saves. Use “Open .sav” + your Epic or Steam User ID to load a save; edit in Character/Inventory/etc., then “Overwrite save” to get an encrypted file back. You never need a PC or another site.
-      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sections.map(({ path, title, desc }) => (

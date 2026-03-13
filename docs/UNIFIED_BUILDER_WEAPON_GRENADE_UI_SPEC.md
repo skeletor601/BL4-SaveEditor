@@ -263,6 +263,164 @@ Each group uses the standard **Select parts… → picker modal → optional qty
 
 ---
 
+## Enhancement tab: specifics and data notes
+
+Enhancement in the Unified Builder mirrors the standalone Enhancement builder, but with the unified **part-groups + picker modal** UX and the shared Current build parts panel.
+
+### Header and groups
+
+- Header matches other accessory tabs:
+  - Manufacturer radio-list modal (from `EnhancementBuilderData.manufacturers`).
+  - Level / Seed inputs (shared global state).
+  - Actions: **Add other parts**, **Random item**, **God roll** (wired, optional data).
+- Part groups (`ENHANCEMENT_PART_ORDER`):
+  - `Rarity` (single; qty fixed to 1 in UI and encoded once).
+  - `Manufacturer perks` (multi-select; indices 1/2/3/9 from the selected manufacturer).
+  - `Legendary Perks` (UI label; internally keyed as `Stacked perks`):
+    - Multi-select of other manufacturers’ perks (indices 1/2/3/9), grouped by manufacturer.
+  - `Universal Perks` (UI label; internally keyed as `Builder 247`):
+    - Multi-select of “247” stats (secondary_247) from the Enhancement builder data.
+
+Each group uses the standard **Select parts… → picker modal → optional qty popup → list with qty + remove** flow. Quantity is:
+
+- Fixed to `"1"` for `Rarity`.
+- Editable per-entry (1–99) for all other groups.
+
+### Enhancement picker labels
+
+- **Primary data source**: `GET /accessories/enhancement/builder-data` → `EnhancementBuilderData`:
+  - `manufacturers: Record<string, { code, name, perks, rarities }>`
+  - `rarityMap247: Record<string, number>`
+  - `secondary247: { code, name }[]`
+- **Rarity**:
+  - Labels are just the rarity names (e.g. `Common`, `Rare`, `Legendary`) taken from `rarities` for the current manufacturer, ordered by `ENHANCEMENT_RARITY_ORDER`.
+- **Manufacturer perks**:
+  - For the current manufacturer, filter `perks` to `index ∈ [1,2,3,9]`.
+  - Label format: **`[index] Name`**, e.g. `[1] Sure Shot`.
+- **Legendary Perks** (Stacked perks):
+  - For every *other* manufacturer, again filter `perks` to indices `1/2/3/9`.
+  - Label format: **`mfgCode:index - Name — MfgName`**, e.g. `284:1 - Sure Shot — Atlas`.
+- **Universal Perks** (Builder 247):
+  - From `secondary247`, label format: **`code - Name`**, e.g. `101 - Fire Rate Boost`.
+
+### Enhancement decoded build logic (unified)
+
+- Selections live in:
+  - `enhancementPartSelections: Record<string, { label: string; qty: string }[]>`.
+- Build function:
+  - `buildDecodedFromEnhancementSelections(data, mfgName, level, seed, enhancementPartSelections, enhancementExtraTokens)`.
+- Behavior:
+  - **Header**: `mfg.code, 0, 1, level| 2, seed||`.
+  - **Rarity**:
+    - Resolve label via `manufacturers[mfgName].rarities[rarityLabel]` → push `{rarityId}`.
+    - Also resolve 247 rarity via `rarityMap247[rarityLabel]` → push `{247:rarity247Id}` if present.
+  - **Manufacturer perks**:
+    - Parse each label’s `index` from `[index] Name`; add `{index}` once per unique index (UI ignores per-entry qty here, matching the standalone builder).
+  - **Legendary Perks** (Stacked perks):
+    - Parse each label’s leading `mfgCode:index` and expand by qty:
+      - Group into `stackedPerks: Record<mfgCode, number[]>`.
+      - For each `mfgCode`, push `{mfgCode:[idx1 idx2 …]}` with ids sorted ascending.
+  - **Universal Perks** (Builder 247):
+    - Parse `code` from `code - Name` and expand by qty.
+    - If there is at least one, push a single `{247:[code1 code2 …]}` token.
+  - **Extra tokens**:
+    - Any tokens from the global “Add other parts” modal (for category `enhancement`) are appended after the core Enhancement tokens.
+
+Enhancement uses the shared Current build parts panel with the same **Descriptive IDs** rules; there is no special per-token override map yet (labels come from the universal `parts/data` lookup or raw tokens).
+
+---
+
+## Heavy tab: specifics and data notes
+
+Heavy in the Unified Builder mirrors the standalone Heavy builder logic but uses the unified **part-groups + picker modal** UX and the shared Current build parts panel.
+
+### Header and groups
+
+- Header matches other accessory tabs:
+  - Manufacturer radio-list modal (from `HeavyBuilderData.mfgs`).
+  - Level / Seed inputs (shared global state).
+  - Actions: **Add other parts**, **Random item**, **God roll** (if presets exist in `heavyBuilderData.godrolls`).
+- Part groups (`HEAVY_PART_ORDER`):
+  - `Rarity` (single; qty fixed to 1 in UI and encoded once, using per-manufacturer rarities).
+  - `Element` (single; element type applied to the heavy).
+  - `Firmware` (single; firmware perk).
+  - `Barrel` (single; main barrel model).
+  - `Barrel Accessory` (multi-select; stackable perks).
+  - `Body Accessory` (multi-select; stackable perks).
+
+All groups use the standard **Select parts… → picker modal → optional qty popup → list with qty + remove** flow. Quantity is:
+
+- Fixed to `"1"` for `Rarity`, `Element`, `Firmware`, and `Barrel` (one of each).
+- Editable per-entry (1–99) for `Barrel Accessory` and `Body Accessory`.
+
+### Heavy picker data and labels
+
+- **Primary data source**: `GET /accessories/heavy/builder-data` → `HeavyBuilderData`:
+  - Built by `api/src/data/heavyBuilder.ts` from:
+    - Per-manufacturer CSV: `heavy/heavy_manufacturer_perk_EN.csv`
+    - Master TSV: `heavy/Borderlands 4 Item Parts Master List - Heavy Weapons.tsv`
+  - Shapes:
+    - `mfgs: { id, name }[]`
+    - `raritiesByMfg: Record<mfgId, HeavyBuilderRarity[]>`
+    - `barrel: HeavyBuilderPart[]`
+    - `element: HeavyBuilderPart[]`
+    - `firmware: HeavyBuilderPart[]`
+    - `barrelAccPerks: HeavyBuilderPart[]`
+    - `bodyAccPerks: HeavyBuilderPart[]`
+    - `bodiesByMfg: Record<mfgId, modelId | null>`
+- Label rules:
+  - `Rarity`: take display text from `raritiesByMfg[mfgId]`, ordered by rarity; labels are the raw `label` strings.
+  - `Element` / `Firmware`: labels are `"partId - stat"` using `HeavyBuilderPart.partId` and `stat`.
+  - `Barrel`: labels are `"partId - stat"`; `stat` text comes from manufacturer CSV plus merged master TSV descriptions.
+  - `Barrel Accessory`:
+    - `heavyBuilder` composes a desktop-style stat string:  
+      `"<barrel subtype> - <stat> - <description> - ID:<part_id>"`.
+    - Picker labels are `"partId - stat"`, where `stat` already includes the subtype and concise description.
+  - `Body Accessory`:
+    - `heavyBuilder` composes: `"<manufacturer> - <stat> - ID:<part_id>"`.
+    - Picker labels are again `"partId - stat"`.
+
+### Heavy decoded build logic (unified)
+
+- Selections live in:
+  - `heavyPartSelections: Record<string, { label: string; qty: string }[]>`.
+- Build function:
+  - `buildDecodedFromHeavySelections(data, mfgId, level, seed, heavyPartSelections, heavyExtraTokens)`.
+- Behavior (high level):
+  - **Header**: use `HEAVY_TYPE_ID` (244) + manufacturer id + level/seed in the same header pattern as other accessories.
+  - **Rarity**:
+    - Resolve rarity id by matching the label against `raritiesByMfg[mfgId]` → push `{rarityId}` once.
+  - **Barrel / Element / Firmware**:
+    - Parse leading `partId` from labels like `"id - stat"`.
+    - Push the corresponding heavy tokens once each (matching the standalone heavy encoding).
+  - **Barrel Accessory / Body Accessory**:
+    - Parse `partId` from labels; expand by qty and push tokens in the correct type slots, preserving the same semantics as the original heavy builder.
+  - **Extra tokens**:
+    - Any tokens from the global “Add other parts” modal (for category `heavy`) are appended after the core Heavy tokens into `heavyExtraTokens`.
+
+### Heavy + Descriptive IDs / part names
+
+- **Base labels** for the Current build parts panel come from the universal parts DB:
+  - `GET /api/parts/data` → `universalParts` → `partsByCode: Map<code, label>`.
+  - Universal DB is generated by `tools/build_universal_parts_db.py` using:
+    - `master_search/db/sources/parts_database_canon_v2_split_columns.csv`
+    - category CSVs (`Borderlands 4 Item Parts Master List - *.csv`, heavy TSV, app CSVs, etc.)
+    - merged reference data from:
+      - `tools/merge_embedded_parts_into_databases.py` (embedded_parts_export.csv → category CSVs + rebuild universal)
+      - `tools/merge_reference_save_editor_into_db.py` (RARITY_TSV from `reference htmls/save-editor.html`)
+      - `tools/merge_item_editor_html_into_db.py` (EMBEDDED_GAME_DATA_BASE64 from `Borderlands Item Editor and Save Editor.html`).
+- **Heavy-specific description and part-type overrides**:
+  - `heavyPartDescriptionByRaw: Map<string, string>` and `heavyPartTypeByRaw: Map<string, string>` are built from `HeavyBuilderData` and used when `category === "heavy"`:
+    - If a decoded token code (e.g. `{282:14}`) is found in `heavyPartDescriptionByRaw`, the Current build parts list shows the shorter, merged heavy description instead of the generic universal DB label.
+    - `heavyPartTypeByRaw` tells the panel whether to show it as “Barrel”, “Barrel Accessory”, “Body Accessory”, etc.
+- **Angel's Share card fix**:
+  - The heavy perk `{282:14}` now has a proper perk name **“Angel's Share”** in the canonical source:
+    - `master_search/db/sources/parts_database_canon_v2_split_columns.csv` row for `{282:14}` was updated so its name/label column contains `Angel's Share`.
+  - After rebuilding the universal DB (`python -m tools.build_universal_parts_db`), the Heavy tab’s Current build parts list displays this code as:
+    - `14 – Angel's Share` at the top of the card, with the full cooldown description shown below.
+
+---
+
 ## Implementation checklist for other tabs (Shield / Repkit / Heavy / Enhancement / Class Mod)
 
 For each new tab section, implement in this order:
