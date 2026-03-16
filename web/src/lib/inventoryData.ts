@@ -26,7 +26,7 @@ export interface ItemSlotWithPath extends ItemSlot {
 function getState(data: SaveData): Record<string, unknown> | null {
   const state =
     (data.state as Record<string, unknown>) ??
-    (data as Record<string, unknown>).data?.state ??
+    ((data.data as Record<string, unknown> | undefined)?.state as Record<string, unknown> | undefined) ??
     data;
   return state && typeof state === "object" ? (state as Record<string, unknown>) : null;
 }

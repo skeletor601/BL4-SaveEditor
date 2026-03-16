@@ -1126,21 +1126,6 @@ export default function WeaponEditView({
         .map((r) => Number(r.partId))
         .filter((n) => Number.isFinite(n));
     };
-    // Prefer magazines that are not charge-up and not COV (COV mags kill reloads).
-    const toPartIdsMagazineNoCharge = (): number[] => {
-      const magRows = weaponRows.filter((r) => norm(r.partType) === "magazine");
-      const noCov = magRows.filter(
-        (r) => !/\bcov\b|children\s*of\s*the\s*vault/.test(norm(`${r.manufacturer ?? ""} ${r.stat ?? ""} ${r.string ?? ""}`)),
-      );
-      const pool = noCov.length ? noCov : magRows;
-      const noCharge = pool.filter(
-        (r) => !/\bcharge\s*time\b|\bmaximum\s*charge\b|\bcharge\s*up\b|\bcharging\b/.test(norm(`${r.stat} ${r.string}`)),
-      );
-      const ids = (noCharge.length ? noCharge : pool)
-        .map((r) => Number(r.partId))
-        .filter((n) => Number.isFinite(n));
-      return ids;
-    };
     const pickToken = (types: string[]): string | null => {
       const ids = toPartIds(types);
       if (!ids.length) return null;
@@ -1153,11 +1138,6 @@ export default function WeaponEditView({
         .filter((n) => Number.isFinite(n));
     const pickUnderbarrelToken = (): string | null => {
       const ids = toPartIdsAllowedUnderbarrel();
-      if (!ids.length) return null;
-      return `{${pick(ids)}}`;
-    };
-    const pickMagazineToken = (): string | null => {
-      const ids = toPartIdsMagazineNoCharge();
       if (!ids.length) return null;
       return `{${pick(ids)}}`;
     };
@@ -1307,7 +1287,7 @@ export default function WeaponEditView({
         const t = norm(`${row.statText ?? ""} ${row.string ?? ""} ${row.partName ?? ""}`);
         if (isBarrelExcluded(t)) return false;
         if (/\bstar\s*helix\b/i.test(t)) return true;
-        if (/\bheavy\b/i.test(norm(row.itemType ?? "")) || /\bheavy\b/i.test(norm(row.weaponType ?? ""))) return true;
+        if (/\bheavy\b/i.test(norm(row.itemType ?? "")) || /\bheavy\b/i.test(norm((row as unknown as Record<string, string>).weaponType ?? ""))) return true;
         return /\bunique\b|\balt(ernate)?\s*(fire|barrel)?\b|\bappearance\b|\bvisual\b|\bdifferent\s*look\b/i.test(t);
       },
     );

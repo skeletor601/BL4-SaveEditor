@@ -186,7 +186,7 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       setSaveData(parsed);
       setSaveFileName(originalSavFileName ?? null);
       setSaveUserId(uid);
-      setSavePlatform(data.platform);
+      setSavePlatform(data.platform as SavePlatform);
       setRawYamlUtf8(data.yaml_content);
       setRawBytesBase64(typeof data.raw_bytes_base64 === "string" ? data.raw_bytes_base64 : null);
     } catch (e) {
