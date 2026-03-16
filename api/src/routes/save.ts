@@ -410,9 +410,9 @@ export async function saveRoutes(
   });
 
   fastify.post<{
-    Body: { yaml_content?: string; item_path?: string[]; new_item_data?: { serial?: string } };
+    Body: { yaml_content?: string; item_path?: string[]; new_item_data?: { serial?: string; state_flags?: number } };
   }>("/save/update-item", async (request, reply) => {
-    const body = request.body as { yaml_content?: string; item_path?: string[]; new_item_data?: { serial?: string } } | undefined;
+    const body = request.body as { yaml_content?: string; item_path?: string[]; new_item_data?: { serial?: string; state_flags?: number } } | undefined;
     const yamlContent = body?.yaml_content;
     const itemPath = body?.item_path;
     const newItemData = body?.new_item_data;

@@ -65,8 +65,8 @@ interface SaveContextValue {
   downloadRebuiltSavNoEdit: (filename?: string) => void | Promise<void>;
   /** True when we have raw bytes from decrypt (no edits) for roundtrip. */
   hasRawBytesForRoundtrip: boolean;
-  /** Replace save data (e.g. after editing character). Keeps saveUserId/savePlatform for re-encrypt. */
-  updateSaveData: (data: SaveData) => void;
+  /** Replace save data (e.g. after editing character). Keeps saveUserId/savePlatform for re-encrypt. If yamlText is provided (e.g. from clear-backpack API), that string is used for getYamlText/export. */
+  updateSaveData: (data: SaveData, yamlText?: string) => void;
   /** Current YAML as string (raw from decrypt when no edits, else stringified). For YAML View. */
   getYamlText: () => string;
 }
@@ -147,12 +147,18 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: uid, sav_data: base64 }),
       });
-      const data = await res.json().catch(() => ({}));
+      const raw = await res.text();
+      let data: { success?: boolean; error?: string; yaml_content?: string; platform?: string; raw_bytes_base64?: string } = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = {};
+      }
       if (!res.ok) {
         const msg =
           isLikelyUnavailable(res)
             ? getApiUnavailableError()
-            : (typeof data.error === "string" ? data.error : "Decrypt failed.");
+            : (typeof data.error === "string" ? data.error : raw?.slice(0, 400) || "Decrypt failed.");
         setLoadError(msg);
         setSaveData(null);
         setSaveFileName(null);
@@ -163,7 +169,7 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       if (!data.success || typeof data.yaml_content !== "string" || !data.platform) {
-        setLoadError("Invalid response from server.");
+        setLoadError(typeof data.error === "string" ? data.error : "Invalid response from server.");
         setSaveData(null);
         setSaveFileName(null);
         setSaveUserId(null);
@@ -194,9 +200,9 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const updateSaveData = useCallback((data: SaveData) => {
+  const updateSaveData = useCallback((data: SaveData, yamlText?: string) => {
     setSaveData(data);
-    setRawYamlUtf8(null);
+    setRawYamlUtf8(typeof yamlText === "string" ? yamlText : null);
     setRawBytesBase64(null);
   }, []);
 

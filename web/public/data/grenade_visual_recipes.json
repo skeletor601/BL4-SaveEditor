@@ -1,0 +1,189 @@
+[
+  {
+    "id": "circle-of-death",
+    "label": "Circle of Death",
+    "notes": "Massive radial burst of green corrosive energy beams, 180 deg spread of vertical lightning spears. 72 dominant.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 6,  "n": 1},
+          {"id": 24, "n": 1},
+          {"id": 23, "n": 1},
+          {"id": 43, "n": 23},
+          {"id": 34, "n": 23},
+          {"id": 72, "n": 130},
+          {"id": 39, "n": 1},
+          {"id": 69, "n": 1},
+          {"id": 78, "n": 1},
+          {"id": 5,  "n": 1},
+          {"id": 40, "n": 1},
+          {"id": 44, "n": 1},
+          {"id": 46, "n": 1},
+          {"id": 57, "n": 1}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "white-tornado",
+    "label": "White Tornado",
+    "notes": "Tall contained spinning white/teal vortex column fills screen. No overflow family. Anchors 17,25,26,27 drive column shape.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 17, "n": 1},
+          {"id": 25, "n": 1},
+          {"id": 26, "n": 1},
+          {"id": 27, "n": 1},
+          {"id": 34, "n": 10},
+          {"id": 40, "n": 6},
+          {"id": 44, "n": 3},
+          {"id": 65, "n": 5}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ride-the-lightning",
+    "label": "Ride the Lightning",
+    "notes": "Massive white/blue lightning columns filling entire screen, multiple branching bolts upward. Each group is a separate 245 token. Shock-themed.",
+    "groups": [
+      {"entries": [{"id": 28, "n": 1}]},
+      {"entries": [{"id": 30, "n": 25}]},
+      {"entries": [{"id": 33, "n": 25}]},
+      {"entries": [{"id": 73, "n": 5}]},
+      {"entries": [{"id": 72, "n": 100}]},
+      {"entries": [{"id": 71, "n": 100}]},
+      {"entries": [{"id": 74, "n": 100}]},
+      {"entries": [{"id": 70, "n": 100}]},
+      {"entries": [{"id": 60, "n": 15}]},
+      {"entries": [{"id": 59, "n": 15}]},
+      {"entries": [{"id": 44, "n": 15}]},
+      {"entries": [{"id": 58, "n": 15}]},
+      {"entries": [{"id": 46, "n": 15}]},
+      {"entries": [{"id": 63, "n": 15}]},
+      {"entries": [{"id": 61, "n": 15}]},
+      {"entries": [{"id": 47, "n": 15}]},
+      {"entries": [{"id": 22, "n": 15}]},
+      {"entries": [{"id": 40, "n": 25}]},
+      {"entries": [{"id": 5,  "n": 1}]}
+    ]
+  },
+  {
+    "id": "green-spinner",
+    "label": "Green Spinner",
+    "notes": "Wide sweeping green energy beam with spinning/rotational motion. 5 stacked 245 blocks. Core drivers: 72+70+71 at extreme stacks.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 6,  "n": 3},
+          {"id": 24, "n": 1},
+          {"id": 23, "n": 5},
+          {"id": 34, "n": 18},
+          {"id": 72, "n": 100},
+          {"id": 24, "n": 8},
+          {"id": 39, "n": 7},
+          {"id": 69, "n": 2},
+          {"id": 78, "n": 9},
+          {"id": 5,  "n": 5},
+          {"id": 40, "n": 5},
+          {"id": 44, "n": 5},
+          {"id": 46, "n": 4},
+          {"id": 5,  "n": 5},
+          {"id": 57, "n": 5}
+        ]
+      },
+      {"entries": [{"id": 73, "n": 5}]},
+      {"entries": [{"id": 71, "n": 100}]},
+      {"entries": [{"id": 72, "n": 100}]},
+      {"entries": [{"id": 70, "n": 100}]}
+    ]
+  },
+  {
+    "id": "the-swarm",
+    "label": "The Swarm",
+    "notes": "72×164 first run, then anchor tail, then 71×190 (Express) + 72×215 second run + 70×203 (Overflow). Express+Overflow at these stacks cause grenades to spawn swarms of other grenades with their own effects. 73 capped at 5. Paired with {291:8}. Single block.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 6,  "n": 5},
+          {"id": 24, "n": 2},
+          {"id": 23, "n": 8},
+          {"id": 34, "n": 39},
+          {"id": 72, "n": 164},
+          {"id": 24, "n": 13},
+          {"id": 39, "n": 16},
+          {"id": 69, "n": 5},
+          {"id": 78, "n": 15},
+          {"id": 5,  "n": 11},
+          {"id": 40, "n": 10},
+          {"id": 44, "n": 12},
+          {"id": 46, "n": 9},
+          {"id": 5,  "n": 8},
+          {"id": 57, "n": 11},
+          {"id": 73, "n": 5},
+          {"id": 71, "n": 190},
+          {"id": 72, "n": 215},
+          {"id": 70, "n": 203}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "spinning-monster",
+    "label": "Spinning Monster",
+    "notes": "Terra's gun recipe. 72×45 dominant, dual secondaries 39×25 + 66×25. 73 (Expansive) hard-capped at 5 by generator regardless of n:10 in source. Note: no {291:8} wrapper in original — only {298:11} anchor used.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 24, "n": 1},
+          {"id": 39, "n": 25},
+          {"id": 30, "n": 5},
+          {"id": 34, "n": 5},
+          {"id": 66, "n": 25},
+          {"id": 21, "n": 1},
+          {"id": 65, "n": 5},
+          {"id": 62, "n": 1},
+          {"id": 44, "n": 5},
+          {"id": 69, "n": 5},
+          {"id": 63, "n": 10},
+          {"id": 64, "n": 10},
+          {"id": 45, "n": 10},
+          {"id": 40, "n": 5},
+          {"id": 10, "n": 1},
+          {"id": 78, "n": 10},
+          {"id": 77, "n": 1},
+          {"id": 75, "n": 15},
+          {"id": 72, "n": 45},
+          {"id": 73, "n": 10},
+          {"id": 79, "n": 19}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dancing-stars",
+    "label": "Dancing Stars",
+    "notes": "72 dominant (85 stacks). Anchor trio 43×9 + 34×8 before the 72 block, then standard tail anchors. Elemental swap produces entirely new color/theme.",
+    "groups": [
+      {
+        "entries": [
+          {"id": 23, "n": 1},
+          {"id": 43, "n": 9},
+          {"id": 34, "n": 8},
+          {"id": 72, "n": 85},
+          {"id": 24, "n": 1},
+          {"id": 39, "n": 1},
+          {"id": 69, "n": 1},
+          {"id": 78, "n": 1},
+          {"id": 5,  "n": 1},
+          {"id": 40, "n": 1},
+          {"id": 44, "n": 5},
+          {"id": 46, "n": 1},
+          {"id": 5,  "n": 1},
+          {"id": 57, "n": 1}
+        ]
+      }
+    ]
+  }
+]

@@ -2,17 +2,60 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   buildPartsByCode,
-  formatTranslatedLine,
   parseDecodedSerial,
   translateParts,
   type PartLookupRow,
+  type TranslatedLine,
 } from "@/lib/partsTranslator";
 import { fetchApi } from "@/lib/apiClient";
 import { usePersistedState } from "@/lib/usePersistedState";
 
+function PartCard({ line }: { line: TranslatedLine }) {
+  const [showFields, setShowFields] = useState(false);
+  const hasFields = line.allFields && Object.keys(line.allFields).length > 0;
+  return (
+    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.8)] p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <span className="font-mono text-xs text-[var(--color-accent)] shrink-0">{line.codeKey}</span>
+        <span className="text-xs text-[var(--color-text-muted)] tabular-nums">×{line.qty}</span>
+      </div>
+      <p className="mt-1 text-xs uppercase tracking-wide text-[var(--color-text-muted)]">{line.partType}</p>
+      <p className="mt-0.5 text-sm font-medium text-[var(--color-text)] break-words">{line.name}</p>
+      {line.stats ? (
+        <p className="mt-1 text-xs text-[var(--color-text-muted)] line-clamp-2" title={line.stats}>
+          {line.stats}
+        </p>
+      ) : null}
+      {hasFields && (
+        <button
+          type="button"
+          onClick={() => setShowFields((v) => !v)}
+          className="mt-2 text-xs text-[var(--color-accent)] hover:underline"
+        >
+          {showFields ? "Hide details" : "Show all fields"}
+        </button>
+      )}
+      {hasFields && showFields && (
+        <dl className="mt-2 pt-2 border-t border-[var(--color-panel-border)] space-y-0.5 text-xs">
+          {Object.entries(line.allFields!).map(([k, v]) => {
+            const str = typeof v === "object" && v !== null ? JSON.stringify(v) : String(v);
+            return (
+              <div key={k} className="flex gap-2 break-words">
+                <dt className="text-[var(--color-text-muted)] shrink-0">{k}:</dt>
+                <dd className="text-[var(--color-text)] min-w-0">{str}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      )}
+    </div>
+  );
+}
+
 export default function PartsTranslatorView() {
   const [input, setInput] = usePersistedState("parts-translator.input", "");
-  const [output, setOutput] = usePersistedState("parts-translator.output", "");
+  const [translatedLines, setTranslatedLines] = useState<TranslatedLine[]>([]);
+  const [translateErrors, setTranslateErrors] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [partsData, setPartsData] = useState<PartLookupRow[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -46,19 +89,24 @@ export default function PartsTranslatorView() {
 
   const byCode = useMemo(() => buildPartsByCode(partsData), [partsData]);
 
-  const filteredOutput = useMemo(() => {
-    const base = output || "";
+  // Filter cards by search (left-to-right, top-to-bottom order preserved).
+  const filteredLines = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    if (!base || !q) return base;
-    const lines = base.split(/\r?\n/);
-    const filteredLines = lines.filter((line) => line.toLowerCase().includes(q));
-    return filteredLines.join("\n");
-  }, [output, filter]);
+    if (!q) return translatedLines;
+    return translatedLines.filter(
+      (line) =>
+        line.codeKey.toLowerCase().includes(q) ||
+        line.partType.toLowerCase().includes(q) ||
+        line.name.toLowerCase().includes(q) ||
+        (line.stats && line.stats.toLowerCase().includes(q)),
+    );
+  }, [translatedLines, filter]);
 
   const runTranslate = useCallback(async () => {
     const raw = input.trim();
     if (!raw) {
-      setOutput("");
+      setTranslatedLines([]);
+      setTranslateErrors([]);
       setStatus("ready");
       return;
     }
@@ -85,7 +133,8 @@ export default function PartsTranslatorView() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          setOutput(data?.error ?? `Decode failed (${res.status})`);
+          setTranslatedLines([]);
+          setTranslateErrors([data?.error ?? `Decode failed (${res.status})`]);
           setStatus("ready");
           return;
         }
@@ -97,7 +146,8 @@ export default function PartsTranslatorView() {
           else decodedLines[lineIdx] = "__ERROR__:No decoded output";
         });
       } catch (e) {
-        setOutput(e instanceof Error ? e.message : "Decode failed");
+        setTranslatedLines([]);
+        setTranslateErrors([e instanceof Error ? e.message : "Decode failed"]);
         setStatus("ready");
         return;
       }
@@ -120,19 +170,22 @@ export default function PartsTranslatorView() {
       allParts.push(...parts);
     }
     if (allParts.length === 0) {
-      setOutput(errors.length ? errors.join("\n") : "No part tokens found. Paste Base85 (@...) or decoded tokens.");
+      setTranslatedLines([]);
+      setTranslateErrors(errors.length ? errors : ["No part tokens found. Paste Base85 (@...) or decoded tokens."]);
       setStatus("ready");
       return;
     }
+    // translateParts returns lines in left-to-right, top-to-bottom order (by firstIndex).
     const translated = translateParts(allParts, byCode);
-    const outLines = translated.map(formatTranslatedLine);
-    setOutput(errors.length ? `${outLines.join("\n")}\n\n${errors.join("\n")}` : outLines.join("\n"));
+    setTranslatedLines(translated);
+    setTranslateErrors(errors);
     setStatus("ready");
   }, [input, byCode]);
 
   const clearAll = useCallback(() => {
     setInput("");
-    setOutput("");
+    setTranslatedLines([]);
+    setTranslateErrors([]);
     setStatus("ready");
   }, []);
 
@@ -170,7 +223,7 @@ export default function PartsTranslatorView() {
         <div className="space-y-2 md:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="block text-sm font-medium text-[var(--color-text-muted)]">
-              Part list (with quantities)
+              Part list (left to right, top to bottom)
             </label>
             <input
               type="text"
@@ -181,9 +234,25 @@ export default function PartsTranslatorView() {
               spellCheck={false}
             />
           </div>
-          <pre className="w-full min-h-[260px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] px-4 py-3 font-mono text-sm text-[var(--color-text)] overflow-auto whitespace-pre-wrap break-words">
-            {filteredOutput || (output ? "No results match this filter." : "Translated parts will appear here.")}
-          </pre>
+          <div className="min-h-[260px] rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.4)] p-3 overflow-auto">
+            {filteredLines.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredLines.map((line, idx) => (
+                  <PartCard key={`${line.codeKey}-${idx}`} line={line} />
+                ))}
+              </div>
+            ) : translateErrors.length > 0 ? (
+              <div className="space-y-1 text-sm text-red-300/90">
+                {translateErrors.map((err, i) => (
+                  <p key={i}>{err}</p>
+                ))}
+              </div>
+            ) : translatedLines.length > 0 && filter.trim() ? (
+              <p className="text-sm text-[var(--color-text-muted)]">No results match this filter.</p>
+            ) : (
+              <p className="text-sm text-[var(--color-text-muted)]">Translated parts will appear here as cards.</p>
+            )}
+          </div>
         </div>
       </div>
 

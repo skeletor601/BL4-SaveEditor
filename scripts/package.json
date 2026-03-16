@@ -1,0 +1,16 @@
+{
+  "name": "bl4-scripts",
+  "private": true,
+  "description": "One-off scripts (build DB, fix codes, scrape data)",
+  "type": "commonjs",
+  "scripts": {
+    "scrape-maxroll-skills": "node scrape_maxroll_skills.js",
+    "scrape-mobalytics-skills": "node scrape_mobalytics_skills.js",
+    "scrape-game8-skills": "node scrape_game8_skills.js",
+    "scrape-eridiyum-skills": "node scrape_eridiyum_skills.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "puppeteer": "^23.6.0"
+  }
+}

@@ -33,6 +33,57 @@ const defaultFilters: FilterState = {
   quickFilter: "",
 };
 
+// Curated part type groups shown per category (keeps the dropdown sane)
+const KNOWN_WEAPON_PART_TYPES = new Set([
+  "barrel", "barrel accessory", "body", "body accessory", "grip", "foregrip",
+  "magazine", "scope", "scope accessory", "underbarrel", "underbarrel accessory",
+  "stat modifier",
+]);
+
+const PART_TYPE_MATCHERS: Record<string, (pt: string) => boolean> = {
+  "All":                   () => true,
+  "Barrel":                (pt) => pt === "barrel",
+  "Barrel Accessory":      (pt) => pt === "barrel accessory",
+  "Body":                  (pt) => pt === "body",
+  "Body Accessory":        (pt) => pt === "body accessory",
+  "Grip":                  (pt) => pt === "grip",
+  "Foregrip":              (pt) => pt === "foregrip",
+  "Magazine":              (pt) => pt === "magazine",
+  "Scope":                 (pt) => pt === "scope",
+  "Scope Accessory":       (pt) => pt === "scope accessory",
+  "Underbarrel":           (pt) => pt === "underbarrel",
+  "Underbarrel Accessory": (pt) => pt === "underbarrel accessory",
+  "Stat Modifier":         (pt) => pt === "stat modifier",
+  "Manufacturer Part":     (pt) => pt === "manufacturer part",
+  "Rarity":                (pt) => pt === "rarity" || pt === "rarities",
+  "Skill":                 (pt) => pt === "skill",
+  "Perk / Augment":        (pt) => ["perk", "primary", "secondary", "legendary", "core", "augment"].includes(pt),
+  "Firmware":              (pt) => pt === "firmware",
+  "Shield Body":           (pt) => pt === "shield" || pt === "shield body",
+  "Enhancement Stat":      (pt) =>
+    pt.length > 0 &&
+    !KNOWN_WEAPON_PART_TYPES.has(pt) &&
+    !["manufacturer part", "rarity", "rarities", "skill", "perk", "primary",
+      "secondary", "legendary", "core", "augment", "firmware", "shield",
+      "shield body", "name"].includes(pt),
+};
+
+const PART_TYPE_GROUPS_BY_CATEGORY: Record<string, string[]> = {
+  All:         ["All", "Barrel", "Barrel Accessory", "Body", "Body Accessory", "Foregrip",
+                 "Grip", "Magazine", "Scope", "Scope Accessory", "Underbarrel",
+                 "Underbarrel Accessory", "Stat Modifier", "Manufacturer Part",
+                 "Rarity", "Skill", "Perk / Augment", "Firmware", "Enhancement Stat", "Shield Body"],
+  Weapon:      ["All", "Barrel", "Barrel Accessory", "Body", "Body Accessory", "Foregrip",
+                 "Grip", "Magazine", "Scope", "Scope Accessory", "Underbarrel",
+                 "Underbarrel Accessory", "Stat Modifier", "Manufacturer Part"],
+  Shield:      ["All", "Shield Body", "Manufacturer Part", "Rarity"],
+  "Class Mod": ["All", "Skill", "Manufacturer Part"],
+  Enhancement: ["All", "Enhancement Stat", "Rarity", "Manufacturer Part"],
+  Grenade:     ["All", "Perk / Augment", "Firmware", "Manufacturer Part", "Rarity"],
+  Repkit:      ["All", "Perk / Augment", "Firmware", "Manufacturer Part", "Rarity"],
+  Heavy:       ["All", "Perk / Augment", "Firmware", "Manufacturer Part", "Rarity"],
+};
+
 function normalize(v: unknown): string {
   return String(v ?? "").trim().toLowerCase();
 }
@@ -133,16 +184,15 @@ export default function MasterSearch() {
       const rowPartType = row["Part Type"] ?? raw["partType"];
       const rowRarity = row.Rarity ?? raw["rarity"];
       const rowManufacturer = getCanonicalManufacturer(row);
-      const rowName = normalize(row["String"] ?? raw["partName"] ?? row["Model Name"]);
 
       if (selectedPartType && selectedPartType !== "all") {
+        const matcher = PART_TYPE_MATCHERS[filters.partType];
         const partTypeNorm = normalize(rowPartType);
-        if (selectedPartType === "barrel") {
-          if (partTypeNorm !== "barrel") return false;
-          // Guard against mis-tagged rows that are not actual barrels.
-          if (!rowName.includes("barrel")) return false;
-        } else if (partTypeNorm !== selectedPartType) {
-          return false;
+        if (matcher) {
+          if (!matcher(partTypeNorm)) return false;
+        } else {
+          // Fallback: exact match against the raw normalized value
+          if (partTypeNorm !== selectedPartType) return false;
         }
       }
       if (selectedRarity && selectedRarity !== "all") {
@@ -201,14 +251,10 @@ export default function MasterSearch() {
     []
   );
 
-  const partTypeOptions = useMemo(() => {
-    const set = new Set<string>();
-    data.forEach((row) => {
-      const pt = getPartType(row);
-      if (pt) set.add(pt);
-    });
-    return ["All", ...Array.from(set).sort()];
-  }, [data]);
+  const partTypeOptions = useMemo(
+    () => PART_TYPE_GROUPS_BY_CATEGORY[filters.category] ?? PART_TYPE_GROUPS_BY_CATEGORY.All,
+    [filters.category]
+  );
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);

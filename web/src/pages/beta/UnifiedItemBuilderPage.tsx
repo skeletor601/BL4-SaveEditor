@@ -10,15 +10,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
-import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
+import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 import {
   generateModdedWeapon,
   type WeaponEditData,
   type UniversalDbPartCode,
+  type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { usePersistedState } from "@/lib/usePersistedState";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
+import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
+import SkillCardPopup from "@/components/SkillCardPopup";
+import PartDetailModal from "@/components/master-search/PartDetailModal";
+import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
+import { apiItemToPartRow, getCode, getPartName } from "@/data/partsData";
 
 export type ItemCategory =
   | "weapon"
@@ -276,6 +282,7 @@ const HEAVY_PART_ORDER: { key: string; slots: number }[] = [
 interface EnhancementMfgPerk {
   index: number;
   name: string;
+  description?: string;
 }
 interface EnhancementManufacturer {
   code: number;
@@ -286,6 +293,7 @@ interface EnhancementManufacturer {
 interface Enhancement247Perk {
   code: number;
   name: string;
+  description?: string;
 }
 interface EnhancementBuilderData {
   manufacturers: Record<string, EnhancementManufacturer>;
@@ -305,9 +313,22 @@ const ENHANCEMENT_PART_ORDER: { key: string; slots: number }[] = [
 ];
 
 const CLASS_MOD_PART_ORDER: { key: string; slots: number }[] = [
+  { key: "Name", slots: 1 },
   { key: "Legendary names", slots: 1 },
   { key: "Perks", slots: 1 },
 ];
+
+function getClassModSkillIconFilename(skillNameEN: string, className: string): string {
+  const norm = skillNameEN
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/['']/g, "")
+    .replace(/\s+/g, "_");
+  const safeName = norm.replace(/[^a-zA-Z0-9_!]/g, "").toLowerCase();
+  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4" };
+  const suffix = suffixMap[className] ?? "";
+  return `${safeName}${suffix}.png`;
+}
 
 function partIdFromLabel(label: string): string | null {
   if (!label || label === NONE) return null;
@@ -569,6 +590,7 @@ function buildDecodedFromGrenadeSelections(
   seed: number,
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
+  skinValue?: string,
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
@@ -641,7 +663,12 @@ function buildDecodedFromGrenadeSelections(
   }
 
   extraTokens.forEach((t) => parts.push(t));
-  return `${header} ${parts.join(" ")} |`;
+  let decodedGrenade = `${header} ${parts.join(" ")} |`;
+  if (skinValue && skinValue.trim()) {
+    const safe = skinValue.trim().replace(/"/g, '\\"');
+    decodedGrenade = decodedGrenade.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+  }
+  return decodedGrenade;
 }
 
 const SHIELD_TYPE_ID = 246;
@@ -686,6 +713,7 @@ function buildDecodedFromShieldSelections(
   seed: number,
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
+  skinValue?: string,
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
@@ -765,7 +793,12 @@ function buildDecodedFromShieldSelections(
   if (secondary237Token) parts.push(secondary237Token);
 
 extraTokens.forEach((t) => parts.push(t));
-return `${header} ${parts.join(" ")} |`;
+let decodedShield = `${header} ${parts.join(" ")} |`;
+if (skinValue && skinValue.trim()) {
+  const safe = skinValue.trim().replace(/"/g, '\\"');
+  decodedShield = decodedShield.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+}
+return decodedShield;
 }
 
 function buildDecodedFromRepkitSelections(
@@ -775,6 +808,7 @@ function buildDecodedFromRepkitSelections(
   seed: number,
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
+  skinValue?: string,
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
@@ -881,7 +915,12 @@ function buildDecodedFromRepkitSelections(
   if (secondary243Token) parts.push(secondary243Token);
 
   extraTokens.forEach((t) => parts.push(t));
-  return `${header} ${parts.join(" ")} |`;
+  let decodedRepkit = `${header} ${parts.join(" ")} |`;
+  if (skinValue && skinValue.trim()) {
+    const safe = skinValue.trim().replace(/"/g, '\\"');
+    decodedRepkit = decodedRepkit.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+  }
+  return decodedRepkit;
 }
 
 function buildDecodedFromHeavySelections(
@@ -891,6 +930,7 @@ function buildDecodedFromHeavySelections(
   seed: number,
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
+  skinValue?: string,
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${HEAVY_TYPE_ID}||`;
   const parts: string[] = [];
@@ -928,7 +968,12 @@ function buildDecodedFromHeavySelections(
   pushAcc("Body Accessory");
 
   extraTokens.forEach((t) => parts.push(t));
-  return `${header} ${parts.join(" ")} |`;
+  let decodedHeavy = `${header} ${parts.join(" ")} |`;
+  if (skinValue && skinValue.trim()) {
+    const safe = skinValue.trim().replace(/"/g, '\\"');
+    decodedHeavy = decodedHeavy.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+  }
+  return decodedHeavy;
 }
 
 function buildDecodedFromEnhancementSelections(
@@ -938,6 +983,7 @@ function buildDecodedFromEnhancementSelections(
   seed: number,
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
+  skinValue?: string,
 ): string {
   const mfg = data.manufacturers[mfgName];
   if (!mfg) return "";
@@ -995,7 +1041,12 @@ function buildDecodedFromEnhancementSelections(
   }
 
   extraTokens.forEach((t) => parts.push(t));
-  return `${header} ${parts.join(" ")} |`;
+  let decodedEnhancement = `${header} ${parts.join(" ")} |`;
+  if (skinValue && skinValue.trim()) {
+    const safe = skinValue.trim().replace(/"/g, '\\"');
+    decodedEnhancement = decodedEnhancement.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+  }
+  return decodedEnhancement;
 }
 
 function buildDecodedFromClassModSelections(
@@ -1007,6 +1058,7 @@ function buildDecodedFromClassModSelections(
   selections: Record<string, { label: string; qty: string }[]>,
   extraTokens: string[],
   skillPoints: Record<string, number>,
+  skinValue?: string,
 ): string {
   const classId = CLASS_MOD_CLASS_IDS[className] ?? 255;
   const classIdStr = String(classId);
@@ -1091,15 +1143,103 @@ function buildDecodedFromClassModSelections(
   }
 
   extraTokens.forEach((t) => parts.push(t));
-  return `${header} ${parts.join(" ")} |`;
+  let decodedClassMod = `${header} ${parts.join(" ")} |`;
+  if (skinValue && skinValue.trim()) {
+    const safe = skinValue.trim().replace(/"/g, '\\"');
+    decodedClassMod = decodedClassMod.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
+  }
+  return decodedClassMod;
+}
+
+// ── Picker helpers ─────────────────────────────────────────────────────────
+
+/** Deduplicate picker options by partId, keeping first occurrence. */
+function dedupeByPartId<T extends { partId: string | number }>(opts: T[]): T[] {
+  const seen = new Set<string>();
+  return opts.filter((o) => {
+    const key = String(o.partId);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * Rich picker row content. Replaces the old "{o.label} + {info}" two-line pattern.
+ *
+ * Descriptive IDs ON  → ID badge · stat/name · extra description · part-type tag
+ * Descriptive IDs OFF → compact "ID  stat" single line
+ */
+function PickerOptionContent({
+  partId,
+  label,
+  description,
+  pickerPartType,
+  descriptive,
+}: {
+  partId: string;
+  label: string;
+  description?: string;
+  pickerPartType?: string | null;
+  descriptive: boolean;
+}) {
+  // Strip leading numeric ID prefix from label: "13 - +Accuracy" → "+Accuracy"
+  const stat = label.replace(/^\d+\s*[-–]\s*/, "").trim() || label;
+  const desc = (description ?? "").trim();
+  // Only show extra description when it adds new info
+  const extraDesc = desc && desc !== stat && desc !== label ? desc : "";
+
+  if (!descriptive) {
+    return (
+      <span className="min-w-0">
+        <span className="block text-sm text-[var(--color-text)]">
+          <span className="font-mono text-[var(--color-text-muted)] text-xs mr-2">{partId}</span>
+          {stat}
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="min-w-0">
+      {/* ID badge + stat name */}
+      <span className="flex items-baseline gap-1.5 flex-wrap">
+        <span className="font-mono text-[10px] font-bold text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 px-1.5 py-0.5 rounded shrink-0">
+          {partId}
+        </span>
+        <span className="text-sm text-[var(--color-text)] leading-snug">{stat}</span>
+      </span>
+      {/* Extra description if it adds info */}
+      {extraDesc && (
+        <span className="block text-xs text-[var(--color-text-muted)] mt-0.5 leading-snug">{extraDesc}</span>
+      )}
+      {/* Part type tag */}
+      {pickerPartType && pickerPartType !== "Rarity" && (
+        <span className="inline-flex items-center mt-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-[rgba(255,255,255,0.05)] text-[var(--color-text-muted)] border border-[var(--color-panel-border)]">
+          {pickerPartType}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Rarity-themed border/bg/name color for selected-part mini cards. */
+function slotRarityStyle(rarity: string | undefined): { border: string; bg: string; nameColor: string } {
+  const r = (rarity ?? "").toLowerCase();
+  if (r === "pearl" || r === "pearlescent") return { border: "border-sky-400/60", bg: "bg-sky-400/5", nameColor: "text-sky-300" };
+  if (r === "legendary") return { border: "border-[var(--color-legendary)]/60", bg: "bg-amber-400/5", nameColor: "text-amber-300" };
+  if (r === "epic") return { border: "border-purple-400/50", bg: "bg-purple-400/5", nameColor: "text-purple-200" };
+  if (r === "rare") return { border: "border-blue-400/40", bg: "bg-blue-400/4", nameColor: "text-blue-200" };
+  if (r === "uncommon") return { border: "border-emerald-400/40", bg: "bg-emerald-400/4", nameColor: "text-emerald-200" };
+  return { border: "border-[var(--color-panel-border)]/50", bg: "bg-[rgba(24,28,34,0.5)]", nameColor: "text-[var(--color-text)]" };
 }
 
 export default function UnifiedItemBuilderPage() {
-  const [category, setCategory] = useState<ItemCategory>("weapon");
-  const [level, setLevel] = useState(50);
-  const [seed, setSeed] = useState(1);
-  const [liveBase85, setLiveBase85] = useState("");
-  const [liveDecoded, setLiveDecoded] = useState("");
+  const [category, setCategory] = usePersistedState<ItemCategory>("uib.category", "weapon");
+  const [level, setLevel] = usePersistedState("uib.level", 50);
+  const [seed, setSeed] = usePersistedState("uib.seed", 1);
+  const [liveBase85, setLiveBase85] = usePersistedState("uib.liveBase85", "");
+  const [liveDecoded, setLiveDecoded] = usePersistedState("uib.liveDecoded", "");
   const [lastEditedCodecSide, setLastEditedCodecSide] = useState<"base85" | "decoded" | null>(null);
   const [codecLoading, setCodecLoading] = useState(false);
   const [codecStatus, setCodecStatus] = useState<string>("Paste Base85 or decoded to start.");
@@ -1115,6 +1255,8 @@ export default function UnifiedItemBuilderPage() {
   // Add other parts (universal DB)
   const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
   const [showAddPartsModal, setShowAddPartsModal] = useState(false);
+  const [addPartsChecked, setAddPartsChecked] = useState<Set<string>>(new Set());
+  const [addPartsQty, setAddPartsQty] = useState("1");
   const [addPartsSearch, setAddPartsSearch] = useState("");
   const [addPartsMfg, setAddPartsMfg] = useState("");
   const [addPartsRarity, setAddPartsRarity] = useState("");
@@ -1125,43 +1267,60 @@ export default function UnifiedItemBuilderPage() {
   const [editQtyIndex, setEditQtyIndex] = useState<number | null>(null);
   const [editQtyValue, setEditQtyValue] = useState("1");
 
+  // Hover card (slot items + sidebar build parts)
+  const [hoverCard, setHoverCard] = useState<HoverCardData | null>(null);
+  const [hoverCardTop, setHoverCardTop] = useState(0);
+  const [hoverCardSide, setHoverCardSide] = useState<"left" | "right">("right");
+  const hoverCardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Weapon: list-based part selections (no caps), multi-select per category
   const [weaponData, setWeaponData] = useState<WeaponGenData | null>(null);
-  const [weaponManufacturer, setWeaponManufacturer] = useState("");
-  const [weaponWeaponType, setWeaponWeaponType] = useState("");
+  const [weaponManufacturer, setWeaponManufacturer] = usePersistedState("uib.weapon.mfg", "");
+  const [weaponWeaponType, setWeaponWeaponType] = usePersistedState("uib.weapon.type", "");
+  // Only true when the user has explicitly picked a manufacturer — otherwise generator randomizes.
+  const [weaponMfgUserSelected, setWeaponMfgUserSelected] = useState(false);
   const [showWeaponMfgModal, setShowWeaponMfgModal] = useState(false);
   const [showWeaponTypeModal, setShowWeaponTypeModal] = useState(false);
-  const [weaponPartSelections, setWeaponPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
-  const [extraTokens, setExtraTokens] = useState<string[]>([]);
+  const [weaponPartSelections, setWeaponPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.weapon.selections", {});
+  const [extraTokens, setExtraTokens] = usePersistedState<string[]>("uib.weapon.extraTokens", []);
   const [showGodRollModal, setShowGodRollModal] = useState(false);
   const [autoFillWarning, setAutoFillWarning] = useState<string | null>(null);
   const [weaponPartPickerPartType, setWeaponPartPickerPartType] = useState<string | null>(null);
   const [weaponPartPickerChecked, setWeaponPartPickerChecked] = useState<Set<string>>(new Set());
   const [weaponPartPickerShowQty, setWeaponPartPickerShowQty] = useState(false);
   const [weaponPartPickerQty, setWeaponPartPickerQty] = useState("1");
-  const [weaponSkinValue, setWeaponSkinValue] = useState("");
+  const [sharedSkins, setSharedSkins] = useState<{ label: string; value: string }[]>([]);
+  const [weaponSkinValue, setWeaponSkinValue] = usePersistedState("uib.weapon.skin", "");
+  const [grenadeSkinValue, setGrenadeSkinValue] = usePersistedState("uib.grenade.skin", "");
+  const [shieldSkinValue, setShieldSkinValue] = usePersistedState("uib.shield.skin", "");
+  const [repkitSkinValue, setRepkitSkinValue] = usePersistedState("uib.repkit.skin", "");
+  const [heavySkinValue, setHeavySkinValue] = usePersistedState("uib.heavy.skin", "");
+  const [enhancementSkinValue, setEnhancementSkinValue] = usePersistedState("uib.enhancement.skin", "");
+  const [classModSkinValue, setClassModSkinValue] = usePersistedState("uib.classMod.skin", "");
   const [moddedWeaponPowerMode, setModdedWeaponPowerMode] = useState<"stable" | "op" | "insane">("op");
+  const [moddedWeaponSpecialMode, setModdedWeaponSpecialMode] = useState<"grenade-reload" | "inf-ammo" | null>(null);
   const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
   const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
+  const [lastDps, setLastDps] = useState<DpsEstimate | null>(null);
 
   // Grenade (when category === "grenade")
   const [grenadeData, setGrenadeData] = useState<GrenadeBuilderData | null>(null);
-  const [grenadeMfgId, setGrenadeMfgId] = useState<number | null>(null);
-  const [grenadePartSelections, setGrenadePartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [grenadeMfgId, setGrenadeMfgId] = usePersistedState<number | null>("uib.grenade.mfgId", null);
+  const [grenadePartSelections, setGrenadePartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.grenade.selections", {});
   const [grenadePartPickerPartType, setGrenadePartPickerPartType] = useState<string | null>(null);
   const [grenadePartPickerChecked, setGrenadePartPickerChecked] = useState<Set<string>>(new Set());
   const [grenadePartPickerShowQty, setGrenadePartPickerShowQty] = useState(false);
   const [grenadePartPickerQty, setGrenadePartPickerQty] = useState("1");
   const [showGrenadeMfgModal, setShowGrenadeMfgModal] = useState(false);
-  const [grenadeExtraTokens, setGrenadeExtraTokens] = useState<string[]>([]);
+  const [grenadeExtraTokens, setGrenadeExtraTokens] = usePersistedState<string[]>("uib.grenade.extraTokens", []);
   const [showGrenadeGodRollModal, setShowGrenadeGodRollModal] = useState(false);
   const [grenadeAutoFillWarning, setGrenadeAutoFillWarning] = useState<string | null>(null);
 
   // Shield (when category === "shield")
   const [shieldData, setShieldData] = useState<ShieldBuilderData | null>(null);
-  const [shieldMfgId, setShieldMfgId] = useState<number | null>(null);
+  const [shieldMfgId, setShieldMfgId] = usePersistedState<number | null>("uib.shield.mfgId", null);
   const [showShieldMfgModal, setShowShieldMfgModal] = useState(false);
-  const [shieldPartSelections, setShieldPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [shieldPartSelections, setShieldPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.shield.selections", {});
   const [shieldPartPickerPartType, setShieldPartPickerPartType] = useState<string | null>(null);
   const [shieldPartPickerChecked, setShieldPartPickerChecked] = useState<Set<string>>(new Set());
   const [shieldPartPickerShowQty, setShieldPartPickerShowQty] = useState(false);
@@ -1172,7 +1331,7 @@ export default function UnifiedItemBuilderPage() {
   const [shieldEnergyQtyById, setShieldEnergyQtyById] = useState<Record<number, number>>({});
   const [shieldArmorQtyById, setShieldArmorQtyById] = useState<Record<number, number>>({});
   const [shieldLegendaryQtyById, setShieldLegendaryQtyById] = useState<Record<string, number>>({});
-  const [shieldExtraTokens, setShieldExtraTokens] = useState<string[]>([]);
+  const [shieldExtraTokens, setShieldExtraTokens] = usePersistedState<string[]>("uib.shield.extraTokens", []);
   const [showShieldGodRollModal, setShowShieldGodRollModal] = useState(false);
   const [shieldAutoFillWarning, setShieldAutoFillWarning] = useState<string | null>(null);
 
@@ -1202,9 +1361,9 @@ export default function UnifiedItemBuilderPage() {
 
   // RepKit (when category === "repkit")
   const [repkitData, setRepkitData] = useState<RepkitBuilderData | null>(null);
-  const [repkitMfgId, setRepkitMfgId] = useState<number | null>(null);
+  const [repkitMfgId, setRepkitMfgId] = usePersistedState<number | null>("uib.repkit.mfgId", null);
   const [showRepkitMfgModal, setShowRepkitMfgModal] = useState(false);
-  const [repkitPartSelections, setRepkitPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [repkitPartSelections, setRepkitPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.repkit.selections", {});
   const [repkitPartPickerPartType, setRepkitPartPickerPartType] = useState<string | null>(null);
   const [repkitPartPickerChecked, setRepkitPartPickerChecked] = useState<Set<string>>(new Set());
   const [repkitPartPickerShowQty, setRepkitPartPickerShowQty] = useState(false);
@@ -1212,7 +1371,7 @@ export default function UnifiedItemBuilderPage() {
   const [repkitResistanceQtyById, setRepkitResistanceQtyById] = useState<Record<number, number>>({});
   const [repkitUniversalQtyById, setRepkitUniversalQtyById] = useState<Record<number, number>>({});
   const [repkitLegendaryQtyById, setRepkitLegendaryQtyById] = useState<Record<string, number>>({});
-  const [repkitExtraTokens, setRepkitExtraTokens] = useState<string[]>([]);
+  const [repkitExtraTokens, setRepkitExtraTokens] = usePersistedState<string[]>("uib.repkit.extraTokens", []);
   const [showRepkitGodRollModal, setShowRepkitGodRollModal] = useState(false);
   const [repkitAutoFillWarning, setRepkitAutoFillWarning] = useState<string | null>(null);
   const [showRepkitUniversalModal, setShowRepkitUniversalModal] = useState(false);
@@ -1230,44 +1389,43 @@ export default function UnifiedItemBuilderPage() {
 
   // Heavy (when category === "heavy")
   const [heavyData, setHeavyData] = useState<HeavyBuilderData | null>(null);
-  const [heavyMfgId, setHeavyMfgId] = useState<number | null>(null);
+  const [heavyMfgId, setHeavyMfgId] = usePersistedState<number | null>("uib.heavy.mfgId", null);
   const [showHeavyMfgModal, setShowHeavyMfgModal] = useState(false);
-  const [heavyPartSelections, setHeavyPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [heavyPartSelections, setHeavyPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.heavy.selections", {});
   const [heavyPartPickerPartType, setHeavyPartPickerPartType] = useState<string | null>(null);
   const [heavyPartPickerChecked, setHeavyPartPickerChecked] = useState<Set<string>>(new Set());
   const [heavyPartPickerShowQty, setHeavyPartPickerShowQty] = useState(false);
   const [heavyPartPickerQty, setHeavyPartPickerQty] = useState("1");
-  const [heavyExtraTokens, setHeavyExtraTokens] = useState<string[]>([]);
+  const [heavyExtraTokens, setHeavyExtraTokens] = usePersistedState<string[]>("uib.heavy.extraTokens", []);
   const [showHeavyGodRollModal, setShowHeavyGodRollModal] = useState(false);
 
   // Enhancement (when category === "enhancement")
   const [enhancementData, setEnhancementData] = useState<EnhancementBuilderData | null>(null);
-  const [enhancementMfgName, setEnhancementMfgName] = useState<string | null>(null);
+  const [enhancementMfgName, setEnhancementMfgName] = usePersistedState<string | null>("uib.enhancement.mfgName", null);
   const [showEnhancementMfgModal, setShowEnhancementMfgModal] = useState(false);
-  const [enhancementPartSelections, setEnhancementPartSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
+  const [enhancementPartSelections, setEnhancementPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.enhancement.selections", {});
   const [enhancementPartPickerPartType, setEnhancementPartPickerPartType] = useState<string | null>(null);
   const [enhancementPartPickerChecked, setEnhancementPartPickerChecked] = useState<Set<string>>(new Set());
   const [enhancementPartPickerShowQty, setEnhancementPartPickerShowQty] = useState(false);
   const [enhancementPartPickerQty, setEnhancementPartPickerQty] = useState("1");
-  const [enhancementExtraTokens, setEnhancementExtraTokens] = useState<string[]>([]);
+  const [enhancementExtraTokens, setEnhancementExtraTokens] = usePersistedState<string[]>("uib.enhancement.extraTokens", []);
   const [showEnhancementGodRollModal, setShowEnhancementGodRollModal] = useState(false);
 
   // Class Mod (when category === "class-mod")
   const [classModData, setClassModData] = useState<ClassModBuilderData | null>(null);
-  const [classModClassName, setClassModClassName] = useState("Amon");
-  const [classModRarity, setClassModRarity] = useState("Legendary");
-  const [classModNameOption, setClassModNameOption] = useState<ClassModNameOption | null>(null);
-  const [classModSelections, setClassModSelections] = useState<Record<string, { label: string; qty: string }[]>>({});
-  const [classModSkillPoints, setClassModSkillPoints] = useState<Record<string, number>>({});
+  const [classModClassName, setClassModClassName] = usePersistedState("uib.classMod.className", "Amon");
+  const [classModRarity, setClassModRarity] = usePersistedState("uib.classMod.rarity", "Legendary");
+  const [classModSelections, setClassModSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.classMod.selections", {});
+  const [classModSkillPoints, setClassModSkillPoints] = usePersistedState<Record<string, number>>("uib.classMod.skillPoints", {});
   const [classModSkillSearch, setClassModSkillSearch] = useState("");
-  const [classModExtraTokens, setClassModExtraTokens] = useState<string[]>([]);
+  const [classModExtraTokens, setClassModExtraTokens] = usePersistedState<string[]>("uib.classMod.extraTokens", []);
   const [showClassModClassModal, setShowClassModClassModal] = useState(false);
   const [showClassModRarityModal, setShowClassModRarityModal] = useState(false);
-  const [showClassModNameModal, setShowClassModNameModal] = useState(false);
   const [classModPartPickerKey, setClassModPartPickerKey] = useState<string | null>(null);
   const [classModPartPickerChecked, setClassModPartPickerChecked] = useState<Set<string>>(new Set());
   const [classModPartPickerShowQty, setClassModPartPickerShowQty] = useState(false);
   const [classModPartPickerQty, setClassModPartPickerQty] = useState("1");
+  const [classModSkillCard, setClassModSkillCard] = useState<{ skillName: string; className: string } | null>(null);
 
   const weaponMfgWtId = useMemo(() => {
     if (!weaponData?.mfgWtIdList?.length) return null;
@@ -1280,6 +1438,20 @@ export default function UnifiedItemBuilderPage() {
     if (!weaponData?.mfgWtIdList?.length) return [];
     return [...new Set(weaponData.mfgWtIdList.filter((e) => e.manufacturer === weaponManufacturer).map((e) => e.weaponType))].sort();
   }, [weaponData, weaponManufacturer]);
+
+  // Load skin list once on mount — shared across all builders
+  useEffect(() => {
+    let cancelled = false;
+    fetchApi("weapon-gen/data")
+      .then((r) => r.json())
+      .then((d: WeaponGenData) => {
+        if (cancelled) return;
+        if (Array.isArray(d.skins)) setSharedSkins(d.skins);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (category !== "weapon") return;
@@ -1386,7 +1558,6 @@ export default function UnifiedItemBuilderPage() {
           setClassModClassName((prev) => (d.classNames.includes(prev) ? prev : firstClass));
         }
         setClassModRarity("Legendary");
-        setClassModNameOption(null);
         // Reset skill points when data or class-mod category loads
         const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
         const skills = d.skillsByClass[classIdStr] ?? [];
@@ -1462,16 +1633,17 @@ export default function UnifiedItemBuilderPage() {
       seed,
       grenadePartSelections,
       grenadeExtraTokens,
+      grenadeSkinValue || undefined,
     );
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Grenade build updated; encoding…");
-  }, [grenadeData, grenadeMfgId, level, seed, grenadePartSelections, grenadeExtraTokens]);
+  }, [grenadeData, grenadeMfgId, level, seed, grenadePartSelections, grenadeExtraTokens, grenadeSkinValue]);
 
   useEffect(() => {
     if (category !== "grenade" || grenadeMfgId == null || !grenadeData) return;
     rebuildGrenadeDecoded();
-  }, [category, grenadeMfgId, grenadeData, grenadePartSelections, grenadeExtraTokens, level, seed, rebuildGrenadeDecoded]);
+  }, [category, grenadeMfgId, grenadeData, grenadePartSelections, grenadeExtraTokens, grenadeSkinValue, level, seed, rebuildGrenadeDecoded]);
 
   const rebuildShieldDecoded = useCallback(() => {
     if (!shieldData || shieldMfgId == null) return;
@@ -1482,16 +1654,18 @@ export default function UnifiedItemBuilderPage() {
       seed,
       shieldPartSelections,
       shieldExtraTokens,
+      shieldSkinValue || undefined,
     );
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Shield build updated; encoding…");
-  }, [shieldData, shieldMfgId, level, seed, shieldPartSelections, shieldExtraTokens]);
+  }, [shieldData, shieldMfgId, level, seed, shieldPartSelections, shieldExtraTokens, shieldSkinValue]);
 
   useEffect(() => {
     if (category !== "shield" || shieldMfgId == null || !shieldData) return;
     const hasShieldConfig =
       shieldExtraTokens.length > 0 ||
+      shieldSkinValue.length > 0 ||
       Object.keys(shieldPartSelections).some((k) => (shieldPartSelections[k]?.length ?? 0) > 0);
     if (!hasShieldConfig) return;
     rebuildShieldDecoded();
@@ -1500,6 +1674,7 @@ export default function UnifiedItemBuilderPage() {
     shieldMfgId,
     shieldData,
     shieldExtraTokens,
+    shieldSkinValue,
     shieldPartSelections,
     level,
     seed,
@@ -1515,16 +1690,18 @@ export default function UnifiedItemBuilderPage() {
       seed,
       repkitPartSelections,
       repkitExtraTokens,
+      repkitSkinValue || undefined,
     );
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("RepKit build updated; encoding…");
-  }, [repkitData, repkitMfgId, level, seed, repkitPartSelections, repkitExtraTokens]);
+  }, [repkitData, repkitMfgId, level, seed, repkitPartSelections, repkitExtraTokens, repkitSkinValue]);
 
   useEffect(() => {
     if (category !== "repkit" || repkitMfgId == null || !repkitData) return;
     const hasRepkitConfig =
       repkitExtraTokens.length > 0 ||
+      repkitSkinValue.length > 0 ||
       Object.keys(repkitPartSelections).some((k) => (repkitPartSelections[k]?.length ?? 0) > 0);
     if (!hasRepkitConfig) return;
     rebuildRepkitDecoded();
@@ -1534,6 +1711,7 @@ export default function UnifiedItemBuilderPage() {
     repkitData,
     repkitPartSelections,
     repkitExtraTokens,
+    repkitSkinValue,
     level,
     seed,
     rebuildRepkitDecoded,
@@ -1548,16 +1726,18 @@ export default function UnifiedItemBuilderPage() {
       seed,
       heavyPartSelections,
       heavyExtraTokens,
+      heavySkinValue || undefined,
     );
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Heavy build updated; encoding…");
-  }, [heavyData, heavyMfgId, level, seed, heavyPartSelections, heavyExtraTokens]);
+  }, [heavyData, heavyMfgId, level, seed, heavyPartSelections, heavyExtraTokens, heavySkinValue]);
 
   useEffect(() => {
     if (category !== "heavy" || heavyMfgId == null || !heavyData) return;
     const hasHeavyConfig =
       heavyExtraTokens.length > 0 ||
+      heavySkinValue.length > 0 ||
       Object.keys(heavyPartSelections).some((k) => (heavyPartSelections[k]?.length ?? 0) > 0);
     if (!hasHeavyConfig) return;
     rebuildHeavyDecoded();
@@ -1567,6 +1747,7 @@ export default function UnifiedItemBuilderPage() {
     heavyData,
     heavyPartSelections,
     heavyExtraTokens,
+    heavySkinValue,
     level,
     seed,
     rebuildHeavyDecoded,
@@ -1581,16 +1762,18 @@ export default function UnifiedItemBuilderPage() {
       seed,
       enhancementPartSelections,
       enhancementExtraTokens,
+      enhancementSkinValue || undefined,
     );
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Enhancement build updated; encoding…");
-  }, [enhancementData, enhancementMfgName, level, seed, enhancementPartSelections, enhancementExtraTokens]);
+  }, [enhancementData, enhancementMfgName, level, seed, enhancementPartSelections, enhancementExtraTokens, enhancementSkinValue]);
 
   useEffect(() => {
     if (category !== "enhancement" || !enhancementMfgName || !enhancementData) return;
     const hasEnhancementConfig =
       enhancementExtraTokens.length > 0 ||
+      enhancementSkinValue.length > 0 ||
       Object.keys(enhancementPartSelections).some((k) => (enhancementPartSelections[k]?.length ?? 0) > 0);
     if (!hasEnhancementConfig) return;
     rebuildEnhancementDecoded();
@@ -1600,6 +1783,7 @@ export default function UnifiedItemBuilderPage() {
     enhancementData,
     enhancementPartSelections,
     enhancementExtraTokens,
+    enhancementSkinValue,
     level,
     seed,
     rebuildEnhancementDecoded,
@@ -1616,22 +1800,24 @@ export default function UnifiedItemBuilderPage() {
       classModSelections,
       classModExtraTokens,
       classModSkillPoints,
+      classModSkinValue || undefined,
     );
     if (!decoded) return;
     setLiveDecoded(decoded);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Class Mod build updated; encoding…");
-  }, [classModData, classModClassName, classModRarity, level, seed, classModSelections, classModExtraTokens, classModSkillPoints]);
+  }, [classModData, classModClassName, classModRarity, level, seed, classModSelections, classModExtraTokens, classModSkillPoints, classModSkinValue]);
 
   useEffect(() => {
     if (category !== "class-mod" || !classModData) return;
     const hasConfig =
       classModExtraTokens.length > 0 ||
+      classModSkinValue.length > 0 ||
       Object.keys(classModSelections).some((k) => (classModSelections[k]?.length ?? 0) > 0) ||
       Object.values(classModSkillPoints).some((v) => v > 0);
     if (!hasConfig) return;
     rebuildClassModDecoded();
-  }, [category, classModData, classModSelections, classModExtraTokens, classModSkillPoints, level, seed, rebuildClassModDecoded]);
+  }, [category, classModData, classModSelections, classModExtraTokens, classModSkillPoints, classModSkinValue, level, seed, rebuildClassModDecoded]);
 
   const handleRandomWeapon = useCallback(() => {
     if (!weaponData?.mfgWtIdList?.length) return;
@@ -1640,6 +1826,7 @@ export default function UnifiedItemBuilderPage() {
     const entry = list[Math.floor(Math.random() * list.length)];
     setWeaponManufacturer(entry.manufacturer);
     setWeaponWeaponType(entry.weaponType);
+    setWeaponMfgUserSelected(true);
     setLevel(Math.floor(1 + Math.random() * 50));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setExtraTokens([]);
@@ -2134,12 +2321,62 @@ export default function UnifiedItemBuilderPage() {
     setGenerateModdedError(null);
     setGenerateModdedLoading(true);
     try {
-      const [editRes, partsRes] = await Promise.all([
+      const base = window.location.origin || "";
+      const [editRes, partsRes, visualBarrelsRes, allowedBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
         fetchApi("weapon-edit/data"),
         fetchApi("parts/data"),
+        fetch(`${base}/data/visual_heavy_barrels.json`).catch(() => null),
+        fetch(`${base}/data/allowed_barrels.json`).catch(() => null),
+        fetch(`${base}/data/allowed_underbarrels.json`).catch(() => null),
+        fetch(`${base}/data/desirable_underbarrels.json`).catch(() => null),
+        fetch(`${base}/data/legendary_grenades.json`).catch(() => null),
+        fetch(`${base}/data/grenade_visual_recipes.json`).catch(() => null),
       ]);
       const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
       const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
+      const visualBarrelEntries = visualBarrelsRes?.ok
+        ? ((await visualBarrelsRes.json().catch(() => [])) as Array<{ name: string; code: string }>)
+        : [];
+      const allowedBarrelEntries = allowedBarrelsRes?.ok
+        ? ((await allowedBarrelsRes.json().catch(() => [])) as Array<{ name: string; code: string }>)
+        : [];
+      const allowedUnderbarrelsPayload = allowedUnderbarrelsRes?.ok
+        ? await allowedUnderbarrelsRes.json().catch(() => null)
+        : null;
+      const allowedUnderbarrelEntries =
+        allowedUnderbarrelsPayload != null &&
+        typeof allowedUnderbarrelsPayload === "object" &&
+        ((Array.isArray((allowedUnderbarrelsPayload as { parts?: unknown[] }).parts) && (allowedUnderbarrelsPayload as { parts: unknown[] }).parts.length > 0) ||
+          (Array.isArray(allowedUnderbarrelsPayload) && allowedUnderbarrelsPayload.length > 0))
+          ? (allowedUnderbarrelsPayload as { parts: unknown[]; accessories?: unknown[] })
+          : undefined;
+      const underbarrelsPayload = underbarrelsRes?.ok
+        ? await underbarrelsRes.json().catch(() => null)
+        : null;
+      const desirableUnderbarrelEntries =
+        Array.isArray(underbarrelsPayload) && underbarrelsPayload.length > 0
+          ? underbarrelsPayload
+          : underbarrelsPayload?.parts?.length > 0
+            ? underbarrelsPayload
+            : undefined;
+      const legendaryGrenadeEntries = legendaryGrenadesRes?.ok
+        ? ((await legendaryGrenadesRes.json().catch(() => [])) as Array<{ name: string; code: string }>)
+        : undefined;
+      const grenadeVisualRecipes = visualRecipesRes?.ok
+        ? ((await visualRecipesRes.json().catch(() => [])) as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[])
+        : [];
+      let skinOptionsForGenerate = weaponData?.skins;
+      if (!skinOptionsForGenerate?.length) {
+        try {
+          const weaponGenRes = await fetchApi("weapon-gen/data");
+          if (weaponGenRes.ok) {
+            const weaponGenData = (await weaponGenRes.json()) as { skins?: { label: string; value: string }[] };
+            skinOptionsForGenerate = Array.isArray(weaponGenData?.skins) ? weaponGenData.skins : undefined;
+          }
+        } catch {
+          // keep skinOptionsForGenerate undefined
+        }
+      }
       const items = Array.isArray(partsPayload?.items) ? partsPayload.items : [];
       const universalPartCodes: UniversalDbPartCode[] = [];
       for (const it of items) {
@@ -2184,11 +2421,21 @@ export default function UnifiedItemBuilderPage() {
         return;
       }
       const weaponLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
-      const decoded = generateModdedWeapon(editData, universalPartCodes, {
+      const { code: decoded, dps } = generateModdedWeapon(editData, universalPartCodes, {
         level: weaponLevel,
         modPowerMode: moddedWeaponPowerMode,
+        specialMode: moddedWeaponSpecialMode,
+        forcedPrefix: weaponMfgUserSelected && weaponMfgWtId ? Number(weaponMfgWtId) : undefined,
         skin: weaponSkinValue.trim() || undefined,
+        skinOptions: skinOptionsForGenerate,
+        visualBarrelEntries: Array.isArray(visualBarrelEntries) && visualBarrelEntries.length > 0 ? visualBarrelEntries : undefined,
+        allowedBarrelEntries: Array.isArray(allowedBarrelEntries) && allowedBarrelEntries.length > 0 ? allowedBarrelEntries : undefined,
+        allowedUnderbarrelEntries,
+        desirableUnderbarrelEntries,
+        legendaryGrenadeEntries: Array.isArray(legendaryGrenadeEntries) && legendaryGrenadeEntries.length > 0 ? legendaryGrenadeEntries : undefined,
+        grenadeVisualRecipes: Array.isArray(grenadeVisualRecipes) && grenadeVisualRecipes.length > 0 ? grenadeVisualRecipes : undefined,
       });
+      setLastDps(dps);
       setLiveDecoded(decoded.trim());
       setLastEditedCodecSide("decoded");
     } catch (e) {
@@ -2197,7 +2444,7 @@ export default function UnifiedItemBuilderPage() {
     } finally {
       setGenerateModdedLoading(false);
     }
-  }, [level, moddedWeaponPowerMode, weaponSkinValue]);
+  }, [level, moddedWeaponPowerMode, moddedWeaponSpecialMode, weaponSkinValue, weaponData?.skins]);
 
   const handleAutoFill = useCallback(() => {
     setAutoFillWarning(null);
@@ -2721,6 +2968,40 @@ export default function UnifiedItemBuilderPage() {
     return map;
   }, [repkitData]);
 
+  const heavyPartDescriptionByRaw = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!heavyData) return map;
+    const add = (raw: string, desc?: string) => {
+      const text = (desc ?? "").trim();
+      if (!raw || !text) return;
+      if (!map.has(raw)) map.set(raw, text);
+    };
+    heavyData.element.forEach((p) => add(`{1:${p.partId}}`, p.description ?? p.stat));
+    heavyData.firmware.forEach((p) => add(`{${HEAVY_TYPE_ID}:${p.partId}}`, p.description ?? p.stat));
+    heavyData.barrel.forEach((p) => add(`{${p.partId}}`, p.description ?? p.stat));
+    heavyData.barrelAccPerks.forEach((p) => add(`{${p.partId}}`, p.description ?? p.stat));
+    heavyData.bodyAccPerks.forEach((p) => add(`{${p.partId}}`, p.description ?? p.stat));
+    return map;
+  }, [heavyData]);
+
+  const enhancementPartDescriptionByRaw = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!enhancementData) return map;
+    const add = (raw: string, desc?: string) => {
+      const text = (desc ?? "").trim();
+      if (!raw || !text) return;
+      if (!map.has(raw)) map.set(raw, text);
+    };
+    Object.values(enhancementData.manufacturers).forEach((mfg) => {
+      (mfg.perks ?? []).forEach((p) => add(`{${p.index}}`, p.description ? `${p.name} — ${p.description}` : p.name));
+    });
+    enhancementData.secondary247.forEach((s) => {
+      const desc = s.description ? `${s.name} — ${s.description}` : s.name;
+      add(`{247:${s.code}}`, desc);
+    });
+    return map;
+  }, [enhancementData]);
+
   const repkitExtraLabels = useMemo(() => {
     const map = new Map<string, string>();
     if (!repkitData) return map;
@@ -3001,11 +3282,69 @@ export default function UnifiedItemBuilderPage() {
     return () => clearTimeout(timer);
   }, [lastEditedCodecSide, liveBase85, liveDecoded]);
 
+  // ── Hover card helpers ────────────────────────────────────────────────────
+
+  /** Convert a UniversalPartRow to HoverCardData for slot/sidebar hovers. */
+  const universalRowToHoverData = useCallback((p: UniversalPartRow): HoverCardData => ({
+    code: p.code,
+    name: p.label || p.code,
+    effect: p.effect,
+    manufacturer: p.manufacturer,
+    partType: p.partType,
+    modelName: p.itemType,
+    rarity: p.rarity,
+  }), []);
+
+  /** Look up a UniversalPartRow by code (for sidebar part hover). */
+  const hoverDataByCode = useCallback((code: string): HoverCardData | null => {
+    const p = universalParts.find((u) => u.code === code);
+    if (!p) return null;
+    return universalRowToHoverData(p);
+  }, [universalParts, universalRowToHoverData]);
+
+  /** Look up a UniversalPartRow by label (for slot item / picker hover). Falls back to label-only data. */
+  const hoverDataByLabel = useCallback((label: string, description?: string, partTypeOverride?: string): HoverCardData => {
+    const p = universalParts.find((u) => u.label === label);
+    const base: HoverCardData = p
+      ? universalRowToHoverData(p)
+      : (() => {
+          const pieces = label.split(" - ");
+          const name = pieces.length > 1 ? pieces.slice(1).join(" - ").trim() : label;
+          return { code: "", name, effect: description } as HoverCardData;
+        })();
+    return partTypeOverride ? { ...base, partType: partTypeOverride } : base;
+  }, [universalParts, universalRowToHoverData]);
+
+  const startHover = useCallback((data: HoverCardData, top: number, side: "left" | "right" = "right") => {
+    if (hoverCardTimer.current) clearTimeout(hoverCardTimer.current);
+    hoverCardTimer.current = setTimeout(() => {
+      setHoverCardTop(top);
+      setHoverCardSide(side);
+      setHoverCard(data);
+    }, 130);
+  }, []);
+
+  const endHover = useCallback(() => {
+    if (hoverCardTimer.current) clearTimeout(hoverCardTimer.current);
+    setHoverCard(null);
+  }, []);
+
   return (
-    <div className="space-y-4">
-      <section className="rounded-xl border-2 border-[var(--color-accent)]/40 bg-[linear-gradient(135deg,rgba(24,28,34,0.95),rgba(24,28,34,0.75))] p-4 shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-4" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: "22px 22px" }}>
+      <section className="relative rounded-xl border-2 border-[var(--color-accent)]/40 bg-[linear-gradient(135deg,rgba(24,28,34,0.95),rgba(24,28,34,0.75))] p-4 shadow-xl overflow-hidden">
+        {/* Left accent stripe */}
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)]/20 rounded-l-xl" aria-hidden="true" />
+        {/* Corner decoration */}
+        <span className="absolute top-2 right-3 font-mono text-[var(--color-accent)]/15 text-xs select-none pointer-events-none" aria-hidden="true">⌐■</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 pl-3">
           <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-mono text-[10px] tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 px-2 py-0.5 rounded">◈ LAB</span>
+              <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                SYSTEM ONLINE
+              </span>
+            </div>
             <Link
               to="/beta"
               className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)]"
@@ -3026,9 +3365,10 @@ export default function UnifiedItemBuilderPage() {
       </section>
 
       {/* Item context */}
-      <section className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] p-3">
-        <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
-          Item category
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] p-3 pl-4 overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/30 rounded-l-xl" aria-hidden="true" />
+        <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2 font-mono">
+          ⌖ Item category
         </p>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
@@ -3046,13 +3386,29 @@ export default function UnifiedItemBuilderPage() {
             </button>
           ))}
         </div>
+        {/* Display toggles */}
+        <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-[var(--color-panel-border)]/50 flex-wrap">
+          <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mr-0.5">Display</span>
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${descriptiveIdsGuidelines ? "bg-[var(--color-accent)]/20 border-[var(--color-accent)] text-[var(--color-accent)]" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"}`}>
+            <input type="checkbox" checked={descriptiveIdsGuidelines} onChange={(e) => setDescriptiveIdsGuidelines(e.target.checked)} className="sr-only" />
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${descriptiveIdsGuidelines ? "bg-[var(--color-accent)]" : "bg-[var(--color-text-muted)]"}`} />
+            Show Info
+          </label>
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${masterUnlockGuidelines ? "bg-amber-400/20 border-amber-400/80 text-amber-300" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-amber-400/40 hover:text-[var(--color-text)]"}`}>
+            <input type="checkbox" checked={masterUnlockGuidelines} onChange={(e) => setMasterUnlockGuidelines(e.target.checked)} className="sr-only" />
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${masterUnlockGuidelines ? "bg-amber-400" : "bg-[var(--color-text-muted)]"}`} />
+            All Parts
+          </label>
+        </div>
       </section>
 
       {/* Live codec: Base85 ⇄ Deserialized (between category and weapon build) */}
-      <section className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] p-3">
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] p-3 pl-4 overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/30 rounded-l-xl" aria-hidden="true" />
         <div className="flex items-center justify-between gap-2 mb-2">
-          <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
-            Live codec (our encode/decode API)
+          <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] font-mono flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse flex-shrink-0" aria-hidden="true" />
+            ◈ Live codec (encode/decode API)
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">
             {codecLoading ? "Converting…" : codecStatus}
@@ -3109,13 +3465,9 @@ export default function UnifiedItemBuilderPage() {
               onChange={(e) => setFlagValue(Number(e.target.value))}
               className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
             >
-              <option value={1}>1 (Normal)</option>
-              <option value={3}>3</option>
-              <option value={5}>5</option>
-              <option value={17}>17</option>
-              <option value={33}>33</option>
-              <option value={65}>65</option>
-              <option value={129}>129</option>
+              {FLAG_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
             </select>
           </label>
           <button
@@ -3130,6 +3482,22 @@ export default function UnifiedItemBuilderPage() {
             <span className="text-xs text-[var(--color-text-muted)]">Load a save (Character → Select Save) to add to backpack.</span>
           )}
         </div>
+        {lastDps && (
+          <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">DPS Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(~3% per +Dmg stack · est.)</span></p>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <span><span className="text-[var(--color-text-muted)] text-xs">Barrel:</span> {lastDps.barrelName || "—"}</span>
+              <span><span className="text-[var(--color-text-muted)] text-xs">Base DPS:</span> {lastDps.baseDps > 0 ? Math.round(lastDps.baseDps).toLocaleString() : "—"}</span>
+              <span><span className="text-[var(--color-text-muted)] text-xs">Est. DPS:</span> <span className="text-green-400 font-bold">{lastDps.estimatedDps > 0 ? Math.round(lastDps.estimatedDps).toLocaleString() : "—"}</span></span>
+              {lastDps.baseDps > 0 && <span className="text-[var(--color-text-muted)] text-xs">{lastDps.baseFireRate.toFixed(1)}/s × {Math.round(lastDps.baseDamagePerShot).toLocaleString()} dmg/shot</span>}
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 mt-1 text-xs text-[var(--color-text-muted)]">
+              <span>+Dmg stacks: {lastDps.damageStackCount}</span>
+              <span>+Crit stacks: {lastDps.critStackCount}</span>
+              <span>+FR stacks: {lastDps.fireRateStackCount}</span>
+            </div>
+          </div>
+        )}
       </section>
 
       {showCleanCodeDialog && (
@@ -3144,8 +3512,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Weapon: Modding-tool style with collapsible part groups + multi-select per part type */}
       {category === "weapon" && weaponData && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Weapon build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Weapon build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -3240,6 +3608,29 @@ export default function UnifiedItemBuilderPage() {
                     <option value="op">OP</option>
                     <option value="insane">Insane</option>
                   </select>
+                  {/* Special mode — mutually exclusive pill toggles */}
+                  {(["grenade-reload", "inf-ammo"] as const).map((mode) => {
+                    const active = moddedWeaponSpecialMode === mode;
+                    const label = mode === "grenade-reload" ? "Grenade Reload" : "Inf Ammo";
+                    const tip = mode === "grenade-reload"
+                      ? "Add grenade reload block (grenade item + perk stacks) to every generated gun. Disables Rowan's Charge stacks."
+                      : "Add 7× Rowan's Charge {27:75} stacks for infinite ammo on every generated gun. Disables grenade reload block.";
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setModdedWeaponSpecialMode(active ? null : mode)}
+                        title={tip}
+                        className={`px-3 py-2 rounded-lg border text-sm min-h-[44px] touch-manipulation transition-colors ${
+                          active
+                            ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
+                            : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                        }`}
+                      >
+                        {active ? "✓ " : ""}{label}
+                      </button>
+                    );
+                  })}
                   <button
                     type="button"
                     onClick={() => void handleGenerateModdedWeapon()}
@@ -3282,6 +3673,7 @@ export default function UnifiedItemBuilderPage() {
                             type="button"
                             onClick={() => {
                               setWeaponManufacturer(m);
+                              setWeaponMfgUserSelected(true);
                               setShowWeaponMfgModal(false);
                             }}
                             className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${active ? "bg-[var(--color-accent)]/10" : ""}`}
@@ -3383,56 +3775,59 @@ export default function UnifiedItemBuilderPage() {
                     if (hasAnyMfgInName) return label;
                     return `${label} (${mfg})`;
                   };
-                  const legendaryOptions: { partId: string; label: string }[] = unlocked
+                  type PartOpt = { partId: string; label: string; description?: string; isStock: boolean };
+                  const legendaryOptions: PartOpt[] = unlocked
                     ? (() => {
-                        const out: { partId: string; label: string }[] = [];
+                        const stock: PartOpt[] = [], extra: PartOpt[] = [];
                         mfgWtIds.forEach((id) => {
                           const mfg = getMfgName(id);
+                          const isStock = id === weaponMfgWtId;
                           (weaponData.legendaryByMfgTypeId[id] ?? []).forEach((r) => {
-                            const base = `${r.partId} - ${r.description}`;
-                            out.push({ partId: r.partId, label: withMfgIfNeeded(base, mfg) });
+                            const item = { partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, mfg), isStock };
+                            if (isStock) stock.push(item); else extra.push(item);
                           });
                         });
-                        return out;
+                        return [...stock, ...extra];
                       })()
-                    : (weaponData.legendaryByMfgTypeId[weaponMfgWtId] ?? []).map((r) => {
-                        const base = `${r.partId} - ${r.description}`;
-                        return { partId: r.partId, label: withMfgIfNeeded(base, weaponManufacturer) };
-                      });
-                  const pearlOptions: { partId: string; label: string }[] = unlocked
+                    : (weaponData.legendaryByMfgTypeId[weaponMfgWtId] ?? []).map((r) => ({
+                        partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, weaponManufacturer), isStock: true,
+                      }));
+                  const pearlOptions: PartOpt[] = unlocked
                     ? (() => {
-                        const out: { partId: string; label: string }[] = [];
+                        const stock: PartOpt[] = [], extra: PartOpt[] = [];
                         mfgWtIds.forEach((id) => {
                           const mfg = getMfgName(id);
+                          const isStock = id === weaponMfgWtId;
                           (weaponData.pearlByMfgTypeId[id] ?? []).forEach((r) => {
-                            const base = `${r.partId} - ${r.description}`;
-                            out.push({ partId: r.partId, label: withMfgIfNeeded(base, mfg) });
+                            const item = { partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, mfg), isStock };
+                            if (isStock) stock.push(item); else extra.push(item);
                           });
                         });
-                        return out;
+                        return [...stock, ...extra];
                       })()
-                    : (weaponData.pearlByMfgTypeId[weaponMfgWtId] ?? []).map((r) => {
-                        const base = `${r.partId} - ${r.description}`;
-                        return { partId: r.partId, label: withMfgIfNeeded(base, weaponManufacturer) };
-                      });
-                  const elementalOptions = weaponData.elemental.map((e) => ({ partId: e.partId, label: `${e.partId} - ${e.stat}` }));
-                  const getOpts = (partType: string): { partId: string; label: string }[] => {
-                    if (partType === "Rarity") return rarityOptions.map((o) => ({ partId: o, label: o }));
+                    : (weaponData.pearlByMfgTypeId[weaponMfgWtId] ?? []).map((r) => ({
+                        partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, weaponManufacturer), isStock: true,
+                      }));
+                  const elementalOptions: PartOpt[] = weaponData.elemental.map((e) => ({ partId: e.partId, label: `${e.partId} - ${e.stat}`, isStock: true }));
+                  const getOpts = (partType: string): PartOpt[] => {
+                    if (partType === "Rarity") return rarityOptions.map((o) => ({ partId: o, label: o, isStock: true }));
                     if (partType === "Legendary Type") return legendaryOptions;
                     if (partType === "Pearl Type") return pearlOptions;
                     if (partType === "Element 1" || partType === "Element 2") return elementalOptions;
                     if (unlocked && weaponData.partsByMfgTypeId) {
-                      const out: { partId: string; label: string }[] = [];
+                      const stock: PartOpt[] = [], extra: PartOpt[] = [];
                       mfgWtIds.forEach((id) => {
                         const mfg = getMfgName(id);
+                        const isStock = id === weaponMfgWtId;
                         (weaponData.partsByMfgTypeId[id]?.[partType] ?? []).forEach((p) => {
-                          out.push({ partId: p.partId, label: withMfgIfNeeded(p.label, mfg) });
+                          const item = { partId: p.partId, label: withMfgIfNeeded(p.label, mfg), isStock };
+                          if (isStock) stock.push(item); else extra.push(item);
                         });
                       });
-                      return out;
+                      return [...stock, ...extra];
                     }
                     const parts = weaponData.partsByMfgTypeId[weaponMfgWtId]?.[partType] ?? [];
-                    return parts.map((p) => ({ partId: p.partId, label: withMfgIfNeeded(p.label, weaponManufacturer) }));
+                    return parts.map((p) => ({ partId: p.partId, label: withMfgIfNeeded(p.label, weaponManufacturer), isStock: true }));
                   };
                   const list = (partType: string) => weaponPartSelections[partType] ?? [];
                   const removePartAt = (partType: string, index: number) => {
@@ -3500,30 +3895,37 @@ export default function UnifiedItemBuilderPage() {
                                 </button>
                                 {entries.length > 0 && (
                                   <div className="space-y-2">
-                                    {entries.map((item, idx) => (
-                                      <div key={`${partType}-${idx}-${item.label}`} className="part-item flex items-center gap-2 flex-wrap rounded-lg border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.5)] p-2">
-                                        <span className="flex-1 min-w-0 text-sm text-[var(--color-text)] truncate">{item.label}</span>
-                                        {partType !== "Rarity" && (
-                                          <input
-                                            type="number"
-                                            min={1}
-                                            max={99}
-                                            value={item.qty}
-                                            onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
-                                            title="Quantity"
-                                          />
-                                        )}
-                                        <button
-                                          type="button"
-                                          onClick={() => removePartAt(partType, idx)}
-                                          className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
-                                          title="Remove"
-                                        >
-                                          ×
-                                        </button>
+                                    {entries.map((item, idx) => {
+                                      const pi = universalParts.find((u) => u.label === item.label);
+                                      const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                                      return (
+                                      <div key={`${partType}-${idx}-${item.label}`} className={`part-item rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className={`flex-1 min-w-0 text-sm font-medium truncate ${nameColor}`}>{item.label}</span>
+                                          {partType !== "Rarity" && (
+                                            <input
+                                              type="number"
+                                              min={1}
+                                              max={99}
+                                              value={item.qty}
+                                              onChange={(e) => setPartQty(partType, idx, e.target.value)}
+                                              className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                              title="Quantity"
+                                            />
+                                          )}
+                                          <button
+                                            type="button"
+                                            onClick={() => removePartAt(partType, idx)}
+                                            className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                            title="Remove"
+                                          >
+                                            ×
+                                          </button>
+                                        </div>
+                                        {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                                       </div>
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>
@@ -3536,7 +3938,15 @@ export default function UnifiedItemBuilderPage() {
                         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setWeaponPartPickerPartType(null)}>
                           <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                             <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
-                              <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {weaponPartPickerPartType}</h3>
+                              <div>
+                                <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {weaponPartPickerPartType}</h3>
+                                {unlocked && (
+                                  <p className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono text-[var(--color-text-muted)]">
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-amber-300 bg-amber-400/15 border border-amber-400/30 leading-none">X-MFG</span>
+                                    = cross-manufacturer part
+                                  </p>
+                                )}
+                              </div>
                               <button type="button" onClick={() => setWeaponPartPickerPartType(null)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Close</button>
                             </div>
                             <div className="flex-1 overflow-y-auto p-3">
@@ -3555,7 +3965,9 @@ export default function UnifiedItemBuilderPage() {
                                 {getOpts(weaponPartPickerPartType).map((o) => (
                                   <label
                                     key={o.partId + o.label}
-                                    className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30"
+                                    className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30 ${unlocked && !o.isStock ? "bg-amber-400/[0.03]" : ""}`}
+                                    onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, weaponPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)}
+                                    onMouseLeave={endHover}
                                   >
                                     <input
                                       type="checkbox"
@@ -3570,7 +3982,12 @@ export default function UnifiedItemBuilderPage() {
                                       }}
                                       className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                     />
-                                    <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                                    <span className="flex-1 min-w-0">
+                                      {unlocked && !o.isStock && (
+                                        <span className="inline-flex items-center mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-amber-300 bg-amber-400/15 border border-amber-400/30 leading-none align-middle">X-MFG</span>
+                                      )}
+                                      <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={weaponPartPickerPartType} descriptive={descriptiveIdsGuidelines} />
+                                    </span>
                                   </label>
                                 ))}
                               </div>
@@ -3685,8 +4102,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Grenade: Manufacturer + Level + Seed + Add other parts + part slot dropdowns */}
       {category === "grenade" && grenadeData && grenadeMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Grenade build (dropdowns)</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Grenade build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -3841,14 +4258,15 @@ export default function UnifiedItemBuilderPage() {
               const legendaryOptions = grenadeData.legendaryPerks.map((l) => ({
                 partId: `${l.mfgId}:${l.partId}`,
                 label: `${l.mfgId}:${l.partId} - ${l.mfgName}: ${l.stat}`,
+                description: l.description,
               }));
-              const elementOptions = grenadeData.element.map((e) => ({ partId: String(e.partId), label: `${e.partId} - ${e.stat}` }));
-              const firmwareOptions = grenadeData.firmware.map((f) => ({ partId: String(f.partId), label: `${f.partId} - ${f.stat}` }));
+              const elementOptions = grenadeData.element.map((e) => ({ partId: String(e.partId), label: `${e.partId} - ${e.stat}`, description: e.description }));
+              const firmwareOptions = grenadeData.firmware.map((f) => ({ partId: String(f.partId), label: `${f.partId} - ${f.stat}`, description: f.description }));
               const mfgPerksList = grenadeData.mfgPerks[grenadeMfgId] ?? [];
-              const mfgPerkOptions = mfgPerksList.map((p) => ({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` }));
-              const universalPerkOptions = grenadeData.universalPerks.map((p) => ({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` }));
+              const mfgPerkOptions = mfgPerksList.map((p) => ({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description }));
+              const universalPerkOptions = grenadeData.universalPerks.map((p) => ({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description }));
 
-              const getOpts = (partType: string): { partId: string; label: string }[] => {
+              const getOpts = (partType: string): { partId: string; label: string; description?: string }[] => {
                 if (partType === "Rarity") return rarities.map((r) => ({ partId: String(r.id), label: r.label }));
                 if (partType === "Legendary") return legendaryOptions;
                 if (partType === "Element") return elementOptions;
@@ -3920,30 +4338,37 @@ export default function UnifiedItemBuilderPage() {
                             </button>
                             {entries.length > 0 && (
                               <div className="space-y-2">
-                                {entries.map((item, idx) => (
-                                  <div key={`${partType}-${idx}-${item.label}`} className="part-item flex items-center gap-2 flex-wrap rounded-lg border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.5)] p-2">
-                                    <span className="flex-1 min-w-0 text-sm text-[var(--color-text)] truncate">{item.label}</span>
-                                    {partType !== "Rarity" && (
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={99}
-                                        value={item.qty}
-                                        onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                        className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
-                                        title="Quantity"
-                                      />
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={() => removePartAt(partType, idx)}
-                                      className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
-                                      title="Remove"
-                                    >
-                                      ×
-                                    </button>
+                                {entries.map((item, idx) => {
+                                  const pi = universalParts.find((u) => u.label === item.label);
+                                  const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                                  return (
+                                  <div key={`${partType}-${idx}-${item.label}`} className={`part-item rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className={`flex-1 min-w-0 text-sm font-medium truncate ${nameColor}`}>{item.label}</span>
+                                      {partType !== "Rarity" && (
+                                        <input
+                                          type="number"
+                                          min={1}
+                                          max={99}
+                                          value={item.qty}
+                                          onChange={(e) => setPartQty(partType, idx, e.target.value)}
+                                          className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                          title="Quantity"
+                                        />
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() => removePartAt(partType, idx)}
+                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                        title="Remove"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+                                    {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                                   </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -3974,7 +4399,7 @@ export default function UnifiedItemBuilderPage() {
                           </button>
                           <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                             {getOpts(grenadePartPickerPartType).map((o) => (
-                              <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30">
+                              <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, grenadePartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                                 <input
                                   type="checkbox"
                                   checked={grenadePartPickerChecked.has(o.label)}
@@ -3988,7 +4413,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={grenadePartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
                               </label>
                             ))}
                           </div>
@@ -4053,6 +4478,26 @@ export default function UnifiedItemBuilderPage() {
                 </>
               );
             })()}
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={grenadeSkinValue}
+                    onChange={(e) => setGrenadeSkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {grenadeSkinValue && (
+                    <SkinPreview token={grenadeSkinValue} label={sharedSkins.find((s) => s.value === grenadeSkinValue)?.label ?? grenadeSkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -4060,8 +4505,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Shield: Manufacturer + Level + Seed + Add other parts + part groups (weapon-style) */}
       {category === "shield" && shieldData && shieldMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Shield build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Shield build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -4299,30 +4744,37 @@ export default function UnifiedItemBuilderPage() {
                               </button>
                               {entries.length > 0 && (
                                 <div className="space-y-2">
-                                  {entries.map((item, idx) => (
-                                    <div key={`${partType}-${idx}-${item.label}`} className="part-item flex items-center gap-2 flex-wrap rounded-lg border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.5)] p-2">
-                                      <span className="flex-1 min-w-0 text-sm text-[var(--color-text)] truncate">{item.label}</span>
-                                      {partType !== "Rarity" && (
-                                        <input
-                                          type="number"
-                                          min={1}
-                                          max={99}
-                                          value={item.qty}
-                                          onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                          className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
-                                          title="Quantity"
-                                        />
-                                      )}
-                                      <button
-                                        type="button"
-                                        onClick={() => removePartAt(partType, idx)}
-                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
-                                        title="Remove"
-                                      >
-                                        ×
-                                      </button>
+                                  {entries.map((item, idx) => {
+                                    const pi = universalParts.find((u) => u.label === item.label);
+                                    const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                                    return (
+                                    <div key={`${partType}-${idx}-${item.label}`} className={`part-item rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className={`flex-1 min-w-0 text-sm font-medium truncate ${nameColor}`}>{item.label}</span>
+                                        {partType !== "Rarity" && (
+                                          <input
+                                            type="number"
+                                            min={1}
+                                            max={99}
+                                            value={item.qty}
+                                            onChange={(e) => setPartQty(partType, idx, e.target.value)}
+                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                            title="Quantity"
+                                          />
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => removePartAt(partType, idx)}
+                                          className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                          title="Remove"
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                      {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                                     </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
@@ -4351,19 +4803,8 @@ export default function UnifiedItemBuilderPage() {
                             ➕ Add part from database…
                           </button>
                           <div className="mt-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
-                            {getOpts(shieldPartPickerPartType).map((o) => {
-                              const info = (() => {
-                                if (!descriptiveIdsGuidelines) return "";
-                                const desc = String(o.description ?? "").trim();
-                                if (desc) return desc;
-                                // Fallback: show the "stat" portion from the label if present
-                                const label = (o.label ?? "").trim();
-                                const pieces = label.split(" - ");
-                                if (pieces.length <= 1) return "";
-                                return pieces.slice(1).join(" - ").trim();
-                              })();
-                              return (
-                                <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30">
+                            {getOpts(shieldPartPickerPartType).map((o) => (
+                                <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, shieldPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                                 <input
                                   type="checkbox"
                                   checked={shieldPartPickerChecked.has(o.label)}
@@ -4377,13 +4818,9 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <span className="min-w-0">
-                                  <span className="block text-sm text-[var(--color-text)]">{o.label}</span>
-                                  {info && <span className="block text-xs text-[var(--color-text-muted)] mt-0.5">{info}</span>}
-                                </span>
+                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={shieldPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
                               </label>
-                              );
-                            })}
+                            ))}
                           </div>
                         </div>
                         <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex gap-2 justify-end shrink-0">
@@ -4451,8 +4888,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Shield: Manufacturer + Level + Seed + Add other parts + part slot dropdowns */}
       {category === "shield" && shieldData && shieldMfgId != null && false && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Shield build (dropdowns)</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Shield build (dropdowns)</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -5295,6 +5732,26 @@ export default function UnifiedItemBuilderPage() {
                 });
               })()}
             </div>
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={shieldSkinValue}
+                    onChange={(e) => setShieldSkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {shieldSkinValue && (
+                    <SkinPreview token={shieldSkinValue} label={sharedSkins.find((s) => s.value === shieldSkinValue)?.label ?? shieldSkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -5302,8 +5759,8 @@ export default function UnifiedItemBuilderPage() {
       {/* RepKit: Manufacturer + Level + Seed + Add other parts + part groups (weapon-style) */}
       {category === "repkit" && repkitData && repkitMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>RepKit build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> RepKit build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -5477,7 +5934,7 @@ export default function UnifiedItemBuilderPage() {
                 return { partId: id, label };
               });
 
-              const getOpts = (partType: string): { partId: string; label: string }[] => {
+              const getOpts = (partType: string): { partId: string; label: string; description?: string }[] => {
                 if (partType === "Rarity") return rarities.map((r) => ({ partId: String(r.id), label: r.label }));
                 if (partType === "Prefix") return prefixOptions;
                 if (partType === "Firmware") return firmwareOptions;
@@ -5552,30 +6009,37 @@ export default function UnifiedItemBuilderPage() {
                               </button>
                               {entries.length > 0 && (
                                 <div className="space-y-2">
-                                  {entries.map((item, idx) => (
-                                    <div key={`${partType}-${idx}-${item.label}`} className="part-item flex items-center gap-2 flex-wrap rounded-lg border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.5)] p-2">
-                                      <span className="flex-1 min-w-0 text-sm text-[var(--color-text)] truncate">{item.label}</span>
-                                      {partType !== "Rarity" && (
-                                        <input
-                                          type="number"
-                                          min={1}
-                                          max={99}
-                                          value={item.qty}
-                                          onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                          className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
-                                          title="Quantity"
-                                        />
-                                      )}
-                                      <button
-                                        type="button"
-                                        onClick={() => removePartAt(partType, idx)}
-                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
-                                        title="Remove"
-                                      >
-                                        ×
-                                      </button>
+                                  {entries.map((item, idx) => {
+                                    const pi = universalParts.find((u) => u.label === item.label);
+                                    const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                                    return (
+                                    <div key={`${partType}-${idx}-${item.label}`} className={`part-item rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className={`flex-1 min-w-0 text-sm font-medium truncate ${nameColor}`}>{item.label}</span>
+                                        {partType !== "Rarity" && (
+                                          <input
+                                            type="number"
+                                            min={1}
+                                            max={99}
+                                            value={item.qty}
+                                            onChange={(e) => setPartQty(partType, idx, e.target.value)}
+                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                            title="Quantity"
+                                          />
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => removePartAt(partType, idx)}
+                                          className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                          title="Remove"
+                                        >
+                                          ×
+                                        </button>
+                                      </div>
+                                      {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                                     </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
@@ -5607,7 +6071,7 @@ export default function UnifiedItemBuilderPage() {
                           </button>
                           <div className="mt-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                             {getOpts(repkitPartPickerPartType).map((o) => (
-                              <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30">
+                              <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, repkitPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                                 <input
                                   type="checkbox"
                                   checked={repkitPartPickerChecked.has(o.label)}
@@ -5621,7 +6085,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={repkitPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
                               </label>
                             ))}
                           </div>
@@ -5684,6 +6148,26 @@ export default function UnifiedItemBuilderPage() {
                 </>
               );
             })()}
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={repkitSkinValue}
+                    onChange={(e) => setRepkitSkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {repkitSkinValue && (
+                    <SkinPreview token={repkitSkinValue} label={sharedSkins.find((s) => s.value === repkitSkinValue)?.label ?? repkitSkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -5691,8 +6175,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Heavy: Manufacturer + Level + Seed + Add other parts + part groups (weapon-style) */}
       {category === "heavy" && heavyData && heavyMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Heavy build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Heavy build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -5845,9 +6329,13 @@ export default function UnifiedItemBuilderPage() {
                         <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
                       ) : (
                         <div className="space-y-2">
-                          {list.map((item, idx) => (
-                            <div key={idx} className="flex items-center gap-2 flex-wrap">
-                              <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
+                          {list.map((item, idx) => {
+                            const pi = universalParts.find((u) => u.label === item.label);
+                            const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                            return (
+                            <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                              <div className="flex items-center gap-2 flex-wrap">
+                              <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
                               {partType !== "Rarity" && partType !== "Barrel" && partType !== "Element" && partType !== "Firmware" && (
                                 <input
                                   type="number"
@@ -5877,8 +6365,11 @@ export default function UnifiedItemBuilderPage() {
                               >
                                 ×
                               </button>
+                              </div>
+                              {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -5889,30 +6380,30 @@ export default function UnifiedItemBuilderPage() {
 
             {heavyPartPickerPartType && !heavyPartPickerShowQty && (() => {
               if (heavyMfgId == null || !heavyData) return null;
-              const opts: { partId: string; label: string }[] = [];
+              const opts: { partId: string; label: string; description?: string }[] = [];
               if (heavyPartPickerPartType === "Rarity") {
                 (heavyData.raritiesByMfg[heavyMfgId] ?? []).forEach((r) => {
                   opts.push({ partId: String(r.id), label: r.label });
                 });
               } else if (heavyPartPickerPartType === "Barrel") {
                 heavyData.barrel.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Element") {
                 heavyData.element.forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Firmware") {
                 heavyData.firmware.forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Barrel Accessory") {
                 heavyData.barrelAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Body Accessory") {
                 heavyData.bodyAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}` });
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               }
               return (
@@ -5932,7 +6423,7 @@ export default function UnifiedItemBuilderPage() {
                       </button>
                       <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                         {opts.map((o) => (
-                          <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                          <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, heavyPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                             <input
                               type="checkbox"
                               checked={heavyPartPickerChecked.has(o.label)}
@@ -5946,7 +6437,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                            <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={heavyPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
                           </label>
                         ))}
                       </div>
@@ -6030,6 +6521,26 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
             )}
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={heavySkinValue}
+                    onChange={(e) => setHeavySkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {heavySkinValue && (
+                    <SkinPreview token={heavySkinValue} label={sharedSkins.find((s) => s.value === heavySkinValue)?.label ?? heavySkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -6037,8 +6548,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Class Mod: Class + Rarity + Name + skills/perks (weapon-style groups) */}
       {category === "class-mod" && classModData && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Class Mod build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Class Mod build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -6067,17 +6578,6 @@ export default function UnifiedItemBuilderPage() {
                   title="Select rarity"
                 >
                   {classModRarity}
-                </button>
-              </div>
-              <div>
-                <label className="block text-xs text-[var(--color-accent)] mb-1">Name</label>
-                <button
-                  type="button"
-                  onClick={() => setShowClassModNameModal(true)}
-                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] min-w-[12rem] text-left"
-                  title="Select name"
-                >
-                  {classModNameOption?.nameEN ?? "Select…"}
                 </button>
               </div>
               <div>
@@ -6193,57 +6693,6 @@ export default function UnifiedItemBuilderPage() {
               </div>
             )}
 
-            {showClassModNameModal && (
-              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShowClassModNameModal(false)}>
-                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-                  <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
-                    <h3 className="text-[var(--color-accent)] font-medium text-sm">Select Name</h3>
-                    <button type="button" onClick={() => setShowClassModNameModal(false)} className="p-2 text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">
-                      Close
-                    </button>
-                  </div>
-                  <div className="flex-1 overflow-y-auto p-3">
-                    <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50">
-                      {(() => {
-                        const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
-                        const rarityKey = classModRarity === "Legendary" ? "legendary" : "normal";
-                        const namesKey = `${classIdStr},${rarityKey}`;
-                        const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
-                        return nameOptions.map((opt) => {
-                          const active = classModNameOption?.nameCode === opt.nameCode;
-                          const label = `${opt.nameCode} - ${opt.nameEN}`;
-                          return (
-                            <button
-                              key={opt.nameCode}
-                              type="button"
-                              onClick={() => {
-                                setClassModNameOption(opt);
-                                setClassModSelections((prev) => ({
-                                  ...prev,
-                                  Name: [{ label, qty: "1" }],
-                                }));
-                                setShowClassModNameModal(false);
-                              }}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-[var(--color-accent)]/10 ${
-                                active ? "bg-[var(--color-accent)]/10" : ""
-                              }`}
-                            >
-                              <span
-                                className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${
-                                  active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"
-                                }`}
-                              />
-                              <span className="text-sm text-[var(--color-text)]">{label}</span>
-                            </button>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {(() => {
               const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
               const skills = classModData.skillsByClass[classIdStr] ?? [];
@@ -6295,11 +6744,23 @@ export default function UnifiedItemBuilderPage() {
                             const clamped = Math.max(0, Math.min(5, v));
                             setClassModSkillPoints((prev) => ({ ...prev, [skill.skillNameEN]: clamped }));
                           };
+                          const iconFilename = getClassModSkillIconFilename(skill.skillNameEN, classModClassName);
+                          const iconSrc = apiUrl(`accessories/class-mod/skill-icon/${classModClassName}/${iconFilename}`);
                           return (
                             <div
                               key={skill.skillNameEN}
-                              className="flex items-center gap-3 px-2 py-1.5 rounded border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.7)]"
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => setClassModSkillCard({ skillName: skill.skillNameEN, className: classModClassName })}
+                              onKeyDown={(e) => e.key === "Enter" && setClassModSkillCard({ skillName: skill.skillNameEN, className: classModClassName })}
+                              className="flex items-center gap-3 px-2 py-1.5 rounded border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.7)] cursor-pointer hover:border-[var(--color-accent)]/60 hover:bg-[rgba(24,28,34,0.85)] transition-colors"
                             >
+                              <img
+                                src={iconSrc}
+                                alt=""
+                                className="w-9 h-9 object-contain flex-shrink-0 rounded border border-[var(--color-panel-border)]/50"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                              />
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm text-[var(--color-text)] truncate">{skill.skillNameEN}</div>
                                 <div className="text-[10px] text-[var(--color-text-muted)]">
@@ -6382,37 +6843,44 @@ export default function UnifiedItemBuilderPage() {
                               <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
                             ) : (
                               <div className="space-y-2">
-                                {entries.map((item, idx) => (
-                                  <div key={idx} className="flex items-center gap-2 flex-wrap">
-                                    <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
-                                    <input
-                                      type="number"
-                                      min={partType === "Legendary names" ? 1 : 0}
-                                      max={partType === "Skills" ? 5 : 99}
-                                      value={item.qty}
-                                      onChange={(e) => {
-                                        const v = e.target.value;
-                                        setEntries(
-                                          partType,
-                                          entries.map((e2, i2) => (i2 === idx ? { ...e2, qty: v } : e2)),
-                                        );
-                                      }}
-                                      className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setEntries(
-                                          partType,
-                                          entries.filter((_, i2) => i2 !== idx),
-                                        );
-                                      }}
-                                      className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
-                                    >
-                                      ×
-                                    </button>
+                                {entries.map((item, idx) => {
+                                  const pi = universalParts.find((u) => u.label === item.label);
+                                  const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                                  return (
+                                  <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
+                                      <input
+                                        type="number"
+                                        min={partType === "Legendary names" || partType === "Name" ? 1 : 0}
+                                        max={partType === "Skills" ? 5 : 99}
+                                        value={item.qty}
+                                        onChange={(e) => {
+                                          const v = e.target.value;
+                                          setEntries(
+                                            partType,
+                                            entries.map((e2, i2) => (i2 === idx ? { ...e2, qty: v } : e2)),
+                                          );
+                                        }}
+                                        className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setEntries(
+                                            partType,
+                                            entries.filter((_, i2) => i2 !== idx),
+                                          );
+                                        }}
+                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+                                    {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                                   </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
@@ -6423,13 +6891,25 @@ export default function UnifiedItemBuilderPage() {
 
                   {classModPartPickerKey && !classModPartPickerShowQty && (() => {
                     const opts: { id: string; label: string }[] = [];
-                    if (classModPartPickerKey === "Legendary names") {
+                    if (classModPartPickerKey === "Name") {
+                      const rarityKey = classModRarity === "Legendary" ? "legendary" : "normal";
+                      const namesKey = `${classIdStr},${rarityKey}`;
+                      const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
+                      nameOptions.forEach((opt) => {
+                        opts.push({ id: String(opt.nameCode), label: `${opt.nameCode} - ${opt.nameEN}` });
+                      });
+                    } else if (classModPartPickerKey === "Legendary names") {
                       const rarityKey = "legendary";
                       const namesKey = `${classIdStr},${rarityKey}`;
                       const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
-                      const currentNameCode = classModNameOption?.nameCode;
+                      const primaryNameCode = (() => {
+                        const first = list("Name")?.[0]?.label;
+                        if (!first) return null;
+                        const code = parseInt(first.split(" - ")[0]?.trim() ?? "", 10);
+                        return Number.isFinite(code) ? code : null;
+                      })();
                       nameOptions.forEach((opt) => {
-                        if (opt.nameCode === currentNameCode) return;
+                        if (opt.nameCode === primaryNameCode) return;
                         opts.push({ id: String(opt.nameCode), label: `${opt.nameCode} - ${opt.nameEN}` });
                       });
                     } else if (classModPartPickerKey === "Skills") {
@@ -6463,7 +6943,7 @@ export default function UnifiedItemBuilderPage() {
                             </button>
                             <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                               {opts.map((o) => (
-                                <label key={o.id + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                                <label key={o.id + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, undefined, classModPartPickerKey || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                                   <input
                                     type="checkbox"
                                     checked={classModPartPickerChecked.has(o.label)}
@@ -6477,7 +6957,7 @@ export default function UnifiedItemBuilderPage() {
                                     }}
                                     className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                   />
-                                  <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                                  <PickerOptionContent partId={o.id} label={o.label} description={undefined} pickerPartType={classModPartPickerKey || undefined} descriptive={descriptiveIdsGuidelines} />
                                 </label>
                               ))}
                             </div>
@@ -6566,9 +7046,37 @@ export default function UnifiedItemBuilderPage() {
                       </div>
                     </div>
                   )}
+
+                  {classModSkillCard && (
+                    <SkillCardPopup
+                      skillName={classModSkillCard.skillName}
+                      className={classModSkillCard.className}
+                      onClose={() => setClassModSkillCard(null)}
+                    />
+                  )}
                 </>
               );
             })()}
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={classModSkinValue}
+                    onChange={(e) => setClassModSkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {classModSkinValue && (
+                    <SkinPreview token={classModSkinValue} label={sharedSkins.find((s) => s.value === classModSkinValue)?.label ?? classModSkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -6576,8 +7084,8 @@ export default function UnifiedItemBuilderPage() {
       {/* RepKit: old dropdown-based UI (disabled, kept for reference) */}
       {category === "repkit" && repkitData && repkitMfgId != null && false && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>RepKit build (dropdowns)</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> RepKit build (dropdowns)</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -7201,8 +7709,8 @@ export default function UnifiedItemBuilderPage() {
       {/* Enhancement: Manufacturer + Level + Seed + part groups (weapon-style) */}
       {category === "enhancement" && enhancementData && enhancementMfgName && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-            <span>Enhancement build</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Enhancement build</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -7355,9 +7863,13 @@ export default function UnifiedItemBuilderPage() {
                         <div className="text-sm text-[var(--color-text-muted)]">None selected.</div>
                       ) : (
                         <div className="space-y-2">
-                          {list.map((item, idx) => (
-                            <div key={idx} className="flex items-center gap-2 flex-wrap">
-                              <div className="min-w-0 flex-1 text-sm text-[var(--color-text)] break-words truncate">{item.label}</div>
+                          {list.map((item, idx) => {
+                            const pi = universalParts.find((u) => u.label === item.label);
+                            const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
+                            return (
+                            <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                              <div className="flex items-center gap-2 flex-wrap">
+                              <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
                               {partType !== "Rarity" && (
                                 <input
                                   type="number"
@@ -7387,8 +7899,11 @@ export default function UnifiedItemBuilderPage() {
                               >
                                 ×
                               </button>
+                              </div>
+                              {pi?.effect && <p className="text-[11px] text-[var(--color-text-muted)] mt-1 truncate leading-snug">{pi.effect}</p>}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -7406,21 +7921,21 @@ export default function UnifiedItemBuilderPage() {
                   : enhancementPartPickerPartType === "Builder 247"
                   ? "Universal Perks"
                   : enhancementPartPickerPartType;
-              let opts: { partId: string; label: string }[] = [];
+              let opts: { partId: string; label: string; description?: string }[] = [];
               if (mfg && enhancementPartPickerPartType === "Rarity") {
                 opts = ENHANCEMENT_RARITY_ORDER.filter((r) => r in (mfg.rarities || {})).map((r) => ({ partId: r, label: r }));
               } else if (mfg && enhancementPartPickerPartType === "Manufacturer perks") {
-                opts = (mfg.perks || []).filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.index)).map((p) => ({ partId: String(p.index), label: `[${p.index}] ${p.name}` }));
+                opts = (mfg.perks || []).filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.index)).map((p) => ({ partId: String(p.index), label: `[${p.index}] ${p.name}`, description: p.description }));
               } else if (enhancementPartPickerPartType === "Stacked perks" && enhancementMfgName) {
                 for (const [name, om] of Object.entries(enhancementData.manufacturers)) {
                   if (name === enhancementMfgName) continue;
                   for (const p of om.perks || []) {
                     if (!ENHANCEMENT_PERK_ORDER.includes(p.index)) continue;
-                    opts.push({ partId: `${om.code}:${p.index}`, label: `${om.code}:${p.index} - ${p.name} — ${name}` });
+                    opts.push({ partId: `${om.code}:${p.index}`, label: `${om.code}:${p.index} - ${p.name} — ${name}`, description: p.description });
                   }
                 }
               } else if (enhancementPartPickerPartType === "Builder 247") {
-                opts = (enhancementData.secondary247 || []).map((s) => ({ partId: String(s.code), label: `${s.code} - ${s.name}` }));
+                opts = (enhancementData.secondary247 || []).map((s) => ({ partId: String(s.code), label: `${s.code} - ${s.name}`, description: s.description }));
               }
               return (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setEnhancementPartPickerPartType(null)}>
@@ -7439,7 +7954,7 @@ export default function UnifiedItemBuilderPage() {
                       </button>
                       <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                         {opts.map((o) => (
-                          <label key={o.partId + o.label} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10">
+                          <label key={o.partId + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, enhancementPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                             <input
                               type="checkbox"
                               checked={enhancementPartPickerChecked.has(o.label)}
@@ -7452,7 +7967,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <span className="text-sm text-[var(--color-text)]">{o.label}</span>
+                            <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={enhancementPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
                           </label>
                         ))}
                       </div>
@@ -7519,6 +8034,26 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
             )}
+            {sharedSkins.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg border border-[var(--color-panel-border)]/60 bg-[rgba(0,0,0,0.15)]">
+                <label className="block text-sm font-medium text-[var(--color-accent)] mb-2">Skin</label>
+                <div className="flex flex-wrap items-start gap-3">
+                  <select
+                    value={enhancementSkinValue}
+                    onChange={(e) => setEnhancementSkinValue(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] min-w-[20rem]"
+                  >
+                    <option value="">None</option>
+                    {sharedSkins.map((s) => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  {enhancementSkinValue && (
+                    <SkinPreview token={enhancementSkinValue} label={sharedSkins.find((s) => s.value === enhancementSkinValue)?.label ?? enhancementSkinValue} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </details>
       )}
@@ -7528,8 +8063,8 @@ export default function UnifiedItemBuilderPage() {
 
         {/* Side: Current build parts (collapsible on small screens) */}
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0" open>
-          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none shrink-0">
-            <span>Current build parts</span>
+          <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none shrink-0 font-mono">
+            <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">◈</span> Current build parts</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="p-3 pt-0 flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -7546,6 +8081,11 @@ export default function UnifiedItemBuilderPage() {
               <div
                 key={`${i}-${part.raw}`}
                 className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] p-2 flex flex-col gap-2"
+                onMouseEnter={(e) => {
+                  const data = hoverDataByCode(part.raw) ?? (part.prefix != null && part.partId != null ? hoverDataByCode(`{${part.prefix}:${part.partId}}`) : null);
+                  if (data) startHover(data, e.currentTarget.getBoundingClientRect().top, "left");
+                }}
+                onMouseLeave={endHover}
               >
                 <div className="flex items-start gap-1">
                   <div className="flex flex-col gap-1 shrink-0">
@@ -7629,6 +8169,22 @@ export default function UnifiedItemBuilderPage() {
                             repkitPartDescriptionByRaw.get(part.raw) ??
                             (part.prefix != null && part.partId != null
                               ? repkitPartDescriptionByRaw.get(`{${part.prefix}:${part.partId}}`)
+                              : undefined)
+                          );
+                        }
+                        if (category === "heavy") {
+                          return (
+                            heavyPartDescriptionByRaw.get(part.raw) ??
+                            (part.prefix != null && part.partId != null
+                              ? heavyPartDescriptionByRaw.get(`{${part.prefix}:${part.partId}}`)
+                              : undefined)
+                          );
+                        }
+                        if (category === "enhancement") {
+                          return (
+                            enhancementPartDescriptionByRaw.get(part.raw) ??
+                            (part.prefix != null && part.partId != null
+                              ? enhancementPartDescriptionByRaw.get(`{${part.prefix}:${part.partId}}`)
                               : undefined)
                           );
                         }
@@ -7768,42 +8324,25 @@ export default function UnifiedItemBuilderPage() {
         </details>
       </section>
 
-      {/* Item guidelines (at bottom: legend, notes, Master Unlock, Descriptive IDs) */}
+      {/* Build reference (tips, collapsed by default) */}
       <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.5)] overflow-hidden group">
-        <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none">
-          <span>Item guidelines</span>
+        <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+          <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⊞</span> Build Reference</span>
           <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
         </summary>
-        <div className="px-3 pb-3 pt-0 border-t border-[var(--color-panel-border)] space-y-3">
+        <div className="px-3 pb-3 pt-2 border-t border-[var(--color-panel-border)] space-y-2">
           <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Checkbox legend:</strong> ✓ Checked = Required part is present | ☐ Unchecked = Required part is missing
+            <strong className="text-[var(--color-text)]">Part checklist:</strong> ✓ = required part present · ☐ = required part missing. Fill all required slots before adding bonus parts for best results.
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Base skin:</strong> The base skin comes from the rarity of the item. Changing the rarity will change the base skin. You can still customize the skin through customization options as well.
+            <strong className="text-[var(--color-text)]">Rarity &amp; skin:</strong> The item's base skin is driven by rarity. Swapping rarity will change the skin — further cosmetic changes can be applied separately.
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Local manufacturer parts:</strong> Only parts from the local manufacturer will render on a gun in game. To make a complete model, you should first fulfill the guidelines with parts from the local manufacturer before adding parts from other manufacturers.
+            <strong className="text-[var(--color-text)]">Manufacturer parts:</strong> In-game models only render parts from the item's own manufacturer. Fill required slots with matching manufacturer parts first; cross-manufacturer parts are secondary.
           </p>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--color-text)]">
-              <input
-                type="checkbox"
-                checked={masterUnlockGuidelines}
-                onChange={(e) => setMasterUnlockGuidelines(e.target.checked)}
-                className="rounded border-[var(--color-panel-border)]"
-              />
-              <span>🔓 Master Unlock: Allow parts from any typeId for all categories</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--color-text)]">
-              <input
-                type="checkbox"
-                checked={descriptiveIdsGuidelines}
-                onChange={(e) => setDescriptiveIdsGuidelines(e.target.checked)}
-                className="rounded border-[var(--color-panel-border)]"
-              />
-              <span>📝 Descriptive IDs: Show part names alongside IDs in the parts list</span>
-            </label>
-          </div>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <strong className="text-[var(--color-text)]">Show Info</strong> — toggles rich descriptions in part pickers. <strong className="text-[var(--color-text)]">All Parts</strong> — expands part lists beyond the selected manufacturer (use with care).
+          </p>
         </div>
       </details>
 
@@ -7850,41 +8389,112 @@ export default function UnifiedItemBuilderPage() {
                 ))}
               </select>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-1 min-h-0">
+            <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-0 divide-y divide-[var(--color-panel-border)]/40">
               {filteredAddParts.map((p, idx) => (
-                <button
+                <label
                   key={`${p.code}-${idx}`}
-                  type="button"
-                  onClick={() => {
-                    setPendingAddPart({ code: p.code, label: p.label });
-                    setPendingAddQty("1");
-                    setShowAddPartsModal(false);
-                  }}
-                  className="w-full text-left rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] px-3 py-2 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] min-h-[44px]"
+                  className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 transition-colors"
+                  onMouseEnter={(e) => startHover(universalRowToHoverData(p), e.currentTarget.getBoundingClientRect().top)}
+                  onMouseLeave={endHover}
                 >
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-mono text-xs">{p.code}</span>
-                    <span className="block truncate">{p.label}</span>
-                    {(p.manufacturer || p.rarity || p.partType) && (
-                      <span className="text-xs text-[var(--color-text-muted)]">
-                        {[p.manufacturer, p.rarity, p.partType].filter(Boolean).join(" · ")}
-                      </span>
-                    )}
-                    {p.effect && (
-                      <span className="text-xs text-[var(--color-accent)] mt-0.5 truncate" title={p.effect}>
-                        {p.effect.length > 90 ? `…${p.effect.slice(-86)}` : p.effect}
-                      </span>
+                  <input
+                    type="checkbox"
+                    checked={addPartsChecked.has(p.code)}
+                    onChange={(e) => {
+                      setAddPartsChecked((prev) => {
+                        const next = new Set(prev);
+                        if (e.target.checked) next.add(p.code); else next.delete(p.code);
+                        return next;
+                      });
+                    }}
+                    className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer mt-0.5 transition-colors checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="font-mono text-[11px] text-[var(--color-text-muted)]">{p.code}</span>
+                      <span className="text-sm text-[var(--color-text)] truncate">{p.label}</span>
+                    </div>
+                    {descriptiveIdsGuidelines && (
+                      <>
+                        {(p.manufacturer || p.rarity || p.partType) && (
+                          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                            {[p.manufacturer, p.rarity, p.partType].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                        {p.effect && (
+                          <p className="text-xs text-[var(--color-accent)]/80 mt-0.5 truncate">{p.effect}</p>
+                        )}
+                      </>
                     )}
                   </div>
-                </button>
+                </label>
               ))}
               {filteredAddParts.length === 0 && (
-                <p className="text-sm text-[var(--color-text-muted)] py-4">No parts match. Try different filters.</p>
+                <p className="text-sm text-[var(--color-text-muted)] py-4 px-3">No parts match. Try different filters.</p>
               )}
+            </div>
+            <div className="px-4 py-3 border-t border-[var(--color-panel-border)] flex items-center justify-between gap-3 shrink-0 flex-wrap">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-[var(--color-text-muted)]">
+                  {addPartsChecked.size > 0 ? `${addPartsChecked.size} selected` : "Check parts to select"}
+                </span>
+                <label className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
+                  Qty
+                  <input
+                    type="number"
+                    min={1}
+                    max={99}
+                    value={addPartsQty}
+                    onChange={(e) => setAddPartsQty(e.target.value)}
+                    className="w-14 px-2 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm"
+                  />
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowAddPartsModal(false); setAddPartsChecked(new Set()); setAddPartsQty("1"); }}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={addPartsChecked.size === 0}
+                  onClick={() => {
+                    const qty = Math.max(1, Math.min(99, parseInt(addPartsQty.trim(), 10) || 1));
+                    const tokens = [...addPartsChecked].map((code) => codeToToken(code, qty));
+                    if (category === "weapon" && weaponMfgWtId) {
+                      setExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "grenade" && grenadeMfgId != null) {
+                      setGrenadeExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "shield" && shieldMfgId != null) {
+                      setShieldExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "repkit" && repkitMfgId != null) {
+                      setRepkitExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "enhancement" && enhancementMfgName) {
+                      setEnhancementExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "heavy" && heavyMfgId != null) {
+                      setHeavyExtraTokens((prev) => [...prev, ...tokens]);
+                    } else if (category === "class-mod" && classModData) {
+                      setClassModExtraTokens((prev) => [...prev, ...tokens]);
+                    } else {
+                      appendToDecoded(tokens);
+                    }
+                    setAddPartsChecked(new Set());
+                    setAddPartsQty("1");
+                    setShowAddPartsModal(false);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add selected ({addPartsChecked.size})
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
+
 
       {/* Quantity modal after picking a part from Add other parts */}
       {pendingAddPart && (
@@ -7929,6 +8539,9 @@ export default function UnifiedItemBuilderPage() {
           </div>
         </div>
       )}
+
+      {/* Floating hover card for slot items and sidebar build parts */}
+      <PartHoverCard data={hoverCard} cardTop={hoverCardTop} side={hoverCardSide} />
     </div>
   );
 }

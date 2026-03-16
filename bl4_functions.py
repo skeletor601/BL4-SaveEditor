@@ -289,48 +289,124 @@ def process_and_load_items(yaml_data: Dict[str, Any]) -> List[ProcessedItem]:
             
     return all_items
 
+
+def _get_child_ignore_case(node: Any, key_str: str) -> Tuple[Optional[Any], Optional[str]]:
+    """Get child by key (case-insensitive). Returns (value, actual_key) or (None, None)."""
+    if not isinstance(node, dict):
+        return None, None
+    key_lower = key_str.lower()
+    for k, v in node.items():
+        if isinstance(k, str) and k.lower() == key_lower:
+            return v, k
+    return None, None
+
+
 def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: str) -> Optional[List[Union[str, int]]]:
     """
     Adds a new item to the first available slot in the backpack.
     Returns the full path to the new item on success, otherwise None.
     """
     try:
-        # Use explicit backpack containers first.
+        if not isinstance(yaml_data, dict):
+            return None
+
         backpack_path: Optional[List[Union[str, int]]] = None
-        backpack_node: Optional[Any] = None
+        backpack_node: Optional[Dict[str, Any]] = None
 
-        for dotted in (
-            "state.inventory.backpack",
-            "inventory.backpack",
-            "state.inventory.Backpack",
-            "inventory.Backpack",
-        ):
-            node = find_node_by_path(yaml_data, dotted)
-            if isinstance(node, dict):
-                backpack_node = node
-                backpack_path = dotted.split(".")
-                break
+        # 0) Step-by-step case-insensitive: state -> inventory -> backpack (handles State.Inventory.Backpack etc.)
+        state_val, state_key = _get_child_ignore_case(yaml_data, "state")
+        if isinstance(state_val, dict) and state_key is not None:
+            inv_val, inv_key = _get_child_ignore_case(state_val, "inventory")
+            if isinstance(inv_val, dict) and inv_key is not None:
+                bp_val, bp_key = _get_child_ignore_case(inv_val, "backpack")
+                if isinstance(bp_val, dict) and bp_key is not None:
+                    backpack_node = bp_val
+                    backpack_path = [state_key, inv_key, bp_key]
+                else:
+                    # Try any key under inventory that contains "backpack" (e.g. Backpack, inventory_backpack)
+                    for k, v in inv_val.items():
+                        if isinstance(k, str) and "backpack" in k.lower() and isinstance(v, dict):
+                            backpack_node = v
+                            backpack_path = [state_key, inv_key, k]
+                            break
+                    # Try state.inventory.items.backpack (game uses this structure)
+                    if backpack_node is None:
+                        items_val, items_key = _get_child_ignore_case(inv_val, "items")
+                        if isinstance(items_val, dict) and items_key is not None:
+                            bp2_val, bp2_key = _get_child_ignore_case(items_val, "backpack")
+                            if isinstance(bp2_val, dict) and bp2_key is not None:
+                                backpack_node = bp2_val
+                                backpack_path = [state_key, inv_key, items_key, bp2_key]
+                            else:
+                                # backpack key missing under items — create it
+                                items_val["backpack"] = {}
+                                backpack_node = items_val["backpack"]
+                                backpack_path = [state_key, inv_key, items_key, "backpack"]
 
-        # Fallback: recursively find any dict key named backpack/backpack with slot_* keys,
-        # preferring paths that include "inventory".
+        # 1) Try dotted paths first if step-by-step didn't find it.
+        if backpack_node is None or backpack_path is None:
+            for dotted in (
+                "state.inventory.items.backpack",
+                "state.inventory.items.Backpack",
+                "inventory.items.backpack",
+                "inventory.items.Backpack",
+                "state.inventory.backpack",
+                "inventory.backpack",
+                "state.inventory.Backpack",
+                "inventory.Backpack",
+                "State.Inventory.Backpack",
+                "State.Inventory.backpack",
+                "data.state.inventory.items.backpack",
+                "data.state.inventory.items.Backpack",
+                "data.state.inventory.backpack",
+                "data.state.inventory.Backpack",
+                "data.State.Inventory.backpack",
+                "data.State.Inventory.Backpack",
+                "data.inventory.backpack",
+                "data.inventory.Backpack",
+                "SaveGame.state.inventory.backpack",
+                "SaveGame.state.inventory.Backpack",
+                "Character.state.inventory.backpack",
+                "Character.state.inventory.Backpack",
+            ):
+                node = find_node_by_path(yaml_data, dotted)
+                if node is None:
+                    node = find_node_by_path_ignore_case(yaml_data, dotted)
+                if isinstance(node, dict):
+                    backpack_node = node
+                    backpack_path = dotted.split(".")
+                    break
+
+        # 2) Recursive fallback: find any dict whose key contains "backpack" (case-insensitive), value is dict with slot_* keys or empty.
         if backpack_node is None or backpack_path is None:
             candidates: List[Tuple[List[Union[str, int]], Dict[str, Any]]] = []
 
             def _collect_backpack_candidates(node: Any, path: List[Union[str, int]]) -> None:
-                if isinstance(node, dict):
-                    for k, v in node.items():
-                        if isinstance(k, str) and k.lower() == "backpack" and isinstance(v, dict):
-                            has_slot = any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys())
-                            if has_slot or len(v) == 0:
-                                candidates.append((path + [k], v))
-                        _collect_backpack_candidates(v, path + [k])
-                elif isinstance(node, list):
-                    for i, v in enumerate(node):
-                        _collect_backpack_candidates(v, path + [i])
+                try:
+                    if isinstance(node, dict):
+                        for k, v in node.items():
+                            if isinstance(k, str) and "backpack" in k.lower() and isinstance(v, dict):
+                                has_slot = any(
+                                    isinstance(sk, str) and str(sk).startswith("slot_")
+                                    for sk in (v.keys() if hasattr(v, "keys") else [])
+                                )
+                                if has_slot or len(v) == 0:
+                                    candidates.append((path + [k], v))
+                            _collect_backpack_candidates(v, path + [k])
+                    elif isinstance(node, list):
+                        for i, v in enumerate(node):
+                            _collect_backpack_candidates(v, path + [i])
+                except (AttributeError, TypeError):
+                    pass
 
             _collect_backpack_candidates(yaml_data, [])
+            if not candidates and isinstance(yaml_data, dict):
+                for top_key in ("data", "state", "SaveGame", "Character", "save"):
+                    if top_key in yaml_data:
+                        _collect_backpack_candidates(yaml_data[top_key], [top_key])
+                        if candidates:
+                            break
             if candidates:
-                # Prefer candidates under inventory-ish paths.
                 candidates.sort(
                     key=lambda c: (
                         0 if "inventory" in "/".join(map(str, c[0])).lower() else 1,
@@ -340,6 +416,9 @@ def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: st
                 backpack_path, backpack_node = candidates[0]
 
         if backpack_node is None or backpack_path is None:
+            import sys
+            hint = get_save_structure_hint(yaml_data)
+            sys.stderr.write(f"[add_item_to_backpack] backpack not found. {hint}\n")
             return None
 
         # Find the highest existing slot number
@@ -347,74 +426,188 @@ def add_item_to_backpack(yaml_data: Dict[str, Any], serial: str, state_flags: st
         for key in backpack_node.keys():
             if isinstance(key, str) and key.startswith("slot_"):
                 try:
-                    num = int(key.split('_')[1])
+                    num = int(key.split("_")[1])
                     if num > max_slot:
                         max_slot = num
                 except (ValueError, IndexError):
                     continue
-        
-        # Determine the new slot key
-        new_slot_key = f"slot_{max_slot + 1}"
 
-        # Create the new item structure
-        new_item = {
-            'serial': serial,
-            'state_flags': int(state_flags)
-        }
-        
-        # Add the new item to the backpack
+        new_slot_key = f"slot_{max_slot + 1}"
+        new_item = {"serial": serial, "state_flags": int(state_flags)}
         backpack_node[new_slot_key] = new_item
-        
-        # Return the full path to the newly added item
         return backpack_path + [new_slot_key]
 
     except Exception:
         return None
 
 
-def _find_backpack_node(yaml_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """Find backpack dict by dotted path or recursive search (same logic as add_item_to_backpack)."""
+def _find_all_backpack_nodes(yaml_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Find all backpack-like dicts (by dotted path and recursive search). Includes empty backpack so add/clear work."""
+    found: List[Dict[str, Any]] = []
+    seen: set = set()
+
+    def _add(node: Any, allow_empty: bool = False) -> None:
+        if not isinstance(node, dict) or id(node) in seen:
+            return
+        has_slots = any(isinstance(sk, str) and sk.startswith("slot_") for sk in node.keys())
+        if not has_slots and not allow_empty:
+            return
+        seen.add(id(node))
+        found.append(node)
+
     for dotted in (
+        "state.inventory.items.backpack",
+        "state.inventory.items.Backpack",
+        "inventory.items.backpack",
+        "inventory.items.Backpack",
         "state.inventory.backpack",
         "inventory.backpack",
         "state.inventory.Backpack",
         "inventory.Backpack",
         "State.Inventory.Backpack",
         "State.Inventory.backpack",
+        "data.state.inventory.items.backpack",
+        "data.state.inventory.items.Backpack",
+        "data.state.inventory.backpack",
+        "data.state.inventory.Backpack",
+        "data.State.Inventory.backpack",
+        "data.State.Inventory.Backpack",
+        "data.inventory.backpack",
+        "data.inventory.Backpack",
+        "SaveGame.state.inventory.backpack",
+        "SaveGame.state.inventory.Backpack",
+        "Character.state.inventory.backpack",
+        "Character.state.inventory.Backpack",
     ):
-        node = find_node_by_path(yaml_data, dotted)
-        if isinstance(node, dict):
-            return node
-    # Recursive fallback: any dict with key "backpack"/"Backpack" whose value has slot_* keys
-    candidates: List[Dict[str, Any]] = []
+        node = find_node_by_path(yaml_data, dotted) or find_node_by_path_ignore_case(yaml_data, dotted)
+        _add(node, allow_empty=True)
 
     def _collect(node: Any) -> None:
         if isinstance(node, dict):
             for k, v in node.items():
-                if isinstance(k, str) and k.lower() == "backpack" and isinstance(v, dict):
-                    if any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys()):
-                        candidates.append(v)
+                if isinstance(k, str) and "backpack" in k.lower() and isinstance(v, dict):
+                    has_slot = any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys())
+                    if has_slot or len(v) == 0:
+                        _add(v, allow_empty=True)
                 _collect(v)
         elif isinstance(node, list):
             for v in node:
                 _collect(v)
 
     _collect(yaml_data)
-    return candidates[0] if candidates else None
+    return found
+
+
+def _find_backpack_node(yaml_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Find first backpack dict (for add_item etc)."""
+    nodes = _find_all_backpack_nodes(yaml_data)
+    return nodes[0] if nodes else None
+
+
+def _find_all_equipped_nodes(yaml_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Find all equipped-inventory-like dicts. Clears all so UI matches."""
+    found: List[Dict[str, Any]] = []
+    seen: set = set()
+
+    def _add(node: Any) -> None:
+        if not isinstance(node, dict) or id(node) in seen:
+            return
+        if not any(isinstance(sk, str) and sk.startswith("slot_") for sk in node.keys()):
+            return
+        seen.add(id(node))
+        found.append(node)
+
+    for dotted in (
+        "state.equipped_inventory.equipped",
+        "state.equipped_inventory.Equipped",
+        "state.equipped_inventory.slots",
+        "State.equipped_inventory.equipped",
+        "State.equipped_inventory.Equipped",
+        "State.equipped_inventory.slots",
+        "state.equipped_inventory",
+        "State.equipped_inventory",
+        "state.inventory.equipped",
+        "state.inventory.Equipped",
+        "inventory.equipped",
+        "inventory.Equipped",
+        "State.Inventory.Equipped",
+        "State.Inventory.equipped",
+        "state.inventory.equipped_inventory",
+        "inventory.equipped_inventory",
+        "State.Inventory.EquippedInventory",
+        "state.inventory.EquippedInventory",
+        "data.state.equipped_inventory.equipped",
+        "data.state.equipped_inventory.Equipped",
+        "data.state.inventory.equipped",
+        "data.state.inventory.Equipped",
+        "data.inventory.equipped",
+        "data.inventory.Equipped",
+        "SaveGame.state.equipped_inventory.equipped",
+        "Character.state.equipped_inventory.equipped",
+    ):
+        node = find_node_by_path(yaml_data, dotted) or find_node_by_path_ignore_case(yaml_data, dotted)
+        _add(node)
+
+    def _collect(node: Any) -> None:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if isinstance(k, str) and isinstance(v, dict):
+                    low = k.lower()
+                    has_slots = any(isinstance(sk, str) and sk.startswith("slot_") for sk in v.keys())
+                    if has_slots and low in ("equipped", "equipped_inventory", "equipment", "equippedinventory", "slots"):
+                        _add(v)
+                _collect(v)
+        elif isinstance(node, list):
+            for v in node:
+                _collect(v)
+
+    _collect(yaml_data)
+    for path_keys in (
+        ["state", "equipped_inventory", "equipped"],
+        ["state", "equipped_inventory", "Equipped"],
+        ["state", "equipped_inventory", "slots"],
+        ["state", "inventory", "equipped"],
+        ["state", "inventory", "Equipped"],
+        ["state", "inventory", "equipped_inventory"],
+        ["inventory", "equipped"],
+        ["inventory", "Equipped"],
+        ["inventory", "equipped_inventory"],
+    ):
+        node = _find_dict_by_path_ignore_case(yaml_data, path_keys, 0)
+        _add(node)
+    return found
+
+
+def _find_equipped_node(yaml_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Find first equipped dict (for other callers)."""
+    nodes = _find_all_equipped_nodes(yaml_data)
+    return nodes[0] if nodes else None
+
+
+def _clear_slot_container(container_node: Optional[Dict[str, Any]]) -> bool:
+    """Remove all slot_* keys from a container dict. Returns True if node was valid."""
+    if not isinstance(container_node, dict):
+        return False
+    keys_to_remove = [k for k in list(container_node.keys()) if isinstance(k, str) and k.startswith("slot_")]
+    for k in keys_to_remove:
+        del container_node[k]
+    return True
 
 
 def clear_backpack(yaml_data: Dict[str, Any]) -> bool:
     """
-    Removes all items from the backpack (deletes all slot_* keys).
-    Returns True if backpack was found and cleared, False otherwise.
+    Removes all items from every backpack and every equipped container (deletes all slot_* keys).
+    Clears all matching containers so the UI shows empty regardless of save structure.
+    Returns True if at least one container was found and cleared.
     """
-    backpack_node = _find_backpack_node(yaml_data)
-    if not isinstance(backpack_node, dict):
-        return False
-    keys_to_remove = [k for k in list(backpack_node.keys()) if isinstance(k, str) and k.startswith("slot_")]
-    for k in keys_to_remove:
-        del backpack_node[k]
-    return True
+    any_cleared = False
+    for node in _find_all_backpack_nodes(yaml_data):
+        if _clear_slot_container(node):
+            any_cleared = True
+    for node in _find_all_equipped_nodes(yaml_data):
+        if _clear_slot_container(node):
+            any_cleared = True
+    return any_cleared
 
 
 def remove_item_by_original_path(yaml_data: dict, original_path):
@@ -493,6 +686,33 @@ def get_yaml_loader():
     return AnyTagLoader
 
 
+def get_save_structure_hint(yaml_data: Any) -> str:
+    """Return a short string describing top-level and one level down for debugging 'backpack not found'."""
+    try:
+        if not isinstance(yaml_data, dict):
+            return "root is not a dict"
+        top = list(yaml_data.keys())[:12]
+        parts = [f"top_keys={top}"]
+        for k in ("data", "state", "inventory", "SaveGame", "Character"):
+            if k in yaml_data:
+                v = yaml_data[k]
+                if isinstance(v, dict):
+                    sub = list(v.keys())[:10]
+                    parts.append(f"{k}=({sub})")
+                else:
+                    parts.append(f"{k}=({type(v).__name__})")
+        # Show state.inventory keys so we can see the actual backpack key name
+        state_node = yaml_data.get("state") or yaml_data.get("State")
+        if isinstance(state_node, dict):
+            inv_node = state_node.get("inventory") or state_node.get("Inventory")
+            if isinstance(inv_node, dict):
+                inv_keys = list(inv_node.keys())[:15]
+                parts.append(f"state.inventory.keys=({inv_keys})")
+        return " ".join(parts)
+    except Exception as e:
+        return f"hint_error={type(e).__name__}: {e}"
+
+
 def find_node_by_path(yaml_data: Dict[str, Any], path_str: str) -> Optional[Any]:
     """通过点分隔的路径字符串查找节点，例如 'inventory.backpack'。"""
     keys = path_str.split('.')
@@ -513,13 +733,33 @@ def find_node_by_path(yaml_data: Dict[str, Any], path_str: str) -> Optional[Any]
     return node
 
 
+def find_node_by_path_ignore_case(yaml_data: Dict[str, Any], path_str: str) -> Optional[Any]:
+    """Find node by dotted path with case-insensitive key matching (e.g. State.Inventory.Backpack)."""
+    keys = path_str.split(".")
+    return _find_dict_by_path_ignore_case(yaml_data, keys, 0)
+
+
+def _find_dict_by_path_ignore_case(node: Any, keys: List[str], index: int) -> Optional[Dict[str, Any]]:
+    """Find a dict by path with case-insensitive key matching. Used for equipped when exact path varies."""
+    if index >= len(keys):
+        return node if isinstance(node, dict) else None
+    key = keys[index].lower()
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if k.lower() == key:
+                found = _find_dict_by_path_ignore_case(v, keys, index + 1)
+                if found is not None:
+                    return found
+    elif isinstance(node, list) and key.isdigit():
+        i = int(key)
+        if 0 <= i < len(node):
+            return _find_dict_by_path_ignore_case(node[i], keys, index + 1)
+    return None
+
+
 def find_last_backpack_slot(yaml_data: Dict[str, Any]) -> int:
     """在背包中找到最后一个或最大的slot ID。"""
-    # 动态查找背包节点
-    backpack_node = find_node_by_path(yaml_data, 'state.inventory.backpack')
-    if backpack_node is None:
-        backpack_node = find_node_by_path(yaml_data, 'inventory.backpack')
-
+    backpack_node = _find_backpack_node(yaml_data)
     if not isinstance(backpack_node, dict):
         raise ValueError("在存档中无法找到或访问背包（Backpack）。")
 
@@ -568,9 +808,9 @@ def sync_inventory_item_levels(yaml_data: Dict[str, Any]) -> Tuple[int, int, Lis
         # Heuristic to identify backpack items. This should be robust.
         is_in_inventory = False
         path_str = '/'.join(map(str, path))
-        if 'inventory' in path and 'backpack' in path_str:
+        if 'inventory' in path and ('backpack' in path_str or 'items' in path_str):
             is_in_inventory = True
-        
+
         if is_in_inventory:
             inventory_items.append((path, item_data))
 
@@ -639,7 +879,7 @@ def set_backpack_item_levels(yaml_data: Dict[str, Any], target_level: int) -> Tu
     inventory_items = []
     for path, item_data in all_discovered_items:
         path_str = '/'.join(map(str, path))
-        if 'inventory' in path and 'backpack' in path_str:
+        if 'inventory' in path and ('backpack' in path_str or 'items' in path_str):
             inventory_items.append((path, item_data))
 
     if not inventory_items:

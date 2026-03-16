@@ -41,7 +41,7 @@ export default function Filters({
       </label>
       <select
         value={filters.category}
-        onChange={(e) => update({ category: e.target.value })}
+        onChange={(e) => update({ category: e.target.value, partType: "All" })}
         className="px-3 py-2 rounded-[10px] border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-[11px] min-w-[120px] min-h-[44px] focus:outline-none focus:border-[var(--color-accent)] touch-manipulation"
         aria-label="Category"
       >

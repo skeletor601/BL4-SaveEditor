@@ -9,6 +9,7 @@ import {
   collectLookupCodesFromDecoded,
   preferItemNameFromDecoded,
 } from "@/lib/backpackNaming";
+import { parseDecodedSerial, translateParts, type TranslatedLine } from "@/lib/partsTranslator";
 
 export interface DecodedItem {
   name: string;
@@ -20,14 +21,24 @@ export interface DecodedItem {
 }
 
 const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3" },
-  { value: 5, label: "5" },
-  { value: 17, label: "17" },
-  { value: 33, label: "33" },
-  { value: 65, label: "65" },
-  { value: 129, label: "129" },
+  { value: 1,   label: "Normal",   short: null,  color: null },
+  { value: 3,   label: "Favorite", short: "★",   color: "bg-yellow-400/20 text-yellow-300 border-yellow-400/50" },
+  { value: 5,   label: "Junk",     short: "JUNK", color: "bg-red-500/20 text-red-300 border-red-500/50" },
+  { value: 17,  label: "Rank 1",   short: "R1",  color: "bg-blue-500/20 text-blue-300 border-blue-500/50" },
+  { value: 33,  label: "Rank 2",   short: "R2",  color: "bg-blue-500/20 text-blue-300 border-blue-500/50" },
+  { value: 65,  label: "Rank 3",   short: "R3",  color: "bg-blue-500/20 text-blue-300 border-blue-500/50" },
+  { value: 129, label: "Rank 4",   short: "R4",  color: "bg-blue-500/20 text-blue-300 border-blue-500/50" },
 ];
+
+function FlagBadge({ stateFlags }: { stateFlags: number }) {
+  const opt = FLAG_OPTIONS.find((o) => o.value === stateFlags);
+  if (!opt || !opt.short || !opt.color) return null;
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-bold leading-none mr-1.5 shrink-0 ${opt.color}`}>
+      {opt.short}
+    </span>
+  );
+}
 
 type ContainerKey = "backpack" | "equipped" | "lostLoot";
 const CONTAINER_LABELS: Record<ContainerKey, string> = {
@@ -106,6 +117,8 @@ export default function BackpackView() {
   const [partsByCode, setPartsByCode] = useState<Map<string, PartLookupItem>>(new Map());
   const [isAdding, setIsAdding] = useState(false);
   const [addMessage, setAddMessage] = useState<string | null>(null);
+  const [selectedFlagValue, setSelectedFlagValue] = useState(1);
+  const [isSavingFlag, setIsSavingFlag] = useState(false);
   const [contextItem, setContextItem] = useState<TreeItem | null>(null);
   const [contextPos, setContextPos] = useState<{ x: number; y: number } | null>(null);
   const [duplicateDialog, setDuplicateDialog] = useState<{ item: TreeItem; qty: string } | null>(null);
@@ -114,6 +127,16 @@ export default function BackpackView() {
   const [clearBackpackLoading, setClearBackpackLoading] = useState(false);
   const [showClearBackpackConfirm, setShowClearBackpackConfirm] = useState(false);
   const navigate = useNavigate();
+
+  // Translate parts for the selected item using existing partsByCode map.
+  const selectedTranslatedLines = useMemo((): TranslatedLine[] => {
+    if (!selected?.decodedFull) return [];
+    const { parts } = parseDecodedSerial(selected.decodedFull);
+    // Convert Map<string, PartLookupItem> → Map<string, PartLookupRow[]> for translateParts.
+    const byCode = new Map<string, import("@/lib/partsTranslator").PartLookupRow[]>();
+    partsByCode.forEach((item, code) => byCode.set(code, [item as import("@/lib/partsTranslator").PartLookupRow]));
+    return translateParts(parts, byCode);
+  }, [selected?.decodedFull, partsByCode]);
 
   const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
   const ITEM_EDIT_TYPES = new Set(["Heavy Weapon", "Grenade", "Shield", "Repkit"]);
@@ -221,20 +244,41 @@ export default function BackpackView() {
         setAddMessage("No YAML content loaded.");
         return;
       }
+      let serial = itemSerial.trim();
+      // If pasted text is decoded code (doesn't start with @U), encode it first.
+      if (!serial.startsWith("@")) {
+        const encodeRes = await fetchApi("save/encode-serial", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ decoded_string: serial }),
+        });
+        const encodeData = await encodeRes.json().catch(() => ({}));
+        if (!encodeRes.ok || !encodeData?.success || typeof encodeData?.serial !== "string") {
+          setAddMessage(encodeData?.error ?? "Could not encode pasted code. Use a valid decoded parts string or @U... serial.");
+          return;
+        }
+        serial = encodeData.serial;
+      }
       const res = await fetchApi("save/add-item", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           yaml_content: yamlContent,
-          serial: itemSerial.trim(),
+          serial,
           flag: String(flagValue),
         }),
       });
-      const data = await res.json().catch(() => ({}));
+      const raw = await res.text();
+      let data: { success?: boolean; error?: string; yaml_content?: string } = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = {};
+      }
       if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
         const msg = isLikelyUnavailable(res)
           ? getApiUnavailableError()
-          : (data?.error ?? "Failed to add item.");
+          : (typeof data?.error === "string" ? data.error : raw?.slice(0, 300) || "Failed to add item.");
         setAddMessage(msg);
         return;
       }
@@ -248,6 +292,37 @@ export default function BackpackView() {
       setIsAdding(false);
     }
   }, [saveData, itemSerial, flagValue, getYamlText, updateSaveData]);
+
+  const handleUpdateFlag = useCallback(async () => {
+    if (!selected || !saveData) return;
+    const yamlContent = getYamlText();
+    if (!yamlContent?.trim()) { setAddMessage("No save YAML loaded."); return; }
+    setIsSavingFlag(true);
+    setAddMessage(null);
+    try {
+      const res = await fetchApi("save/update-item", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          yaml_content: yamlContent,
+          item_path: selected.path,
+          new_item_data: { serial: selected.serial, state_flags: selectedFlagValue },
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+        setAddMessage(data?.error ?? "Failed to update flag.");
+        return;
+      }
+      const parsed = yamlParse(data.yaml_content) as Record<string, unknown>;
+      updateSaveData(parsed);
+      setAddMessage("Flag updated. Use \"Overwrite save\" to export.");
+    } catch {
+      setAddMessage(getApiUnavailableError());
+    } finally {
+      setIsSavingFlag(false);
+    }
+  }, [selected, selectedFlagValue, saveData, getYamlText, updateSaveData]);
 
   const handleRemoveItem = useCallback(
     async (item: TreeItem) => {
@@ -361,10 +436,6 @@ export default function BackpackView() {
     }
   }, [gearLevelDialog, saveData, getYamlText, updateSaveData]);
 
-  const handleClearBackpackClick = useCallback(() => {
-    setShowClearBackpackConfirm(true);
-  }, []);
-
   const handleClearBackpackConfirm = useCallback(async () => {
     if (!saveData) return;
     setShowClearBackpackConfirm(false);
@@ -466,7 +537,7 @@ export default function BackpackView() {
           >
             {FLAG_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
-                {o.label}
+                {o.short ? `${o.short} · ` : ""}{o.label}
               </option>
             ))}
           </select>
@@ -488,10 +559,10 @@ export default function BackpackView() {
         </button>
         <button
           type="button"
-          onClick={handleClearBackpackClick}
+          onClick={() => setShowClearBackpackConfirm(true)}
           disabled={clearBackpackLoading}
           className="px-4 py-2 rounded-lg border border-red-500/60 text-red-400 text-sm hover:bg-red-500/10 disabled:opacity-50 min-h-[44px]"
-          title="Remove all items from the backpack"
+          title="Clear all items from backpack and equipped"
         >
           {clearBackpackLoading ? "Clearing…" : "Clear backpack"}
         </button>
@@ -500,11 +571,11 @@ export default function BackpackView() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowClearBackpackConfirm(false)}>
           <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
             <p className="text-sm text-[var(--color-text)] mb-4">
-              Remove all items from the backpack? This cannot be undone (until you reload the save).
+              Remove all items from backpack and equipped? Reload the save to undo.
             </p>
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setShowClearBackpackConfirm(false)} className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] text-sm">Cancel</button>
-              <button type="button" onClick={() => void handleClearBackpackConfirm()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-500">Clear all</button>
+              <button type="button" onClick={() => void handleClearBackpackConfirm()} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-500">Clear backpack</button>
             </div>
           </div>
         </div>
@@ -554,7 +625,7 @@ export default function BackpackView() {
                             <button
                               key={`${item.container}-${item.slotKey}`}
                               type="button"
-                              onClick={() => setSelected(item)}
+                              onClick={() => { setSelected(item); setSelectedFlagValue(item.stateFlags || 1); }}
                               onContextMenu={(e) => {
                                 e.preventDefault();
                                 setContextItem(item);
@@ -566,7 +637,8 @@ export default function BackpackView() {
                                   : "text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
                               }`}
                             >
-                              {item.displayName} — {item.container}/{item.slotKey} — Level {item.level}
+                              <FlagBadge stateFlags={item.stateFlags} />
+                              {item.displayName} — {item.slotKey} — Lv {item.level}
                             </button>
                           ))}
                         </div>
@@ -596,6 +668,35 @@ export default function BackpackView() {
                 <dt className="text-[var(--color-text-muted)]">Manufacturer:</dt>
                 <dd className="text-[var(--color-text)]">{selected.manufacturer}</dd>
               </dl>
+              {/* Flag editor */}
+              <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.5)]">
+                <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">Mark as:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {FLAG_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => setSelectedFlagValue(o.value)}
+                      className={`px-2.5 py-1 rounded text-xs font-bold border transition-all ${
+                        selectedFlagValue === o.value
+                          ? o.color ?? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
+                          : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50"
+                      }`}
+                    >
+                      {o.short ? `${o.short} · ` : ""}{o.label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleUpdateFlag()}
+                  disabled={isSavingFlag || selectedFlagValue === (selected.stateFlags || 1)}
+                  className="px-3 py-1 rounded text-xs bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-40"
+                >
+                  {isSavingFlag ? "Saving…" : "Save"}
+                </button>
+              </div>
+
               <h3 className="text-[var(--color-accent)] font-medium mb-2">Fields</h3>
               <div className="space-y-3">
                 <label className="block">
@@ -625,6 +726,33 @@ export default function BackpackView() {
                     className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-xs font-mono resize-y whitespace-pre-wrap break-all"
                   />
                 </label>
+                {selectedTranslatedLines.length > 0 && (
+                  <div>
+                    <span className="text-xs text-[var(--color-text-muted)] block mb-2">Parts</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">
+                      {selectedTranslatedLines.map((line) => (
+                        <div
+                          key={line.codeKey}
+                          className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.8)] p-2 shadow-sm"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-mono text-xs text-[var(--color-accent)] shrink-0">{line.codeKey}</span>
+                            {line.qty > 1 && (
+                              <span className="text-xs text-[var(--color-text-muted)] tabular-nums shrink-0">×{line.qty}</span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)]">{line.partType}</p>
+                          <p className="mt-0.5 text-sm font-medium text-[var(--color-text)] break-words">{line.name}</p>
+                          {line.stats && (
+                            <p className="mt-1 text-xs text-[var(--color-text-muted)] line-clamp-2" title={line.stats}>
+                              {line.stats}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <label className="block">
                   <span className="text-xs text-[var(--color-text-muted)] block mb-1">Decoded ID</span>
                   <input

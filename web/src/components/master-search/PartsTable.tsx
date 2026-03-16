@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback } from "react";
 import type { PartRow } from "@/data/partsData";
 import {
   getRowKey,
@@ -6,8 +7,11 @@ import {
   getEffect,
   inferRarity,
   isLegendaryByName,
+  deriveCategory,
 } from "@/data/partsData";
 import LegendaryBadge from "./LegendaryBadge";
+import PartDetailModal from "./PartDetailModal";
+import PartHoverCard, { type HoverCardData } from "./PartHoverCard";
 
 type SortCol = "code" | "itemType" | "rarity" | "partName" | "effect" | null;
 type SortDir = "asc" | "desc";
@@ -23,7 +27,6 @@ interface PartsTableProps {
   sortCol: SortCol;
   sortDir: SortDir;
   onSort: (col: SortCol) => void;
-  /** When set (e.g. "Legendary first"), rows are already sorted by rarity; do not override with column sort */
   sortByRarity?: string;
 }
 
@@ -34,32 +37,44 @@ function sortRows(rows: PartRow[], sortCol: SortCol, sortDir: SortDir): PartRow[
     let va: string | number, vb: string | number;
     switch (sortCol) {
       case "code":
-        va = getCode(a);
-        vb = getCode(b);
-        break;
+        va = getCode(a); vb = getCode(b); break;
       case "itemType":
         va = (a["Model Name"] ?? "").toString();
         vb = (b["Model Name"] ?? "").toString();
         break;
       case "rarity":
-        va = inferRarity(a);
-        vb = inferRarity(b);
-        break;
+        va = inferRarity(a); vb = inferRarity(b); break;
       case "partName":
-        va = getPartName(a);
-        vb = getPartName(b);
-        break;
+        va = getPartName(a); vb = getPartName(b); break;
       case "effect":
-        va = getEffect(a);
-        vb = getEffect(b);
-        break;
+        va = getEffect(a); vb = getEffect(b); break;
       default:
         return 0;
     }
-    const cmp = String(va).localeCompare(String(vb));
-    return mult * cmp;
+    return mult * String(va).localeCompare(String(vb));
   });
 }
+
+// ── Convert PartRow → HoverCardData ──────────────────────────────────────────
+
+function rowToHoverData(row: PartRow): HoverCardData {
+  const rarity = inferRarity(row);
+  const isPearl = rarity === "pearl";
+  const isLeg = rarity === "legendary" || (!isPearl && isLegendaryByName(row));
+  return {
+    code: getCode(row),
+    name: getPartName(row),
+    effect: getEffect(row),
+    manufacturer: (row.Manufacturer ?? (row as Record<string, unknown>)["manufacturer"] ?? "").toString().trim() || undefined,
+    partType: (row["Part Type"] ?? (row as Record<string, unknown>)["partType"] ?? "").toString().trim() || undefined,
+    modelName: (row["Model Name"] ?? "").toString().trim() || undefined,
+    weaponType: (row["Weapon Type"] ?? (row as Record<string, unknown>)["weaponType"] ?? "").toString().trim() || undefined,
+    rarity: isLeg ? "legendary" : isPearl ? "pearl" : rarity || undefined,
+    category: deriveCategory(row) || (row.category ?? "").toString().trim() || undefined,
+  };
+}
+
+// ── Main table ────────────────────────────────────────────────────────────────
 
 export default function PartsTable({
   rows,
@@ -74,10 +89,30 @@ export default function PartsTable({
   onSort,
   sortByRarity,
 }: PartsTableProps) {
+  const [hoverData, setHoverData] = useState<HoverCardData | null>(null);
+  const [cardTop, setCardTop] = useState(0);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Mobile only: tap card → open detail modal
+  const [mobileDetailRow, setMobileDetailRow] = useState<PartRow | null>(null);
+
   const useRarityOrder = sortByRarity && sortByRarity !== "Default";
   const sorted = useRarityOrder ? rows : sortRows(rows, sortCol, sortDir);
   const selectedVisibleCount = sorted.reduce((n, row) => (selectedKeys.has(getRowKey(row)) ? n + 1 : n), 0);
   const allVisibleSelected = sorted.length > 0 && selectedVisibleCount === sorted.length;
+
+  const handleRowEnter = useCallback((row: PartRow, e: React.MouseEvent<HTMLTableRowElement>) => {
+    const top = e.currentTarget.getBoundingClientRect().top;
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => {
+      setCardTop(top);
+      setHoverData(rowToHoverData(row));
+    }, 130);
+  }, []);
+
+  const handleRowLeave = useCallback(() => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    setHoverData(null);
+  }, []);
 
   const th = (col: SortCol, label: string) => (
     <th
@@ -127,11 +162,14 @@ export default function PartsTable({
               return (
                 <tr
                   key={key}
-                  className={`border-b border-[rgba(60,68,78,0.3)] hover:bg-[var(--color-accent-dim)] ${
+                  className={`border-b border-[rgba(60,68,78,0.3)] hover:bg-[var(--color-accent-dim)] cursor-pointer ${
                     isPearl ? "bg-sky-400/10" : isLeg ? "legendary-row" : ""
-                  }`}
+                  } ${selectedKeys.has(key) ? "bg-[var(--color-accent)]/10" : ""}`}
+                  onClick={() => onToggleSelect(row)}
+                  onMouseEnter={(e) => handleRowEnter(row, e)}
+                  onMouseLeave={handleRowLeave}
                 >
-                  <td className="w-10 text-center py-2.5 px-3.5">
+                  <td className="w-10 text-center py-2.5 px-3.5" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       checked={selectedKeys.has(key)}
@@ -141,34 +179,31 @@ export default function PartsTable({
                   </td>
                   <td
                     className="w-10 text-center py-2.5 px-3.5 text-base cursor-pointer select-none hover:text-[var(--color-accent)]"
-                    onClick={() => onToggleFavorite(row)}
+                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(row); }}
                   >
                     {isFav ? "★" : "☆"}
                   </td>
                   <td
                     className="py-2.5 px-3.5 text-xs font-mono cursor-pointer hover:underline hover:text-[var(--color-accent)]"
-                    onClick={() => onCopyCode(row)}
+                    onClick={(e) => { e.stopPropagation(); onCopyCode(row); }}
                   >
                     {code}
                   </td>
-                  <td className="py-2.5 px-3.5 text-xs">
-                    {itemTypeStr || "—"}
-                  </td>
+                  <td className="py-2.5 px-3.5 text-xs">{itemTypeStr || "—"}</td>
                   <td className="py-2.5 px-3.5 text-xs">
                     <LegendaryBadge rarity={rarity} isLegendary={isLeg} isPearl={isPearl} />
                   </td>
-                  <td className="py-2.5 px-3.5 text-xs font-mono">
-                    {getPartName(row)}
-                  </td>
-                  <td className="py-2.5 px-3.5 text-xs max-w-md truncate">
-                    {getEffect(row)}
-                  </td>
+                  <td className="py-2.5 px-3.5 text-xs font-mono">{getPartName(row)}</td>
+                  <td className="py-2.5 px-3.5 text-xs max-w-md truncate">{getEffect(row)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+
+      {/* Hover card (desktop only, no pointer events so it doesn't interfere) */}
+      <PartHoverCard data={hoverData} cardTop={cardTop} />
 
       {/* Mobile: stacked cards */}
       <div className="md:hidden overflow-auto py-4 px-4 max-h-[calc(100vh-180px)] space-y-3">
@@ -184,47 +219,52 @@ export default function PartsTable({
           return (
             <div
               key={key}
-              className={`rounded-xl border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 ${
+              onClick={() => onToggleSelect(row)}
+              className={`rounded-xl border border-[var(--color-panel-border)] bg-[var(--color-panel)] p-4 cursor-pointer hover:border-[var(--color-accent)]/50 transition-colors ${
                 isPearl ? "border-sky-300/80 bg-sky-400/10" : isLeg ? "border-[var(--color-legendary)]" : ""
-              }`}
+              } ${isSelected ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/5" : ""}`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <button
                   type="button"
                   className="text-lg touch-manipulation"
-                  onClick={() => onToggleFavorite(row)}
+                  onClick={(e) => { e.stopPropagation(); onToggleFavorite(row); }}
                   aria-label={isFav ? "Remove favorite" : "Add favorite"}
                 >
                   {isFav ? "★" : "☆"}
                 </button>
-                <label className="text-[11px] flex items-center gap-1">
+                <label className="text-[11px] flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                   <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(row)} />
                   Select
                 </label>
                 <button
                   type="button"
                   className="font-mono text-[11px] text-[var(--color-accent)] hover:underline touch-manipulation"
-                  onClick={() => onCopyCode(row)}
+                  onClick={(e) => { e.stopPropagation(); onCopyCode(row); }}
                 >
                   {code}
                 </button>
+                <button
+                  type="button"
+                  className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] touch-manipulation"
+                  onClick={(e) => { e.stopPropagation(); setMobileDetailRow(row); }}
+                >
+                  Details
+                </button>
               </div>
-              <p className="text-xs font-semibold text-[var(--color-text)]">
-                {itemTypeStr || "—"}
-              </p>
+              <p className="text-xs font-semibold text-[var(--color-text)]">{itemTypeStr || "—"}</p>
               <p className="text-[11px] text-[var(--color-text-muted)] mt-1">
                 <LegendaryBadge rarity={rarity} isLegendary={isLeg} isPearl={isPearl} />
               </p>
-              <p className="font-mono text-[11px] text-[var(--color-text-muted)] mt-1 break-all">
-                {getPartName(row)}
-              </p>
-              <p className="text-xs mt-2 text-[var(--color-text-muted)] line-clamp-2">
-                {getEffect(row)}
-              </p>
+              <p className="font-mono text-[11px] text-[var(--color-text-muted)] mt-1 break-all">{getPartName(row)}</p>
+              <p className="text-xs mt-2 text-[var(--color-text-muted)] line-clamp-2">{getEffect(row)}</p>
             </div>
           );
         })}
       </div>
+
+      {/* Mobile detail modal */}
+      <PartDetailModal row={mobileDetailRow} onClose={() => setMobileDetailRow(null)} />
     </>
   );
 }

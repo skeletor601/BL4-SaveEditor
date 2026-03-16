@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { createReadStream, existsSync } from "fs";
+import { createReadStream, existsSync, readFileSync } from "fs";
 import { getGrenadeBuilderData } from "../data/grenadeBuilder.js";
 import { getRepkitBuilderData } from "../data/repkitBuilder.js";
 import { getShieldBuilderData } from "../data/shieldBuilder.js";
@@ -83,6 +83,39 @@ export async function accessoriesRoutes(
       return reply
         .type("image/png")
         .send(createReadStream(filePath));
+    },
+  );
+
+  fastify.get<{ Querystring: { class: string; name: string } }>(
+    "/accessories/class-mod/skill-details",
+    async (request, reply) => {
+      const { class: className, name: skillName } = request.query;
+      if (!className || !skillName || !allowedClasses.includes(className)) {
+        return reply.code(400).send({ error: "Missing or invalid class/name" });
+      }
+      const filePath = join(repoRoot, "class_mods", `${className}_skills_full.json`);
+      if (!existsSync(filePath)) {
+        return reply.code(404).send({ error: "Not found" });
+      }
+      try {
+        const raw = readFileSync(filePath, "utf8");
+        const skills: { name: string; type?: string; description?: string; stats?: string[] }[] = JSON.parse(raw);
+        const found = skills.find(
+          (s) => s.name.toLowerCase().trim() === String(skillName).toLowerCase().trim()
+        );
+        if (!found) {
+          return reply.code(404).send({ error: "Skill not found" });
+        }
+        return reply.send({
+          name: found.name,
+          type: found.type ?? "",
+          description: found.description ?? "",
+          stats: found.stats ?? [],
+        });
+      } catch (e) {
+        fastify.log.error(e);
+        return reply.code(500).send({ error: "Failed to load skill details" });
+      }
     },
   );
 

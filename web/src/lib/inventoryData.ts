@@ -24,8 +24,11 @@ export interface ItemSlotWithPath extends ItemSlot {
 }
 
 function getState(data: SaveData): Record<string, unknown> | null {
-  const state = (data.state as Record<string, unknown>) ?? data;
-  return state && typeof state === "object" ? state : null;
+  const state =
+    (data.state as Record<string, unknown>) ??
+    (data as Record<string, unknown>).data?.state ??
+    data;
+  return state && typeof state === "object" ? (state as Record<string, unknown>) : null;
 }
 
 /** Recursively find first object in tree that has the given key and is a dict (for backpack / equipped). */

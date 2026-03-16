@@ -14,17 +14,9 @@ import {
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 
-const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
+import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3" },
-  { value: 5, label: "5" },
-  { value: 17, label: "17" },
-  { value: 33, label: "33" },
-  { value: 65, label: "65" },
-  { value: 129, label: "129" },
-];
+const WEAPON_TYPES = new Set(["Pistol", "Shotgun", "SMG", "Assault Rifle", "Sniper"]);
 
 interface DecodedBackpackWeapon {
   slot: ItemSlotWithPath | (Omit<ItemSlotWithPath, "path"> & { path: string[] });
@@ -1050,7 +1042,8 @@ export default function WeaponEditView({
       if (!weaponRowsByPrefix.has(pfx)) weaponRowsByPrefix.set(pfx, []);
       weaponRowsByPrefix.get(pfx)!.push(row);
     }
-    const isBarrelExcluded = (text: string) => /\bnoisy\s*cricket\b|kaleidosplode/.test(norm(text));
+    const isBarrelExcluded = (text: string) =>
+        /\bnoisy\s*cricket\b|kaleidosplode|queens\s*rest|queensrest|potatothrower|potato\s*thrower/i.test(norm(text));
     const legendaryBarrelIdsByPrefix = new Map<number, Set<number>>();
     const legendaryRarityIdsByPrefix = new Map<number, Set<number>>();
     for (const c of candidates) {
@@ -1133,13 +1126,17 @@ export default function WeaponEditView({
         .map((r) => Number(r.partId))
         .filter((n) => Number.isFinite(n));
     };
-    // Prefer magazines that are not charge-up (avoid "charge time", "maximum charge", etc.).
+    // Prefer magazines that are not charge-up and not COV (COV mags kill reloads).
     const toPartIdsMagazineNoCharge = (): number[] => {
       const magRows = weaponRows.filter((r) => norm(r.partType) === "magazine");
-      const noCharge = magRows.filter(
+      const noCov = magRows.filter(
+        (r) => !/\bcov\b|children\s*of\s*the\s*vault/.test(norm(`${r.manufacturer ?? ""} ${r.stat ?? ""} ${r.string ?? ""}`)),
+      );
+      const pool = noCov.length ? noCov : magRows;
+      const noCharge = pool.filter(
         (r) => !/\bcharge\s*time\b|\bmaximum\s*charge\b|\bcharge\s*up\b|\bcharging\b/.test(norm(`${r.stat} ${r.string}`)),
       );
-      const ids = (noCharge.length ? noCharge : magRows)
+      const ids = (noCharge.length ? noCharge : pool)
         .map((r) => Number(r.partId))
         .filter((n) => Number.isFinite(n));
       return ids;
@@ -1255,14 +1252,7 @@ export default function WeaponEditView({
         randInt(modeCfg.exemplarCycleRepeats[0], modeCfg.exemplarCycleRepeats[1]),
       ),
     );
-    const exemplarAmmoGroup = groupedToken(
-      22,
-      Array.from({ length: randInt(modeCfg.exemplarAmmoCount[0], modeCfg.exemplarAmmoCount[1]) }, () => 72),
-    );
-    const exemplarFireGroup = groupedToken(
-      292,
-      Array.from({ length: randInt(modeCfg.exemplarFireCount[0], modeCfg.exemplarFireCount[1]) }, () => 9),
-    );
+    // No ammo stacks: 0 ammo codes per gun so grenade reload is achievable (no infinite mag). 292:9 stacks removed.
     const exemplarStabilityGroup =
       Math.random() < modeCfg.useStabilityGroupChance
         ? [groupedToken(14, Array.from({ length: randInt(8, 42) }, () => 3))]
@@ -1276,19 +1266,8 @@ export default function WeaponEditView({
       modeCfg.statRange[1],
       ),
     ];
-    const ammoStacks = [
-      exemplarAmmoGroup,
-      ...addStatStacks(
-        (text) =>
-          // Prefer ammo/shot count, but avoid explicit magazine size perks.
-          (/\bammo\b|\bshots?\b/.test(text)) &&
-          !/\bmag(azine)?\s*size\b|\bmagsize\b/.test(text),
-        modeCfg.statRange[0],
-        modeCfg.statRange[1],
-      ),
-    ];
+    const ammoStacks: string[] = [];
     const fireRateStacks = [
-      exemplarFireGroup,
       ...exemplarStabilityGroup,
       ...addStatStacks(
       (text) => /\bfire rate\b|\/s fr\b|\bfr\b/.test(text),
@@ -1327,6 +1306,8 @@ export default function WeaponEditView({
         if (row.visualUniqueBarrel === true || row.uniqueEffect === true) return true;
         const t = norm(`${row.statText ?? ""} ${row.string ?? ""} ${row.partName ?? ""}`);
         if (isBarrelExcluded(t)) return false;
+        if (/\bstar\s*helix\b/i.test(t)) return true;
+        if (/\bheavy\b/i.test(norm(row.itemType ?? "")) || /\bheavy\b/i.test(norm(row.weaponType ?? ""))) return true;
         return /\bunique\b|\balt(ernate)?\s*(fire|barrel)?\b|\bappearance\b|\bvisual\b|\bdifferent\s*look\b/i.test(t);
       },
     );
@@ -1337,15 +1318,6 @@ export default function WeaponEditView({
       ({ parsed }) => parsed.prefix !== headerPrefix,
     );
     const allUniqueBarrels = [...samePrefixUniqueBarrels, ...crossUniqueBarrels];
-    const useUniqueBarrel = allUniqueBarrels.length > 0 && Math.random() < 0.85;
-    const uniqueFirstBarrelToken =
-      useUniqueBarrel && allUniqueBarrels.length
-        ? (() => {
-            const u = pick(allUniqueBarrels);
-            return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
-          })()
-        : "";
-    const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
     const crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
       if (pfx === headerPrefix) return [];
       const idsInPrefix = new Set(
@@ -1361,6 +1333,20 @@ export default function WeaponEditView({
         .map((r) => ({ prefix: pfx, part: Number(r.partId) }))
         .filter((x) => Number.isFinite(x.part));
     });
+    const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
+    // Always paste a visual barrel to the left of the first barrel (game reads left-to-right). Use visual pool or fallback to any cross-prefix barrel.
+    const uniqueFirstBarrelToken =
+      allUniqueBarrels.length > 0
+        ? (() => {
+            const u = pick(allUniqueBarrels);
+            return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
+          })()
+        : crossPrefixBarrels.length > 0
+          ? (() => {
+              const c = pick(crossPrefixBarrels);
+              return `{${c.prefix}:${c.part}}`;
+            })()
+          : "";
     const samePrefixBarrelParts: string[] = [];
     for (let i = 0; i < randInt(modeCfg.extraBarrelsRange[0], modeCfg.extraBarrelsRange[1]); i += 1) {
       if (!usableSamePrefixBarrels.length) break;
@@ -1388,11 +1374,10 @@ export default function WeaponEditView({
       return;
     }
 
-    const magazineToken = pickMagazineToken();
-    if (!magazineToken) {
-      setMessage("Could not build stock weapon core: missing Magazine.");
-      return;
-    }
+    // Always use Vladof 50-round magazine {18:14} only (per modded weapon rules). No COV/Order or other magazines.
+    const vladof50MagToken = "{18:14}";
+    const magazineToken = vladof50MagToken;
+    const magazinePrefixForOrderCov = "";
     const gripToken = pickToken(["grip"]);
     const scopeToken = pickToken(["scope"]);
     // Grenade-reload / Tediore-style builds get multiple manufacturer parts (e.g. Jakobs, Tediore reload, Hyperion).
@@ -1580,8 +1565,7 @@ export default function WeaponEditView({
       altFireTokens = chosen.map((id) => `{1:${id}}`);
     }
 
-    // Grenade reload block: always add on every gun.
-    // Pattern: {267:1} {245:[...grenade perks...]} {267:3} OR {291:8} {245:[...]} {291:9}
+    // Grenade reload block: same grenade code directly before and after {245:[...]} (real types: 291:8 waterfall, 291:7 blockbuster, 298:7 firepot, 267:1).
     const grenadeParts: string[] = [];
     const grenadePerkPool = candidates.filter(
       ({ parsed, row }) => parsed.prefix === 245 && norm(row.partType) !== "rarity",
@@ -1593,9 +1577,9 @@ export default function WeaponEditView({
         /\bcorrosive\b|\bacid\b|\bcorrode\b|\btoxic\b/.test(t);
     });
     const perkSource = grenadePerkFireCorrosivePool.length ? grenadePerkFireCorrosivePool : grenadePerkPool;
-    const grenadePrefix = Math.random() < 0.5 ? 267 : 291;
-    const grenadeCode = grenadePrefix === 267 ? "{267:1}" : "{291:8}";
-    const grenadeRarityCode = grenadePrefix === 267 ? "{267:3}" : "{291:9}";
+    const GRENADE_TYPE_CODES: [number, number][] = [[291, 8], [291, 7], [298, 7], [267, 1]];
+    const chosenGrenade = pick(GRENADE_TYPE_CODES);
+    const grenadeCode = `{${chosenGrenade[0]}:${chosenGrenade[1]}}`;
     grenadeParts.push(grenadeCode);
     if (perkSource.length) {
       const count = randInt(modeCfg.grenadePerkRange[0], modeCfg.grenadePerkRange[1]);
@@ -1603,7 +1587,7 @@ export default function WeaponEditView({
       for (let i = 0; i < count; i += 1) perkIds.push(pick(perkSource).parsed.part);
       grenadeParts.push(`{245:[${perkIds.join(" ")}]}`);
     }
-    grenadeParts.push(grenadeRarityCode);
+    grenadeParts.push(grenadeCode);
 
     // Other heavy enhancement stacks were cleared as part of the simplified rules; no generic enhancement/stalker stacks.
 
@@ -1614,7 +1598,7 @@ export default function WeaponEditView({
       ...altFireTokens,
       bodyToken,
       ...bodyAccessoryStack,
-      ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
+      ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []), // visual barrel first (left) so it overrides
       primaryBarrelToken,
       ...samePrefixBarrelParts,
       ...crossParts,
@@ -1622,6 +1606,7 @@ export default function WeaponEditView({
       multiProjectileToken,
       ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
       ...homingStacks273,
+      ...(magazinePrefixForOrderCov ? [magazinePrefixForOrderCov] : []),
       magazineToken,
       ...(gripToken ? [gripToken] : []),
       ...(foregripToken ? [foregripToken] : []),

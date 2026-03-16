@@ -1,0 +1,638 @@
+[
+  {
+    "name": "Rinse",
+    "type": "Passive",
+    "description": "People Person Rafa gains increased Reload Speed.",
+    "stats": []
+  },
+  {
+    "name": "Las Jaras",
+    "type": "Passive",
+    "description": "People Person Overdrive Skill. Rafa Regenerates Ammo while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "The Thrill",
+    "type": "Passive",
+    "description": "Overdrive Skill. Rafa gains increased Fire Rate, which is increased even further while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Preparado",
+    "type": "Passive",
+    "description": "People Person Whenever Rafa Reloads his current Gun, he gains increased Action Skill Cooldown Rate. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Pa' Dentro",
+    "type": "Passive",
+    "description": "People Person Activating an Action Skill grants Rafa Health Regeneration.",
+    "stats": []
+  },
+  {
+    "name": "Arriba",
+    "type": "Passive",
+    "description": "People Person Kill Skill. Whenever Rafa kills an enemy, he gains increased Ordnance Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "First Impression",
+    "type": "Passive",
+    "description": "People Person The first shot fired from a fully-loaded Magazine gains increased Damage.",
+    "stats": []
+  },
+  {
+    "name": "Al Centro",
+    "type": "Passive",
+    "description": "People Person Overdrive Skill. Rafa gains increased Gun Handling and Action Skill Handling while Overdrive is active. The longer Overdrive has been active, the greater the bonus.",
+    "stats": []
+  },
+  {
+    "name": "Metal Management",
+    "type": "Passive",
+    "description": "People Person Whenever Rafa activates or retriggers an Action Skill, his gun consumes no Ammo.",
+    "stats": []
+  },
+  {
+    "name": "Abajo",
+    "type": "Passive",
+    "description": "People Person Whenever Rafa throws a Grenade, he gains increased Action Skill Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Brain Dump",
+    "type": "Passive",
+    "description": "People Person (Branch 1) Overdrive Skill. Rafa gains Critical Hit Chance with his Guns while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Conductivo",
+    "type": "Passive",
+    "description": "People Person (Branch 1) Rafa gains increased Status Effect Chance, and also gains further increased Shock Chance.",
+    "stats": []
+  },
+  {
+    "name": "El Catrin",
+    "type": "Passive",
+    "description": "Whenever Rafa Slides, his Action Skill deals Bonus Shock Damage, and he also deals increased Critical Hit Damage.",
+    "stats": []
+  },
+  {
+    "name": "Awe",
+    "type": "Passive",
+    "description": "People Person (Branch 1) Whenever Rafa Shocks an enemy, all shots fired at that enemy are Critical Hits.",
+    "stats": []
+  },
+  {
+    "name": "Fiesta",
+    "type": "Passive",
+    "description": "People Person (Branch 1) Whenever Rafa applies a Status Effect, his Action Skills consume no Duration, and APOPHIS Lance consumes no Charges.",
+    "stats": []
+  },
+  {
+    "name": "Drone Defense",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Whenever Rafa activates an Ordnance, spawn STRM Gliders that hover near him. As he takes Damage, transfer some of it to his STRM Gliders. Once a STRM Glider receives too much Damage, it explodes, dealing Corrosive Splash Damage to nearby enemies.",
+    "stats": []
+  },
+  {
+    "name": "El Soldado",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Overdrive Skill. Rafa gains increased Gun Damage while Overdrive is active. This bonus is doubled while Rafa is charging APOPHIS Lance.",
+    "stats": []
+  },
+  {
+    "name": "The Right Tools",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Rafa gains increased Ordnance Damage after Reloading his Gun. This bonus stacks.",
+    "stats": []
+  },
+  {
+    "name": "Debtonation",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Whenever Rafa damages an enemy with an Action Skill, place a Remote Detonator on that enemy. Remote Detonators gain increased Damage and increased Splash Radius for every Remote Detonator on an enemy. Remote Detonators automatically explode after a delay or whenever the enemy they're attached to dies. Ordnance Override. Detonate all Remote Detonators.",
+    "stats": []
+  },
+  {
+    "name": "Drone Assault",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Whenever Rafa triggers or retriggers an Action Skill, send one of his STRM Gliders at an enemy in his view. Once it arrives, it explodes in a Corrosive Explosion equal to its remaining health.",
+    "stats": []
+  },
+  {
+    "name": "Jaque",
+    "type": "Passive",
+    "description": "People Person (Branch 3) Whenever Rafa damages an enemy with a Skill, he gains a Stack of Jaque. For every Stack of Jaque, he gains increased Overdrive Bonuses. Whenever Overdrive ends, he loses all Stacks.",
+    "stats": []
+  },
+  {
+    "name": "La Garza",
+    "type": "Passive",
+    "description": "People Person (Branch 3) Overdrive Skill. Rafa gains increased Gun Handling and Action Skill Handling while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Mate",
+    "type": "Passive",
+    "description": "People Person (Branch 3) When Overdrive ends, convert all Jaque Stacks into Mate Stacks. Gain increased Action Skill Cooldown Rate for every Stack of Mate. Once Rafa's Action Skill is readied, lose all Stacks of Mate.",
+    "stats": []
+  },
+  {
+    "name": "Deadline",
+    "type": "Passive",
+    "description": "People Person (Branch 3) Overdrive Skill. Rafa gains increased Fire Rate and increased Reload Speed while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Per My Last",
+    "type": "Passive",
+    "description": "People Person (Branch 3) Whenever Rafa deals Damage with an Action Skill to an enemy, he gains a chance to deal that Damage again.",
+    "stats": []
+  },
+  {
+    "name": "PROJECT: Gorgon",
+    "type": "Capstone",
+    "description": "People Person (Branch 3) APOPHIS Lance is now a Laser that passes through enemies, dealing Incendiary Damage. Pressing and holding Action Skill causes the Laser to deal increased Damage and Chain to more Enemies as it consumes Charges.",
+    "stats": []
+  },
+  {
+    "name": "Sitiar",
+    "type": "Passive",
+    "description": "Remote Agent Rafa gains increased Gun Damage.",
+    "stats": []
+  },
+  {
+    "name": "Deft Hands",
+    "type": "Passive",
+    "description": "Remote Agent Rafa and his Peacebreaker Cannons gain increased Fire Rate.",
+    "stats": []
+  },
+  {
+    "name": "Shield Barriest",
+    "type": "Passive",
+    "description": "Remote Agent Overdrive Skill. Rafa gains increased Shield Recharge Rate and improved Shield Regen Delay while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Juerga",
+    "type": "Passive",
+    "description": "Remote Agent Whenever Rafa Critically Hits an enemy, Action Skill Duration is restored.",
+    "stats": []
+  },
+  {
+    "name": "Field Repairs",
+    "type": "Passive",
+    "description": "Remote Agent Whenever Rafa activates an Action Skill, he restores a portion of his Maximum Shield Capacity. If his Shields are already full, he gains Overshield instead.",
+    "stats": []
+  },
+  {
+    "name": "CYA",
+    "type": "Passive",
+    "description": "Remote Agent Kill Skill. Killing an enemy restores Shields based on Rafa's Maximum Health Capacity.",
+    "stats": []
+  },
+  {
+    "name": "Resiliencia",
+    "type": "Passive",
+    "description": "Remote Agent Overdrive Skill. Rafa gains increased Damage Reduction while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Maestro",
+    "type": "Passive",
+    "description": "Remote Agent Rafa gains increased Skill Damage.",
+    "stats": []
+  },
+  {
+    "name": "Venganza",
+    "type": "Passive",
+    "description": "Remote Agent Whenever Rafa's Shields break after being fully recharged, spawn a free Grenade. If he has a Grenade equipped, use that Grenade instead.",
+    "stats": []
+  },
+  {
+    "name": "El Valiente",
+    "type": "Passive",
+    "description": "Remote Agent Rafa deals increased damage from all sources. The fuller Rafa's Shields are, the greater the bonus. While Rafa's Shields are at Maximum Capacity, double the bonus.",
+    "stats": []
+  },
+  {
+    "name": "Hell in a Shell",
+    "type": "Augment",
+    "description": "Remote Agent (Branch 1) Pressing Action Skill while Peacebreaker Cannons are active causes them to fire two Firebombs that deal Incendiary Damage in a large area. Killing enemies partially restores this Skill's Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Asymmetric Warfare",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) Indirect Projectiles gain increased Damage. Indirect Projectiles include all Action Skill Weapons, Thrown Guns, and Projectiles not fired from your Gun.",
+    "stats": []
+  },
+  {
+    "name": "Errant Spark",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) All Indirect Projectiles deal Bonus Incendiary Damage. If the Indirect Projectile already deals Incendiary Damage, double the Bonus Damage.",
+    "stats": []
+  },
+  {
+    "name": "Hostile Acquisition",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) Rafa's Indirect Projectiles gain Lifesteal.",
+    "stats": []
+  },
+  {
+    "name": "Rolling Stone",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) While moving, shots have a chance to Ricochet off of Rafa. This chance is doubled while Sliding.",
+    "stats": []
+  },
+  {
+    "name": "Proprietary Incendiary",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) Melee Override. Press ability to lob a STRM Glider at an enemy. Once it reaches its targets, it explodes and deals Incendiary Damage in an area based on the amount of Ammo in Rafa's Gun when he threw the STRM Glider.",
+    "stats": []
+  },
+  {
+    "name": "Double-Ought Autoshot",
+    "type": "Capstone",
+    "description": "Remote Agent (Branch 1) Rafa's Peacebreaker Cannons are replaced with Shotguns that deal increased Damage and have an increased Pellet Count. Additionally, Rafa's Turrets gain a chance to Ricochet off of targets. Ricochets deal Reduced Damage, and Critical Hits always Ricochet.",
+    "stats": []
+  },
+  {
+    "name": "Lateral Plinking",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 1) Rafa's Indirect Projectiles gain a chance to Ricochet.",
+    "stats": []
+  },
+  {
+    "name": "Confeti",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) Rafa's Ordnances deal Bonus Damage in his current Gun's Element.",
+    "stats": []
+  },
+  {
+    "name": "Insta-Fort Battle System",
+    "type": "Augment",
+    "description": "Remote Agent (Branch 2) Rafa's Peacebreaker Cannons also deal Ordnance Damage, and he deals increased Ordnance Damage while Peacebreaker Cannons are active. Pressing Action Skill while Peacebreaker Cannons are active causes them to disconnect from Rafa and become a Turret Companion that begins firing at enemies in place. Additionally, it will occasionally fire Grenades at its targets. If Rafa has a Grenade equipped, it copies that Grenade. Pressing Action Skill again returns the Turret Companion to Rafa's back.",
+    "stats": []
+  },
+  {
+    "name": "Vitriol",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) The first shot fired from Rafa's fully-loaded Magazine deals Bonus Corrosive Damage.",
+    "stats": []
+  },
+  {
+    "name": "Pain Reaction",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) Rafa's Guns gain a chance to Ricochet off of enemies with Status Effects. Ricochet Damage is based on the Damage Dealt.",
+    "stats": []
+  },
+  {
+    "name": "Concentrated Build Up",
+    "type": "Passive",
+    "description": "While Aiming with a Gun, Rafa deals Bonus Shock Damage. Each time Rafa hits an enemy this way, deal increased Bonus Damage until he zooms out. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "El Alacran",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) Enemies damaged by Rafa's Peacebreaker Cannons have increased Status Effect Chance.",
+    "stats": []
+  },
+  {
+    "name": "Beam Team",
+    "type": "Capstone",
+    "description": "Remote Agent (Branch 2) Rafa's Peacebreaker Cannons are replaced with a Shock Beam and a Corrosive Beam. Each beam automatically locks onto enemies in your view, and may lock onto different enemies. Whenever Rafa applies a Status Effect, gain increased Action Skill Damage.",
+    "stats": []
+  },
+  {
+    "name": "Inspirado",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) Whenever Rafa inflicts a Status Effect on an enemy, he gains increased Action Skill Cooldown Rate and improved Action Skill Duration Rate. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Barrage",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 3) Overdrive Skill. Rafa gains increased Splash Damage while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Unmissable Missiles",
+    "type": "Augment",
+    "description": "Remote Agent (Branch 3) Pressing Action Skill while Peacebreaker Cannons are active causes them to fire a volley of Homing Missiles at enemies in view, at the cost of Action Skill Duration.",
+    "stats": []
+  },
+  {
+    "name": "Everdrive",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 3) Overdrive gains increased Duration.",
+    "stats": []
+  },
+  {
+    "name": "Devil-May-Care",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 3) Overdrive Skill. While Overdrive is active, Rafa gains increased Movement Speed, and gains Health Regeneration. While Overdrive is not active, Rafa takes increased Damage, and gains increased Action Skill Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Temerario",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 3) Overdrive Skill. Rafa gains increased Gun Damage, but decreased Gun Handling. These Effects are based on how long Overdrive has been active.",
+    "stats": []
+  },
+  {
+    "name": "Soltado",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 3) Kill Skill. Double all Overdrive bonuses.",
+    "stats": []
+  },
+  {
+    "name": "Volatile Hollowpoints",
+    "type": "Capstone",
+    "description": "Remote Agent (Branch 3) Rafa's Peacebreaker Cannons are replaced with Rockets that deal Splash Damage.",
+    "stats": []
+  },
+  {
+    "name": "Handshake Deal",
+    "type": "Passive",
+    "description": "This Year's Gimmick Rafa gains increased Gun Damage and Melee Damage",
+    "stats": []
+  },
+  {
+    "name": "Midnight Oil",
+    "type": "Passive",
+    "description": "This Year's Gimmick Rafa's Action Skills deal Bonus Corrosive Damage. The longer the Skill has been active, the greater the Bonus Damage.",
+    "stats": []
+  },
+  {
+    "name": "Expedite",
+    "type": "Passive",
+    "description": "This Year's Gimmick Overdrive Skill. Overdrive grants Rafa increased Movement Speed.",
+    "stats": []
+  },
+  {
+    "name": "Dial In",
+    "type": "Passive",
+    "description": "This Year's Gimmick Whenever Rafa damages an enemy with a Melee Attack, his Melee Attacks gain Critical Hit Chance. This chance stacks, and all Stacks are removed whenever Rafa Critically Hits an enemy.",
+    "stats": []
+  },
+  {
+    "name": "Altered Cabron",
+    "type": "Augment",
+    "description": "This Year's Gimmick Whenever Rafa kills an enemy while Arc-Knives are active, restore a portion of his Health. Whenever Rafa gains Health, deal Bonus Corrosive Damage with all attacks, and gain increased Movement Speed. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "El Corazon",
+    "type": "Passive",
+    "description": "This Year's Gimmick A portion of Rafa's Maximum Health Capacity is converted into Maximum Shield Capacity.",
+    "stats": []
+  },
+  {
+    "name": "Dead Man Walking",
+    "type": "Augment",
+    "description": "This Year's Gimmick Arc-Knives do not end when their Duration runs out. Instead they only end if Rafa enters Fight For Your Life or activates Blade Fury. While Arc-Knives' duration is depleted, Rafa loses Health instead. Whenever Rafa damages an enemy, he gains Overshield.",
+    "stats": []
+  },
+  {
+    "name": "Diamond Hands",
+    "type": "Passive",
+    "description": "This Year's Gimmick Dealing Melee Damage grants Rafa a Stack of Diamond Hands. Gain increased Gun Damage for every Stack of Diamond Hands. Once Rafa deals Gun Damage, Stacks begin to decay quickly until they run out.",
+    "stats": []
+  },
+  {
+    "name": "Saldar",
+    "type": "Passive",
+    "description": "This Year's Gimmick Rafa's Melee Critical Hits gain Lifesteal.",
+    "stats": []
+  },
+  {
+    "name": "In the Zone",
+    "type": "Passive",
+    "description": "This Year's Gimmick Kill Skill. Killing an enemy freezes Overdrive's Duration.",
+    "stats": []
+  },
+  {
+    "name": "To the Last",
+    "type": "Passive",
+    "description": "This Year's Gimmick Rafa gains increased Gun Damage and Skill Damage. The lower his Health, the greater the bonuses.",
+    "stats": []
+  },
+  {
+    "name": "Hard Sell",
+    "type": "Passive",
+    "description": "This Year's Gimmick Whenever Rafa's Shields break, he instantly gains a portion of his Shield Maximum Capacity as Overshield. This Skill cannot be used again until Rafa next activates his Action Skill.",
+    "stats": []
+  },
+  {
+    "name": "Blowout",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Whenever Rafa applies a Mark or Critically Hits an enemy with his Action Skill, they explode in Corrosive Lobbed Projectiles. The longer Rafa's Action Skill has been active, the more Corrosive Projectiles are spawned.",
+    "stats": []
+  },
+  {
+    "name": "Thundercutter",
+    "type": "Augment",
+    "description": "This Year's Gimmick (Branch 1) Attacks made with Arc-Knives deal Shock Melee Splash Damage. Rafa gains increased Splash Damage.",
+    "stats": []
+  },
+  {
+    "name": "El Paraguas",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Rafa gains increased Splash Damage and Critical Hit Chance.",
+    "stats": []
+  },
+  {
+    "name": "Protecto-Pulse",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Pressing ability while Arc-Knives are active or Rafa retriggers his Action Skill drains a portion of Rafa's Shields, and deals that much Shock Damage to nearby enemies.",
+    "stats": []
+  },
+  {
+    "name": "Shock Market",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Whenever Rafa deals Splash Damage, deal Bonus Shock Damage based on the Damage Dealt.",
+    "stats": []
+  },
+  {
+    "name": "Liquidation",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Marked enemies killed by Rafa leave behind a Corrosive Hazard.",
+    "stats": []
+  },
+  {
+    "name": "Huracán Especial",
+    "type": "Capstone",
+    "description": "Activating Blade Fury causes Rafa to spin his blades, creating a Singularity that draws in all Marked enemies and other nearby enemies while dealing continuous Shock Damage. Whenever this attack kills an enemy, Overdrive grants increased Action Skill Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Artilleria",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) Rafa gains increased Ordnance Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Parting Gift",
+    "type": "Augment",
+    "description": "This Year's Gimmick (Branch 2) Whenever Rafa activates his Dash Attack, he leaves behind a Grenade. If he has a Grenade equipped, use that Grenade instead. Enemies damaged by these Grenades become Marked. Whenever Rafa applies a Mark to an enemy, apply an additional Mark.",
+    "stats": []
+  },
+  {
+    "name": "Collaborative Ignition",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) Overdrive Skill. Rafa deals Bonus Damage with Skills and Ordnances in the Element of his current Gun while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Booming Business",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) Whenever Rafa Critically Hits an enemy, he gains a chance to spawn a Free Grenade. If Rafa has a Grenade equipped, spawn a Grenade based on that.",
+    "stats": []
+  },
+  {
+    "name": "Sinergia",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) Whenever Rafa deals Ordnance Damage, he also deals increased Gun Damage and Melee Damage. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Hemolitions",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) Overdrive Skill. While Overdrive is active, Rafa may use Grenades during Ordnance Cooldown at the cost of Health. Every time a Grenade is used this way, it costs more Health until Rafa's Grenade fully cools down.",
+    "stats": []
+  },
+  {
+    "name": "Inferno Protocol",
+    "type": "Capstone",
+    "description": "This Year's Gimmick (Branch 2) While Arc-Knives are active, Rafa's Exo-Suit stores all Damage Dealt to him. The Exo-Suit then heats up and constantly deals a small amount of Incendiary Damage to him. Additionally, Rafa's Melee Attacks deal Bonus Incendiary Damage. A portion of all Damage Dealt to Rafa is also dealt to enemies he has Marked. Using Blade Fury causes Rafa to consume all Stored Damage, and deals Bonus Incendiary Damage based on Stored Damage. A portion of all Damage dealt this way is returned to Rafa as Health.",
+    "stats": []
+  },
+  {
+    "name": "El Diablito",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 2) A portion of all Incendiary Damage Rafa deals also deals Bonus Incendiary Ordnance Damage.",
+    "stats": []
+  },
+  {
+    "name": "El Borracho",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 3) Rafa deals increased Corrosive Damage while his Action Skill is active. The longer it has been active, the greater the bonus. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Acid Drop",
+    "type": "Augment",
+    "description": "This Year's Gimmick (Branch 3) Arc-Knives' Dash Attack is replaced by Caustic Leap. Pressing Action Skill causes Rafa to leap forward and create a Caustic Hazard wherever he lands. Whenever a Mark is removed from an enemy, it explodes into a Corrosive Nova.",
+    "stats": []
+  },
+  {
+    "name": "Empuje",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 3) Rafa gains increased Action Skill Duration.",
+    "stats": []
+  },
+  {
+    "name": "Sustainable Energy",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 3) Overdrive Skill. Rafa gains Health Regeneration based on how much Overdrive time is remaining.",
+    "stats": []
+  },
+  {
+    "name": "Motivar",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 3) Pressing Action Skill during Arc-Knives grants increased Overdrive Duration. This bonus is reset whenever Rafa activates an Action Skill.",
+    "stats": []
+  },
+  {
+    "name": "Galvanic Panic",
+    "type": "Capstone",
+    "description": "This Year's Gimmick (Branch 3) Whenever Rafa performs a Melee Attack while Arc-Knives are active, fire an Acid STRM Glider at an enemy in his view. Acid STRM Gliders deal Corrosive Splash Damage based on the number of total Marked enemies. Additionally, killing an enemy while Arc-Knives are active restores Action Skill Duration. Activating Blade Fury causes Rafa to fire a volley of Acid STRM Gliders in front of him and end Arc-Knives.",
+    "stats": []
+  },
+  {
+    "name": "Cruel Accrual",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 3) Rafa gains increased Skill Damage with all Skills. The longer his Action Skill has been active, the greater the bonus. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Battery Subscription Service",
+    "type": "Passive",
+    "description": "People Person APOPHIS Lance gains an Additional Charge. Additionally, whenever Rafa consumes a set minimum number of Charges, he gains increased Action Skill Potency.",
+    "stats": []
+  },
+  {
+    "name": "Sangre por Sangre",
+    "type": "Passive",
+    "description": "People Person Whenever Rafa consumes an APOPHIS Lance Charge, he gains increased Action Skill Cooldown Rate. This bonus is increased for every APOPHIS Lance Charge consumed.",
+    "stats": []
+  },
+  {
+    "name": "The Thrill (Rafa)",
+    "type": "Passive",
+    "description": "People Person Overdrive Skill. Rafa gains increased Fire Rate, which is increased even further while Overdrive is active.",
+    "stats": []
+  },
+  {
+    "name": "Bullet-Buddy Deluxe",
+    "type": "Passive",
+    "description": "Remote Agent While Peacebreaker Cannons are active, Rafa and his Allies Regenerate Ammo into their Magazine. Rafa's Peacebreaker Cannons deal Bonus Incendiary Damage based on how full his Gun is, and his Turrets shoot Exploding Bullets while his Magazine is full. Pressing Action Skill while Peacebreaker Cannons are active causes Rafa's shots to consume no Ammo, but causes his Action Skill Duration to drain faster.",
+    "stats": []
+  },
+  {
+    "name": "Instinto",
+    "type": "Passive",
+    "description": "Remote Agent Rafa's Peacebreaker Cannons gain increased Critical Hit Chance. Pressing Action Skill while Peacebreaker Cannons are active causes them to double their Critical Hit Chance and gain increased Critical Hit Damage, while also causing his Action Duration to drain faster. Kill Skill. Killing an enemy causes Rafa to restore Action Skill Duration, while also causing his Action Skill Duration to drain faster.",
+    "stats": []
+  },
+  {
+    "name": "El Catri­n",
+    "type": "Passive",
+    "description": "People Person (Branch 1) Whenever Rafa Slides, his Action Skill deals Bonus Shock Damage, and he also deals increased Critical Hit Damage.",
+    "stats": []
+  },
+  {
+    "name": "Ojo Rojo",
+    "type": "Passive",
+    "description": "People Person (Branch 1) APOPHIS Lance gains Critical Hit Chance. Whenever Rafa damages an enemy with APOPHIS Lance, he gains further increased Critical Hit Chance.",
+    "stats": []
+  },
+  {
+    "name": "PROJECT: Raiju",
+    "type": "Passive",
+    "description": "People Person (Branch 1) APOPHIS Lance is now a close-range Shocking Taser. Pressing and holding Action Skill causes Rafa to deal Shock Damage in an arc in front of him. The longer Rafa holds this attack, the greater Damage it deals.",
+    "stats": []
+  },
+  {
+    "name": "Huracan Especial",
+    "type": "Passive",
+    "description": "This Year's Gimmick (Branch 1) Activating Blade Fury causes Rafa to spin his blades, creating a Singularity that draws in all Marked enemies and other nearby enemies while dealing continuous Shock Damage. Whenever this attack kills an enemy, Overdrive grants increased Action Skill Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Gibistruct Module",
+    "type": "Passive",
+    "description": "People Person (Branch 2) Whenever Rafa kills an enemy with his APOPHIS Lance, spawn a free Grenade on that enemy. If Rafa has a Grenade equipped, spawn a copy of that Grenade instead.",
+    "stats": []
+  },
+  {
+    "name": "PROJECT: Basilisk",
+    "type": "Passive",
+    "description": "People Person (Branch 2) APOPHIS Lance now fires a Corrosive Blob that leaves a Corrosive Hazard and Splits into several smaller Projectiles whenever it detonates. The more Charges APOPHIS Lance consumes at once, the more it Splits.",
+    "stats": []
+  },
+  {
+    "name": "Concentrated Build-Up",
+    "type": "Passive",
+    "description": "Remote Agent (Branch 2) While Aiming with a Gun, Rafa deals Bonus Shock Damage. Each time Rafa hits an enemy this way, deal increased Bonus Damage until he zooms out. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Engorged Bore",
+    "type": "Passive",
+    "description": "People Person (Branch 3) APOPHIS Lance gains increased Projectile Radius and Projectile Speed. PROJECT: Gorgon gains increased Number of Chains.",
+    "stats": []
+  }
+]

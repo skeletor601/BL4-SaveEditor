@@ -3,16 +3,7 @@ import { Link } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
-
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3 (Favorites)" },
-  { value: 5, label: "5 (Trash)" },
-  { value: 17, label: "17 (Group 1)" },
-  { value: 33, label: "33 (Group 2)" },
-  { value: 65, label: "65 (Group 3)" },
-  { value: 129, label: "129 (Group 4)" },
-];
+import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 
 interface ClassModNameOption {
   nameCode: number;

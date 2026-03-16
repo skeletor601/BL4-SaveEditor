@@ -14,6 +14,17 @@ export const THEMES = [
 export type ThemeId = (typeof THEMES)[number];
 
 const STORAGE_KEY = "bl4-theme";
+const FONT_SIZE_KEY = "bl4-font-size";
+
+export const FONT_SIZES = [
+  { label: "S",    value: 13 },
+  { label: "M",    value: 16 },
+  { label: "L",    value: 18 },
+  { label: "XL",   value: 20 },
+  { label: "XXL",  value: 23 },
+] as const;
+
+export type FontSizeValue = (typeof FONT_SIZES)[number]["value"];
 
 type ThemeConfig = {
   accent: string;
@@ -35,6 +46,17 @@ const THEME_BG_FILENAMES: Record<ThemeId, string> = {
   Platinum: "Platinum",
 };
 
+export const THEME_META: Record<ThemeId, { label: string; accent: string }> = {
+  Ion:         { label: "Ion",         accent: "#00BFFF" },
+  Lava:        { label: "Lava",        accent: "#FF6600" },
+  Phoenix:     { label: "Phoenix",     accent: "#FF4500" },
+  Violet:      { label: "Violet",      accent: "#BF00FF" },
+  Blue_Balls:  { label: "Blue Balls",  accent: "#0080FF" },
+  Artic_Hex:   { label: "Artic Hex",   accent: "#00FFFF" },
+  Carbon_Flux: { label: "Carbon Flux", accent: "#00D4AA" },
+  Platinum:    { label: "Platinum",    accent: "#A0B8D0" },
+};
+
 const themeConfig: Record<ThemeId, ThemeConfig> = {
   Ion: { accent: "#00BFFF", accentMuted: "rgba(0,245,255,0.7)", accentDim: "rgba(0,191,255,0.35)", panelBorder: "#00ffff", bgOverlay: "rgba(0,0,0,0.25)" },
   Lava: { accent: "#FF6600", accentMuted: "rgba(255,102,0,0.7)", accentDim: "rgba(255,102,0,0.35)", panelBorder: "#ff6600", bgOverlay: "rgba(0,0,0,0.45)" },
@@ -50,6 +72,8 @@ interface ThemeContextValue {
   theme: ThemeId;
   setTheme: (id: ThemeId) => void;
   themeConfig: ThemeConfig;
+  fontSize: FontSizeValue;
+  setFontSize: (size: FontSizeValue) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -61,6 +85,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (s && THEMES.includes(s as ThemeId)) return s as ThemeId;
     } catch {}
     return "Ion";
+  });
+
+  const [fontSize, setFontSizeState] = useState<FontSizeValue>(() => {
+    try {
+      const s = localStorage.getItem(FONT_SIZE_KEY);
+      const n = s ? Number(s) : null;
+      if (n && FONT_SIZES.some((f) => f.value === n)) return n as FontSizeValue;
+    } catch {}
+    return 16;
   });
 
   useEffect(() => {
@@ -77,13 +110,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    localStorage.setItem(FONT_SIZE_KEY, String(fontSize));
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontSize]);
+
+  const setFontSize = (size: FontSizeValue) => setFontSizeState(size);
+
   const value = useMemo(
     () => ({
       theme,
       setTheme: setThemeState,
       themeConfig: themeConfig[theme],
+      fontSize,
+      setFontSize,
     }),
-    [theme]
+    [theme, fontSize]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

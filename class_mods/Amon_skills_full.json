@@ -1,0 +1,680 @@
+[
+  {
+    "name": "Impetus",
+    "type": "Passive",
+    "description": "Calamity Kill Skill. Amon gains increased Shield Regeneration Rate and Movement Speed for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "What Burns Within",
+    "type": "Passive",
+    "description": "Calamity Amon gains increased Incendiary Damage.",
+    "stats": []
+  },
+  {
+    "name": "Discombobulate",
+    "type": "Passive",
+    "description": "Calamity Amon gains Melee Critical Hit Chance.",
+    "stats": []
+  },
+  {
+    "name": "Heavy Plate",
+    "type": "Passive",
+    "description": "Calamity Amon gains increased Maximum Shield Capacity and Maximum Overshield Capacity.",
+    "stats": []
+  },
+  {
+    "name": "Wield the Storm",
+    "type": "Passive",
+    "description": "Calamity Amon gains increased Status Effect Damage and Status Effect Duration.",
+    "stats": []
+  },
+  {
+    "name": "Pyroclast",
+    "type": "Augment",
+    "description": "Calamity Whenever Onslaughter is activated, Amon fully Restores his Health and Shield, and is surrounded by a Forgestorm that deals Incendiary Status Effect Damage to nearby enemies over time. Kill Skill. Killing an enemy inside of the Forgestorm restores Amon's Action Skill Duration, and increases Forgestorm's Damage.",
+    "stats": []
+  },
+  {
+    "name": "Gut Punch",
+    "type": "Passive",
+    "description": "Calamity Melee Damage and Ordnance Damage have a chance to apply Weakness to enemies for a Duration. Weakened enemies deal reduced Damage, and take increased Damage. Weakness is affected by Status Effect Duration, and is itself considered a Status Effect.",
+    "stats": []
+  },
+  {
+    "name": "Thermal Diffusion",
+    "type": "Augment",
+    "description": "Calamity Rocket Punch now has two modes, gains increased Radius, and deals Bonus Damage based on Amon's Maximum Shield Capacity. Pressing Action Skill causes Rocket Punch to deal Incendiary Melee Attack Damage. Pressing Melee causes Rocket Punch to deal Cryo Melee Attack Damage.",
+    "stats": []
+  },
+  {
+    "name": "Tritanium Knuckles",
+    "type": "Passive",
+    "description": "Calamity Amon gains increased Melee Damage and Skill Damage.",
+    "stats": []
+  },
+  {
+    "name": "Forged In Steel",
+    "type": "Passive",
+    "description": "Calamity Amon becomes immune to all Damage for a brief Duration whenever he activates a Forgeskill.",
+    "stats": []
+  },
+  {
+    "name": "Bullet Storm",
+    "type": "Passive",
+    "description": "Calamity Whenever Amon applies a Status Effect, he gains increased Gun Damage for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Metal Urge",
+    "type": "Passive",
+    "description": "Calamity Whenever Amon deals Gun Damage, he gains increased Action Skill Cooldown Rate for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "The Best Defense",
+    "type": "Passive",
+    "description": "Calamity Amon gains Overshield whenever he deals Melee Damage.",
+    "stats": []
+  },
+  {
+    "name": "Berserk",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Whenever Amon activates his Forgeskill, he becomes Berserk for a Duration, gaining Slow Immunity, and Bonus Cryo Damage with Gun Damage and Melee Damage.",
+    "stats": []
+  },
+  {
+    "name": "Fellfrost",
+    "type": "Augment",
+    "description": "Calamity (Branch 1) Pressing Action Skill immediately after a Rocket Punch causes Amon to use a follow-up attack, dealing Cryo Melee Attack Damage in a large area in front of Amon. Non-Boss enemies hit below 25% Total HP are killed.",
+    "stats": []
+  },
+  {
+    "name": "Bloodlust",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Whenever Amon's Shield Breaks, he gains Bloodlust for a Duration, gaining increased Reload Speed and Lifesteal. Bloodlust is also activated on Action Skill Activation.",
+    "stats": []
+  },
+  {
+    "name": "There Is Only Red",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Kill Skill. Whenever Amon kills an enemy while Berserk is active, partially restore Berserk's Duration, and increase Bonus Cryo Damage from Berserk.",
+    "stats": []
+  },
+  {
+    "name": "Rimebreak",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Whenever Amon's Shield Breaks, he partially Restores Shield and Detonates, dealing Cryo Damage to all nearby enemies and Freezing them.",
+    "stats": []
+  },
+  {
+    "name": "Brimming Vigor",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Amon gains increased Maximum Health Capacity and deals increased Melee Damage the more full his Health.",
+    "stats": []
+  },
+  {
+    "name": "My Touch Is Death",
+    "type": "Passive",
+    "description": "Calamity (Branch 1) Whenever Amon deals Melee Damage, there is a chance to Activate Kill Skills.",
+    "stats": []
+  },
+  {
+    "name": "Hoarcleave",
+    "type": "Capstone",
+    "description": "Calamity (Branch 1) Molten Slam is now Hoarcleave. Press and hold Action Skill to swing a Massive Forgeaxe, launching a Forgewave that deals Cryo Melee Damage and Freezes enemies it passes through. Enemies killed by Hoarcleave cause a Detonation, dealing Cryo Damage.",
+    "stats": []
+  },
+  {
+    "name": "Into The Fray",
+    "type": "Passive",
+    "description": "Amon gains increased Damage Dealt and Damage Reduction based on his distance from the enemy. The closer the enemy, the greater the bonus.",
+    "stats": []
+  },
+  {
+    "name": "Force of Nature",
+    "type": "Augment",
+    "description": "Calamity (Branch 2) While Onslaughter is active, Gun Damage dealt to enemies will Prime them for a Duration, and will Detonate when they die or are damaged by a Forgeskill, dealing Incendiary Damage to nearby enemies. Detonations can also be caused by Melee Attack Damage, but deal less Damage. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Burning Ramparts",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Amon gains increased Fire Rate and Status Effect Chance the more full his Shields.",
+    "stats": []
+  },
+  {
+    "name": "Harbinger",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Kill Skill. Amon gains increased Melee Damage and Maximum Shield Capacity for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Rearm",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Whenever Amon deals Damage with a Melee Attack, his current Gun has its Ammo partially refilled.",
+    "stats": []
+  },
+  {
+    "name": "Maiming Strike",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Gun Critical Hits have a chance to apply Weakness to enemies for a Duration. Weakened enemies deal reduced Damage, and take increased Damage. Weakness is affected by Status Effect Duration, and is itself considered a Status Effect.",
+    "stats": []
+  },
+  {
+    "name": "Molten Roil",
+    "type": "Capstone",
+    "description": "Calamity (Branch 2) Pyres deal additional Incendiary Melee Damage based on Damage Stored by Molten Slam, distributed among the remaining targets.",
+    "stats": []
+  },
+  {
+    "name": "Mortal Flare",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Whenever Amon kills a Weakened enemy, they Detonate, dealing Incendiary Melee Damage to nearby enemies.",
+    "stats": []
+  },
+  {
+    "name": "Catastrophe",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Whenever Amon applies Shock to an enemy, he gains increased Critical Hit Chance for a Duration. Whenever Amon applies Burning to an enemy, he gains increased Critical Hit Damage for a Duration. Both effects stack separately.",
+    "stats": []
+  },
+  {
+    "name": "Fulminating Fist",
+    "type": "Augment",
+    "description": "Calamity (Branch 3) Amon gains increased Status Effect Chance while Onslaughter is active. Pressing Action Skill launches a concentrated Lightning Wave that deals Shock Melee Attack Damage to enemies it passes through.",
+    "stats": []
+  },
+  {
+    "name": "Dragon's Breath",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Whenever Amon Activates his Ordnance, his next Gun Shot is converted to Incendiary Damage, Staggering damaged enemies, and gaining increased Damage Dealt. Bosses cannot be Staggered, and Badasses have a chance to be Staggered.",
+    "stats": []
+  },
+  {
+    "name": "Judgment",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Amon deals increased Melee Damage to enemies below 50% total HP.",
+    "stats": []
+  },
+  {
+    "name": "Fists of Stone",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Whenever Amon deals Melee Damage, Restore a percentage of Forgeskill Cooldown. Melee Attacks Double this effect.",
+    "stats": []
+  },
+  {
+    "name": "Crackling Aegis",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Amon gains increased Status Effect Damage and Ordnance Damage based on his Shields. The fuller his Shield, the greater the effect.",
+    "stats": []
+  },
+  {
+    "name": "Electrical Fire",
+    "type": "Passive",
+    "description": "Calamity (Branch 3) Whenever Amon Burns an enemy, he also Shocks them. Whenever Amon Shocks an enemy, he also Burns them.",
+    "stats": []
+  },
+  {
+    "name": "Stormcutter",
+    "type": "Capstone",
+    "description": "Calamity (Branch 3) Molten Slam is now Stormcutter. Press and hold Action Skill to swing a Massive Forgesword, launching a Forgewave that deals Shock Melee Damage to all enemies it passes through. Restore Action Skill Cooldown, Action Skill Duration, and Ordnance Cooldown for each enemy hit.",
+    "stats": []
+  },
+  {
+    "name": "Wrath of Nature",
+    "type": "Passive",
+    "description": "Vengeance Amon gains increased Status Effect Application Chance and Cryo Effectiveness. This effect is Doubled when his Action Skill is active.",
+    "stats": []
+  },
+  {
+    "name": "Scorched Kairos",
+    "type": "Passive",
+    "description": "Vengeance Amon gains increased Ordnance Damage and Magazine Size.",
+    "stats": []
+  },
+  {
+    "name": "The Thrill",
+    "type": "Passive",
+    "description": "Amon gains Missing Health Regeneration. Every time Amon takes or absorbs Non-Status Effect Damage, he gains a Stack of Resolute for a Duration, which increases this effect.",
+    "stats": []
+  },
+  {
+    "name": "Battleborn",
+    "type": "Passive",
+    "description": "Vengeance Amon gains increased Gun Damage the more Full his Health. This effect is Doubled while Amon is at Maximum Health.",
+    "stats": []
+  },
+  {
+    "name": "Eternal",
+    "type": "Passive",
+    "description": "Vengeance Amon gains increased Action Skill Duration and Gun Swap Speed.",
+    "stats": []
+  },
+  {
+    "name": "Blastchill",
+    "type": "Augment",
+    "description": "Vengeance Forgewaves now consume more Vengeance and explode on impact, dealing Cryo Ordnance Damage in an area. Explosion Radius is further increased if the Forgewave passes through Firewall.",
+    "stats": []
+  },
+  {
+    "name": "Tail of the Comet",
+    "type": "Passive",
+    "description": "Vengeance Whenever Amon deals Ordnance Damage, there is a Chance to apply a Cryo Status Effect that deals Cryo Damage over time for a Duration. Tail of the Comet is affected by Status Effect Application Chance.",
+    "stats": []
+  },
+  {
+    "name": "Cryonic Thrum",
+    "type": "Augment",
+    "description": "Vengeance While Scourge is active, Amon Taunts enemies and sends out a Cryonic Pulse every second, dealing Cryo Damage to enemies, and restoring Allies' Health. While Aiming, Amon's Movement Speed is reduced, but Amon gains Bonus Cryo Damage with Guns and consumes Vengeance on each Gun Shot.",
+    "stats": []
+  },
+  {
+    "name": "Scar Tissue",
+    "type": "Passive",
+    "description": "Vengeance Amon gains increased Maximum Health Capacity and Repkit Healing.",
+    "stats": []
+  },
+  {
+    "name": "Bullet Hail",
+    "type": "Passive",
+    "description": "Vengeance Amon's Gun Shots have a Chance to Ricochet as an Elemental Shard, dealing Cryo Damage.",
+    "stats": []
+  },
+  {
+    "name": "Machinist",
+    "type": "Passive",
+    "description": "Vengeance Kill Skill. Amon Restores a percentage of Ordnance Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Ancient Ways",
+    "type": "Passive",
+    "description": "Vengeance Amon deals increased Cryo Damage.",
+    "stats": []
+  },
+  {
+    "name": "Warrior's Cup",
+    "type": "Passive",
+    "description": "Vengeance Whenever Amon uses a Repkit while his Action Skill is active, partially restore Action Skill Duration.",
+    "stats": []
+  },
+  {
+    "name": "Wildfire",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Amon gains increased Ricochet Damage, Burning Damage, and Burning Duration.",
+    "stats": []
+  },
+  {
+    "name": "Molten Rebuke",
+    "type": "Augment",
+    "description": "Vengeance (Branch 1) Forgewave is now Molten Rebuke. Press Action Skill to Consume all Vengeance and throw the Forgeshield at target enemy, dealing Incendiary Ordnance Damage, and Ricocheting on impact. Molten Rebuke Ricochets additional times based on Vengeance consumed. Whenever the Forgeshield is thrown, Damage Absorption is Disabled until it returns.",
+    "stats": []
+  },
+  {
+    "name": "Burning Rage",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Kill Skill. Killing an enemy with Incendiary Damage will grant a Stack of Flame Affinity for a Duration. Flame Affinity Stacks grant increased Reload Speed and Action Skill Cooldown Rate.",
+    "stats": []
+  },
+  {
+    "name": "Ballistic Bulwark",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Amon gains Overshield when he deals Ordnance Damage.",
+    "stats": []
+  },
+  {
+    "name": "Disco Infernus",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Whenever Amon applies Burning to an enemy, he gains increased Fire Rate for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Worldbreaker",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Whenever Amon Ground Slams, he consumes all Flame Affinity Stacks to create a Flame Fissure in front of him, dealing Incendiary Melee Damage to all enemies hit. Worldbreaker deals Bonus Damage for each Stack of Flame Affinity consumed.",
+    "stats": []
+  },
+  {
+    "name": "Ring of Frostfire",
+    "type": "Capstone",
+    "description": "Vengeance (Branch 1) Firewall is now a Ring that deals Incendiary Status Effect Damage to enemies inside of it, and Cryo Damage to enemies who enter or leave. Firewall grants Friendly Projectiles that pass through it further increased Damage and Projectile Speed.",
+    "stats": []
+  },
+  {
+    "name": "Cooling Mantle",
+    "type": "Passive",
+    "description": "Vengeance (Branch 1) Kill Skill. Partially Restore Worldbreaker's Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Icy Rage",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Kill Skill. Killing an enemy with Cryo Damage will grant a Stack of Cryo Affinity for a Duration. Cryo Affinity Stacks grant increased Gun Damage.",
+    "stats": []
+  },
+  {
+    "name": "Eternal Winter",
+    "type": "Augment",
+    "description": "Vengeance (Branch 2) Forgewaves now partially restore Action Skill Duration and Firewall Duration on damaging enemies, and can be activated three times in succession. The third activation launches a Massive Forgewave that deals increased Damage and does not consume Vengeance.",
+    "stats": []
+  },
+  {
+    "name": "Northern Wind",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Amon's Gun Critical Hits have a Chance to apply additional Slow to enemies, as if dealt Cryo Damage. Chance is Doubled while his Action Skill is active.",
+    "stats": []
+  },
+  {
+    "name": "Winter's Kiss",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Whenever Amon deals Ordnance Damage, he consumes a Stack of Cryo Affinity for each nearby enemy to spawn an Elemental Shard, dealing Cryo Damage in an area.",
+    "stats": []
+  },
+  {
+    "name": "Primal Surge",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Whenever Amon applies a Status Effect to an enemy, there is a Chance to partially restore his Shield and Ammo.",
+    "stats": []
+  },
+  {
+    "name": "Age of Ice",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Amon deals increased Damage to Frozen enemies and Bosses.",
+    "stats": []
+  },
+  {
+    "name": "Caroming Shard",
+    "type": "Passive",
+    "description": "Vengeance (Branch 2) Elemental Shard has a Chance to Ricochet.",
+    "stats": []
+  },
+  {
+    "name": "Glacial Rapture",
+    "type": "Capstone",
+    "description": "Vengeance (Branch 2) Firewall is now Glacial Rapture. Press and hold Action Skill to swing Forgewhips, dealing Cryo Ordnance Damage over 2 Hits to nearby enemies before slamming into the ground, creating a Cryonic Fissure that deals Cryo Ordnance Damage and leaves Cryo Hazards for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Blackout",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) Ordnance Damage has a Chance to Critically Hit, and Shock enemies when they do.",
+    "stats": []
+  },
+  {
+    "name": "Stormlance",
+    "type": "Augment",
+    "description": "Vengeance (Branch 3) Forgewave is now Stormlance. Press Action Skill to throw a Forgespear, dealing Shock Ordnance Damage on impact, consuming Vengeance to increase Damage Dealt. Enemies damaged by Forgespear are Primed for a Duration, and will Detonate when they are damaged by a Forgeskill, dealing Shock Damage to the target, but none to nearby enemies. Detonations can also be caused by Gun Critical Hits, but deal less Damage. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Thunderous Rage",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) Kill Skill. Killing an enemy with Shock Damage will grant a Stack of Shock Affinity for a Duration. Shock Affinity Stacks grant increased Critical Hit Damage.",
+    "stats": []
+  },
+  {
+    "name": "Tactician",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) While Hipfiring, Amon gains increased Fire Rate, but decreased Gun Handling. While Aiming, Amon gains increased Gun Damage and Gun Handling.",
+    "stats": []
+  },
+  {
+    "name": "Smelter",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) Kill Skill. Amon Restores a percentage of Forgeskill Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Strike the Anvil",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) Whenever Amon deals Action Skill Damage, he consumes a Stack of Shock Affinity to cause an Elemental Bolt to strike that enemy, dealing Shock Damage.",
+    "stats": []
+  },
+  {
+    "name": "Wrathfall",
+    "type": "Capstone",
+    "description": "Vengeance (Branch 3) Firewall is now Wrathfall. Press and hold Action Skill to call down a Massive Forgesword to strike a target enemy, dealing Shock Ordnance Damage to enemies in the area. Wrathfall always Critically Hits.",
+    "stats": []
+  },
+  {
+    "name": "High Voltage",
+    "type": "Passive",
+    "description": "Vengeance (Branch 3) Elemental Bolts now Stagger enemies, and consume an additional Stack of Shock Affinity to Multiply Damage Dealt. Bosses cannot be Staggered, and Badasses have a reduced Chance to be Staggered.",
+    "stats": []
+  },
+  {
+    "name": "Cast Iron",
+    "type": "Passive",
+    "description": "Cybernetics Amon gains increased Forgeskill Cooldown Rate and Gun Handling.",
+    "stats": []
+  },
+  {
+    "name": "Gathering Storm",
+    "type": "Passive",
+    "description": "Cybernetics Kill Skill. Amon deals increased Elemental Damage for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Executioner",
+    "type": "Passive",
+    "description": "Cybernetics Amon gains increased Critical Hit Damage. The effect is Doubled for a Duration after dealing Melee Damage.",
+    "stats": []
+  },
+  {
+    "name": "Get The Lead Out",
+    "type": "Passive",
+    "description": "Cybernetics Amon gains increased Reload Speed. The effect is Doubled for a Duration after causing a Detonation.",
+    "stats": []
+  },
+  {
+    "name": "Destruction Engine",
+    "type": "Passive",
+    "description": "Cybernetics Amon gains increased Forgeskill Damage and Detonation Damage.",
+    "stats": []
+  },
+  {
+    "name": "Axe and Stone",
+    "type": "Augment",
+    "description": "Cybernetics Amon gains increased Movement Speed for a Duration after damaging an enemy with a Forgeaxe, and can Detonate Primed enemies with a Melee Attack. Detonating a Flame Axe restores Action Skill Cooldown. Detonating a Cryo Axe restores Ordnance Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Tempered Pyre",
+    "type": "Passive",
+    "description": "Cybernetics Forgedrone Skill. Whenever Amon activates his Forgeskill, he spawns an Axe Forgedrone that attacks nearby enemies for a Duration, dealing Incendiary Melee Damage. Activating a Forgeskill while Tempered Pyre is active fully Restores the Duration of all active Forgedrones.",
+    "stats": []
+  },
+  {
+    "name": "Endless War",
+    "type": "Augment",
+    "description": "Cybernetics Primed enemies take increased Gun Damage for each stack of Prime. If Amon Detonates a Primed enemy, a new Forgeaxe is spawned that seeks out a nearby enemy.",
+    "stats": []
+  },
+  {
+    "name": "Bolt Action",
+    "type": "Passive",
+    "description": "Cybernetics Whenever Amon Reloads, his Guns gain Bonus Shock Damage for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Bellows",
+    "type": "Passive",
+    "description": "Cybernetics Whenever Amon Activates his Forgeskill, he gains increased Gun Damage for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Twin Tempers",
+    "type": "Passive",
+    "description": "Cybernetics Tempered Pyre now spawns an additional Axe Forgedrone that deals Cryo Melee Damage. Forgedrones from Tempered Pyre have reduced Duration.",
+    "stats": []
+  },
+  {
+    "name": "Vital Organs",
+    "type": "Passive",
+    "description": "Cybernetics Kill Skill. Amon gains Critical Hit Chance with Guns for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Herald's Call",
+    "type": "Passive",
+    "description": "Cybernetics Amon gains increased Shock Damage.",
+    "stats": []
+  },
+  {
+    "name": "Tempered Ice",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Forgedrone Skill. Whenever Amon activates his Ordnance, he spawns a Hammer Forgedrone that attacks nearby enemies for a Duration, dealing Cryo Melee Damage.",
+    "stats": []
+  },
+  {
+    "name": "Hour of the Hammer",
+    "type": "Augment",
+    "description": "Cybernetics (Branch 1) Amon now readies Forgehammers, choosing Frost or Shock. Enemies damaged by Forgehammer are Primed for a Duration, and will Detonate when they die or are damaged by a Forgeskill, dealing Damage to nearby enemies. Can throw a Cryo Hammer, dealing Cryo Melee Damage in an area on impact, or a Shock Hammer, dealing Shock Melee Damage in an area on impact.",
+    "stats": []
+  },
+  {
+    "name": "Cacophony",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Amon gains increased Ordnance Damage and Detonation Radius.",
+    "stats": []
+  },
+  {
+    "name": "Masterwork",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Forgedrones gain increased Damage and Duration.",
+    "stats": []
+  },
+  {
+    "name": "Endless Bombardment",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Grenades have a Chance to refund themselves on use. Heavy Ordnance have a Chance to refund 1 Ammo on damaging enemies.",
+    "stats": []
+  },
+  {
+    "name": "Stoked",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Whenever Amon deals Ordnance Damage, he gains increased Fire Rate for a Duration. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Ordained Hammer",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 1) Hammer Forgedrones now deal Ordnance Damage in addition to their other types and gain a Chance to cause a Detonation on damaging enemies, dealing Cryo Damage in an area.",
+    "stats": []
+  },
+  {
+    "name": "Snowmaul",
+    "type": "Capstone",
+    "description": "Cybernetics (Branch 1) Double-Edge is now Snowmaul. Press and hold Action Skill to throw a Twinned Forgehammer, dealing Cryo Melee Damage to nearby enemies on impact that Ricochets between nearby enemies up to 3 times. If no Ricochet targets are found, it deals Damage an additional time before destroying itself. For each Detonation caused, it Ricochets an additional time.",
+    "stats": []
+  },
+  {
+    "name": "Blast Furnace",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Whenever Amon or his Forgedrones Critically Hit an enemy or cause a Detonation, he gains increased Damage Dealt for a Duration. Detonations grant multiple Stacks.",
+    "stats": []
+  },
+  {
+    "name": "Blade Tempest",
+    "type": "Augment",
+    "description": "Cybernetics (Branch 2) Amon now readies Forgeswords, choosing Flame or Shock. Whenever activated, consume all Charges to launch a Barrage of Forgeswords. Enemies damaged by Forgeswords are Primed for a Duration, and will Detonate when they die or are damaged by a Forgeskill dealing Damage to the target, but none to nearby enemies. Can fire a Barrage of Flame Swords, dealing Incendiary Melee Damage, or a Barrage of Shock Swords, dealing Shock Melee Damage. This effect can stack.",
+    "stats": []
+  },
+  {
+    "name": "Tempered Lightning",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Forgedrone Skill. Whenever Amon activates his Action Skill, he spawns a Sword Forgedrone that attacks nearby enemies for a Duration, dealing Shock Melee Damage. Activating an Action Skill while Tempered Lightning is active will partially Restore the Duration of all active Forgedrones.",
+    "stats": []
+  },
+  {
+    "name": "Armor of Contempt",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Amon gains Overshield when he deals Action Skill Damage.",
+    "stats": []
+  },
+  {
+    "name": "Lightning Rod",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Amon's Gun Shots have a Chance on Critical Hit to spawn an Elemental Bolt, dealing Shock Damage.",
+    "stats": []
+  },
+  {
+    "name": "Escalation",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Forgedrones gain increased Attack Speed and Movement Speed.",
+    "stats": []
+  },
+  {
+    "name": "Storm Surge",
+    "type": "Capstone",
+    "description": "Cybernetics (Branch 2) Double-Edge is now Storm Surge. Press and hold Action Skill to throw a Twinned Forgeblade, dealing Shock Melee Damage in an area on impact. Storm Surge creates a Forgestorm on impact for a Duration, dealing Shock Status Effect Damage over time.",
+    "stats": []
+  },
+  {
+    "name": "Honed Point",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 2) Forgedrones have a Chance to Critically Hit. Whenever a Forgedrone Critically Hits, they partially restore Amon's Action Skill Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Permafrost",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Whenever Amon Freezes an enemy, Cryo Hazard is created under them, dealing Cryo Damage for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Searing Cold",
+    "type": "Augment",
+    "description": "Cybernetics (Branch 3) Frost Axes apply Freeze on impact. Flame Axes now pass through enemies.",
+    "stats": []
+  },
+  {
+    "name": "Raging Inferno",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Action Skill Damage has a Chance to Critically Hit and Burn enemies when it does.",
+    "stats": []
+  },
+  {
+    "name": "Wildheart",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Amon gains increased Status Effect Damage and Hazard Damage.",
+    "stats": []
+  },
+  {
+    "name": "Freezer Burn",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Dealing Incendiary Damage with Guns increases Cryo Damage for a Duration. Dealing Cryo Damage with Guns increases Incendiary Damage for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Reactive Armor",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Detonations partially Restore Amon's Shield and Ordnance Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "Reverse Explosion",
+    "type": "Passive",
+    "description": "Cybernetics (Branch 3) Whenever Amon deals Forgeskill Damage, he creates a Drone Singularity for a Duration.",
+    "stats": []
+  },
+  {
+    "name": "Conflangarang",
+    "type": "Capstone",
+    "description": "Cybernetics (Branch 3) Double-Edge now deals Incendiary Melee Damage in both directions, gains increased Radius, and leaves a trail of Fire as it travels if close enough to the ground, dealing Incendiary Damage over time. Causing a Detonation or damaging an enemy with Conflangarang will restore Forgeskill Cooldown.",
+    "stats": []
+  },
+  {
+    "name": "The Thrill (Amon)",
+    "type": "Passive",
+    "description": "Vengeance Amon gains Missing Health Regeneration. Every time Amon takes or absorbs Non-Status Effect Damage, he gains a Stack of Resolute for a Duration, which increases this effect.",
+    "stats": []
+  },
+  {
+    "name": "Into the Fray",
+    "type": "Passive",
+    "description": "Calamity (Branch 2) Amon gains increased Damage Dealt and Damage Reduction based on his distance from the enemy. The closer the enemy, the greater the bonus.",
+    "stats": []
+  }
+]

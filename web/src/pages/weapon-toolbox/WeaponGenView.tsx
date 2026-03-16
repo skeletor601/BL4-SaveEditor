@@ -9,17 +9,14 @@ import {
 } from "@/lib/apiClient";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 import ThemedSelect from "@/components/weapon-toolbox/ThemedSelect";
+import {
+  generateModdedWeapon,
+  type WeaponEditData,
+  type UniversalDbPartCode,
+} from "@/lib/generateModdedWeapon";
+import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 
 const NONE = "None";
-const FLAG_OPTIONS = [
-  { value: 1, label: "1 (Normal)" },
-  { value: 3, label: "3 (Favorite)" },
-  { value: 5, label: "5 (Junk)" },
-  { value: 17, label: "17 (Group1)" },
-  { value: 33, label: "33 (Group2)" },
-  { value: 65, label: "65 (Group3)" },
-  { value: 129, label: "129 (Group4)" },
-];
 
 const MULTI_SLOTS: Record<string, number> = {
   "Body Accessory": 4,
@@ -195,6 +192,8 @@ export default function WeaponGenView({
     parts: string[];
   } | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [isGeneratingModded, setIsGeneratingModded] = useState(false);
+  const [moddedPowerMode, setModdedPowerMode] = useState<"stable" | "op" | "insane">("op");
 
   const mfgWtId =
     data?.mfgWtIdList.find(
@@ -306,7 +305,21 @@ export default function WeaponGenView({
   useEffect(() => {
     let cancelled = false;
     fetchApi("weapon-gen/data")
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok) {
+          const text = await r.text();
+          let msg = `Weapon data error (${r.status}). `;
+          try {
+            const j = text ? JSON.parse(text) : {};
+            if (typeof j.error === "string") msg += j.error;
+            else msg += text.slice(0, 200) || "Check API logs.";
+          } catch {
+            msg += text.slice(0, 200) || "Check API logs.";
+          }
+          throw new Error(msg);
+        }
+        return r.json();
+      })
       .then((d) => {
         if (!cancelled) {
           setData(d);
@@ -318,8 +331,15 @@ export default function WeaponGenView({
           if (d.weaponTypes?.length && !list.length) setWeaponType(d.weaponTypes[0]);
         }
       })
-      .catch(() => {
-        if (!cancelled) setLoadError("Could not load weapon data. Is the API running?");
+      .catch((e) => {
+        if (!cancelled) {
+          const msg = e instanceof Error ? e.message : String(e);
+          const hint =
+            msg.includes("Failed to fetch") || msg.includes("Load failed") || msg.includes("NetworkError")
+              ? " Open the app at http://localhost:5173 and ensure the API is running (e.g. in api folder: npm run dev, port 3001)."
+              : "";
+          setLoadError(`Could not load weapon data.${hint} ${msg}`.trim());
+        }
       });
     return () => {
       cancelled = true;
@@ -568,6 +588,74 @@ export default function WeaponGenView({
       setMessage("No God Rolls loaded. Add godrolls.json to the project.");
     }
   }, [data?.godrolls]);
+
+  const handleGenerateModded = useCallback(async () => {
+    if (!mfgWtId) { setMessage("Select manufacturer and weapon type first."); return; }
+    setIsGeneratingModded(true);
+    setMessage(null);
+    try {
+      const base = window.location.origin || "";
+      const [editRes, partsRes, visualBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
+        fetchApi("weapon-edit/data"),
+        fetchApi("parts/data"),
+        fetch(`${base}/data/visual_heavy_barrels.json`).catch(() => null),
+        fetch(`${base}/data/allowed_underbarrels.json`).catch(() => null),
+        fetch(`${base}/data/desirable_underbarrels.json`).catch(() => null),
+        fetch(`${base}/data/legendary_grenades.json`).catch(() => null),
+        fetch(`${base}/data/grenade_visual_recipes.json`).catch(() => null),
+      ]);
+      const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
+      if (!editData?.parts?.length) { setMessage("Weapon edit data failed to load. Try again."); return; }
+      const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
+      const items = Array.isArray(partsPayload?.items) ? partsPayload.items : [];
+      const universalPartCodes: UniversalDbPartCode[] = [];
+      for (const it of items) {
+        if (!it || typeof it !== "object") continue;
+        const raw = it as Record<string, unknown>;
+        const code = String(raw.code ?? raw.Code ?? "").trim();
+        if (!code) continue;
+        universalPartCodes.push({
+          code,
+          partType: String(raw.partType ?? raw["Part Type"] ?? "").trim(),
+          rarity: String(raw.rarity ?? raw.Rarity ?? "").trim(),
+          itemType: String(raw.itemType ?? raw["Item Type"] ?? raw["Weapon Type"] ?? "").trim(),
+          manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? "").trim(),
+          statText: [raw.statText, raw.Stats, raw.stat, raw.string, raw.partName].map((v) => String(v ?? "").trim()).filter(Boolean).join(" "),
+          string: String(raw.string ?? raw.String ?? raw.partName ?? "").trim(),
+          partName: String(raw.partName ?? raw.name ?? "").trim(),
+          uniqueEffect: raw.uniqueEffect === true,
+          visualUniqueBarrel: raw.visualUniqueBarrel === true,
+        });
+      }
+      if (!universalPartCodes.length) { setMessage("Parts data failed to load. Try again."); return; }
+      const visualBarrelEntries = visualBarrelsRes?.ok ? ((await visualBarrelsRes.json().catch(() => [])) as Array<{ name: string; code: string }>) : [];
+      const allowedUnderbarrelsPayload = allowedUnderbarrelsRes?.ok ? await allowedUnderbarrelsRes.json().catch(() => null) : null;
+      const allowedUnderbarrelEntries = allowedUnderbarrelsPayload?.parts?.length > 0 ? allowedUnderbarrelsPayload : undefined;
+      const underbarrelsPayload = underbarrelsRes?.ok ? await underbarrelsRes.json().catch(() => null) : null;
+      const desirableUnderbarrelEntries = underbarrelsPayload?.parts?.length > 0 ? underbarrelsPayload : Array.isArray(underbarrelsPayload) && underbarrelsPayload.length > 0 ? underbarrelsPayload : undefined;
+      const legendaryGrenadeEntries = legendaryGrenadesRes?.ok ? ((await legendaryGrenadesRes.json().catch(() => [])) as Array<{ name: string; code: string }>) : [];
+      const grenadeVisualRecipes = visualRecipesRes?.ok ? ((await visualRecipesRes.json().catch(() => [])) as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[]) : [];
+      const nonChristmasSkins = (data?.skins ?? []).filter((s) => !/christmas/i.test(s.label) && !/christmas/i.test(s.value));
+      const lvl = /^\d+$/.test(level) ? Number(level) : 50;
+      const { code: decoded } = generateModdedWeapon(editData, universalPartCodes, {
+        level: lvl,
+        modPowerMode: moddedPowerMode,
+        forcedPrefix: Number(mfgWtId),
+        skin: skinToken ?? undefined,
+        skinOptions: nonChristmasSkins,
+        visualBarrelEntries: visualBarrelEntries.length > 0 ? visualBarrelEntries : undefined,
+        allowedUnderbarrelEntries,
+        desirableUnderbarrelEntries,
+        legendaryGrenadeEntries: legendaryGrenadeEntries.length > 0 ? legendaryGrenadeEntries : undefined,
+        grenadeVisualRecipes: grenadeVisualRecipes.length > 0 ? grenadeVisualRecipes : undefined,
+      });
+      await encodeAndSet(decoded.trim());
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Generate modded weapon failed.");
+    } finally {
+      setIsGeneratingModded(false);
+    }
+  }, [mfgWtId, level, moddedPowerMode, skinToken, data?.skins, encodeAndSet]);
 
   const godRollAddToBackpack = useCallback(async () => {
     const list = data?.godrolls ?? [];
@@ -1054,6 +1142,25 @@ export default function WeaponGenView({
           title="Randomize manufacturer, type, level, seed, all parts, and skin"
         >
           Surprise Me
+        </button>
+        <select
+          value={moddedPowerMode}
+          onChange={(e) => setModdedPowerMode(e.target.value as "stable" | "op" | "insane")}
+          className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+          title="Power level for modded weapon generation"
+        >
+          <option value="stable">Stable</option>
+          <option value="op">OP</option>
+          <option value="insane">Insane</option>
+        </select>
+        <button
+          type="button"
+          onClick={() => void handleGenerateModded()}
+          disabled={isGeneratingModded || !mfgWtId}
+          className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black min-h-[44px] font-medium hover:opacity-90 disabled:opacity-50"
+          title="Generate a fully modded legendary weapon using the selected manufacturer/type"
+        >
+          {isGeneratingModded ? "Generating…" : "Generate Modded"}
         </button>
         <button
           type="button"

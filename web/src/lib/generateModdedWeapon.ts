@@ -1,6 +1,41 @@
 /**
  * Shared modded weapon generator. Returns a single-line decoded weapon string.
  * Used by Unified Item Builder (in-place) and can be used by Weapon Edit view.
+ *
+ * ========== LOCKED RULES – DO NOT REVERT OR REMOVE ==========
+ * 1. Magazine: ONLY Vladof 50-round {18:14}. No pickMagazineToken(), no COV/Order.
+ * 2. Stat stacks: NEVER use code 27:75 (exclude via isExcludedStatCode).
+ * 3. Exemplar: {9:[28 32 40 55 59 62...]} — two separate groups per gun, cycling those IDs. Terra confirmed great.
+ * 4. Grenade 245 block: only part IDs 22–81 (perks/augments). Legendary grenade from JSON.
+ * 5. Barrels: when allowedBarrelEntries is set, only those barrels; same for allowedUnderbarrelEntries.
+ *    Terra's rule: MAX 5 unique barrel codes per gun. Slots = visual(1)+primary(1)+extra_same_prefix(0-2)+cross(0-1).
+ *    Extra barrels are stacked as grouped tokens (amplifies effect); cross-prefix limited to 0-1 unique code.
+ * 6. Underbarrel: exclude malswitch (UNDERBARREL_EXCLUDED). When allowedUnderbarrelEntries set, use only that list.
+ * 7. Skin: use options.skin or random from skinOptions (non-Christmas). Always add skin when chosenSkin is set.
+ * 8. Tediore Reload no stat changes: always include when available. Underbarrel then foregrip (one only).
+ * 9. Full-auto string (Terra-confirmed exact values): {281:[3×36]} Free Charger, {275:[23×9]} Heat Exchange, {26:[30×3]} Order SR mag — makes any gun fully automatic.
+ *    Also: {282:14} Angel's Share, {286:1} Ventilator (variable stacks).
+ * 10. Seamstress extras when {26:77} underbarrel detected: {13:70} + {11:75} Anarchy (12 pellets) + {11:81} Eigenburst barrel.
+ * 11. Pearl rarity: ALWAYS put {11:82} (Eigenburst rarity) as the absolute FIRST token. Rarity = first token wins.
+ * 12. Class mod perks cross-insert: {234:[21-31...]} — class mod skill perk IDs embedded in weapon, imports skill behaviors.
+ * 13. Stacked Vladof mags: {18:[14×N]} instead of single {18:14}. Stack 8-16 times by mode.
+ * 14. Split Rowan's + fire rate: separate grouped tokens {27:[15×N]} and {27:[75×N]} instead of mixed.
+ * 15. Pearl rarity pool: pick from [{11:82},{25:82}] — confirmed codes. First token always wins rarity.
+ * 16. Extreme same-prefix stacking: pick a random barrel/body acc from own prefix, repeat 30-80×.
+ * 17. {292:[9×10]} Tediore Enhancement Divider — exactly 10 stacks on every gun. Terra-confirmed rule.
+ * 18. {11:75} near end on every gun — Terra confirmed: enables player flight.
+ * 19. Terra's perfect gun (type 20, seed 420) rules — all confirmed:
+ *     {298:11} Torgue grenade anchor before {245:[...]} block (alongside {291:8}).
+ *     {287:[9×150]} Tediore Shield cross-insert. {234:[42×50]} class mod perk 42 dominant.
+ *     {299/268/271:[1 1 9 9 2 2 3 3]} enhancement cross-inserts (all 3 manufacturers).
+ *     {292:[9 9 2 2 3 3 9 9 9 9 9]} Tediore Enhancement (variant pattern).
+ *     {246:[22-58...]} Shield body cross-insert. {14:[78 3 3...]} stability group with part 78.
+ *     Grenade perk 72 is the dominant visual (42 stacks). New heavy perk IDs: 34,39,45,64,77,78.
+ *     {289:16}={MAL_HW MIRV, spawns 3 orbs}, {289:2}={MAL_HW MIRV dXa variant} — both in {289} block = main gun visuals.
+ *     {289:[17 16 2 17...]} Two-Shot + both MIRV variants. {26:77} Seamstress = alt fire + wild reload.
+ *     Tediore MIRV cross-inserts ({13:21},{2:71},...) from all weapon types — pick N, adds MIRV to shots.
+ * See docs/MODDED_WEAPON_GENERATOR_RULES.md for full list. Do not "restore" or "uncomment" {9:[...]} or other magazines.
+ * ========== END LOCKED RULES ==========
  */
 
 export interface WeaponEditPartRow {
@@ -29,6 +64,7 @@ export interface UniversalDbPartCode {
   partType?: string;
   rarity?: string;
   itemType?: string;
+  weaponType?: string;
   manufacturer?: string;
   statText?: string;
   string?: string;
@@ -37,10 +73,86 @@ export interface UniversalDbPartCode {
   visualUniqueBarrel?: boolean;
 }
 
+/** Manually curated list: name + code, e.g. { name: "Onslaught", code: "{22:68}" }. Load from /data/visual_heavy_barrels.json */
+export interface VisualBarrelEntry {
+  name: string;
+  code: string;
+}
+/** Manually curated list for underbarrel slot. Load from /data/desirable_underbarrels.json */
+export interface DesirableUnderbarrelEntry {
+  name: string;
+  code: string;
+}
+/** Underbarrel part (actual underbarrel). partType pairs with accessories. */
+export interface DesirableUnderbarrelPart {
+  name: string;
+  code: string;
+  partType?: string;
+}
+/** Underbarrel accessory; must be used with a part that has the same partType. */
+export interface DesirableUnderbarrelAccessory {
+  name: string;
+  code: string;
+  partType: string;
+}
+export type DesirableUnderbarrelData =
+  | DesirableUnderbarrelEntry[]
+  | { parts: DesirableUnderbarrelPart[]; accessories?: DesirableUnderbarrelAccessory[] };
+
+/** A single entry in a grenade visual recipe group: perk id repeated n times (at insane scale). */
+export interface GrenadeVisualRecipeEntry {
+  id: number;
+  n: number;
+}
+/** One {245:[...]} token worth of entries. Order is ABSOLUTE. */
+export interface GrenadeVisualRecipeGroup {
+  entries: GrenadeVisualRecipeEntry[];
+}
+/**
+ * Named visual recipe. Each group produces one {245:[...]} token.
+ * Stack counts are scaled by mode (stable=1.0×, op=2.0×, insane=3.5×) with ±20% jitter, min 1.
+ * Recipe n values represent the STABLE baseline. Effects are multiplicative so higher modes amplify significantly.
+ * Elemental code swaps on any recipe produce entirely new visuals — only the 245 block changes.
+ */
+export interface GrenadeVisualRecipe {
+  id: string;
+  label: string;
+  notes?: string;
+  groups: GrenadeVisualRecipeGroup[];
+}
+
 export interface GenerateModdedWeaponOptions {
   level?: number;
   modPowerMode?: "stable" | "op" | "insane";
   skin?: string;
+  /** When set, force the generator to use this mfgWtId prefix (from the weapon builder dropdown). */
+  forcedPrefix?: number;
+  /** When set, a code is picked at random and pasted to the left of the first barrel. Edit web/public/data/visual_heavy_barrels.json */
+  visualBarrelEntries?: VisualBarrelEntry[];
+  /** When set, only barrels in this list are used (primary + extra + cross). Edit web/public/data/allowed_barrels.json. */
+  allowedBarrelEntries?: Array<{ name: string; code: string }>;
+  /** When set, ONLY underbarrels (and accessories) from this list are used; no fallback to edit data. Edit web/public/data/allowed_underbarrels.json. Same shape as desirableUnderbarrelData. */
+  allowedUnderbarrelEntries?: DesirableUnderbarrelData;
+  /** When set, underbarrel is picked from this list instead of from edit data. Edit web/public/data/desirable_underbarrels.json. Ignored if allowedUnderbarrelEntries is set. */
+  desirableUnderbarrelEntries?: DesirableUnderbarrelData;
+  /** When set, grenade block wrapper uses only these codes (actual legendary grenades from web/public/data/legendary_grenades.json). Format: { "name": "...", "code": "{prefix:part}" }. */
+  legendaryGrenadeEntries?: Array<{ name: string; code: string }>;
+  /** When skin is not set, a random skin is picked from this list (excluding Christmas). */
+  skinOptions?: Array<{ label: string; value: string }>;
+  /**
+   * Named visual recipes from web/public/data/grenade_visual_recipes.json.
+   * When set, one recipe is picked at random and used to drive the {245:[...]} perk block.
+   * Each group in the recipe becomes one {245:[...]} token. Scales by modPowerMode.
+   * Falls back to the hardcoded Terra pattern when not provided.
+   */
+  grenadeVisualRecipes?: GrenadeVisualRecipe[];
+  /**
+   * Special mode for the modded weapon generator.
+   * - "grenade-reload": always add the grenade block; never add Rowan's Charge (27:75) stacks.
+   * - "inf-ammo": always add 7× Rowan's Charge (27:75) stacks; skip the grenade block entirely.
+   * - undefined/null: default probabilistic behaviour (tediore check + 35% chance).
+   */
+  specialMode?: "grenade-reload" | "inf-ammo" | null;
 }
 
 type ParsedComponent =
@@ -111,16 +223,68 @@ function parseComponentString(componentStr: string): ParsedComponent[] {
 // const ENHANCEMENT_PREFIXES = [234, 246, 268, 271, 275, 281, 287, 292, 299] as const;
 // const GUN_BENEFICIAL_PREFIXES = [234, 246, 247] as const;
 
-/** Underbarrels that do nothing - never pick these. */
-const UNDERBARREL_EXCLUDED = /\batlas\b.*\btracker\b.*\bdart\b|\btracker\s*dart\b|\btracker\s+grenade\b|\bgrenade\s+tracker\b/i;
-/** Only pick underbarrels that match these (Seamstress, Spread Launcher, Grenade Launcher, etc.). */
-const UNDERBARREL_ALLOWED =
-  /seamstress|needle\s*launcher|spread\s*launcher|beam\s*tosser|energy\s*disc|fragcendiary|singularity|grenade\s*launcher|missile\s*launcher|micro\s*rocket|gravity\s*well|death\s*sphere|airstrike|flame\s*thrower|flamethrower|underbarrel\s*launcher|rocket\s*launcher|frag\s*launcher/i;
+/**
+ * Underbarrels to NEVER pick. Denylist approach — everything not excluded is allowed.
+ * Excluded: Atlas tracker darts/grenades, malswitch, elemental switch, ammo switcher,
+ * weapon-specific mode switches with no cross-weapon value, placeholder DB entries.
+ */
+const UNDERBARREL_EXCLUDED =
+  /\batlas\b|\btracker\b|\bmalswitch\b|\belemental\s+switch\b|\bmaliwan\s+elemental\b|\bammo\s+switch\b|\bdaedalus\s+ammo\b|\bvertical\s+mode\b|\blegendary\s+perk\b|dad_ar_underbarrel_04|\bknife\s*launcher\b|\bknife\b|\bharpoon\b|\bmeathook\b|\bgravity\b/i;
 
 function isAllowedUnderbarrel(row: WeaponEditPartRow): boolean {
   const t = `${(row.stat ?? "").trim()} ${(row.string ?? "").trim()}`.toLowerCase();
-  if (UNDERBARREL_EXCLUDED.test(t)) return false;
-  return UNDERBARREL_ALLOWED.test(t);
+  return !UNDERBARREL_EXCLUDED.test(t);
+}
+
+export interface DpsEstimate {
+  /** Barrel display name (e.g. "F.A.N.G.") */
+  barrelName: string;
+  /** Base damage per shot (damage × pellets) at Level 50 Common from barrel String */
+  baseDamagePerShot: number;
+  /** Base fire rate in shots/sec from barrel String */
+  baseFireRate: number;
+  /** Base DPS = baseDamagePerShot × baseFireRate (no mods) */
+  baseDps: number;
+  /** Number of +Damage stacks added by the generator */
+  damageStackCount: number;
+  /** Number of +Crit Damage stacks added */
+  critStackCount: number;
+  /** Number of +Fire Rate stacks added */
+  fireRateStackCount: number;
+  /** Estimated DPS with all stacks (3% per +Damage stack, 2% per +FR stack, 3% crit at 30% crit rate) */
+  estimatedDps: number;
+}
+
+export interface GenerateModdedWeaponResult {
+  code: string;
+  dps: DpsEstimate;
+}
+
+/** Parse barrel display String for base damage, pellet count, and fire rate. */
+function parseBarrelStats(str: string): { name: string; damage: number; pellets: number; fireRate: number } {
+  const name = str.split(",")[0]?.trim() ?? "";
+  // Handles: "571 Damage", "265 x 6 Damage", "669x3 Damage"
+  const multiMatch = str.match(/(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+)\s*Damage/i);
+  const singleMatch = str.match(/(\d+(?:\.\d+)?)\s*Damage/i);
+  let damage = 0, pellets = 1;
+  if (multiMatch) {
+    damage = parseFloat(multiMatch[1]);
+    pellets = parseInt(multiMatch[2]);
+  } else if (singleMatch) {
+    damage = parseFloat(singleMatch[1]);
+  }
+  const frMatch = str.match(/([\d.]+)\s*\/s\s*(?:Fire\s*Rate|FR)/i);
+  const fireRate = frMatch ? parseFloat(frMatch[1]) : 0;
+  return { name, damage, pellets, fireRate };
+}
+
+/** Count how many part IDs are inside a grouped token like {13:[9 9 9 9 9]} */
+function countGroupedStacks(tokens: string[]): number {
+  return tokens.reduce((sum, t) => {
+    const m = t.match(/\[([^\]]*)\]/);
+    if (!m || !m[1].trim()) return sum;
+    return sum + m[1].trim().split(/\s+/).length;
+  }, 0);
 }
 
 /**
@@ -131,14 +295,21 @@ export function generateModdedWeapon(
   weaponEditData: WeaponEditData,
   universalPartCodes: UniversalDbPartCode[],
   options: GenerateModdedWeaponOptions = {},
-): string {
+): GenerateModdedWeaponResult {
   const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
   const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
   const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
 
   const modPowerMode = options.modPowerMode ?? "op";
   const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 50)));
-  const chosenSkin = (options.skin ?? "").trim();
+  const skinFromOptions = (options.skin ?? "").trim();
+  /** Only use skins from the skin selector (skinOptions), excluding Christmas. No stock/default skin. */
+  const nonChristmasSkins = (options.skinOptions ?? []).filter(
+    (s) => !/christmas/i.test(String(s.label ?? "")) && !/christmas/i.test(String(s.value ?? "")),
+  );
+  const chosenSkin =
+    skinFromOptions ||
+    (nonChristmasSkins.length > 0 ? pick(nonChristmasSkins).value : "");
 
   const modeCfg = {
     stable: {
@@ -148,11 +319,10 @@ export function generateModdedWeapon(
       useStabilityGroupChance: 0.7,
       bodyAccRange: [4, 8] as const,
       barrelAccRange: [4, 8] as const,
-      extraBarrelsRange: [4, 10] as const,
-      crossBarrelRange: [2, 5] as const,
       grenadePerkRange: [16, 52] as const,
       underAccRange: [1, 3] as const,
       statRange: [2, 6] as const,
+      damageRange: [10, 20] as const,
       enhancementRepeatRange: [0, 6] as const,
     },
     op: {
@@ -162,11 +332,10 @@ export function generateModdedWeapon(
       useStabilityGroupChance: 0.45,
       bodyAccRange: [4, 12] as const,
       barrelAccRange: [4, 12] as const,
-      extraBarrelsRange: [8, 22] as const,
-      crossBarrelRange: [4, 10] as const,
       grenadePerkRange: [24, 120] as const,
       underAccRange: [1, 6] as const,
       statRange: [3, 10] as const,
+      damageRange: [100, 150] as const,
       enhancementRepeatRange: [8, 48] as const,
     },
     insane: {
@@ -176,11 +345,10 @@ export function generateModdedWeapon(
       useStabilityGroupChance: 0.85,
       bodyAccRange: [8, 20] as const,
       barrelAccRange: [8, 24] as const,
-      extraBarrelsRange: [18, 48] as const,
-      crossBarrelRange: [8, 20] as const,
       grenadePerkRange: [80, 280] as const,
       underAccRange: [3, 10] as const,
       statRange: [8, 20] as const,
+      damageRange: [500, 1000] as const,
       enhancementRepeatRange: [24, 120] as const,
     },
   }[modPowerMode];
@@ -200,7 +368,8 @@ export function generateModdedWeapon(
     weaponRowsByPrefix.get(pfx)!.push(row);
   }
 
-  const isBarrelExcluded = (text: string) => /\bnoisy\s*cricket\b|kaleidosplode/.test(norm(text));
+  const isBarrelExcluded = (text: string) =>
+    /\bnoisy\s*cricket\b|kaleidosplode|queens\s*rest|queensrest|potatothrower|potato\s*thrower/i.test(norm(text));
   const legendaryBarrelIdsByPrefix = new Map<number, Set<number>>();
   const legendaryRarityIdsByPrefix = new Map<number, Set<number>>();
   for (const c of candidates) {
@@ -248,7 +417,9 @@ export function generateModdedWeapon(
   const validPrefixes = validPrefixesLegendary.length ? validPrefixesLegendary : validPrefixesFallback;
   if (!validPrefixes.length) throw new Error("No valid weapon prefix has required core parts and barrel/rarity.");
 
-  const headerPrefix = pick(validPrefixes);
+  // Use forcedPrefix from options (dropdown selection) when provided and valid; otherwise pick randomly.
+  const forcedPfx = options.forcedPrefix != null && Number.isFinite(options.forcedPrefix) ? options.forcedPrefix : null;
+  const headerPrefix = forcedPfx != null && weaponRowsByPrefix.has(forcedPfx) ? forcedPfx : pick(validPrefixes);
   const seed = String(randInt(1000, 9999));
   const weaponRows = weaponEditData.parts.filter((r) => Number(r.mfgWtId) === headerPrefix);
   const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");
@@ -277,15 +448,6 @@ export function generateModdedWeapon(
       .map((r) => Number(r.partId))
       .filter((n) => Number.isFinite(n));
   };
-  const toPartIdsMagazineNoCharge = (): number[] => {
-    const magRows = weaponRows.filter((r) => norm(r.partType) === "magazine");
-    const noCharge = magRows.filter(
-      (r) => !/\bcharge\s*time\b|\bmaximum\s*charge\b|\bcharge\s*up\b|\bcharging\b/.test(norm(`${r.stat} ${r.string}`)),
-    );
-    return (noCharge.length ? noCharge : magRows)
-      .map((r) => Number(r.partId))
-      .filter((n) => Number.isFinite(n));
-  };
   const pickToken = (types: string[]): string | null => {
     const ids = toPartIds(types);
     if (!ids.length) return null;
@@ -302,17 +464,7 @@ export function generateModdedWeapon(
     if (!ids.length) return null;
     return `{${pick(ids)}}`;
   };
-  const pickMagazineToken = (): string | null => {
-    const ids = toPartIdsMagazineNoCharge();
-    if (!ids.length) return null;
-    return `{${pick(ids)}}`;
-  };
   const groupedToken = (prefix: number, ids: number[]): string => `{${prefix}:[${ids.join(" ")}]}`;
-  const repeatPattern = (ids: number[], repeats: number): number[] => {
-    const out: number[] = [];
-    for (let i = 0; i < repeats; i += 1) out.push(...ids);
-    return out;
-  };
   const stackTokens = (types: string[], minCount: number, maxCount: number): string[] => {
     const ids = toPartIds(types);
     if (!ids.length) return [];
@@ -322,98 +474,153 @@ export function generateModdedWeapon(
     return out;
   };
 
+  /** Never use 27:75 in any stat/damage stacks (per modded weapon rules). */
+  const isExcludedStatCode = (prefix: number, part: number) => prefix === 27 && part === 75;
+
+  // Stackable accessory part types — the only types whose stat bonus stacks meaningfully.
+  // Barrels/bodies/manufacturer parts are excluded (their "damage" is in the string/display, not the stat field).
+  const STACKABLE_PART_TYPES = new Set(["barrel accessory", "body accessory", "scope accessory", "grip", "foregrip"]);
+
+  // addStatStacks: matches ONLY against r.stat (not r.string) so barrel display text never pollutes.
+  // Picks ONE part from the pool and repeats it N times as a single grouped block — clean stacking.
   const addStatStacks = (
-    matcher: (text: string) => boolean,
+    statMatcher: (stat: string) => boolean,
     minCount: number,
     maxCount: number,
   ): string[] => {
-    const nonRarityCandidates = candidates.filter(({ row }) => norm(row.partType) !== "rarity");
-    const local = nonRarityCandidates.filter(
-      ({ row, parsed }) =>
-        parsed.prefix === headerPrefix && validCurrentPartIds.has(parsed.part) && matcher(norm(row.statText)),
-    );
-    const fallback = nonRarityCandidates.filter(({ row }) => matcher(norm(row.statText)));
-    const pool = local.length ? local : fallback;
+    const pool = weaponEditData.parts.filter((r) => {
+      const pfx = Number(r.mfgWtId);
+      const part = Number(r.partId);
+      if (!Number.isFinite(pfx) || !Number.isFinite(part)) return false;
+      if (isExcludedStatCode(pfx, part)) return false;
+      if (!STACKABLE_PART_TYPES.has(norm(r.partType))) return false;
+      return statMatcher(norm(r.stat ?? ""));
+    });
     if (!pool.length) return [];
-    const outTokens: string[] = [];
-    const byPrefix = new Map<number, number[]>();
-    const picks = randInt(minCount, maxCount);
-    for (let i = 0; i < picks; i += 1) {
-      const c = pick(pool);
-      const pfx = c.parsed.prefix;
-      if (pfx === headerPrefix) outTokens.push(`{${c.parsed.part}}`);
-      else {
-        if (!byPrefix.has(pfx)) byPrefix.set(pfx, []);
-        byPrefix.get(pfx)!.push(c.parsed.part);
-      }
-    }
-    for (const [pfx, ids] of byPrefix.entries()) {
-      if (!ids.length) continue;
-      outTokens.push(`{${pfx}:[${ids.join(" ")}]}`);
-    }
-    return outTokens;
+    // Pick one part and repeat it — consistent single-code stacking like {prefix:[id id id...]}.
+    const chosen = pick(pool);
+    const pfx = Number(chosen.mfgWtId);
+    const part = Number(chosen.partId);
+    const count = randInt(minCount, maxCount);
+    return [`{${pfx}:[${Array(count).fill(part).join(" ")}]}`];
   };
 
-  const exemplarDamageGroup = groupedToken(
-    9,
-    repeatPattern([28, 32, 40, 55, 59, 62, 68], randInt(modeCfg.exemplarCycleRepeats[0], modeCfg.exemplarCycleRepeats[1])),
-  );
-  const exemplarAmmoGroup = groupedToken(
-    22,
-    Array.from({ length: randInt(modeCfg.exemplarAmmoCount[0], modeCfg.exemplarAmmoCount[1]) }, () => 72),
-  );
-  const exemplarFireGroup = groupedToken(
-    292,
-    Array.from({ length: randInt(modeCfg.exemplarFireCount[0], modeCfg.exemplarFireCount[1]) }, () => 9),
-  );
+  // Exemplar damage stacks — Terra confirmed these are great. Use IDs [28 32 40 55 59 62] cycling.
+  // Terra's code uses two separate {9:[...]} groups. Cycles vary by mode.
+  const exemplarIds = [28, 32, 40, 55, 59, 62];
+  const exemplarCycles = { stable: randInt(4, 8), op: randInt(8, 14), insane: randInt(14, 20) }[modPowerMode];
+  const buildExemplarGroup = (cycles: number) =>
+    groupedToken(9, Array.from({ length: cycles * exemplarIds.length }, (_, i) => exemplarIds[i % exemplarIds.length]!));
+  const exemplarStacks = [buildExemplarGroup(exemplarCycles), buildExemplarGroup(exemplarCycles)];
+
+  // Terra's perfect gun uses {14:[78 3 3 3 3 3 3 3 3 3 3 3]} — part 78 leads, then all 3s.
   const exemplarStabilityGroup =
     Math.random() < modeCfg.useStabilityGroupChance
-      ? [groupedToken(14, Array.from({ length: randInt(8, 42) }, () => 3))]
+      ? [groupedToken(14, [78, ...Array.from({ length: randInt(8, 42) }, () => 3)])]
       : [];
 
-  const damageStacks = [
-    exemplarDamageGroup,
-    ...addStatStacks(
-      (text) => /\bdamage\b|\bsplash\b|\bbonus damage\b|\bgun damage\b|\bmelee damage\b/.test(text),
-      modeCfg.statRange[0],
-      modeCfg.statRange[1],
-    ),
-  ];
-  const ammoStacks = [
-    exemplarAmmoGroup,
-    ...addStatStacks(
-      (text) =>
-        // Prefer ammo/shot count, but avoid explicit magazine size perks.
-        (/\bammo\b|\bshots?\b/.test(text)) &&
-        !/\bmag(azine)?\s*size\b|\bmagsize\b/.test(text),
-      modeCfg.statRange[0],
-      modeCfg.statRange[1],
-    ),
-  ];
+  // Damage stacks — match r.stat exactly "+Damage" (accessory parts only, barrels excluded).
+  const damageStacks = addStatStacks(
+    (stat) => /^\+damage$/.test(stat),
+    modeCfg.damageRange[0],
+    modeCfg.damageRange[1],
+  );
+  // Crit damage stacks on top.
+  const weaponTypeDamageStacks = addStatStacks(
+    (stat) => /\+crit\s*damage|\+critical\s*damage/.test(stat),
+    modeCfg.statRange[0],
+    modeCfg.statRange[1],
+  );
+  // Movement speed stacks (not in weapon CSV stat field, skip gracefully if pool empty).
+  const movementSpeedStacks = addStatStacks(
+    (stat) => /movement\s*speed|move\s*speed/.test(stat),
+    1,
+    Math.max(1, modeCfg.statRange[1]),
+  );
+  // Find Tediore Reload (no stat changes) early — universalPartCodes have no statText so search
+  // weaponEditData.parts by .string display name instead.
+  const tedioreReloadRowsEarly = weaponEditData.parts.filter((r) => {
+    if (norm(r.partType) !== "manufacturer part") return false;
+    const s = norm(r.string ?? "");
+    return /tediore\s*reload/i.test(s) && !/shooting|combo|mirv/i.test(s);
+  });
+  const samePrefixTedioreRowEarly = tedioreReloadRowsEarly.find((r) => Number(r.mfgWtId) === headerPrefix);
+  const tedioreReloadRowEarly = samePrefixTedioreRowEarly ?? (tedioreReloadRowsEarly.length ? pick(tedioreReloadRowsEarly) : null);
+  // Cross-prefix universal fallback: if weapon-specific DB has no Tediore Reload, search universalPartCodes.
+  // Needed for weapon types (e.g. pistol, heavy) where the category builder-data doesn't include a Tediore Reload part.
+  const tedioreReloadCodeFromUniversal: string | null = (() => {
+    if (tedioreReloadRowEarly != null) return null; // already found above
+    const found = universalPartCodes.find((r) => {
+      if (norm(r.partType ?? "") !== "manufacturer part") return false;
+      const s = norm(r.string ?? r.partName ?? "");
+      return /tediore\s*reload/i.test(s) && !/shooting|combo|mirv/i.test(s);
+    });
+    return found?.code ?? null;
+  })();
+  const tedioreReloadCode =
+    tedioreReloadRowEarly != null
+      ? Number(tedioreReloadRowEarly.mfgWtId) === headerPrefix
+        ? `{${tedioreReloadRowEarly.partId}}`
+        : `{${tedioreReloadRowEarly.mfgWtId}:${tedioreReloadRowEarly.partId}}`
+      : tedioreReloadCodeFromUniversal;
+  // Rowans Charge {27:75} mixed with {27:15} +Fire Rate in a single grouped token.
+  // Reference builds use 6+7, 18+7 (codes 2 & 3 from creator analysis). Varies by mode.
+  // specialMode overrides: "inf-ammo" = always max, "grenade-reload" = always off,
+  // default = guaranteed when no grenade reload is available; 35% chance otherwise.
+  // Rowan's Charge {27:75} and +Fire Rate {27:15} split into separate grouped tokens (Code 7 pattern).
+  // Reference: {27:[15×13]} then later {27:[75×10]} — each token independently sized.
+  const rowansChargeCount = { stable: randInt(3, 7), op: randInt(6, 14), insane: randInt(12, 20) }[modPowerMode];
+  // Fire rate capped lower — {27:15} on top of the full-auto string drains ammo in seconds for fast weapon types.
+  const rowansFireRateCount = { stable: randInt(2, 4), op: randInt(3, 5), insane: randInt(4, 7) }[modPowerMode];
+  const rowansChargeStacks =
+    options.specialMode === "inf-ammo"
+      ? [groupedToken(27, Array(9).fill(75)), groupedToken(27, Array(7).fill(15))]
+      : options.specialMode === "grenade-reload"
+        ? []
+        : tedioreReloadCode == null || Math.random() < 0.35
+          ? [groupedToken(27, Array(rowansChargeCount).fill(75)), groupedToken(27, Array(rowansFireRateCount).fill(15))]
+          : [];
   const fireRateStacks = [
-    exemplarFireGroup,
     ...exemplarStabilityGroup,
     ...addStatStacks(
-      (text) => /\bfire rate\b|\/s fr\b|\bfr\b/.test(text),
+      (stat) => /\+fire rate|\+fr\b/.test(stat),
       modeCfg.statRange[0],
       modeCfg.statRange[1],
     ),
   ];
 
   const barrelRowOk = (r: WeaponEditPartRow) => !isBarrelExcluded(norm(`${r.stat ?? ""} ${r.string ?? ""}`));
+  const allowedPrefixPart: Set<string> = new Set();
+  const allowedPartByPrefix = new Map<number, Set<number>>();
+  if (options.allowedBarrelEntries?.length) {
+    for (const e of options.allowedBarrelEntries) {
+      const p = parseCodePair(String(e?.code ?? "").trim());
+      if (!p) continue;
+      allowedPrefixPart.add(`${p.prefix}:${p.part}`);
+      if (!allowedPartByPrefix.has(p.prefix)) allowedPartByPrefix.set(p.prefix, new Set());
+      allowedPartByPrefix.get(p.prefix)!.add(p.part);
+    }
+  }
   const mappedLegendaryBarrels = Array.from(legendaryBarrelIdsByPrefix.get(headerPrefix) ?? []).filter((id) =>
     validCurrentPartIds.has(id),
   );
-  const samePrefixBarrels = mappedLegendaryBarrels.length
+  let samePrefixBarrels = mappedLegendaryBarrels.length
     ? mappedLegendaryBarrels
     : weaponRows
         .filter((r) => norm(r.partType) === "barrel" && isSpecialRarity(r) && barrelRowOk(r))
         .map((r) => Number(r.partId))
         .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
-  const anyPrefixBarrels = weaponRows
+  let anyPrefixBarrels = weaponRows
     .filter((r) => norm(r.partType) === "barrel" && barrelRowOk(r))
     .map((r) => Number(r.partId))
     .filter((n) => Number.isFinite(n) && validCurrentPartIds.has(n));
+  if (allowedPartByPrefix.size > 0) {
+    const allowedSamePrefix = allowedPartByPrefix.get(headerPrefix);
+    if (allowedSamePrefix?.size) {
+      samePrefixBarrels = samePrefixBarrels.filter((id) => allowedSamePrefix.has(id));
+      anyPrefixBarrels = anyPrefixBarrels.filter((id) => allowedSamePrefix.has(id));
+    }
+  }
   const usableSamePrefixBarrels = samePrefixBarrels.length ? samePrefixBarrels : anyPrefixBarrels;
   if (!usableSamePrefixBarrels.length) throw new Error("Could not build stock weapon core: missing Barrel for selected prefix.");
 
@@ -422,6 +629,8 @@ export function generateModdedWeapon(
     if (row.visualUniqueBarrel === true || row.uniqueEffect === true) return true;
     const t = norm(`${row.statText ?? ""} ${row.string ?? ""} ${row.partName ?? ""}`);
     if (isBarrelExcluded(t)) return false;
+    if (/\bstar\s*helix\b/i.test(t)) return true;
+    if (/\bheavy\b/i.test(norm(row.itemType ?? "")) || /\bheavy\b/i.test(norm(row.weaponType ?? ""))) return true;
     return /\bunique\b|\balt(ernate)?\s*(fire|barrel)?\b|\bappearance\b|\bvisual\b|\bdifferent\s*look\b/i.test(t);
   });
   const samePrefixUniqueBarrels = uniqueEffectBarrels.filter(
@@ -429,15 +638,7 @@ export function generateModdedWeapon(
   );
   const crossUniqueBarrels = uniqueEffectBarrels.filter(({ parsed }) => parsed.prefix !== headerPrefix);
   const allUniqueBarrels = [...samePrefixUniqueBarrels, ...crossUniqueBarrels];
-  const useUniqueBarrel = allUniqueBarrels.length > 0 && (Math.random() < 0.85);
-  const uniqueFirstBarrelToken = useUniqueBarrel && allUniqueBarrels.length
-    ? (() => {
-        const u = pick(allUniqueBarrels);
-        return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
-      })()
-    : "";
-  const primaryBarrelToken = `{${pick(usableSamePrefixBarrels)}}`;
-  const crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
+  let crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
     if (pfx === headerPrefix) return [];
     const idsInPrefix = new Set(rows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)));
     const mapped = Array.from(legendaryBarrelIdsByPrefix.get(pfx) ?? []).filter((id) => idsInPrefix.has(id));
@@ -447,22 +648,50 @@ export function generateModdedWeapon(
       .map((r) => ({ prefix: pfx, part: Number(r.partId) }))
       .filter((x) => Number.isFinite(x.part));
   });
-  const samePrefixBarrelParts: string[] = [];
-  for (let i = 0; i < randInt(modeCfg.extraBarrelsRange[0], modeCfg.extraBarrelsRange[1]); i += 1) {
-    if (!usableSamePrefixBarrels.length) break;
-    samePrefixBarrelParts.push(`{${pick(usableSamePrefixBarrels)}}`);
+  if (allowedPrefixPart.size > 0) {
+    crossPrefixBarrels = crossPrefixBarrels.filter((c) => allowedPrefixPart.has(`${c.prefix}:${c.part}`));
   }
-  const crossByPrefix = new Map<number, number[]>();
-  const crossPickCount = randInt(modeCfg.crossBarrelRange[0], modeCfg.crossBarrelRange[1]);
-  for (let i = 0; i < crossPickCount; i += 1) {
-    if (!crossPrefixBarrels.length) break;
-    const c = pick(crossPrefixBarrels);
-    if (!crossByPrefix.has(c.prefix)) crossByPrefix.set(c.prefix, []);
-    crossByPrefix.get(c.prefix)!.push(c.part);
-  }
-  const crossParts = Array.from(crossByPrefix.entries()).map(
-    ([prefix, parts]) => `{${prefix}:[${parts.join(" ")}]}`,
+  const chosenBarrelId = pick(usableSamePrefixBarrels);
+  const primaryBarrelToken = `{${chosenBarrelId}}`;
+  const chosenBarrelRow = weaponRows.find((r) => norm(r.partType) === "barrel" && Number(r.partId) === chosenBarrelId);
+  const barrelStats = chosenBarrelRow ? parseBarrelStats(chosenBarrelRow.string) : { name: "", damage: 0, pellets: 1, fireRate: 0 };
+  // Always paste a visual/heavy barrel to the left of the first barrel (game reads left-to-right). Prefer manual JSON list.
+  const uniqueFirstBarrelToken =
+    options.visualBarrelEntries?.length
+      ? pick(options.visualBarrelEntries).code.trim()
+      : allUniqueBarrels.length > 0
+        ? (() => {
+            const u = pick(allUniqueBarrels);
+            return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
+          })()
+        : crossPrefixBarrels.length > 0
+          ? (() => {
+              const c = pick(crossPrefixBarrels);
+              return `{${c.prefix}:${c.part}}`;
+            })()
+          : "";
+  // ── Terra's barrel cap: max 5 unique barrel codes per gun ──────────────────────────────────
+  // visual(1) + primary(1) already used = 3 slots remaining.
+  // Extra same-prefix: pick 1-2 unique additional barrel IDs (not repeating), stack each ×N as a grouped token.
+  // Stacking the same barrel multiple times amplifies its effect without adding new unique codes.
+  // Cross-prefix: pick 0-1 unique barrel from a different weapon type prefix.
+  const extraBarrelUniqueCount = { stable: 1, op: 2, insane: 2 }[modPowerMode];
+  const crossBarrelUniqueCount = { stable: 0, op: randInt(0, 1), insane: 1 }[modPowerMode];
+  const extraBarrelStackSize = { stable: randInt(8, 15), op: randInt(15, 25), insane: randInt(25, 40) }[modPowerMode];
+  const extraSamePrefixBarrelIds = (() => {
+    const pool = usableSamePrefixBarrels.filter((id) => id !== chosenBarrelId);
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(extraBarrelUniqueCount, pool.length));
+  })();
+  // Stack each unique extra barrel as a grouped token (same code repeated)
+  const samePrefixBarrelParts: string[] = extraSamePrefixBarrelIds.map((id) =>
+    groupedToken(headerPrefix, Array(extraBarrelStackSize).fill(id)),
   );
+  // Cross-prefix: 0 or 1 additional unique barrel from another weapon type
+  const crossParts: string[] = (() => {
+    if (crossBarrelUniqueCount === 0 || !crossPrefixBarrels.length) return [];
+    const c = pick(crossPrefixBarrels);
+    return [`{${c.prefix}:${c.part}}`];
+  })();
   const barrelAccessoryStack = stackTokens(
     ["barrel accessory"],
     modeCfg.barrelAccRange[0],
@@ -472,16 +701,16 @@ export function generateModdedWeapon(
     throw new Error("Could not build stock weapon core: missing enough Barrel Accessory parts.");
   }
 
-  const magazineToken = pickMagazineToken();
-  if (!magazineToken) throw new Error("Could not build stock weapon core: missing Magazine.");
+  // Stacked Vladof 50-round magazines {18:[14×N]} — Code 7 uses 12 stacked mags.
+  // Stacking multiples reinforces the mag reference for the spawner and adds ammo capacity anchors.
+  const vladof50MagCount = { stable: randInt(4, 8), op: randInt(8, 14), insane: randInt(12, 20) }[modPowerMode];
+  const magazineToken = groupedToken(18, Array(vladof50MagCount).fill(14));
+  // No Order/COV prefix; we use the same magazine on every gun.
   const gripToken = pickToken(["grip"]);
   const scopeToken = pickToken(["scope"]);
+  // tedioreReloadCode already computed above (early detection using weaponEditData.parts).
   const manufacturerPartsCount =
-    weaponManufacturer.includes("tediore") ||
-    candidates.some(
-      ({ row, parsed }) =>
-        parsed.prefix === headerPrefix && /\btediore\b|\breload\b/.test(norm(row.statText)),
-    )
+    weaponManufacturer.includes("tediore") || tedioreReloadCode != null
       ? randInt(2, 5)
       : 1;
   const baseManufacturerTokens =
@@ -491,38 +720,13 @@ export function generateModdedWeapon(
           return t ? [t] : [];
         })()
       : stackTokens(["manufacturer part"], manufacturerPartsCount, manufacturerPartsCount);
-  // Tediore reload options: ensure at least one such part on every gun.
-  const tedioreReloadCandidates = candidates.filter(({ row }) => {
-    const t = norm(row.statText ?? "");
-    return /\btediore\b/.test(t) && /\breload\b|\bthrown\b|\bthrow\b/.test(t);
-  });
   const manufacturerTokens =
-    tedioreReloadCandidates.length > 0
-      ? (() => {
-          const chosen = pick(tedioreReloadCandidates);
-          const reloadToken =
-            chosen.parsed.prefix === headerPrefix
-              ? `{${chosen.parsed.part}}`
-              : `{${chosen.parsed.prefix}:${chosen.parsed.part}}`;
-          return [...baseManufacturerTokens, reloadToken];
-        })()
+    tedioreReloadCode != null
+      ? [tedioreReloadCode, ...baseManufacturerTokens.filter((t) => t !== tedioreReloadCode)]
       : baseManufacturerTokens;
-  const currentWeaponTypeNorm = norm(weaponRows[0]?.weaponType ?? "");
-  const daedalusAltAmmoCandidates = candidates.filter(
-    ({ row }) =>
-      norm(row.partType) === "manufacturer part" &&
-      norm(row.manufacturer) === "daedalus" &&
-      (!currentWeaponTypeNorm || norm(row.itemType) === currentWeaponTypeNorm),
-  );
-  const shouldUseDaedalusAltAmmo = daedalusAltAmmoCandidates.length > 0 && Math.random() < 0.35;
-  const daedalusAltAmmoToken = shouldUseDaedalusAltAmmo
-    ? (() => {
-        const c = pick(daedalusAltAmmoCandidates);
-        return c.parsed.prefix === headerPrefix ? `{${c.parsed.part}}` : `{${c.parsed.prefix}:${c.parsed.part}}`;
-      })()
-    : "";
-  // Never select a foregrip part for these modded builds.
-  const foregripToken: string | null = null;
+  // Daedalus alt-ammo disabled: causes infinite ammo which breaks grenade reload mechanic.
+  // Exactly one foregrip; placed at the very end (after underbarrel).
+  const foregripToken = pickToken(["foregrip"]);
 
   const crossPrefixUnderbarrels: { prefix: number; part: number }[] = [];
   const crossPrefixUnderbarrelAccessories: { prefix: number; part: number }[] = [];
@@ -559,19 +763,84 @@ export function generateModdedWeapon(
 
   let underbarrelToken = "";
   let underbarrelAccessoryStack: string[] = [];
-  const underbarrelInfiniteAmmoToken = "{27:[75 75 75 75 75 75 75]}";
   if (shouldUseUnderbarrelAlt) {
-    const preferCross = crossPrefixUnderbarrels.length > 0 && Math.random() < 0.65;
-    if (preferCross && crossPrefixUnderbarrels.length > 0) {
-      const u = pick(crossPrefixUnderbarrels);
-      underbarrelToken = `{${u.prefix}:${u.part}}`;
+    const allowedUb = options.allowedUnderbarrelEntries;
+    const desirableUb = options.desirableUnderbarrelEntries;
+    const hasAllowed =
+      allowedUb != null &&
+      ((Array.isArray(allowedUb) && allowedUb.length > 0) ||
+        (Array.isArray((allowedUb as { parts?: unknown[] }).parts) && (allowedUb as { parts: unknown[] }).parts.length > 0));
+    const ubData = hasAllowed ? allowedUb : desirableUb;
+    const useAllowedOnly = hasAllowed;
+    const isNewShape =
+      ubData != null &&
+      !Array.isArray(ubData) &&
+      Array.isArray((ubData as { parts?: unknown[] }).parts) &&
+      (ubData as { parts: unknown[] }).parts.length > 0;
+    const ubPartsRaw = isNewShape
+      ? (ubData as { parts: DesirableUnderbarrelPart[] }).parts
+      : Array.isArray(ubData)
+        ? (ubData as DesirableUnderbarrelEntry[])
+        : [];
+    const ubParts = Array.isArray(ubPartsRaw)
+      ? ubPartsRaw.filter((e) => !UNDERBARREL_EXCLUDED.test(String((e as { name?: string }).name ?? "").trim()))
+      : [];
+    const ubAccessories = isNewShape && Array.isArray((ubData as { accessories?: unknown[] }).accessories)
+      ? (ubData as { accessories: DesirableUnderbarrelAccessory[] }).accessories
+      : [];
+
+    if (ubParts.length > 0) {
+      const useAccessory =
+        ubAccessories.length > 0 && Math.random() < 0.5;
+      if (useAccessory && ubAccessories.length > 0) {
+        const acc = pick(ubAccessories);
+        const partType = (acc.partType ?? "").trim().toLowerCase();
+        const matchingParts = (ubParts as DesirableUnderbarrelPart[]).filter(
+          (p) => (p.partType ?? "").trim().toLowerCase() === partType,
+        );
+        if (matchingParts.length > 0) {
+          const part = pick(matchingParts);
+          underbarrelToken = part.code.trim();
+          underbarrelAccessoryStack = [acc.code.trim()];
+        } else {
+          underbarrelToken = pick(ubParts as DesirableUnderbarrelEntry[]).code.trim();
+        }
+      } else {
+        underbarrelToken = pick(ubParts as DesirableUnderbarrelEntry[]).code.trim();
+      }
+    }
+    // Fallback 1: crossPrefix allowed underbarrels (UNDERBARREL_ALLOWED filter)
+    if (!underbarrelToken) {
+      const preferCross = crossPrefixUnderbarrels.length > 0 && Math.random() < 0.65;
+      if (preferCross && crossPrefixUnderbarrels.length > 0) {
+        const u = pick(crossPrefixUnderbarrels);
+        underbarrelToken = `{${u.prefix}:${u.part}}`;
+      }
     }
     if (!underbarrelToken) underbarrelToken = pickUnderbarrelToken() ?? "";
     if (!underbarrelToken && crossPrefixUnderbarrels.length > 0) {
       const u = pick(crossPrefixUnderbarrels);
       underbarrelToken = `{${u.prefix}:${u.part}}`;
     }
-    if (!underbarrelToken && nonSwitchElementIds.length >= 2) {
+    // Fallback 2: any non-excluded underbarrel across ALL weapon data (no UNDERBARREL_ALLOWED restriction).
+    // This guarantees every gun always gets an underbarrel.
+    if (!underbarrelToken) {
+      const globalUbPool = weaponEditData.parts.filter(
+        (r) =>
+          norm(r.partType) === "underbarrel" &&
+          !UNDERBARREL_EXCLUDED.test(`${r.stat ?? ""} ${r.string ?? ""}`.toLowerCase()),
+      );
+      if (globalUbPool.length) {
+        const r = pick(globalUbPool);
+        underbarrelToken =
+          Number(r.mfgWtId) === headerPrefix
+            ? `{${r.partId}}`
+            : `{${r.mfgWtId}:${r.partId}}`;
+      }
+    }
+    if (underbarrelToken && nonSwitchElementIds.length > 0) {
+      // Elemental alt-fire alongside underbarrel (already handled above).
+    } else if (!underbarrelToken && nonSwitchElementIds.length >= 2) {
       const first = pick(nonSwitchElementIds);
       const secondPool = nonSwitchElementIds.filter((id) => id !== first);
       const second = secondPool.length ? pick(secondPool) : null;
@@ -580,59 +849,66 @@ export function generateModdedWeapon(
         shouldUseUnderbarrelAlt = false;
       }
     }
+    // In grenade-reload mode an underbarrel is required — use {26:77} Seamstress as guaranteed fallback.
+    // In other modes, silently skip rather than throw so the gun still generates.
     if (shouldUseUnderbarrelAlt && !underbarrelToken) {
-      throw new Error("Could not apply alt-fire mode: no underbarrel available and no dual-element fallback.");
-    }
-    // Exactly one underbarrel accessory, but ONLY if it clearly complements the chosen underbarrel.
-    const parseCodePair = (code: string): { prefix: number; part: number } | null => {
-      const s = code.trim();
-      const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
-      if (m2) return { prefix: Number(m2[1]), part: Number(m2[2]) };
-      const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
-      if (m1) {
-        const n = Number(m1[1]);
-        return { prefix: n, part: n };
+      if (options.specialMode === "grenade-reload") {
+        underbarrelToken = "{26:77}";
       }
-      return null;
-    };
-    const ubParsed = parseCodePair(underbarrelToken);
-    if (ubParsed) {
-      const ubRow = weaponEditData.parts.find(
-        (r) => Number(r.mfgWtId) === ubParsed.prefix && Number(r.partId) === ubParsed.part,
-      );
-      if (ubRow) {
-        const ubText = norm(`${ubRow.stat ?? ""} ${ubRow.string ?? ""}`);
-        const ubWords = new Set(
-          ubText
-            .split(/\W+/)
-            .filter((w) => w.length >= 4),
+    }
+    // When not using the allowed list, optionally add one underbarrel accessory from edit data if it complements the chosen underbarrel.
+    if (!useAllowedOnly) {
+      const parseCodePair = (code: string): { prefix: number; part: number } | null => {
+        const s = code.trim();
+        const m2 = s.match(/^\{\s*(\d+)\s*:\s*(\d+)\s*\}$/);
+        if (m2) return { prefix: Number(m2[1]), part: Number(m2[2]) };
+        const m1 = s.match(/^\{\s*(\d+)\s*\}$/);
+        if (m1) {
+          const n = Number(m1[1]);
+          return { prefix: n, part: n };
+        }
+        return null;
+      };
+      const ubParsed = parseCodePair(underbarrelToken);
+      if (ubParsed) {
+        const ubRow = weaponEditData.parts.find(
+          (r) => Number(r.mfgWtId) === ubParsed.prefix && Number(r.partId) === ubParsed.part,
         );
-        const samePrefixUnderbarrelAcc = weaponRows.filter((r) => norm(r.partType) === "underbarrel accessory");
-        const complementaryAccIds = samePrefixUnderbarrelAcc
-          .filter((r) => {
-            const t = norm(`${r.stat ?? ""} ${r.string ?? ""}`);
-            const words = new Set(
-              t
-                .split(/\W+/)
-                .filter((w) => w.length >= 4),
-            );
-            for (const w of ubWords) {
-              if (words.has(w)) return true;
-            }
-            return false;
-          })
-          .map((r) => Number(r.partId))
-          .filter((n) => Number.isFinite(n));
-        if (complementaryAccIds.length) {
-          underbarrelAccessoryStack = [`{${pick(complementaryAccIds)}}`];
-        } else {
-          underbarrelAccessoryStack = [];
+        if (ubRow) {
+          const ubText = norm(`${ubRow.stat ?? ""} ${ubRow.string ?? ""}`);
+          const ubWords = new Set(
+            ubText
+              .split(/\W+/)
+              .filter((w) => w.length >= 4),
+          );
+          const samePrefixUnderbarrelAcc = weaponRows.filter((r) => norm(r.partType) === "underbarrel accessory");
+          const complementaryAccIds = samePrefixUnderbarrelAcc
+            .filter((r) => {
+              const t = norm(`${r.stat ?? ""} ${r.string ?? ""}`);
+              const words = new Set(
+                t
+                  .split(/\W+/)
+                  .filter((w) => w.length >= 4),
+              );
+              for (const w of ubWords) {
+                if (words.has(w)) return true;
+              }
+              return false;
+            })
+            .map((r) => Number(r.partId))
+            .filter((n) => Number.isFinite(n));
+          if (complementaryAccIds.length) {
+            underbarrelAccessoryStack = [`{${pick(complementaryAccIds)}}`];
+          } else {
+            underbarrelAccessoryStack = [];
+          }
         }
       }
     }
   }
 
-  const multiProjectileToken = "{289:[17 17 17 17 17]}";
+  // {273:1} on every gun — makes Seamstress (and other projectiles) home to cursor.
+  const homingToken = "{273:1}";
   const isNeedleLauncherUnderbarrel = ((): boolean => {
     if (!underbarrelToken) return false;
     const colonMatch = underbarrelToken.match(/\{(\d+):(\d+)\}/);
@@ -649,7 +925,7 @@ export function generateModdedWeapon(
     );
     if (!row) return false;
     const t = norm(`${row.stat ?? ""} ${row.string ?? ""}`);
-    return /\bseamstress\b|\bneedle\s*launcher\b/.test(t);
+    return /\bseamstress\b|\bneedle\s*launcher\b|\bcallous\b/.test(t);
   })();
   const daedalusShotgunAmmoToken = (() => {
     if (!isNeedleLauncherUnderbarrel) return "";
@@ -662,9 +938,126 @@ export function generateModdedWeapon(
     if (!c) return "";
     return c.parsed.prefix === headerPrefix ? `{${c.parsed.part}}` : `{${c.parsed.prefix}:${c.parsed.part}}`;
   })();
+  // {13:70} + {11:75} only when Seamstress underbarrel.
+  // {11:75} = Tediore SG Anarchy barrel (335 x 12 Damage, 12 pellets) — each pellet becomes a homing needle via Seamstress.
+  // {11:81} = Eigenburst barrel — cross-inserts full Eigenburst behavior alongside the rarity token {11:82}.
+  const isSeamstressUnderbarrel = underbarrelToken.includes("26:77");
+  const seamstressExtras = isSeamstressUnderbarrel ? ["{13:70}", "{11:75}", "{11:81}"] : [];
   const homingStacks273 = isNeedleLauncherUnderbarrel
     ? [groupedToken(273, Array.from({ length: randInt(8, 24) }, () => 1))]
     : [];
+
+  // {289:17} Two Shot — Terra confirmed: 4 stacks fixed, 5 max. More than this kills damage (splits projectiles).
+  // {289:16} = MAL_HW.part_barrel_02_a  — Heavy Weapon MIRV, spawns 3 MIRV Orbs on explosion (Terra's perfect gun).
+  // {289:2}  = MAL_HW.part_barrel_02_dXa — Heavy Weapon MIRV variant, same effect.
+  // {289:18} Two Shot accessory — 2 stacks.
+  // Cross-inserting 16 + 2 (both MIRV variants) = the main gun visuals Terra mentioned.
+  const proj17Count = randInt(3, 4);
+  const multiProjectileToken = groupedToken(289, [
+    ...Array.from({ length: proj17Count }, () => 17),
+    16, 2,   // both Heavy MIRV variants — 3 MIRV Orbs each on explosion
+    18, 18,
+  ]);
+
+  // Cross-manufacturer ammo-efficiency stacks (from Uxhiha/Terra-Morpheous weapon analysis).
+  // {281:3}  = Order Enhancement "Free Charger"  — 30% chance to fire for free at max charge.
+  // {282:14} = Vladof HW "Angel's Share"         — every 6th shot doesn't cost ammo.
+  // {286:1}  = COV Enhancement "Ventilator"      — 25% chance 0 Heat when fired.
+  // {275:23} = Ripper HW "Heat Exchange"         — fires full auto after initial charge.
+  // {273:29} = Torgue HW "Scanning"              — rockets home toward nearby targets.
+  const ammoEffRanges = {
+    stable: { fc: [8,  16] as const, as: [8,  16] as const, ven: [8,  16] as const, he: [4,  8] as const },
+    op:     { fc: [20, 36] as const, as: [15, 25] as const, ven: [15, 25] as const, he: [6,  12] as const },
+    insane: { fc: [36, 80] as const, as: [25, 60] as const, ven: [25, 60] as const, he: [10, 24] as const },
+  }[modPowerMode];
+  // Terra's full-auto string — these three exact stacks together make any gun fully automatic.
+  // {281:[3×36]} Free Charger × 36, {275:[23×9]} Heat Exchange × 9, {26:[30×3]} Order SR mag × 3.
+  // Fixed values — do not vary by mode.
+  const freeChargerStacks  = [groupedToken(281, Array(36).fill(3))];
+  const heatExchangeStacks = [groupedToken(275, Array(9).fill(23))];
+  const orderSrMagStacks   = [groupedToken(26,  Array(3).fill(30))];
+  const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(ammoEffRanges.as[0],  ammoEffRanges.as[1])  }, () => 14))];
+  // Ventilator excluded from grenade-reload mode — COV heat mechanic disables the reload trigger,
+  // which prevents the grenade reload visual from ever firing.
+  const ventilatorStacks = options.specialMode === "grenade-reload"
+    ? []
+    : [groupedToken(286, Array.from({ length: randInt(ammoEffRanges.ven[0], ammoEffRanges.ven[1]) }, () => 1))];
+  // {273:29} Scanning — rockets home toward nearby targets; complements {273:1} Reticle Homing.
+  const scanningHomingToken = "{273:29}";
+
+  // Cross-manufacturer crit & damage stacks (discovered from creator weapon analysis).
+  // {3:6}  = Jakobs Pistol +Crit Damage body accessory — cross-prefix crit stacking.
+  // {22:72} = Vladof SMG +Damage barrel accessory — cross-prefix damage stacking.
+  // {18:31} = Vladof AR barrel accessory — additional cross-prefix stacking (Code 7: 14 stacks).
+  const crossCritRanges   = { stable: [6, 12] as const, op: [10, 20] as const, insane: [15, 40] as const }[modPowerMode];
+  const crossDmgRanges    = { stable: [4,  8] as const, op: [6,  14] as const, insane: [10, 24] as const }[modPowerMode];
+  const crossBarrelAccRanges = { stable: [4, 8] as const, op: [8, 16] as const, insane: [12, 24] as const }[modPowerMode];
+  const jakobsCritStacks   = [groupedToken(3,  Array.from({ length: randInt(crossCritRanges[0],    crossCritRanges[1])    }, () => 6))];
+  const vladofSmgDmgStacks  = [groupedToken(22, Array.from({ length: randInt(crossDmgRanges[0],    crossDmgRanges[1])     }, () => 72))];
+  const vladofArBarrelStacks = [groupedToken(18, Array.from({ length: randInt(crossBarrelAccRanges[0], crossBarrelAccRanges[1]) }, () => 31))];
+
+  // ── Tediore MIRV cross-inserts — "Tediore MIRV, no stat changes" Manufacturer Parts ──
+  // Cross-inserting these from different weapon prefixes applies MIRV splitting behavior to the gun's shots.
+  // Terra confirmed: {289:16} (Heavy MIRV) + {289:2} (Heavy MIRV dXa) = main gun visual orbs.
+  // These manufacturer-part MIRVs add additional MIRV layers on top of {289:16/2}.
+  // IMPORTANT: ALL Daedalus-prefix MIRV codes are excluded from this pool.
+  // Daedalus manufacturer parts control ammo type — cross-inserting ANY Daedalus mfg part
+  // overrides the underbarrel's alt-fire to that ammo type (e.g. {2:71} → pistol ammo on micro-rockets).
+  // Removed: {13:21} DAD_AR, {2:71} DAD_PS, {8:72} DAD_SG, {20:91} DAD_SM.
+  const mirvPool = [
+    "{27:20}", // JAK_AR — Jakobs AR Tediore MIRV
+    "{3:61}",  // JAK_PS — Jakobs Pistol Tediore MIRV
+    "{9:65}",  // JAK_SG — Jakobs Shotgun Tediore MIRV
+    "{24:68}", // JAK_SR — Jakobs Sniper Tediore MIRV
+    "{10:74}", // MAL_SG — Maliwan Shotgun Tediore MIRV
+    "{21:76}", // MAL_SM — Maliwan SMG Tediore MIRV
+    "{25:76}", // MAL_SR — Maliwan Sniper Tediore MIRV
+    "{15:63}", // ORD_AR — Order AR Tediore MIRV
+    "{4:65}",  // ORD_PS — Order Pistol Tediore MIRV
+    "{26:19}", // ORD_SR — Order Sniper Tediore MIRV
+    "{7:77}",  // BOR_SG — Ripper Shotgun Tediore MIRV
+    "{19:77}", // BOR_SM — Ripper SMG Tediore MIRV
+    "{23:77}", // BOR_SR — Ripper Sniper Tediore MIRV
+    "{14:10}", // TED_AR — Tediore AR Tediore MIRV
+    "{5:10}",  // TED_PS — Tediore Pistol Tediore MIRV
+    "{11:10}", // TED_SG — Tediore Shotgun Tediore MIRV
+    "{17:69}", // TOR_AR — Torgue AR Tediore MIRV
+    "{6:71}",  // TOR_PS — Torgue Pistol Tediore MIRV
+    "{12:72}", // TOR_SG — Torgue Shotgun Tediore MIRV
+    "{18:83}", // VLA_AR — Vladof AR Tediore MIRV
+    "{22:83}", // VLA_SM — Vladof SMG Tediore MIRV
+    "{16:84}", // VLA_SR — Vladof Sniper Tediore MIRV
+  ];
+  // Pick N unique codes from the pool (shuffle + slice).
+  const mirvPickCount = { stable: 4, op: 8, insane: 12 }[modPowerMode];
+  const mirvInserts: string[] = [...mirvPool]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, mirvPickCount);
+
+  // Class mod perk cross-insert {234:[...]} — embeds class mod skill perk IDs into the weapon.
+  // Code 7 pattern: IDs 21,22,23,26,28,30,31 with repetition for weighting.
+  // Terra's perfect gun: ID 42 appears 50×. Added with high weight.
+  // Prefix 234 = class mod perks. Cross-inserting these imports skill behaviors into the weapon.
+  const classModPerkIds = [42, 42, 42, 42, 42, 21, 21, 21, 22, 22, 22, 23, 26, 28, 28, 28, 30, 30, 30, 31, 31, 31, 31];
+  const classModPerkCount = { stable: randInt(20, 35), op: randInt(35, 55), insane: randInt(50, 80) }[modPowerMode];
+  const classModCrossInsert = [groupedToken(234, Array.from({ length: classModPerkCount }, () => pick(classModPerkIds)))];
+
+  // ── Terra's cross-manufacturer enhancement & shield inserts (confirmed from perfect gun) ──
+  // {287:[9×N]} = Tediore Shield manufacturer — Terra uses 150 stacks. Visual/behavior enhancer.
+  const tedioreShieldCount = { stable: randInt(50, 80), op: randInt(100, 150), insane: randInt(150, 200) }[modPowerMode];
+  const tedioreShieldInsert = [groupedToken(287, Array(tedioreShieldCount).fill(9))];
+
+  // Enhancement manufacturer cross-inserts — Terra's exact pattern [1 1 9 9 2 2 3 3]:
+  // {299} Daedalus, {268} Jakobs, {271} Maliwan, {292} Tediore (extra 9s in Terra's variant).
+  const enhancementPattern = [1, 1, 9, 9, 2, 2, 3, 3];
+  const tedioreEnhancementPattern = [9, 9, 2, 2, 3, 3, 9, 9, 9, 9, 9];
+  const daedalusEnhInsert  = [groupedToken(299, enhancementPattern)];
+  const jakobsEnhInsert    = [groupedToken(268, enhancementPattern)];
+  const maliwanEnhInsert   = [groupedToken(271, enhancementPattern)];
+  const tedioreEnhInsert   = [groupedToken(292, tedioreEnhancementPattern)];
+
+  // {246:[...]} Shield body cross-insert — Terra's exact parts from perfect gun.
+  const shieldBodyInsert = ["{246:[22 22 23 23 26 26 25 25 24 24 31 39 40 45 46 58 58]}"];
 
   if (underbarrelToken && nonSwitchElementIds.length > 0) {
     const wantMultiple = nonSwitchElementIds.length >= 2 && Math.random() < 0.5;
@@ -679,62 +1072,183 @@ export function generateModdedWeapon(
     altFireTokens = chosen.map((id) => `{1:${id}}`);
   }
 
-  // Grenade reload block: always add on every gun.
-  // Pattern: {267:1} {245:[...grenade perks...]} {267:3} OR {291:8} {245:[...]} {291:9}
-  const grenadeParts: string[] = [];
-  const grenadePerkPool = candidates.filter(
-    ({ parsed, row }) => parsed.prefix === 245 && norm(row.partType) !== "rarity",
-  );
-  // Filter 245 perks down to ones mentioning fire or corrosive/acid, so we only use those elements.
-  const grenadePerkFireCorrosivePool = grenadePerkPool.filter(({ row }) => {
-    const t = norm(row.statText ?? "");
-    return /\bfire\b|\bincendiary\b|\bburning\b|\bignite\b|\bflame\b/.test(t) ||
-      /\bcorrosive\b|\bacid\b|\bcorrode\b|\btoxic\b/.test(t);
-  });
-  const perkSource = grenadePerkFireCorrosivePool.length ? grenadePerkFireCorrosivePool : grenadePerkPool;
-  const grenadePrefix = Math.random() < 0.5 ? 267 : 291;
-  const grenadeCode = grenadePrefix === 267 ? "{267:1}" : "{291:8}";
-  const grenadeRarityCode = grenadePrefix === 267 ? "{267:3}" : "{291:9}";
-  grenadeParts.push(grenadeCode);
-  if (perkSource.length) {
-    const count = randInt(40, 120);
-    const perkIds: number[] = [];
-    for (let i = 0; i < count; i += 1) {
-      perkIds.push(pick(perkSource).parsed.part);
-    }
-    grenadeParts.push(`{245:[${perkIds.join(" ")}]}`);
+  // ── Terra's grenade perk system ─────────────────────────────────────────────────────────────
+  // Always on every gun — the {245:[...]} block drives visual effects based on which IDs are stacked.
+  // Build grenade visual perk block(s).
+  // When grenadeVisualRecipes is provided, pick one recipe at random and generate {245:[...]} token(s).
+  // Scale factors: stable=0.35, op=0.65, insane=1.0. Each entry count gets ±20% jitter, min 1.
+  // Each group in the recipe → one {245:[...]} token; multi-group recipes produce multiple tokens.
+  // Elemental code swaps produce entirely new visuals — only the 245 block drives the visual.
+  // Falls back to hardcoded Terra pattern when no recipes are provided.
+  const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
+  // Recipe n values are the STABLE baseline. Effects are multiplicative so op/insane multiply up significantly.
+  const scaleForMode = { stable: 1.0, op: 2.0, insane: 3.5 }[modPowerMode];
+  // Perks that CRASH the game above a certain stack count — hard cap regardless of mode.
+  // 73 = Expansive, 76 = Nuke — both crash above 5 stacks.
+  const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
+  const recipes = options.grenadeVisualRecipes?.filter((r) => r?.groups?.length > 0) ?? [];
+  let terraGrenadePerkBlock: string;
+  if (recipes.length > 0) {
+    const recipe = pick(recipes);
+    const groupTokens = recipe.groups.map((group) => {
+      const ids: number[] = [];
+      for (const entry of group.entries) {
+        const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
+        const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
+          ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
+          : rawCount;
+        for (let i = 0; i < count; i++) ids.push(entry.id);
+      }
+      return `{245:[${ids.join(" ")}]}`;
+    });
+    terraGrenadePerkBlock = groupTokens.join(" ");
+  } else {
+    // Terra's perfect gun fallback pattern: 72 dominant visual, then secondary + standard perks.
+    const baseHeavyStack = { stable: randInt(6, 8), op: 10, insane: randInt(10, 14) }[modPowerMode];
+    const dominantStack  = { stable: randInt(16, 24), op: randInt(30, 45), insane: randInt(40, 60) }[modPowerMode];
+    const heavyStack2    = { stable: randInt(10, 16), op: randInt(18, 28), insane: randInt(25, 40) }[modPowerMode];
+    const terraPerkIds: number[] = [
+      ...Array(dominantStack).fill(72),
+      ...Array(heavyStack2).fill(39),
+      ...Array(heavyStack2).fill(75),
+      ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap((id) => Array(baseHeavyStack).fill(id)),
+      24, 40, 53, 62, 66, 76,
+      10, 77, 21,
+    ];
+    terraGrenadePerkBlock = `{245:[${terraPerkIds.join(" ")}]}`;
   }
-  grenadeParts.push(grenadeRarityCode);
+  // {298:11} = Torgue grenade anchor — Terra's perfect gun uses this (not {291:8}).
+  // {291:8} = Vladof Waterfall grenade — wraps {245:[...]} on both sides for grenade reload.
+  const torgueGrenadeAnchor = "{298:11}";
+  const vladofGrenadeAnchor = "{291:8}";
+
+  // Optional legendary grenade wrap (if provided by UI) — placed around the perk block for grenade reload.
+  const legendaryGrenades = options.legendaryGrenadeEntries?.filter(
+    (e) => e?.code && /^\s*\{\s*\d+\s*:\s*\d+\s*\}\s*$/.test(String(e.code).trim()),
+  ) ?? [];
+  const grenadeCode = legendaryGrenades.length > 0 ? pick(legendaryGrenades).code.trim() : "";
+
+  // Grenade system: {298:11} Torgue anchor always precedes {245:[...]} (Terra's perfect gun pattern).
+  // {291:8} waterfall wrapper goes around {245:[...]} for grenade-reload mode.
+  // Extra legendary grenade wraps outside if provided by UI.
+  const grenadeParts: string[] =
+    options.specialMode === "inf-ammo"
+      ? []
+      : grenadeCode
+        ? [grenadeCode, torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor, grenadeCode]
+        : [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor];
+
+  const finalGrenadeParts = grenadeParts;
 
   // Other heavy enhancement stacks were cleared as part of the simplified rules; no generic enhancement/stalker stacks.
 
+  // Stock magazine from the weapon's own prefix — placed dead last so the game has a native
+  // magazine reference for inventory/spawning but it doesn't render visually during firing.
+  const stockMagToken = pickToken(["magazine"]);
+
+  // ── ASSEMBLY ORDER ────────────────────────────────────────────────────────────────────────
+  // 1. Full stock weapon base (rarity → body → barrel → mag → grip → scope → mfg parts)
+  //    The game needs every stock slot filled or the weapon won't spawn.
+  // 2. Modded additions on top (extra barrels, stacks, grenade reload, underbarrel).
+  // 3. Stock magazine last — gives spawner a native mag code, renders after everything else
+  //    so it doesn't override the visual during firing.
+  // Pearl rarity pool — confirmed {prefix:82} codes from decoded weapons.
+  // {11:82} = Tediore SG Eigenburst rarity, {25:82} = Maliwan SR rarity.
+  // More will be added as new codes are decoded. Always the absolute first token.
+  const pearlRarityPool = ["{11:82}", "{25:82}"];
+  const pearlRarityToken = pick(pearlRarityPool);
+
+  // Extreme same-prefix stacking — Terra's pattern: THREE separate groups, each a different part ID ×25.
+  // e.g. {20:[80×25]} {20:[84×25]} {20:[81×25]}. Picks 3 unique barrel/body acc parts from own prefix.
+  const extremeStackPartPool = weaponRows.filter(
+    (r) => norm(r.partType) === "barrel accessory" || norm(r.partType) === "body accessory",
+  );
+  const extremeStackCount = { stable: randInt(15, 20), op: randInt(20, 28), insane: randInt(25, 35) }[modPowerMode];
+  const extremeSamePrefixStack = (() => {
+    if (!extremeStackPartPool.length) return [];
+    const shuffled = [...extremeStackPartPool].sort(() => Math.random() - 0.5);
+    const chosen = shuffled.slice(0, Math.min(3, shuffled.length));
+    return chosen.map((r) =>
+      groupedToken(headerPrefix, Array(extremeStackCount).fill(Number(r.partId))),
+    );
+  })();
+
+
+  // Body ×10 stacking — Terra repeats the body token 10 times for reinforcement.
+  const bodyRepeatTokens = bodyToken ? Array(10).fill(bodyToken) : [];
+
+  // {292:[9×10]} Tediore Enhancement "Divider" — Terra confirmed: always exactly 10 stacks on every gun.
+  const dividerStacks = [groupedToken(292, Array(10).fill(9))];
+
+  // Elemental override codes — confirmed from DB: {1:56-60} = shock/radiation/corrosive/cryo/fire overrides.
+  // {1:55} kinetic intentionally omitted — kinetic = plain white ammo, no visual. Keeping 56-60 gives colorful projectile effects.
+  const extendedElementTokens = [56, 57, 58, 59, 60].map((id) => `{1:${id}}`);
+
   const allNewParts = [
+    // ── Pearl rarity FIRST — rarity = first token wins (Rule 11) ──
+    pearlRarityToken,
+    // ── Extended elements early — Terra places these right after Pearl rarity ──
+    ...extendedElementTokens,
+    // ── Stock base ──
     firstRarityCode,
-    ...altFireTokens,
     bodyToken,
     ...bodyAccessoryStack,
+    // Visual barrel MUST come before primaryBarrelToken — game reads left-to-right, leftmost barrel sets the visual.
     ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
     primaryBarrelToken,
-    ...samePrefixBarrelParts,
-    ...crossParts,
     ...barrelAccessoryStack,
-    multiProjectileToken,
-    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
-    ...homingStacks273,
     magazineToken,
     ...(gripToken ? [gripToken] : []),
-    ...(foregripToken ? [foregripToken] : []),
     ...(scopeToken ? [scopeToken] : []),
-    ...(daedalusAltAmmoToken ? [daedalusAltAmmoToken] : []),
     ...manufacturerTokens,
+
+    // ── Modded additions ──
+    ...altFireTokens,
+    ...samePrefixBarrelParts,
+    ...crossParts,
+    // Three extreme same-prefix stacks — Terra pattern: 3 different part IDs each ×25
+    ...extremeSamePrefixStack,
+    // Body ×10 stacking — Terra's pattern
+    ...bodyRepeatTokens,
+    multiProjectileToken,
+    homingToken,
+    scanningHomingToken,
+    ...seamstressExtras,
+    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
+    ...homingStacks273,
+    ...rowansChargeStacks,
     ...damageStacks,
-    ...ammoStacks,
+    ...weaponTypeDamageStacks,
+    ...movementSpeedStacks,
     ...fireRateStacks,
+    ...freeChargerStacks,
+    ...heatExchangeStacks,
+    ...orderSrMagStacks,
+    ...angelsShareStacks,
+    ...ventilatorStacks,
+    ...exemplarStacks,
+    ...jakobsCritStacks,
+    ...vladofSmgDmgStacks,
+    ...vladofArBarrelStacks,
+    ...mirvInserts,                                          // Tediore MIRV cross-inserts — adds MIRV splitting to gun shots
+    ...classModCrossInsert,
+    ...tedioreShieldInsert,                                  // {287:[9×N]} Tediore Shield cross-insert (Terra's perfect gun)
+    ...daedalusEnhInsert,                                    // {299:[1 1 9 9 2 2 3 3]} Terra enhancement pattern
+    ...jakobsEnhInsert,                                      // {268:[1 1 9 9 2 2 3 3]}
+    ...maliwanEnhInsert,                                     // {271:[1 1 9 9 2 2 3 3]}
+    ...tedioreEnhInsert,                                     // {292:[9 9 2 2 3 3 9 9 9 9 9]}
+    ...shieldBodyInsert,                                     // {246:[22 22 23 23 26 26 25 25 24 24 31 39 40 45 46 58 58]}
+    ...dividerStacks,
+    "{11:75}",                                               // Terra: enables flight — every gun, near end
+    // Terra grenade perk block — always present, drives visual effects
+    ...finalGrenadeParts,
+    // Foregrip → underbarrel accessories → underbarrel (underbarrel must be last modded part).
+    ...(foregripToken ? [foregripToken] : []),
     ...underbarrelAccessoryStack,
-    ...(shouldUseUnderbarrelAlt ? [underbarrelInfiniteAmmoToken] : []),
-    ...grenadeParts,
-    // Underbarrel must always be the last code.
     ...(underbarrelToken ? [underbarrelToken] : []),
+
+    // ── Stock magazine last (spawn anchor, no visual impact) ──
+    ...(stockMagToken ? [stockMagToken] : []),
   ];
   if (!allNewParts.length) throw new Error("Could not build random modded parts.");
 
@@ -745,9 +1259,35 @@ export function generateModdedWeapon(
     .replace(/\s{2,}/g, " ")
     .trim();
 
-  const safeSkin = chosenSkin.replace(/"/g, '\\"');
+  const safeSkin = chosenSkin ? chosenSkin.replace(/"/g, '\\"') : "";
   const updatedDecoded = safeSkin
     ? `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} | "c", "${safeSkin}" |`
     : `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} |`;
-  return updatedDecoded;
+
+  // DPS estimate — uses real base stats from the barrel's String field.
+  const dmgStackCount = countGroupedStacks(damageStacks);
+  const critStackCount = countGroupedStacks(weaponTypeDamageStacks);
+  const frStackCount = countGroupedStacks(fireRateStacks);
+  const baseDamagePerShot = barrelStats.damage * barrelStats.pellets;
+  const baseFireRate = barrelStats.fireRate;
+  const baseDps = baseDamagePerShot * baseFireRate;
+  // Per Mobalytics formula: all gun-part bonuses are additive into Soup, crits add into Soup at crit rate.
+  // Assumes 3% per +Damage stack, 3% per +Crit stack at 30% crit rate, 2% per +FireRate stack.
+  const soupMultiplier = 1 + (dmgStackCount * 0.03) + (critStackCount * 0.03 * 0.30);
+  const frMultiplier = 1 + (frStackCount * 0.02);
+  const estimatedDps = baseDps * soupMultiplier * frMultiplier;
+
+  return {
+    code: updatedDecoded,
+    dps: {
+      barrelName: barrelStats.name,
+      baseDamagePerShot,
+      baseFireRate,
+      baseDps,
+      damageStackCount: dmgStackCount,
+      critStackCount,
+      fireRateStackCount: frStackCount,
+      estimatedDps,
+    },
+  };
 }

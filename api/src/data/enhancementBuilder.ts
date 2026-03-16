@@ -22,6 +22,28 @@ function trim(s: unknown): string {
 export interface EnhancementMfgPerk {
   index: number;
   name: string;
+  description?: string;
+}
+
+/** Split combined "Name -Description" or "Name - Description" strings from the CSV. */
+function splitPerkName(combined: string): { name: string; description?: string } {
+  if (!combined) return { name: combined };
+  // "Name - Description" (space-dash-space)
+  const sds = combined.indexOf(" - ");
+  if (sds !== -1) {
+    return { name: combined.slice(0, sds).trim(), description: combined.slice(sds + 3).trim() };
+  }
+  // "Name -Description" (space-dash, no space after)
+  const sd = combined.indexOf(" -");
+  if (sd !== -1) {
+    return { name: combined.slice(0, sd).trim(), description: combined.slice(sd + 2).trim() };
+  }
+  // "Name-Description" (bare dash) — split only if the name part is short
+  const d = combined.indexOf("-");
+  if (d !== -1 && d <= 30) {
+    return { name: combined.slice(0, d).trim(), description: combined.slice(d + 1).trim() };
+  }
+  return { name: combined };
 }
 
 export interface EnhancementManufacturer {
@@ -34,6 +56,7 @@ export interface EnhancementManufacturer {
 export interface Enhancement247Perk {
   code: number;
   name: string;
+  description?: string;
 }
 
 export interface EnhancementBuilderData {
@@ -74,7 +97,11 @@ export function getEnhancementBuilderData(): EnhancementBuilderData {
         };
       }
       if (Number.isFinite(perkId) && perkName) {
-        manufacturers[mfgName].perks.push({ index: perkId, name: perkName });
+        // perk_name_EN is now a clean name (enriched CSV); perk_description_EN has the full effect text
+        const csvDesc = trim(r["perk_description_EN"]);
+        const { name, description: splitDesc } = splitPerkName(perkName);
+        const description = csvDesc || splitDesc;
+        manufacturers[mfgName].perks.push(description ? { index: perkId, name, description } : { index: perkId, name });
       }
     }
   }
@@ -101,7 +128,8 @@ export function getEnhancementBuilderData(): EnhancementBuilderData {
       const code = parseInt(trim(r["perk_ID"]), 10);
       const name = trim(r["perk_name_EN"]);
       if (!Number.isFinite(code)) continue;
-      secondary247.push({ code, name });
+      const description = trim(r["perk_description_EN"]) || undefined;
+      secondary247.push(description ? { code, name, description } : { code, name });
     }
   }
 

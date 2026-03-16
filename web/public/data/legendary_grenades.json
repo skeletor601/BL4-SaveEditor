@@ -1,0 +1,16 @@
+[
+  { "name": "MIRV", "code": "{35:6}" },
+  { "name": "Storm Front", "code": "{35:7}" },
+  { "name": "Rain", "code": "{35:8}" },
+  { "name": "Quasar", "code": "{35:9}" },
+  { "name": "Fastball", "code": "{35:11}" },
+  { "name": "Hex", "code": "{298:12}" },
+  { "name": "Legendary Gold", "code": "{263:8}" },
+  { "name": "Legendary Gold", "code": "{267:8}" },
+  { "name": "Legendary Gold", "code": "{270:5}" },
+  { "name": "Legendary Gold", "code": "{272:6}" },
+  { "name": "Legendary Gold", "code": "{278:8}" },
+  { "name": "Legendary Gold", "code": "{291:5}" },
+  { "name": "Legendary Gold", "code": "{298:5}" },
+  { "name": "Legendary Gold", "code": "{311:5}" }
+]

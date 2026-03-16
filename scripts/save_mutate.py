@@ -175,7 +175,14 @@ def main() -> None:
             sys.exit(0)
         path = bl4f.add_item_to_backpack(data, serial.strip(), str(flag))
         if path is None:
-            print(json.dumps({"success": False, "error": "Failed to add item (backpack not found or invalid)"}))
+            try:
+                hint = bl4f.get_save_structure_hint(data)
+            except Exception as e:
+                hint = f"hint_error={type(e).__name__}: {e}"
+            err_msg = f"Failed to add item (backpack not found or invalid). Save structure: {hint}"
+            sys.stderr.write(err_msg + "\n")
+            sys.stderr.flush()
+            print(json.dumps({"success": False, "error": err_msg}), flush=True)
             sys.exit(0)
         out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
         print(json.dumps({"success": True, "yaml_content": out_yaml}))
@@ -207,6 +214,12 @@ def main() -> None:
                 print(json.dumps({"success": False, "error": "item_path does not point to an object"}))
                 sys.exit(0)
             item_node["serial"] = new_serial.strip()
+            # Also update state_flags if provided
+            if "state_flags" in new_item_data:
+                try:
+                    item_node["state_flags"] = int(new_item_data["state_flags"])
+                except (TypeError, ValueError):
+                    pass
             out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
             print(json.dumps({"success": True, "yaml_content": out_yaml}))
         except (KeyError, IndexError, TypeError) as e:
@@ -237,7 +250,7 @@ def main() -> None:
             out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
             print(json.dumps({"success": True, "yaml_content": out_yaml}))
         else:
-            print(json.dumps({"success": False, "error": "Backpack not found or could not clear"}))
+            print(json.dumps({"success": False, "error": "Backpack and equipped not found or could not clear"}))
         sys.exit(0)
 
     if action == "apply_preset":

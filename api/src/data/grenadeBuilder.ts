@@ -127,13 +127,15 @@ export function getGrenadeBuilderData(): GrenadeBuilderData {
       if (!Number.isFinite(partId)) continue;
       const partType = trim(r["Part_type"]);
       const stat = trim(r["Stat"]);
+      const description = trim(r["Description"]) || undefined;
+      const base: GrenadeBuilderPart = description ? { partId, stat, description } : { partId, stat };
 
       if (partType === "Element") {
-        element.push({ partId, stat });
+        element.push(base);
       } else if (partType === "Firmware") {
-        firmware.push({ partId, stat });
+        firmware.push(base);
       } else if (partType === "Perk") {
-        universalPerks.push({ partId, stat });
+        universalPerks.push(base);
       }
     }
   }

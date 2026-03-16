@@ -27,6 +27,8 @@ export interface TranslatedLine {
   qty: number;
   /** First position this part appeared in the decoded build (for left-to-right ordering). */
   firstIndex: number;
+  /** All data fields from the parts DB for this part (for "show all fields" display). */
+  allFields?: Record<string, unknown>;
 }
 
 /** Extract parts list from decoded string/body with {tid:pid}, {tid}, "c", skinId/string. */
@@ -78,12 +80,12 @@ function codeKey(typeId: number, partId: number): string {
   return `{${typeId}:${partId}}`;
 }
 
-/** Look up one part and return (partType, name, stats, codeKey). Uses byCode map + optional elemental names. */
+/** Look up one part and return (partType, name, stats, codeKey, allFields). Uses byCode map + optional elemental names. */
 export function lookupPart(
   part: ParsedPart,
   byCode: Map<string, PartLookupRow[]>,
   elementalNames?: Map<number, string>
-): { partType: string; name: string; stats: string; codeKey: string } {
+): { partType: string; name: string; stats: string; codeKey: string; allFields?: Record<string, unknown> } {
   if (part[0] === "skin") {
     const skinToken = part[1];
     return { partType: "Skin", name: skinToken, stats: "", codeKey: `"c", "${skinToken}"` };
@@ -106,7 +108,13 @@ export function lookupPart(
   const partType = (row.partType ?? row.category ?? "Part") as string;
   const name = (row.partName ?? row.itemType ?? row.String ?? `ID ${partId}`) as string;
   const stats = (row.effect ?? row.Stats ?? row["Stats (Level 50, Common)"] ?? "") as string;
-  return { partType, name, stats, codeKey: key };
+  const allFields: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (v !== undefined && v !== null && v !== "") {
+      allFields[k] = v;
+    }
+  }
+  return { partType, name, stats, codeKey: key, allFields: Object.keys(allFields).length ? allFields : undefined };
 }
 
 /** Build byCode map from API-style items (code like "{284:1}"). */
@@ -130,22 +138,73 @@ export function translateParts(
 ): TranslatedLine[] {
   const counts = new Map<string, TranslatedLine>();
   parts.forEach((part, idx) => {
-    const { partType, name, stats, codeKey: key } = lookupPart(part, byCode, elementalNames);
+    const { partType, name, stats, codeKey: key, allFields } = lookupPart(part, byCode, elementalNames);
     const entry = counts.get(key);
     if (entry) {
       entry.qty += 1;
     } else {
-      counts.set(key, { codeKey: key, partType, name, stats, qty: 1, firstIndex: idx });
+      counts.set(key, { codeKey: key, partType, name, stats, qty: 1, firstIndex: idx, allFields });
     }
   });
   // Preserve build order: sort by firstIndex (left-to-right, top-to-bottom in the decoded string).
   return Array.from(counts.values()).sort((a, b) => a.firstIndex - b.firstIndex);
 }
 
-/** Format one translated line for display (desktop-style). */
+/** Preferred order for allFields keys when displaying. */
+const FIELD_ORDER = [
+  "code",
+  "partType",
+  "Part Type",
+  "partName",
+  "String",
+  "Model Name",
+  "manufacturer",
+  "Manufacturer",
+  "weaponType",
+  "Weapon Type",
+  "itemType",
+  "Item Type",
+  "category",
+  "Category",
+  "effect",
+  "Effect",
+  "Stats",
+  "Stats (Level 50, Common)",
+  "Effects",
+  "Requirements",
+  "rarity",
+  "canonicalRarity",
+  "elemental",
+  "Elemental",
+  "Unique Effect",
+  "Visual Unique Barrel",
+  "Search Text",
+  "canonicalPartType",
+  "canonicalManufacturer",
+  "Specific Category",
+  "Matched Legendary Name",
+  "Canonical Name",
+  "Is Legendary",
+];
+
+/** Format one translated line for display, including all data fields when present. */
 export function formatTranslatedLine(line: TranslatedLine): string {
-  if (line.stats) {
-    return `  ${line.qty}×  ${line.codeKey}  [${line.partType}]  ${line.name}  —  ${line.stats}`;
+  const main =
+    line.stats !== ""
+      ? `  ${line.qty}×  ${line.codeKey}  [${line.partType}]  ${line.name}  —  ${line.stats}`
+      : `  ${line.qty}×  ${line.codeKey}  [${line.partType}]  ${line.name}`;
+  if (!line.allFields || Object.keys(line.allFields).length === 0) {
+    return main;
   }
-  return `  ${line.qty}×  ${line.codeKey}  [${line.partType}]  ${line.name}`;
+  const keys = Object.keys(line.allFields);
+  const ordered = [
+    ...FIELD_ORDER.filter((k) => keys.includes(k)),
+    ...keys.filter((k) => !FIELD_ORDER.includes(k)).sort(),
+  ];
+  const fieldLines = ordered.map((k) => {
+    const v = line.allFields![k];
+    const str = typeof v === "object" && v !== null ? JSON.stringify(v) : String(v);
+    return `     ${k}: ${str}`;
+  });
+  return [main, ...fieldLines].join("\n");
 }

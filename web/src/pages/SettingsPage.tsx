@@ -1,9 +1,9 @@
-import { useTheme, THEMES, type ThemeId } from "@/contexts/ThemeContext";
+import { useTheme, THEMES, THEME_META, FONT_SIZES, type ThemeId, type FontSizeValue } from "@/contexts/ThemeContext";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/apiClient";
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, fontSize, setFontSize } = useTheme();
   const [version, setVersion] = useState<{ version?: string; downloadUrl?: string }>({});
 
   useEffect(() => {
@@ -14,31 +14,78 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <h1 className="text-xl font-semibold text-[var(--color-text)]">Settings</h1>
+    <div
+      className="space-y-6 max-w-2xl"
+      style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: "22px 22px" }}
+    >
+      <h1 className="text-xl font-semibold text-[var(--color-text)] font-mono tracking-wide">⚙ Settings</h1>
 
-      <section className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
-        <h2 className="text-[var(--color-accent)] font-medium mb-3">Theme</h2>
-        <p className="text-sm text-[var(--color-text-muted)] mb-4">Match the 8 themes from the desktop app.</p>
+      {/* Theme */}
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
+        <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-1 pl-1">⌖ Theme</h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-4 pl-1">8 themes — matches the desktop app.</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {THEMES.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTheme(t as ThemeId)}
-              className={`min-h-[44px] px-3 py-2 rounded-lg border text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
-                theme === t ? "border-accent bg-accent/20 text-accent" : "border-panel-border text-[var(--color-text-muted)] hover:bg-panel"
-              }`}
-              aria-label={`Theme ${t}`}
-            >
-              {t}
-            </button>
-          ))}
+          {THEMES.map((t) => {
+            const meta = THEME_META[t as ThemeId];
+            const active = theme === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTheme(t as ThemeId)}
+                className={`flex items-center gap-2 min-h-[44px] px-3 py-2 rounded-lg border text-sm font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-all ${
+                  active
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-[0_0_12px_var(--color-accent)]/30"
+                    : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                }`}
+                aria-label={`Theme ${meta.label}`}
+                style={active ? { boxShadow: `0 0 14px ${meta.accent}30` } : undefined}
+              >
+                <span
+                  className="w-3 h-3 rounded-full flex-shrink-0 border border-white/20"
+                  style={{
+                    backgroundColor: meta.accent,
+                    boxShadow: active ? `0 0 8px ${meta.accent}` : undefined,
+                  }}
+                />
+                {meta.label}
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      <section className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
-        <h2 className="text-[var(--color-accent)] font-medium mb-3">About / Credits</h2>
+      {/* Font Size */}
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
+        <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-1 pl-1">⊞ Text Size</h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-4 pl-1">Scales all text across the entire app.</p>
+        <div className="flex gap-2 flex-wrap">
+          {FONT_SIZES.map((f) => {
+            const active = fontSize === f.value;
+            return (
+              <button
+                key={f.value}
+                type="button"
+                onClick={() => setFontSize(f.value as FontSizeValue)}
+                className={`min-w-[56px] min-h-[44px] px-4 py-2 rounded-lg border font-mono text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-all ${
+                  active
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-[0_0_12px_var(--color-accent)]/30"
+                    : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Credits */}
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
+        <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-3 pl-1">◈ About / Credits</h2>
         <p className="text-sm text-[var(--color-text-muted)]">
           BL4 AIO Save Editor – Web version. All credit goes to original creator <strong>Superexboom</strong>.
         </p>
@@ -52,19 +99,19 @@ export default function SettingsPage() {
           <strong>Spliff and Shaggy</strong> - testing and spreading the word.
         </p>
         <p className="text-sm mt-3">
-          <a href="https://BL4Editor.com" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
+          <a href="https://BL4Editor.com" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline font-mono">
             BL4Editor.com
           </a>
           {" · "}
-          <a href="https://github.com/skeletor601/BL4-SaveEditor" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
-            Repository
+          <a href="https://github.com/skeletor601/BL4-SaveEditor" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline font-mono">
+            GitHub
           </a>
         </p>
-        <p className="text-sm mt-4">
-          Backend version: <span className="font-mono">{version.version ?? "—"}</span>
+        <p className="text-sm mt-4 font-mono text-[var(--color-text-muted)]">
+          Backend: <span className="text-[var(--color-accent)]">{version.version ?? "—"}</span>
           {version.downloadUrl && version.downloadUrl !== "#" && (
-            <a href={version.downloadUrl} target="_blank" rel="noreferrer" className="ml-2 text-[var(--color-accent)] hover:underline">
-              Download desktop
+            <a href={version.downloadUrl} target="_blank" rel="noreferrer" className="ml-3 text-[var(--color-accent)] hover:underline">
+              ↓ Desktop build
             </a>
           )}
         </p>

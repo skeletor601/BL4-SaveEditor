@@ -35,14 +35,22 @@ export function collectLookupCodesFromDecoded(decodedFull: string): string[] {
   const out = new Set<string>();
   const headerMatch = decodedFull.match(/^(\d+),/);
   const itemTypeId = headerMatch ? parseInt(headerMatch[1], 10) : undefined;
-  const re = /\{(\d+)(?::(\d+))?\}/g;
+  // Match {tid:pid}, {tid:[id id ...]}, and bare {tid}
+  const re = /\{(\d+)(?::(\d+|\[[\d\s]+\]))?\}/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(decodedFull)) !== null) {
-    if (m[2] != null) {
-      out.add(`{${m[1]}:${m[2]}}`);
+    const tid = m[1];
+    const inner = m[2];
+    if (inner == null) {
+      out.add(`{${tid}}`);
+      if (itemTypeId != null) out.add(`{${itemTypeId}:${tid}}`);
+    } else if (inner.startsWith("[")) {
+      // Array style: {tid:[id1 id2 ...]} — emit one lookup code per unique id
+      for (const sid of inner.replace(/[\[\]]/g, "").trim().split(/\s+/)) {
+        if (sid) out.add(`{${tid}:${sid}}`);
+      }
     } else {
-      out.add(`{${m[1]}}`);
-      if (itemTypeId != null) out.add(`{${itemTypeId}:${m[1]}}`);
+      out.add(`{${tid}:${inner}}`);
     }
   }
   return Array.from(out);

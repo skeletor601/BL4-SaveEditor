@@ -1,103 +1,59 @@
 # BL4 AIO Save Editor
 
-An all-in-one Borderlands 4 save editing platform built for speed, flexibility, and modern workflow.
+> **Live editor → [bl4editor.com](https://bl4editor.com)**
 
-Originally forked and completely redesigned, BL4 AIO has evolved into a unified editing ecosystem for both desktop and mobile modders.
-
----
-
-## 🚀 Download
-
-Download the latest Windows build from the **Releases** tab:
-
-👉 https://github.com/skeletor601/BL4-SaveEditor/releases
-
-• Windows 64-bit standalone executable  
-• No installation required  
+An all-in-one Borderlands 4 save editing platform — browser-based and desktop. Build modded weapons, search the full parts database, edit every item type, and manage your save backpack without installing anything.
 
 ---
 
-## ✨ Core Features
+## 🌐 Web Editor — bl4editor.com
 
-### 🔧 Unified Item Editor
-- Grenade, Shield, Repkit, and Heavy editing in a single window
-- Double-click inventory auto-load into the correct editor
-- Integrated on-screen part libraries
-- Live Base85 ↔ Deserialize bidirectional sync
-- Manual edit protection to prevent overwrite conflicts
+The full editor runs in your browser at **[bl4editor.com](https://bl4editor.com)** — no install, no account, works on desktop and phone.
 
-### 🔍 Master Search (Desktop + Mobile HTML Version)
-- High-speed searchable parts database
-- Advanced filtering & legendary highlighting
-- Lightbox-style preview system
-- Mobile-friendly HTML version for phone users
-- Optimized for modders who build and copy parts on mobile devices
+### Features
 
-### 🎨 Live Skin Previews
-- Real-time cosmetic preview while typing
-- Click-to-insert skin tokens
-- Automatic formatting injection support
+| Feature | What it does |
+|---|---|
+| **Unified Item Builder** | Build or edit weapons, grenades, shields, class mods, repkits, and heavy weapons from a single page with live Base85 ↔ deserialized sync |
+| **Modded Weapon Generator** | One-click generates OP/insane modded weapons with stacked damage, underbarrels, visual barrels, and skin injection |
+| **DPS Estimator** | Live damage-per-second estimate based on barrel stats and stacked parts |
+| **Master Search** | Search all 9,600+ parts by name, manufacturer, rarity, or type with hover previews and part detail cards |
+| **Backpack Manager** | Add, remove, duplicate, and upgrade items directly in your save |
+| **Parts Translator** | Paste a raw code and see every part decoded into plain English |
+| **Skin Preview** | Real-time weapon skin previews while you build |
+| **Save Decrypt / Encrypt** | Load a `.sav` file with your Epic or Steam User ID, edit, and re-export as `.sav`, `.json`, or `.yaml` |
 
-### 🔄 One-Click Parts Library Updater
-- Checks for latest database version
-- Secure download & verification
-- Automatic backup before replacement
-- Hot reload support (no restart required)
+---
 
-### 🎛 Modern UI
-- Complete dashboard redesign
+## 🚀 Desktop Download
+
+Windows standalone executable — no install required.
+
+**→ [Releases](https://github.com/skeletor601/BL4-SaveEditor/releases)**
+
+The desktop app includes everything in the web editor plus:
+- Direct save file access (no manual decrypt/encrypt)
+- Offline use
 - 8 selectable themes
-- Live news feed integration
-- Improved signal handling and stability
 
 ---
 
-## 🌐 Web version
+## 🛠 Tech Stack
 
-**https://BL4Editor.com** – Full save editor in the browser: Master Search, weapon and item editing, backpack (add/remove/duplicate/upgrade), character and inventory tools. No install; works on desktop and phone.
-
----
-
-## 🛠 Built With
-
-- Python 3.11
-- PyQt6
-- PyInstaller
-- JSON-based parts database
-- Custom HTML Master Search interface
+**Web frontend** — React + TypeScript + Vite + Tailwind CSS
+**API** — Fastify (Node.js) · save decrypt/encrypt · parts database · encode/decode
+**Desktop** — Python 3.11 + PyQt6 + PyInstaller
+**Parts database** — 9,600+ entries covering all item categories, built from game data CSVs
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project is unofficial and is not affiliated with Gearbox Software or 2K Games.
-
-Use responsibly.
-
----
-
-## 📌 Status
-
-Actively developed.
-
-Version 3.69 introduced:
-- Complete UI overhaul
-- Master Search rework
-- Parts Library Updater
-- Live skin preview injection
-- Structural code cleanup
-
-More features and improvements are planned.
+Unofficial project — not affiliated with Gearbox Software or 2K Games. Use responsibly.
 
 ---
 
 ## 💬 Contact / Support
 
-For feedback, feature requests, or support:
-
-Discord: **DrLecter6969**  
-GitHub Issues are also welcome.
-
----
-
-BL4 AIO continues evolving into a complete all-in-one Borderlands 4 save editing platform.
+Discord: **DrLecter6969**
+GitHub Issues are welcome.

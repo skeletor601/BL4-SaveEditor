@@ -1,0 +1,296 @@
+{
+  "parts": [
+    {
+      "name": "part underbarrel 06 star helix",
+      "code": "{13:76}",
+      "partType": ""
+    },
+    {
+      "name": "part underbarrel 03 airstrike",
+      "code": "{17:45}",
+      "partType": "airstrike"
+    },
+    {
+      "name": "part underbarrel 03 beam tosser",
+      "code": "{10:43}",
+      "partType": "beamtosser"
+    },
+    {
+      "name": "part underbarrel 02 deathsphere",
+      "code": "{15:68}",
+      "partType": "deathsphere"
+    },
+    {
+      "name": "part underbarrel 03 mine",
+      "code": "{8:50}",
+      "partType": "democharge"
+    },
+    {
+      "name": "part underbarrel 03 semtex",
+      "code": "{2:75}",
+      "partType": "democharge"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{13:60}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{2:45}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{8:44}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{20:47}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{7:53}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{19:48}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{23:46}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{14:69}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{5:51}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{11:56}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{17:42}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{6:42}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{12:42}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{18:85}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{22:49}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 06 malswitch",
+      "code": "{16:45}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel om spacelaser",
+      "code": "{13:75}",
+      "partType": "elementswitch"
+    },
+    {
+      "name": "part underbarrel 02 energydisc",
+      "code": "{10:44}",
+      "partType": "energydisc"
+    },
+    {
+      "name": "part underbarrel 02 overcharge",
+      "code": "{21:46}",
+      "partType": "energydisc"
+    },
+    {
+      "name": "part underbarrel 03 flamethrower",
+      "code": "{22:52}",
+      "partType": "flamethrower"
+    },
+    {
+      "name": "part underbarrel 02 meathook",
+      "code": "{9:46}",
+      "partType": "gravityharpoon"
+    },
+    {
+      "name": "part underbarrel 02 gravitywell",
+      "code": "{4:72}",
+      "partType": "gravitywell"
+    },
+    {
+      "name": "part underbarrel 01 grenade",
+      "code": "{13:63}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel 01 grenadelauncher",
+      "code": "{18:49}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel 01 mirvgrenade",
+      "code": "{17:43}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel 01 stungrenade",
+      "code": "{20:79}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel 03 bounce grenade",
+      "code": "{12:44}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel 02 knifelauncher",
+      "code": "{2:47}",
+      "partType": "knife"
+    },
+    {
+      "name": "part underbarrel 01 microrocket",
+      "code": "{8:45}",
+      "partType": "microrocket"
+    },
+    {
+      "name": "part underbarrel 01 microrocket",
+      "code": "{3:46}",
+      "partType": "microrocket"
+    },
+    {
+      "name": "part underbarrel 01 microrockets",
+      "code": "{22:50}",
+      "partType": "microrocket"
+    },
+    {
+      "name": "part underbarrel 03 microrocket",
+      "code": "{13:62}",
+      "partType": "microrocket"
+    },
+    {
+      "name": "part underbarrel 03 seamstress",
+      "code": "{26:77}",
+      "partType": "needlelauncher"
+    },
+    {
+      "name": "part underbarrel 01 shotgun",
+      "code": "{24:45}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 01 shotgun",
+      "code": "{16:52}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 02 shotgun",
+      "code": "{13:61}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 02 shotgun",
+      "code": "{20:48}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 02 shotgun",
+      "code": "{17:72}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 02 shotgun",
+      "code": "{18:87}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 03 grenade",
+      "code": "{9:45}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 03 shotgun",
+      "code": "{27:55}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 03 shotgun",
+      "code": "{14:65}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 03 shotgun",
+      "code": "{5:50}",
+      "partType": "shotgun"
+    },
+    {
+      "name": "part underbarrel 01 singularity",
+      "code": "{25:49}",
+      "partType": "singularity"
+    },
+    {
+      "name": "part underbarrel 02 singularity",
+      "code": "{8:43}",
+      "partType": "singularity"
+    },
+    {
+      "name": "part underbarrel 01 taser",
+      "code": "{2:48}",
+      "partType": "taser"
+    },
+    {
+      "name": "part underbarrel 02 multitaser",
+      "code": "{25:48}",
+      "partType": "taser"
+    },
+    {
+      "name": "part underbarrel 02 taser",
+      "code": "{22:51}",
+      "partType": "taser"
+    }
+  ],
+  "accessories": [
+    {
+      "name": "part underbarrel flamethrower acc",
+      "code": "{22:57}",
+      "partType": "flamethrower"
+    },
+    {
+      "name": "part underbarrel grenade acc",
+      "code": "{18:50}",
+      "partType": "grenade"
+    },
+    {
+      "name": "part underbarrel microrockets acc",
+      "code": "{22:55}",
+      "partType": "microrocket"
+    },
+    {
+      "name": "part underbarrel taser acc",
+      "code": "{22:56}",
+      "partType": "taser"
+    }
+  ]
+}

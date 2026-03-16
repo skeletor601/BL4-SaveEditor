@@ -1,0 +1,31 @@
+{
+  "description": "Underbarrels in desirable_underbarrels.json that are NOT in allowed_underbarrels.json. Copy any entry into allowed_underbarrels.json (parts or accessories) to allow it.",
+  "parts": [
+    { "name": "part underbarrel 06 malswitch", "code": "{13:60}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{2:45}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{8:44}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{20:47}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{7:53}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{19:48}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{23:46}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{14:69}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{5:51}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{11:56}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{17:42}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{6:42}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{12:42}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{18:85}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{22:49}", "partType": "elementswitch" },
+    { "name": "part underbarrel 06 malswitch", "code": "{16:45}", "partType": "elementswitch" },
+    { "name": "part underbarrel 01 shotgun", "code": "{24:45}", "partType": "shotgun" },
+    { "name": "part underbarrel 01 shotgun", "code": "{16:52}", "partType": "shotgun" },
+    { "name": "part underbarrel 02 shotgun", "code": "{13:61}", "partType": "shotgun" },
+    { "name": "part underbarrel 02 shotgun", "code": "{20:48}", "partType": "shotgun" },
+    { "name": "part underbarrel 02 shotgun", "code": "{17:72}", "partType": "shotgun" },
+    { "name": "part underbarrel 02 shotgun", "code": "{18:87}", "partType": "shotgun" },
+    { "name": "part underbarrel 03 shotgun", "code": "{27:55}", "partType": "shotgun" },
+    { "name": "part underbarrel 03 shotgun", "code": "{14:65}", "partType": "shotgun" },
+    { "name": "part underbarrel 03 shotgun", "code": "{5:50}", "partType": "shotgun" }
+  ],
+  "accessories": []
+}

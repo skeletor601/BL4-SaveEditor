@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme, THEMES, THEME_META, type ThemeId } from "@/contexts/ThemeContext";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -70,20 +70,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[var(--color-text-muted)] hidden sm:inline">Theme</span>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as typeof theme)}
-              className="bg-panel border border-panel-border text-accent rounded px-2 py-1.5 text-sm min-w-[6rem] min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-              aria-label="Theme"
-            >
-              {["Ion", "Lava", "Phoenix", "Violet", "Blue_Balls", "Artic_Hex", "Carbon_Flux", "Platinum"].map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
+          <div className="flex items-center gap-3">
+            {/* Theme swatch row */}
+            <div className="flex items-center gap-1.5" role="group" aria-label="Theme">
+              <span className="text-[10px] font-mono tracking-widest text-[var(--color-text-muted)] hidden sm:inline mr-0.5">THEME</span>
+              {THEMES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTheme(t as ThemeId)}
+                  title={THEME_META[t as ThemeId].label}
+                  aria-label={`Theme: ${THEME_META[t as ThemeId].label}`}
+                  className={`w-5 h-5 rounded-full border-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                    theme === t
+                      ? "border-white scale-125"
+                      : "border-transparent opacity-50 hover:opacity-100 hover:scale-110"
+                  }`}
+                  style={{
+                    backgroundColor: THEME_META[t as ThemeId].accent,
+                    boxShadow: theme === t ? `0 0 10px ${THEME_META[t as ThemeId].accent}` : undefined,
+                  }}
+                />
               ))}
-            </select>
+            </div>
             <Link
               to="/settings"
               className="min-h-[44px] inline-flex items-center px-3 py-2 rounded border border-panel-border text-sm text-[var(--color-text-muted)] hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
