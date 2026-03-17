@@ -12,6 +12,9 @@ import {
   buttonPrimaryClass,
   FLAG_OPTIONS,
 } from "@/components/weapon-toolbox/builderStyles";
+import { useCodeHistory } from "@/lib/useCodeHistory";
+import CodeHistoryPanel from "@/components/CodeHistoryPanel";
+import VisualRecipePanel, { type RecipePart } from "@/components/grenade/VisualRecipePanel";
 
 interface GrenadeBuilderPart {
   partId: number;
@@ -68,6 +71,7 @@ function copyToClipboard(text: string): void {
 
 export default function GrenadeBuilderView() {
   const { saveData, getYamlText, updateSaveData } = useSave();
+  const { addEntry: addHistoryEntry } = useCodeHistory();
   const [builderData, setBuilderData] = useState<GrenadeBuilderData | null>(null);
   const [mfgId, setMfgId] = useState<number>(263);
   const [level, setLevel] = useState("50");
@@ -214,6 +218,21 @@ export default function GrenadeBuilderView() {
     setSelectedParts((prev) => prev.filter((p) => p.typeId !== typeId));
   }, []);
 
+  const moveSelectedPart = useCallback((idx: number, dir: -1 | 1) => {
+    setSelectedParts((prev) => {
+      const next = [...prev];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next;
+    });
+  }, []);
+
+  const loadRecipe = useCallback((parts: RecipePart[]) => {
+    // Replace all type-245 selections with the recipe's parts (in recipe order), keep others
+    setSelectedParts((prev) => [...parts, ...prev.filter((p) => p.typeId !== 245)]);
+  }, []);
+
   const rebuildOutput = useCallback(async () => {
     if (manualOutputMode || !builderData) return;
     const header = `${mfgId}, 0, 1, ${level}| 2, 305||`;
@@ -242,7 +261,9 @@ export default function GrenadeBuilderView() {
     const tokens: string[] = [];
     for (const [typeId, ids] of byType.entries()) {
       if (!ids.length) continue;
-      const sorted = [...ids].sort((a, b) => a - b);
+      // Preserve insertion order for type 245 (grenade perks) — order determines visual effect.
+      // Sort all other type IDs numerically for deterministic output.
+      const sorted = typeId === 245 ? [...ids] : [...ids].sort((a, b) => a - b);
       if (sorted.length === 1) {
         if (typeId === mfgId) tokens.push(`{${sorted[0]}}`);
         else tokens.push(`{${typeId}:${sorted[0]}}`);
@@ -495,7 +516,17 @@ export default function GrenadeBuilderView() {
               className={`${inputClass} font-mono text-sm resize-y`}
             />
             <div className="flex flex-wrap items-center gap-2 mt-2 gap-y-2">
-              <button type="button" onClick={() => copyToClipboard(b85Output)} className={buttonSecondaryClass}>
+              <button
+                type="button"
+                onClick={() => {
+                  const serial = b85Output.trim();
+                  copyToClipboard(serial);
+                  if (serial.startsWith("@U")) {
+                    addHistoryEntry({ itemType: "grenade", code: serial, decoded: rawOutput.trim() || undefined });
+                  }
+                }}
+                className={buttonSecondaryClass}
+              >
                 Copy
               </button>
               <button
@@ -750,9 +781,26 @@ export default function GrenadeBuilderView() {
                 {selectedParts.map((p, idx) => (
                   <div
                     key={`${p.typeId}:${p.partId}:${idx}`}
-                    className="flex items-center gap-2 rounded px-3 py-2 min-h-[44px] border border-transparent hover:border-[var(--color-panel-border)] hover:bg-[rgba(255,255,255,0.04)]"
+                    className={`flex items-center gap-2 rounded px-3 py-2 min-h-[44px] border hover:bg-[rgba(255,255,255,0.04)] ${p.typeId === 245 ? "border-purple-500/20 bg-purple-500/5" : "border-transparent hover:border-[var(--color-panel-border)]"}`}
                   >
-                    <span className="text-xs text-[var(--color-text-muted)] font-mono">{`{${p.typeId}:${p.partId}}`}</span>
+                    {/* Reorder arrows for type-245 (order-sensitive) */}
+                    {p.typeId === 245 && (
+                      <div className="flex flex-col gap-0.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveSelectedPart(idx, -1)}
+                          className="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-white/10 opacity-50 hover:opacity-100 transition-opacity"
+                          title="Move up"
+                        >▲</button>
+                        <button
+                          type="button"
+                          onClick={() => moveSelectedPart(idx, 1)}
+                          className="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-white/10 opacity-50 hover:opacity-100 transition-opacity"
+                          title="Move down"
+                        >▼</button>
+                      </div>
+                    )}
+                    <span className="text-xs text-[var(--color-text-muted)] font-mono shrink-0">{`{${p.typeId}:${p.partId}}`}</span>
                     <span className="flex-1 min-w-0 truncate text-sm text-[var(--color-text)]" title={p.label}>{p.label}</span>
                     <input
                       type="number"
@@ -843,6 +891,12 @@ export default function GrenadeBuilderView() {
           </div>
         </div>
       )}
+
+      {/* Visual recipe picker (Feature 12) */}
+      <VisualRecipePanel onLoad={loadRecipe} />
+
+      {/* Code history */}
+      <CodeHistoryPanel />
 
       {/* Super parts modal (DB-backed picker) */}
       {showSuperAddParts && (

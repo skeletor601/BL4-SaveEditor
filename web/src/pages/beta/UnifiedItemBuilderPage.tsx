@@ -18,10 +18,14 @@ import {
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { usePersistedState } from "@/lib/usePersistedState";
+import { useCodeHistory } from "@/lib/useCodeHistory";
+import CodeHistoryPanel from "@/components/CodeHistoryPanel";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
+import ClassModNameHoverCard, { type ClassModNameCardData } from "@/components/ClassModNameHoverCard";
+import { getClassModNameInfo } from "@/data/classModNameDescriptions";
 import PartDetailModal from "@/components/master-search/PartDetailModal";
 import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
 import { apiItemToPartRow, getCode, getPartName } from "@/data/partsData";
@@ -1235,6 +1239,7 @@ function slotRarityStyle(rarity: string | undefined): { border: string; bg: stri
 }
 
 export default function UnifiedItemBuilderPage() {
+  const { addEntry: addHistoryEntry } = useCodeHistory();
   const [category, setCategory] = usePersistedState<ItemCategory>("uib.category", "weapon");
   const [level, setLevel] = usePersistedState("uib.level", 50);
   const [seed, setSeed] = usePersistedState("uib.seed", 1);
@@ -1426,6 +1431,7 @@ export default function UnifiedItemBuilderPage() {
   const [classModPartPickerShowQty, setClassModPartPickerShowQty] = useState(false);
   const [classModPartPickerQty, setClassModPartPickerQty] = useState("1");
   const [classModSkillCard, setClassModSkillCard] = useState<{ skillName: string; className: string } | null>(null);
+  const [classModNameCard, setClassModNameCard] = useState<ClassModNameCardData | null>(null);
 
   const weaponMfgWtId = useMemo(() => {
     if (!weaponData?.mfgWtIdList?.length) return null;
@@ -2468,7 +2474,8 @@ export default function UnifiedItemBuilderPage() {
     if (raritySel === "Legendary" && legendaryLabels.length) {
       const legList = weaponPartSelections["Legendary Type"] ?? [];
       const legSel = legList[0]?.label ?? "";
-      if (!legSel || legSel === NONE || !legendaryLabels.includes(legSel)) {
+      // Use partIdFromLabel so labels with appended "(MfgName)" suffixes still validate correctly.
+      if (!legSel || legSel === NONE || !partIdFromLabel(legSel)) {
         setAutoFillWarning("Please select a Legendary type first, then click Auto fill.");
         return;
       }
@@ -2476,7 +2483,7 @@ export default function UnifiedItemBuilderPage() {
     if (raritySel === "Pearl" && pearlLabels.length) {
       const pearlList = weaponPartSelections["Pearl Type"] ?? [];
       const pearlSel = pearlList[0]?.label ?? "";
-      if (!pearlSel || pearlSel === NONE || !pearlLabels.includes(pearlSel)) {
+      if (!pearlSel || pearlSel === NONE || !partIdFromLabel(pearlSel)) {
         setAutoFillWarning("Please select a Pearl type first, then click Auto fill.");
         return;
       }
@@ -2527,10 +2534,11 @@ export default function UnifiedItemBuilderPage() {
     try {
       await navigator.clipboard.writeText(serial);
       setCodecStatus("Copied to clipboard.");
+      addHistoryEntry({ itemType: category, code: serial, decoded: liveDecoded.trim() || undefined });
     } catch {
       setCodecStatus("Clipboard copy failed.");
     }
-  }, [liveBase85, liveDecoded]);
+  }, [liveBase85, liveDecoded, category, addHistoryEntry]);
 
   const handleCopyDecoded = useCallback(async () => {
     const decoded = liveDecoded.trim();
@@ -6847,7 +6855,19 @@ export default function UnifiedItemBuilderPage() {
                                   const pi = universalParts.find((u) => u.label === item.label);
                                   const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
                                   return (
-                                  <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                  <div
+                                    key={idx}
+                                    className={`rounded-lg border ${border} ${bg} p-2`}
+                                    onMouseEnter={(e) => {
+                                      startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top);
+                                      if (partType === "Name" || partType === "Legendary names") {
+                                        const nameEN = item.label.includes(" - ") ? item.label.split(" - ").slice(1).join(" - ").trim() : item.label;
+                                        const info = getClassModNameInfo(nameEN);
+                                        if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
+                                      }
+                                    }}
+                                    onMouseLeave={() => { endHover(); setClassModNameCard(null); }}
+                                  >
                                     <div className="flex items-center gap-2 flex-wrap">
                                       <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
                                       <input
@@ -6943,7 +6963,19 @@ export default function UnifiedItemBuilderPage() {
                             </button>
                             <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] divide-y divide-[var(--color-panel-border)]/50 max-h-[50vh] overflow-y-auto">
                               {opts.map((o) => (
-                                <label key={o.id + o.label} className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10" onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, undefined, classModPartPickerKey || undefined), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                                <label
+                                  key={o.id + o.label}
+                                  className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10"
+                                  onMouseEnter={(e) => {
+                                    startHover(hoverDataByLabel(o.label, undefined, classModPartPickerKey || undefined), e.currentTarget.getBoundingClientRect().top);
+                                    if (classModPartPickerKey === "Name" || classModPartPickerKey === "Legendary names") {
+                                      const nameEN = o.label.includes(" - ") ? o.label.split(" - ").slice(1).join(" - ").trim() : o.label;
+                                      const info = getClassModNameInfo(nameEN);
+                                      if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
+                                    }
+                                  }}
+                                  onMouseLeave={() => { endHover(); setClassModNameCard(null); }}
+                                >
                                   <input
                                     type="checkbox"
                                     checked={classModPartPickerChecked.has(o.label)}
@@ -7054,6 +7086,7 @@ export default function UnifiedItemBuilderPage() {
                       onClose={() => setClassModSkillCard(null)}
                     />
                   )}
+                  <ClassModNameHoverCard data={classModNameCard} />
                 </>
               );
             })()}
@@ -8539,6 +8572,9 @@ export default function UnifiedItemBuilderPage() {
           </div>
         </div>
       )}
+
+      {/* Code history */}
+      <CodeHistoryPanel />
 
       {/* Floating hover card for slot items and sidebar build parts */}
       <PartHoverCard data={hoverCard} cardTop={hoverCardTop} side={hoverCardSide} />

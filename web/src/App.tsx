@@ -11,6 +11,8 @@ import SettingsPage from "@/pages/SettingsPage";
 import SuperWorkbenchPage from "@/pages/SuperWorkbenchPage";
 import BetaPage from "@/pages/BetaPage";
 import UnifiedItemBuilderPage from "@/pages/beta/UnifiedItemBuilderPage";
+import SaveComparisonPage from "@/pages/SaveComparisonPage";
+import CommunityVaultPage from "@/pages/CommunityVaultPage";
 
 function AppRoutes() {
   return (
@@ -69,6 +71,8 @@ function AppRoutes() {
         <Route path="/master-search" element={<MasterSearch />} />
         <Route path="/master-search-simple" element={<MasterSearchPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/save-compare" element={<SaveComparisonPage />} />
+        <Route path="/community" element={<CommunityVaultPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />
       </Routes>

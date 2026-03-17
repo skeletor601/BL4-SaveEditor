@@ -625,20 +625,8 @@ export function generateModdedWeapon(
   const usableSamePrefixBarrels = samePrefixBarrels.length ? samePrefixBarrels : anyPrefixBarrels;
   if (!usableSamePrefixBarrels.length) throw new Error("Could not build stock weapon core: missing Barrel for selected prefix.");
 
-  const uniqueEffectBarrels = candidates.filter(({ row }) => {
-    if (norm(row.partType) !== "barrel") return false;
-    if (row.visualUniqueBarrel === true || row.uniqueEffect === true) return true;
-    const t = norm(`${row.statText ?? ""} ${row.string ?? ""} ${row.partName ?? ""}`);
-    if (isBarrelExcluded(t)) return false;
-    if (/\bstar\s*helix\b/i.test(t)) return true;
-    if (/\bheavy\b/i.test(norm(row.itemType ?? "")) || /\bheavy\b/i.test(norm(row.weaponType ?? ""))) return true;
-    return /\bunique\b|\balt(ernate)?\s*(fire|barrel)?\b|\bappearance\b|\bvisual\b|\bdifferent\s*look\b/i.test(t);
-  });
-  const samePrefixUniqueBarrels = uniqueEffectBarrels.filter(
-    ({ parsed }) => parsed.prefix === headerPrefix && validCurrentPartIds.has(parsed.part),
-  );
-  const crossUniqueBarrels = uniqueEffectBarrels.filter(({ parsed }) => parsed.prefix !== headerPrefix);
-  const allUniqueBarrels = [...samePrefixUniqueBarrels, ...crossUniqueBarrels];
+  // uniqueEffectBarrels / allUniqueBarrels removed — visual barrel slot now always uses the curated
+  // visual barrel pool (with hardcoded fallback), never the old allUniqueBarrels/crossPrefixBarrels path.
   let crossPrefixBarrels = Array.from(weaponRowsByPrefix.entries()).flatMap(([pfx, rows]) => {
     if (pfx === headerPrefix) return [];
     const idsInPrefix = new Set(rows.map((r) => Number(r.partId)).filter((n) => Number.isFinite(n)));
@@ -656,24 +644,33 @@ export function generateModdedWeapon(
   const primaryBarrelToken = `{${chosenBarrelId}}`;
   const chosenBarrelRow = weaponRows.find((r) => norm(r.partType) === "barrel" && Number(r.partId) === chosenBarrelId);
   const barrelStats = chosenBarrelRow ? parseBarrelStats(chosenBarrelRow.string) : { name: "", damage: 0, pellets: 1, fireRate: 0 };
-  // Always paste a visual/heavy barrel to the left of the first barrel (game reads left-to-right). Prefer manual JSON list.
-  // Filter to visual:true entries only — avoids picking named legendaries with no dramatic projectile effect.
+  // Always paste a visual barrel to the left of the primary barrel (game reads left-to-right, leftmost barrel sets the visual).
+  // Priority: visual:true entries from JSON → all entries from JSON → hardcoded fallback list.
+  // Hardcoded fallback guarantees a dramatic visual barrel even when the JSON fetch fails silently.
+  const FALLBACK_VISUAL_BARRELS: VisualBarrelEntry[] = [
+    { name: "BottledLightning", code: "{289:26}", visual: true },
+    { name: "bugbear",          code: "{17:54}",  visual: true },
+    { name: "DiscJockey",       code: "{275:30}", visual: true },
+    { name: "fisheye",          code: "{26:75}",  visual: true },
+    { name: "GammaVoid",        code: "{289:24}", visual: true },
+    { name: "goremaster",       code: "{7:1}",    visual: true },
+    { name: "javelin",          code: "{273:35}", visual: true },
+    { name: "jetset",           code: "{275:35}", visual: true },
+    { name: "mantra",           code: "{10:62}",  visual: true },
+    { name: "onslaught",        code: "{22:68}",  visual: true },
+    { name: "Atling Gun",       code: "{282:25}", visual: true },
+    { name: "Sidewinder",       code: "{273:37}", visual: true },
+    { name: "Convergence",      code: "{7:64}",   visual: true },
+    { name: "Ravenfire",        code: "{273:40}", visual: true },
+    { name: "Splatoon",         code: "{282:2}",  visual: true },
+    { name: "Streamer",         code: "{275:1}",  visual: true },
+    { name: "symmetry",         code: "{26:72}",  visual: true },
+  ];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
-  const visualBarrelPool = visualOnly.length > 0 ? visualOnly : (options.visualBarrelEntries ?? []);
-  const uniqueFirstBarrelToken =
-    visualBarrelPool.length
-      ? pick(visualBarrelPool).code.trim()
-      : allUniqueBarrels.length > 0
-        ? (() => {
-            const u = pick(allUniqueBarrels);
-            return u.parsed.prefix === headerPrefix ? `{${u.parsed.part}}` : `{${u.parsed.prefix}:${u.parsed.part}}`;
-          })()
-        : crossPrefixBarrels.length > 0
-          ? (() => {
-              const c = pick(crossPrefixBarrels);
-              return `{${c.prefix}:${c.part}}`;
-            })()
-          : "";
+  const allVisualEntries = visualOnly.length > 0 ? visualOnly : (options.visualBarrelEntries ?? []);
+  const visualBarrelPool = allVisualEntries.length > 0 ? allVisualEntries : FALLBACK_VISUAL_BARRELS;
+  // Always picks from the curated pool — no fallback to allUniqueBarrels/crossPrefixBarrels for visual slot.
+  const uniqueFirstBarrelToken = pick(visualBarrelPool).code.trim();
   // ── Terra's barrel cap: max 5 unique barrel codes per gun ──────────────────────────────────
   // visual(1) + primary(1) already used = 3 slots remaining.
   // Extra same-prefix: pick 1-2 unique additional barrel IDs (not repeating), stack each ×N as a grouped token.
@@ -853,10 +850,13 @@ export function generateModdedWeapon(
         shouldUseUnderbarrelAlt = false;
       }
     }
-    // In grenade-reload mode an underbarrel is required — use {26:77} Seamstress as guaranteed fallback.
-    // In other modes, silently skip rather than throw so the gun still generates.
-    if (shouldUseUnderbarrelAlt && !underbarrelToken) {
-      if (options.specialMode === "grenade-reload") {
+    // Guaranteed fallback — every gun ALWAYS gets an underbarrel, no exceptions, no mode dependencies.
+    // Pick from the curated desirable list (unfiltered — we trust these are all safe choices).
+    // Absolute last resort: {26:77} Seamstress, which is always in the desirable list.
+    if (!underbarrelToken) {
+      if (ubPartsRaw.length > 0) {
+        underbarrelToken = pick(ubPartsRaw as DesirableUnderbarrelEntry[]).code.trim();
+      } else {
         underbarrelToken = "{26:77}";
       }
     }
@@ -1147,9 +1147,9 @@ export function generateModdedWeapon(
 
   // Other heavy enhancement stacks were cleared as part of the simplified rules; no generic enhancement/stalker stacks.
 
-  // Stock magazine from the weapon's own prefix — placed dead last so the game has a native
-  // magazine reference for inventory/spawning but it doesn't render visually during firing.
-  const stockMagToken = pickToken(["magazine"]);
+  // NOTE: stockMagToken removed — placing the weapon's native magazine at the end caused COV-type
+  // heat-gauge magazines to override the stacked Vladof mag. The game reads the last magazine token
+  // as the active one. The stacked {18:[14×N]} Vladof mag in stockBase is the only magazine needed.
 
   // ── ASSEMBLY ORDER ────────────────────────────────────────────────────────────────────────
   // 1. Full stock weapon base (rarity → body → barrel → mag → grip → scope → mfg parts)
@@ -1186,8 +1186,13 @@ export function generateModdedWeapon(
   const dividerStacks = [groupedToken(292, Array(10).fill(9))];
 
   // Elemental override codes — confirmed from DB: {1:56-60} = shock/radiation/corrosive/cryo/fire overrides.
-  // {1:55} kinetic intentionally omitted — kinetic = plain white ammo, no visual. Keeping 56-60 gives colorful projectile effects.
-  const extendedElementTokens = [56, 57, 58, 59, 60].map((id) => `{1:${id}}`);
+  // {1:55} kinetic intentionally omitted — kinetic = plain white ammo, no visual.
+  // Randomised per gun: shuffle pool, pick 1-3 unique elements so each gun has a distinct elemental identity.
+  const extendedElementTokens = (() => {
+    const pool = [56, 57, 58, 59, 60].sort(() => Math.random() - 0.5);
+    const count = randInt(1, 3);
+    return pool.slice(0, count).map((id) => `{1:${id}}`);
+  })();
 
   const allNewParts = [
     // ── Pearl rarity FIRST — rarity = first token wins (Rule 11) ──
@@ -1252,8 +1257,7 @@ export function generateModdedWeapon(
     ...underbarrelAccessoryStack,
     ...(underbarrelToken ? [underbarrelToken] : []),
 
-    // ── Stock magazine last (spawn anchor, no visual impact) ──
-    ...(stockMagToken ? [stockMagToken] : []),
+    // stockMagToken removed — was causing COV magazines to override Vladof mag (game uses last mag token).
   ];
   if (!allNewParts.length) throw new Error("Could not build random modded parts.");
 

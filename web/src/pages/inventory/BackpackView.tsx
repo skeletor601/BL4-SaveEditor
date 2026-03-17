@@ -10,6 +10,7 @@ import {
   preferItemNameFromDecoded,
 } from "@/lib/backpackNaming";
 import { parseDecodedSerial, translateParts, type TranslatedLine } from "@/lib/partsTranslator";
+import ItemComparePanel from "@/components/inventory/ItemComparePanel";
 
 export interface DecodedItem {
   name: string;
@@ -126,6 +127,9 @@ export default function BackpackView() {
   const [gearLevelLoading, setGearLevelLoading] = useState(false);
   const [clearBackpackLoading, setClearBackpackLoading] = useState(false);
   const [showClearBackpackConfirm, setShowClearBackpackConfirm] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareItemA, setCompareItemA] = useState<TreeItem | null>(null);
+  const [compareItemB, setCompareItemB] = useState<TreeItem | null>(null);
   const navigate = useNavigate();
 
   // Translate parts for the selected item using existing partsByCode map.
@@ -566,6 +570,22 @@ export default function BackpackView() {
         >
           {clearBackpackLoading ? "Clearing…" : "Clear backpack"}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setCompareMode((v) => !v);
+            setCompareItemA(null);
+            setCompareItemB(null);
+          }}
+          className={`px-4 py-2 rounded-lg border text-sm min-h-[44px] transition-colors ${
+            compareMode
+              ? "border-blue-500/60 bg-blue-500/15 text-blue-300"
+              : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:bg-white/5"
+          }`}
+          title="Compare two items side by side"
+        >
+          {compareMode ? `Compare${compareItemA ? " (A set)" : ""}${compareItemB ? " (B set)" : ""}` : "Compare"}
+        </button>
       </div>
       {showClearBackpackConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowClearBackpackConfirm(false)}>
@@ -625,14 +645,29 @@ export default function BackpackView() {
                             <button
                               key={`${item.container}-${item.slotKey}`}
                               type="button"
-                              onClick={() => { setSelected(item); setSelectedFlagValue(item.stateFlags || 1); }}
+                              onClick={() => {
+                                if (compareMode) {
+                                  if (!compareItemA) { setCompareItemA(item); }
+                                  else if (!compareItemB) { setCompareItemB(item); }
+                                  else { setCompareItemA(item); setCompareItemB(null); }
+                                } else {
+                                  setSelected(item);
+                                  setSelectedFlagValue(item.stateFlags || 1);
+                                }
+                              }}
                               onContextMenu={(e) => {
                                 e.preventDefault();
                                 setContextItem(item);
                                 setContextPos({ x: e.clientX, y: e.clientY });
                               }}
                               className={`block w-full text-left py-1.5 px-2 rounded text-sm truncate ${
-                                selected?.container === item.container && selected?.slotKey === item.slotKey
+                                compareMode
+                                  ? compareItemA?.container === item.container && compareItemA?.slotKey === item.slotKey
+                                    ? "bg-blue-500/20 text-blue-300"
+                                    : compareItemB?.container === item.container && compareItemB?.slotKey === item.slotKey
+                                    ? "bg-green-500/20 text-green-300"
+                                    : "text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
+                                  : selected?.container === item.container && selected?.slotKey === item.slotKey
                                   ? "bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
                                   : "text-[var(--color-text)] hover:bg-[var(--color-panel-border)]/50"
                               }`}
@@ -769,6 +804,16 @@ export default function BackpackView() {
           )}
         </div>
       </div>
+
+      {/* Item comparison panel (Feature 4) */}
+      {compareMode && compareItemA && compareItemB && (
+        <ItemComparePanel itemA={compareItemA} itemB={compareItemB} partsByCode={partsByCode} />
+      )}
+      {compareMode && (!compareItemA || !compareItemB) && (
+        <p className="text-sm opacity-50 text-center py-4">
+          {!compareItemA ? "Click item A to start comparing" : "Click item B to compare"}
+        </p>
+      )}
 
       {/* Right-click context menu */}
       {contextItem && contextPos && (
