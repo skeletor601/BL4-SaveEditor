@@ -1795,6 +1795,21 @@ export default function UnifiedItemBuilderPage() {
     rebuildEnhancementDecoded,
   ]);
 
+  /** label → description lookup for enhancement perk hover cards */
+  const enhancementPerkDescMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!enhancementData) return map;
+    for (const mfg of Object.values(enhancementData.manufacturers)) {
+      for (const p of mfg.perks) {
+        if (p.description) map.set(`[${p.index}] ${p.name}`, p.description);
+      }
+    }
+    for (const s of enhancementData.secondary247) {
+      if (s.description) map.set(`${s.code} - ${s.name}`, s.description);
+    }
+    return map;
+  }, [enhancementData]);
+
   const rebuildClassModDecoded = useCallback(() => {
     if (!classModData) return;
     const decoded = buildDecodedFromClassModSelections(
@@ -7900,7 +7915,7 @@ export default function UnifiedItemBuilderPage() {
                             const pi = universalParts.find((u) => u.label === item.label);
                             const { border, bg, nameColor } = slotRarityStyle(pi?.rarity);
                             return (
-                            <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
+                            <div key={idx} className={`rounded-lg border ${border} ${bg} p-2`} onMouseEnter={(e) => startHover(hoverDataByLabel(item.label, enhancementPerkDescMap.get(item.label), partType), e.currentTarget.getBoundingClientRect().top)} onMouseLeave={endHover}>
                               <div className="flex items-center gap-2 flex-wrap">
                               <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
                               {partType !== "Rarity" && (
