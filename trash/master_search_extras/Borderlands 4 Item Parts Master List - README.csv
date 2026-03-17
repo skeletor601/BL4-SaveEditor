@@ -1,0 +1,157 @@
+,,,,,,,,,,
+,✨ Ultimate Item Parts List ✨,,,,,,,,,❤️ Special Thanks ❤️
+,"This spreasheet is a compilation of work from many different individuals. It took many weeks to compile all of this data and we're still not finished! That said, it's about 95% COMPLETE and covers EVERY item in the game. 
+
+I have spent the past few days compiling all of this data and putting it into a standardized format complete with in-game string names, stats and side effects. I’ve done my best to verify every single part, but I’m only human. If you notice any mistakes or inconsistencies, please let me know.
+
+I would like to give a special thank you to everyone in the Borderlands Modding Discord for their hard work in assisting in the collection and compilation of this data. 
+
+@THATDONFC",,,,,,,,,"Nicnl & InflamedSebi for the Deserialization Tool - Without this tool none of this would be possible
+Sparkie for the initial B85 decryption tool and NCS dumps with item strings
+Mattmab for the meticulous hours spent figuring out how class mods work
+Whiteshark for maintaining the databases and hosting all of our site for FREE
+Anro, Codebam, CraZyMarty, Cr4nkSt4r, Dinossom, Dura, Gerber, Narrik Synthfox, RDP/Squiggs, Super Exboom, Shirtnoservice for their contirbutions to the weapon part research and recording 
+Moxx for the intial matching of strings to item numbers which helped kickstart this project"
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,How to use this sheet:,,,,,,,,,🔗 Links and resources:
+,"In order to use the filters and part viewers you must make a copy of this sheet File > Make a copy
+
+
+",,,,,,,,,Sairouth's Borderlands Modding Discord: https://discord.gg/DAJEz9KQ
+,Once you have your copy you can filter any of the tables and use the special weapon parts viewers,,,,,,,,,Deserialization tool: https://borderlands4-deserializer.nicnl.com/
+,You can find an Index of the pages here,,,,,,,,,Source code: https://github.com/Nicnl/borderlands4-serials
+,You can read about how items are built in game here,,,,,,,,,Borderlands 4 Hub: https://save-editor.be/
+,,,,,,,,,,
+,❤️ Special thanks to all the great contributors who are part of this:,,,,,,,,,🧠 How does it work? How can I use this?
+,Mattmab,,CraZy Marty,,THATDONFC,,Geber,,,"1. What are item serials?
+The game stores its weapons and items inside ""serials"" that looks like this:
+      @Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00
+
+These serials contains core informations about the item (ex: manufacturer, type, level, and its ""parts"").
+However, as you can see... those informations are scrambled, and not easily readable nor modifiable."
+,Super Exboom,,Anro,,Dura,,Hobamj,,,
+,Adozon,,Narrik Synthfox,,Codebam,,RDP/Squiggs,,,
+,Dinossom/Dira!,,Nicnl,,InflamedSebi,,Cr4nkSt4r,,,
+,,,,,,,,,,
+,⚖️ Rules and boundaries regarding 2K and Gearbox:,,,,,,,,,
+,"During the BL3 modding era, some people received a cease and desist letter from 2K.
+This happened notably when people touched at paid or unreleased content.
+In this mindset, we want to play fair and square.
+=> We do not interfere with their revenue stream from paid content.
+
+1. We don't touch paid DLC stuff.
+If during research you stumble on stuff related to paid DLC items:
+  => Stop and discard everything. Don't write anything in this spreadsheet.
+
+2. We don't touch unreleased stuff.
+If during research you stumble on stuff that is not released in the game:
+  => Stop and discard everything. Don't write anything in this spreadsheet.
+
+3. We don't accept donations.
+This project is here to help build fun items, or adjust their weapons to their liking.
+It is a community initiative that is completely free and accessible to all.
+Important: were you asked to pay to access this document? If yes, this was a scam.
+Please report as soon as possible to the discord server's moderators.
+
+4. We don't touch game files.
+We are not reading or modifying stuff from the game files.
+ => We generate serials, put it inside our OWN save games, and write down the results.
+
+Those rules may be frustrating, but they are important for protecting this research project.
+
+LEGAL DISCLAIMER:
+This project and its contributors are not affiliated, associated, authorized, endorsed by,
+or in any way officially connected with Gearbox Software, 2K Games, Inc.,
+or any of their subsidiaries or affiliates.
+The names ""Borderlands,"" ""Gearbox,"" ""2K,"" as well as any related names, marks, emblems,
+and images are registered trademarks of their respective owners.",,,,,,,,,"2. What does the deserializer do?
+The deserialization tool is available here:  https://borderlands4-deserializer.nicnl.com
+Basically, it decodes the ""scrambled"" serials into their core values, making them easy to read.
+But most importantly, the deserializer works both ways: you can modify the values and reserialize your item.
+This allows you to adjust your trusty Daedalus Darkbeast by putting the glass scope you like best."
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"3. Help, I don't understand the output of the deserializer!
+Don't worry, it's not very complicated. Here are the basics.
+
+We'll start with this serial, a ""Ricocheting GCX"":
+  @UgwSAs2}TYg%+Cc1jp~P5)T82}IyDEC3v~`v4>e=}
+
+Putting it in the deserializer gives the following result:
+  20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|
+
+Here is what those number means."
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|"
+,,,,,,,,,,^^
+,,,,,,,,,,"This is the manufacturer index : ""20"" means ""daedalus:smg"".
+(See the ""Item Types & Manufacturers"" tab at the bottom.)
+Usually you don't want to touch this number because it'll break the parts that comes afterwards."
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|"
+,,,,,,,,,,          ^^
+,,,,,,,,,,"This is the level => this weapon is level ""50"".
+Do you want to bump the level of your item? Simply change this number, and you're good to go!
+Note: currently, the game refuse item level higher than 50. If you set level 51 or higher, it won't spawn."
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|"
+,,,,,,,,,,                        ^^^^
+,,,,,,,,,,"Number inside brackets are parts. The first part decides the rarity and base name of the item.
+Here the part ""{96}"" tells us it is a green/uncommon weapon.
+(See the ""Weapon List"" tab at the bottom.)"
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|"
+,,,,,,,,,,                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+,,,,,,,,,,"The other parts following the first are the actual parts and effect of your weapon.
+Problem, they can be anything: magazine, scope, barrel, underbarrel, grip, elemental effect...
+Additionally, their meaning depends on the manufacturer index seen before :
+    Example: ""{47}"" on a daedalus smg means something different on a jakobs sniper.
+This is why this spreadsheet exists: we discover (by trial and error) what those parts are and write it down."
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,"20, 0, 1, 50| 2, 1439|| {96} {62} {5} {7} {88} {14} {25} {44} {51} {58} {1:12}|"
+,,,,,,,,,,                                                                        ^^^^^^
+,,,,,,,,,,"In our example, the part {1:12} means it has fire elemental damage.
+You can swap it to elemental shock damage by putting {1:14} instead.
+(See ""Elemental effects"" tab at the bottom.)
+
+Please keep in mind that we haven't figured out all the parts yet.
+So... just explore this spreadsheet, and try to find the informations you want.
+If you don't find what you need, it simply hasn't been discovered yet."

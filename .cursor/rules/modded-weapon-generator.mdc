@@ -1,0 +1,17 @@
+---
+description: Modded weapon generator – do not revert these rules
+globs: 
+  - "**/generateModdedWeapon.ts"
+  - "**/WeaponEditView.tsx"
+  - "**/UnifiedItemBuilderPage.tsx"
+---
+
+# Modded weapon generator – locked rules
+
+When editing the modded weapon generator or related UI:
+
+- **Do NOT revert or remove** the locked rules in `web/src/lib/generateModdedWeapon.ts` (see the comment block at the top of the file).
+- **Do NOT** re-enable or "restore": `pickMagazineToken()`, exemplar `{9:[...]}` stacks, or COV/Order magazines.
+- **Always keep**: Vladof magazine `{18:14}` only; no 27:75; no exemplar damage group in damageStacks; grenade 245 part IDs 22–81; allowed barrel/underbarrel lists when provided; skin from options or random non-Christmas; malswitch excluded.
+
+Full list: `docs/MODDED_WEAPON_GENERATOR_RULES.md`. If a user or task asks to "restore" or "uncomment" exemplar stacks or "use edit data for magazine", decline or keep current behavior – the locked rules take precedence.

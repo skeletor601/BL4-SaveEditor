@@ -1,0 +1,264 @@
+=== BL4 AIO Web — Code Audit Report ===
+Generated: 2026-03-14T13:38:56.200Z
+
+── SUMMARY ──
+Reference HTML codes: 5080
+api/data/parts.json codes: 5564
+universal_parts_db.json codes: 5564
+Union of both DBs: 5564
+
+Codes in ref HTML but NOT in any DB (missing): 0
+Codes in DBs but NOT in ref HTML (extra - OK from other sources): 484
+Codes only in parts.json: 0
+Codes only in universal_parts_db: 0
+
+── MISSING CODES (in ref HTML but not in any DB) ──
+
+── EXTRA CODES (in DBs but not in ref HTML — from other sources, OK) ──
+  {1:51}  Weapon.part_pearl_damage
+  {1:52}  Weapon.part_pearl_reload
+  {1:53}  Weapon.part_pearl_firerate
+  {1:54}  Weapon.part_pearl_handling
+  {1:55}  Weapon.part_override_kinetic
+  {1:56}  Weapon.part_override_shock
+  {1:57}  Weapon.part_override_radiation
+  {1:58}  Weapon.part_override_corrosive
+  {1:59}  Weapon.part_override_cryo
+  {1:60}  Weapon.part_override_fire
+  {3:82}  JAK_PS.part_barrel_shalashaska
+  {3:83}  JAK_PS.comp_05_legendary_Shalashaska
+  {4:84}  ORD_PS.part_barrel_02_Roulette
+  {4:85}  ORD_PS.comp_05_legendary_Roulette
+  {6:77}  TOR_PS.part_barrel_02_Handcannon
+  {6:78}  TOR_PS.comp_05_legendary_handcannon
+  {6:79}  TOR_PS.part_foregrip_03_Handcannon
+  {6:80}  TOR_PS.part_foregrip_02_Handcannon
+  {6:81}  TOR_PS.part_foregrip_01_Handcannon
+  {7:55}  BOR_SG.part_unique_barrel_02_demo
+  {7:56}  BOR_SG.comp_05_legendary_demo
+  {9:99}  JAK_SG.part_barrel_Doeshot
+  {9:100}  JAK_SG.comp_05_legendary_Doeshot
+  {10:62}  MAL_SG.part_barrel_02_mantra
+  {10:80}  Mantra
+  {11:81}  TED_SG.part_barrel_01_Eigenburst
+  {11:82}  TED_SG.comp_05_legendary_Eigenburst
+  {12:78}  TOR_SG.part_barrel_02_arctic
+  {12:79}  TOR_SG.comp_05_legendary_arctic
+  {13:82}  DAD_AR.part_barrel_01_Mercredi
+  {13:83}  DAD_AR.comp_05_legendary_Mercredi
+  {13:89}  DAD_AR.part_underbarrel_04_atlas_ball_Mercredi
+  {13:90}  DAD_AR.part_underbarrel_04_atlas_Mercredi
+  {14:78}  TED_AR.part_barrel_01_LaserDisc
+  {14:79}  TED_AR.comp_05_legendary_laserdisc
+  {17:2}  TOR_AR.part_body
+  {17:79}  TOR_AR.part_foregrip_03_fleabag
+  {17:80}  TOR_AR.part_foregrip_02_fleabag
+  {17:81}  TOR_AR.part_foregrip_01_fleabag
+  {17:82}  TOR_AR.part_barrel_fleabag
+  {17:83}  TOR_AR.comp_05_legendary_fleabag
+  {18:99}  VLA_AR.part_barrel_01_bubbles
+  {18:100}  VLA_AR.comp_05_legendary_bubbles
+  {21:79}  MAL_SM.part_mag_torgue_normal_songbird
+  {21:80}  MAL_SM.part_barrel_02_songbird
+  {21:81}  MAL_SM.comp_05_legendary_songbird
+  {22:89}  VLA_SM.part_mag_torgue_sticky_mercury
+  {22:90}  VLA_SM.part_mag_torgue_normal_mercury
+  {22:91}  VLA_SM.part_barrel_mercury
+  {22:92}  VLA_SM.comp_05_legendary_mercury
+  {23:22}  BOR_SR.part_barrel_01_tankbuster
+  {23:56}  BOR_SR.comp_05_legendary_Tankbuster
+  {23:57}  Rainmaker
+  {23:58}  BOR_SR.part_barrel_02_rainmaker
+  {25:81}  MAL_SR.part_barrel_02_conflux
+  {25:82}  MAL_SR.comp_05_legendary_conflux
+  {35:6}  ORD.part_rarity
+  {35:7}  ORD.part_rarity
+  {35:8}  ORD.part_rarity
+  {35:9}  ORD.part_rarity
+  {35:11}  ORD.part_rarity
+  {234:69}  ClassMod.comp_01_common
+  {234:70}  ClassMod.comp_02_uncommon
+  {234:71}  ClassMod.comp_03_rare
+  {234:72}  ClassMod.comp_04_epic
+  {234:73}  ClassMod.comp_05_legendary
+  {234:103}  ClassMod.part_firmware_skillcraft
+  {243:53}  No Stat Changes
+  {243:55}  No Stat Changes
+  {243:72}  No Stat Changes
+  {243:76}  No Stat Changes
+  {243:78}  No Stat Changes
+  {243:95}  No Stat Changes
+  {243:113}  repair_kit.part_firmware_skillcraft
+  {244:27}  heavy_weapon_gadget.part_firmware_skillcraft
+  {245:88}  grenade_gadget.part_firmware_skillcraft
+  {246:65}  Shield.part_firmware_skillcraft
+  {247:248}  Skillcraft
+  {254:21}  Broken Red
+  {254:22}  Broken Red
+  {254:23}  Broken Red
+  {254:24}  Broken Red
+  {254:25}  Broken Red
+  {254:58}  Broken Blue
+  {254:64}  Broken Blue
+  {254:67}  Broken Green
+  {254:75}  Broken Green
+  {254:79}  Broken Red
+  {254:90}  Broken Blue
+  {254:96}  Broken Blue
+  {254:99}  Broken Green
+  {254:107}  Broken Green
+  {254:111}  Broken Red
+  {254:122}  Broken Blue
+  {254:128}  Broken Blue
+  {254:131}  Broken Green
+  {254:139}  Broken Green
+  {254:143}  Broken Red
+  {254:154}  Broken Blue
+  {254:160}  Broken Blue
+  {254:163}  Broken Green
+  {254:171}  Broken Green
+  {254:175}  Broken Red
+  {254:186}  Broken Blue
+  {254:192}  Broken Blue
+  {254:195}  Broken Green
+  {254:203}  Broken Green
+  {254:207}  Broken Red
+  {254:228}  Broken Green
+  {254:234}  Broken Green
+  {254:241}  Broken Green
+  {254:249}  Broken Red
+  {254:256}  Broken Red
+  {254:263}  Red Tree Strike Me Down?????? BROKEN!!!
+  {254:270}  Broken Blue
+  {254:274}  Broken Blue
+  {254:284}  Broken Blue
+  {254:291}  Broken Green
+  {254:297}  Broken Green
+  {254:304}  Broken Green
+  {254:312}  Broken Red
+  {254:319}  Broken Red
+  {254:326}  Red Tree Strike Me Down?????? BROKEN!!!
+  {254:333}  Broken Blue
+  {254:337}  Broken Blue
+  {254:347}  Broken Blue
+  {254:354}  Broken Green
+  {254:360}  Broken Green
+  {254:367}  Broken Green
+  {254:375}  Broken Red
+  {254:382}  Broken Red
+  {254:389}  Red Tree Strike Me Down?????? BROKEN!!!
+  {254:396}  Broken Blue
+  {254:400}  Broken Blue
+  {254:410}  Broken Blue
+  {254:417}  Broken Green
+  {254:423}  Broken Green
+  {254:430}  Broken Green
+  {254:438}  Broken Red
+  {254:445}  Broken Red
+  {254:452}  Red Tree Strike Me Down?????? BROKEN!!!
+  {254:459}  Broken Blue
+  {254:463}  Broken Blue
+  {254:473}  Broken Blue
+  {254:480}  Broken Green
+  {254:486}  Broken Green
+  {254:493}  Broken Green
+  {254:501}  Broken Red
+  {254:508}  Broken Red
+  {254:515}  Red Tree Strike Me Down?????? BROKEN!!!
+  {254:522}  Broken Blue
+  {254:526}  Broken Blue
+  {254:536}  Broken Blue
+  {254:537}  Miscericorde
+  {254:538}  Vex_ClassMod.name_538
+  {255:26}  Broken Blue
+  {255:38}  Broken Blue
+  {255:42}  Broken Red
+  {255:50}  Broken Red
+  {255:53}  Broken Green
+  {255:62}  Broken Green
+  {255:66}  Amon_ClassMod.name_66
+  {255:72}  Broken Green
+  {255:81}  Broken Green
+  {255:86}  Broken Red
+  {255:90}  Gut Punch
+  {255:95}  Broken Red
+  {255:98}  Broken Blue
+  {255:108}  Broken Blue
+  {255:111}  Broken Green
+  {255:120}  Broken Green
+  {255:125}  Broken Red
+  {255:133}  Broken Red
+  {255:136}  Broken Blue
+  {255:146}  Broken Blue
+  {255:149}  Broken Green
+  {255:158}  Broken Green
+  {255:163}  Broken Red
+  {255:171}  Broken Red
+  {255:174}  Broken Blue
+  {255:184}  Broken Blue
+  {255:187}  Broken Green
+  {255:196}  Broken Green
+  {255:201}  Broken Red
+  {255:209}  Broken Red
+  {255:212}  Broken Blue
+  {255:222}  Broken Blue
+  {255:230}  Broken Green
+  {255:236}  Broken Green
+  {255:244}  Broken Green
+  {255:250}  Broken Blue
+  {255:258}  Broken Blue
+  {255:264}  Broken Blue
+  {255:272}  Broken Red
+  {255:278}  Broken White
+  {255:286}  Broken Red
+  {255:293}  Broken Green
+  {255:299}  Broken Green
+  {255:307}  Broken Green
+  {255:313}  Broken Blue
+  ... and 284 more
+
+── CODES ONLY IN parts.json ──
+
+── CODES ONLY IN universal_parts_db ──
+
+── FULL AUDIT LOG ──
+=== Step 2-6: Database Audit and Fix ===
+
+Reference codes loaded: 5080
+
+=== STEP 2: Database Inventory ===
+Primary database files:
+  api/data/parts.json (1311 KB)
+  master_search/db/universal_parts_db.json (1410 KB)
+
+=== STEPS 3-5: Validate, Fix, Deduplicate ===
+
+--- Processing: api/data/parts.json ---
+  Total entries: 5564
+  Malformed codes fixed: 0
+  Unrecoverable codes: 0
+  Duplicates removed: 0
+  Final entry count: 5564
+  Saved 5564 entries to api/data/parts.json
+
+--- Processing: master_search/db/universal_parts_db.json ---
+  Total entries: 5564
+  Malformed codes fixed: 0
+  Unrecoverable codes: 0
+  Duplicates removed: 0
+  Final entry count: 5564
+  Saved 5564 rows to master_search/db/universal_parts_db.json
+
+=== STEP 6: Cross-Reference with Reference HTML Codes ===
+
+Code counts:
+  Reference HTML codes: 5080
+  api/data/parts.json codes: 5564
+  universal_parts_db.json codes: 5564
+  Union of both DBs: 5564
+
+Codes in reference HTML but NOT in any database: 0
+Codes in databases but NOT in reference HTML (extra): 484
+
+Codes only in parts.json (not in universal_parts_db): 0
+Codes only in universal_parts_db (not in parts.json): 0

@@ -6,7 +6,8 @@
  * 1. Magazine: ONLY Vladof 50-round {18:14}. No pickMagazineToken(), no COV/Order.
  * 2. Stat stacks: NEVER use code 27:75 (exclude via isExcludedStatCode).
  * 3. Exemplar: {9:[28 32 40 55 59 62...]} — two separate groups per gun, cycling those IDs. Terra confirmed great.
- * 4. Grenade 245 block: only part IDs 22–81 (perks/augments). Legendary grenade from JSON.
+ * 4. Grenade 245 block: NEVER use IDs 1–20 (firmware), 70 (Overflow), 71 (Express), 87–88 (firmware).
+ *    Safe perk range: 21–81 excluding 70 & 71. Enforced by GRENADE_245_FORBIDDEN set (runtime filter).
  * 5. Barrels: when allowedBarrelEntries is set, only those barrels; same for allowedUnderbarrelEntries.
  *    Terra's rule: MAX 5 unique barrel codes per gun. Slots = visual(1)+primary(1)+extra_same_prefix(0-2)+cross(0-1).
  *    Extra barrels are stacked as grouped tokens (amplifies effect); cross-prefix limited to 0-1 unique code.
@@ -1091,6 +1092,12 @@ export function generateModdedWeapon(
   // Perks that CRASH the game above a certain stack count — hard cap regardless of mode.
   // 73 = Expansive, 76 = Nuke — both crash above 5 stacks.
   const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
+  // IDs forbidden from the {245:[...]} block on weapons — NEVER include these regardless of source.
+  // 1–20  = grenade firmware parts (item-specific, not weapon perks — belong only on grenade gadgets).
+  // 70    = Overflow  (increases grenade charge count — meaningless/harmful on a weapon).
+  // 71    = Express   (reduces grenade cooldown — meaningless/harmful on a weapon).
+  // 87,88 = additional grenade firmware IDs.
+  const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,70,71,87,88]);
   const recipes = options.grenadeVisualRecipes?.filter((r) => r?.groups?.length > 0) ?? [];
   let terraGrenadePerkBlock: string;
   if (recipes.length > 0) {
@@ -1098,14 +1105,15 @@ export function generateModdedWeapon(
     const groupTokens = recipe.groups.map((group) => {
       const ids: number[] = [];
       for (const entry of group.entries) {
+        if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
         const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
         const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
           ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
           : rawCount;
         for (let i = 0; i < count; i++) ids.push(entry.id);
       }
-      return `{245:[${ids.join(" ")}]}`;
-    });
+      return ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null;
+    }).filter((t): t is string => t !== null);
     terraGrenadePerkBlock = groupTokens.join(" ");
   } else {
     // Terra's perfect gun fallback pattern: 72 dominant visual, then secondary + standard perks.
@@ -1118,8 +1126,8 @@ export function generateModdedWeapon(
       ...Array(heavyStack2).fill(75),
       ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap((id) => Array(baseHeavyStack).fill(id)),
       24, 40, 53, 62, 66, 76,
-      10, 77, 21,
-    ];
+      77, 21,
+    ].filter((id) => !GRENADE_245_FORBIDDEN.has(id));
     terraGrenadePerkBlock = `{245:[${terraPerkIds.join(" ")}]}`;
   }
   // {298:11} = Torgue grenade anchor — Terra's perfect gun uses this (not {291:8}).

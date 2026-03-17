@@ -1,0 +1,115 @@
+ENRICHMENT REPORT
+=================
+Date: 2026-03-14T14:22:35.372Z
+Source: scripts/big_editor_parts_flat.json (3415 parts)
+
+
+=== Enriching api/data/parts.json ===
+  Entries before: 5210
+  Backup: C:\BL4\BL4_AIO_Web\api\data\parts.json.bak
+  Entries after:  5210
+  Entries enriched: 3308
+  Fields added:     9456
+
+=== Enriching master_search/db/universal_parts_db.json ===
+  Entries before: 5210
+  Backup: C:\BL4\BL4_AIO_Web\master_search\db\universal_parts_db.json.bak
+  Entries after:  5210
+  Entries enriched: 3308
+  Fields added:     9456
+
+=== Scanning for other JSON databases ===
+  Found 12 other JSON files to check
+
+=== Enriching CSV files ===
+
+  CSV: shield\shield_main_perk_EN.csv
+    Data rows: 107
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 85
+    Rows matching big editor (with spawn_code): 107
+    Backup created
+    Adding columns: SpawnCode
+    Rows enriched: 107
+
+  CSV: shield\manufacturer_perk_EN.csv
+    Data rows: 84
+    Rows matching big editor (with effects): 35
+    Rows matching big editor (with description): 75
+    Rows matching big editor (with spawn_code): 76
+    Backup created
+    Adding columns: BigEditor_Effects, SpawnCode
+    Rows enriched: 76
+
+  CSV: grenade\grenade_main_perk_EN.csv
+    Data rows: 82
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 60
+    Rows matching big editor (with spawn_code): 0
+    Backup created
+    Columns already present or no new columns needed — skipping
+
+  CSV: grenade\manufacturer_rarity_perk_EN.csv
+    Data rows: 93
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 0
+    Rows matching big editor (with spawn_code): 0
+    No enrichable data found — skipping
+
+  CSV: repkit\repkit_main_perk_EN.csv
+    Data rows: 101
+    Rows matching big editor (with effects): 6
+    Rows matching big editor (with description): 101
+    Rows matching big editor (with spawn_code): 0
+    Backup created
+    Adding columns: BigEditor_Effects
+    Rows enriched: 6
+
+  CSV: repkit\repkit_manufacturer_perk_EN.csv
+    Data rows: 58
+    Rows matching big editor (with effects): 15
+    Rows matching big editor (with description): 48
+    Rows matching big editor (with spawn_code): 36
+    Backup created
+    Adding columns: BigEditor_Effects, SpawnCode
+    Rows enriched: 43
+
+  CSV: heavy\heavy_main_perk_EN.csv
+    Data rows: 27
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 0
+    Rows matching big editor (with spawn_code): 27
+    Backup created
+    Adding columns: SpawnCode
+    Rows enriched: 27
+
+  CSV: heavy\heavy_manufacturer_perk_EN.csv
+    Data rows: 122
+    Rows matching big editor (with effects): 97
+    Rows matching big editor (with description): 113
+    Rows matching big editor (with spawn_code): 118
+    Backup created
+    Adding columns: BigEditor_Effects, SpawnCode
+    Rows enriched: 118
+
+  CSV: enhancement\Enhancement_perk.csv
+    Data rows: 237
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 215
+    Rows matching big editor (with spawn_code): 0
+    Backup created
+    Adding columns: BigEditor_Description
+    Rows enriched: 215
+
+  CSV: enhancement\Enhancement_manufacturers.csv
+    Data rows: 44
+    Rows matching big editor (with effects): 0
+    Rows matching big editor (with description): 40
+    Rows matching big editor (with spawn_code): 0
+    Backup created
+    Adding columns: BigEditor_Description
+    Rows enriched: 40
+
+=== Summary ===
+api/data/parts.json: 5210 entries (unchanged), 3308 enriched, 9456 fields added
+universal_parts_db.json: 5210 entries (unchanged), 3308 enriched, 9456 fields added
