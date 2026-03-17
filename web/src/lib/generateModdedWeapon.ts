@@ -977,11 +977,12 @@ export function generateModdedWeapon(
   const heatExchangeStacks = [groupedToken(275, Array(9).fill(23))];
   const orderSrMagStacks   = [groupedToken(26,  Array(3).fill(30))];
   const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(ammoEffRanges.as[0],  ammoEffRanges.as[1])  }, () => 14))];
-  // Ventilator excluded from grenade-reload mode — COV heat mechanic disables the reload trigger,
-  // which prevents the grenade reload visual from ever firing.
-  const ventilatorStacks = options.specialMode === "grenade-reload"
-    ? []
-    : [groupedToken(286, Array.from({ length: randInt(ammoEffRanges.ven[0], ammoEffRanges.ven[1]) }, () => 1))];
+  // Ventilator excluded from all grenade-reload guns — COV heat mechanic disables the reload trigger,
+  // which prevents the grenade reload visual from ever firing. Only used in inf-ammo mode where
+  // there is no grenade block and the heat gauge is the intended mechanic.
+  const ventilatorStacks = options.specialMode === "inf-ammo"
+    ? [groupedToken(286, Array.from({ length: randInt(ammoEffRanges.ven[0], ammoEffRanges.ven[1]) }, () => 1))]
+    : [];
   // {273:29} Scanning — rockets home toward nearby targets; complements {273:1} Reticle Homing.
   const scanningHomingToken = "{273:29}";
 
