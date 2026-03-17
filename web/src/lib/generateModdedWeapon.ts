@@ -77,6 +77,7 @@ export interface UniversalDbPartCode {
 export interface VisualBarrelEntry {
   name: string;
   code: string;
+  visual?: boolean;
 }
 /** Manually curated list for underbarrel slot. Load from /data/desirable_underbarrels.json */
 export interface DesirableUnderbarrelEntry {
@@ -656,9 +657,12 @@ export function generateModdedWeapon(
   const chosenBarrelRow = weaponRows.find((r) => norm(r.partType) === "barrel" && Number(r.partId) === chosenBarrelId);
   const barrelStats = chosenBarrelRow ? parseBarrelStats(chosenBarrelRow.string) : { name: "", damage: 0, pellets: 1, fireRate: 0 };
   // Always paste a visual/heavy barrel to the left of the first barrel (game reads left-to-right). Prefer manual JSON list.
+  // Filter to visual:true entries only — avoids picking named legendaries with no dramatic projectile effect.
+  const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
+  const visualBarrelPool = visualOnly.length > 0 ? visualOnly : (options.visualBarrelEntries ?? []);
   const uniqueFirstBarrelToken =
-    options.visualBarrelEntries?.length
-      ? pick(options.visualBarrelEntries).code.trim()
+    visualBarrelPool.length
+      ? pick(visualBarrelPool).code.trim()
       : allUniqueBarrels.length > 0
         ? (() => {
             const u = pick(allUniqueBarrels);
