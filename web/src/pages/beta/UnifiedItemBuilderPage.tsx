@@ -6874,11 +6874,12 @@ export default function UnifiedItemBuilderPage() {
                                     key={idx}
                                     className={`rounded-lg border ${border} ${bg} p-2`}
                                     onMouseEnter={(e) => {
-                                      startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top);
                                       if (partType === "Name" || partType === "Legendary names") {
                                         const nameEN = item.label.includes(" - ") ? item.label.split(" - ").slice(1).join(" - ").trim() : item.label;
                                         const info = getClassModNameInfo(nameEN);
                                         if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
+                                      } else {
+                                        startHover(hoverDataByLabel(item.label), e.currentTarget.getBoundingClientRect().top);
                                       }
                                     }}
                                     onMouseLeave={() => { endHover(); setClassModNameCard(null); }}
@@ -6982,11 +6983,12 @@ export default function UnifiedItemBuilderPage() {
                                   key={o.id + o.label}
                                   className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10"
                                   onMouseEnter={(e) => {
-                                    startHover(hoverDataByLabel(o.label, undefined, classModPartPickerKey || undefined), e.currentTarget.getBoundingClientRect().top);
                                     if (classModPartPickerKey === "Name" || classModPartPickerKey === "Legendary names") {
                                       const nameEN = o.label.includes(" - ") ? o.label.split(" - ").slice(1).join(" - ").trim() : o.label;
                                       const info = getClassModNameInfo(nameEN);
                                       if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
+                                    } else {
+                                      startHover(hoverDataByLabel(o.label, undefined, classModPartPickerKey || undefined), e.currentTarget.getBoundingClientRect().top);
                                     }
                                   }}
                                   onMouseLeave={() => { endHover(); setClassModNameCard(null); }}
