@@ -662,22 +662,16 @@ export function generateModdedWeapon(
   // when it contains non-visual barrels (e.g. AI-generated list with mixed visual/non-visual).
   const FALLBACK_VISUAL_BARRELS: VisualBarrelEntry[] = [
     { name: "BottledLightning", code: "{289:26}", visual: true },
-    { name: "bugbear",          code: "{17:54}",  visual: true },
     { name: "DiscJockey",       code: "{275:30}", visual: true },
-    { name: "fisheye",          code: "{26:75}",  visual: true },
     { name: "GammaVoid",        code: "{289:24}", visual: true },
-    { name: "goremaster",       code: "{7:1}",    visual: true },
     { name: "javelin",          code: "{273:35}", visual: true },
     { name: "jetset",           code: "{275:35}", visual: true },
     { name: "mantra",           code: "{10:62}",  visual: true },
     { name: "onslaught",        code: "{22:68}",  visual: true },
-    { name: "Atling Gun",       code: "{282:25}", visual: true },
     { name: "Sidewinder",       code: "{273:37}", visual: true },
     { name: "Convergence",      code: "{7:64}",   visual: true },
     { name: "Ravenfire",        code: "{273:40}", visual: true },
-    { name: "Splatoon",         code: "{282:2}",  visual: true },
     { name: "Streamer",         code: "{275:1}",  visual: true },
-    { name: "symmetry",         code: "{26:72}",  visual: true },
   ];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
   const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
@@ -1128,9 +1122,9 @@ export function generateModdedWeapon(
       const idx = Math.floor(Math.random() * remaining.length);
       const recipe = remaining[idx]!;
       remaining.splice(idx, 1);
-      const recipeGroups = Array.isArray(recipe.groups) ? recipe.groups : (recipe as { group?: unknown }).group != null ? [(recipe as { group: unknown }).group] : [];
-      const groupTokens = recipeGroups.map((group: { entries?: { id: number; n: number }[]; entry?: { id: number; n: number }[] }) => {
-        const entries = Array.isArray(group?.entries) ? group.entries : Array.isArray((group as { entry?: unknown }).entry) ? (group as { entry: { id: number; n: number }[] }).entry : [];
+      const recipeGroups: GrenadeVisualRecipeGroup[] = Array.isArray(recipe.groups) ? recipe.groups : [];
+      const groupTokens = recipeGroups.map((group) => {
+        const entries = group.entries ?? [];
         const ids: number[] = [];
         for (const entry of entries) {
           if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
