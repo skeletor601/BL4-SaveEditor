@@ -298,6 +298,7 @@ export function generateModdedWeapon(
   universalPartCodes: UniversalDbPartCode[],
   options: GenerateModdedWeaponOptions = {},
 ): GenerateModdedWeaponResult {
+  const retryDepth = Math.max(0, Math.min(12, Number((options as { __retryDepth?: unknown }).__retryDepth ?? 0) || 0));
   const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
   const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
   const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
@@ -313,6 +314,12 @@ export function generateModdedWeapon(
     skinFromOptions ||
     (nonChristmasSkins.length > 0 ? pick(nonChristmasSkins).value : "");
 
+  /**
+   * Power mode rebalance (requested):
+   * - Stable: unchanged.
+   * - Insane: previous OP values.
+   * - OP: midpoint between Stable and previous OP.
+   */
   const modeCfg = {
     stable: {
       exemplarCycleRepeats: [8, 24] as const,
@@ -328,6 +335,19 @@ export function generateModdedWeapon(
       enhancementRepeatRange: [0, 6] as const,
     },
     op: {
+      exemplarCycleRepeats: [12, 48] as const,
+      exemplarAmmoCount: [18, 94] as const,
+      exemplarFireCount: [14, 63] as const,
+      useStabilityGroupChance: 0.575,
+      bodyAccRange: [4, 10] as const,
+      barrelAccRange: [4, 10] as const,
+      grenadePerkRange: [20, 86] as const,
+      underAccRange: [1, 5] as const,
+      statRange: [3, 8] as const,
+      damageRange: [55, 85] as const,
+      enhancementRepeatRange: [4, 27] as const,
+    },
+    insane: {
       exemplarCycleRepeats: [16, 72] as const,
       exemplarAmmoCount: [24, 140] as const,
       exemplarFireCount: [18, 90] as const,
@@ -339,19 +359,6 @@ export function generateModdedWeapon(
       statRange: [3, 10] as const,
       damageRange: [100, 150] as const,
       enhancementRepeatRange: [8, 48] as const,
-    },
-    insane: {
-      exemplarCycleRepeats: [56, 180] as const,
-      exemplarAmmoCount: [120, 420] as const,
-      exemplarFireCount: [90, 320] as const,
-      useStabilityGroupChance: 0.85,
-      bodyAccRange: [8, 20] as const,
-      barrelAccRange: [8, 24] as const,
-      grenadePerkRange: [80, 280] as const,
-      underAccRange: [3, 10] as const,
-      statRange: [8, 20] as const,
-      damageRange: [500, 1000] as const,
-      enhancementRepeatRange: [24, 120] as const,
     },
   }[modPowerMode];
 
@@ -394,7 +401,11 @@ export function generateModdedWeapon(
     const hasBody = rows.some((r) => norm(r.partType) === "body");
     const hasBarrel = rows.some((r) => norm(r.partType) === "barrel");
     const hasMagazine = rows.some((r) => norm(r.partType) === "magazine");
-    return hasBody && hasBarrel && hasMagazine;
+    // Spawn safety: require core slots we always try to fill.
+    const hasGrip = rows.some((r) => norm(r.partType) === "grip");
+    const hasScope = rows.some((r) => norm(r.partType) === "scope");
+    const hasMfgPart = rows.some((r) => norm(r.partType) === "manufacturer part");
+    return hasBody && hasBarrel && hasMagazine && hasGrip && hasScope && hasMfgPart;
   };
 
   const validPrefixesLegendary = Array.from(weaponRowsByPrefix.keys()).filter((p) => {
@@ -510,7 +521,7 @@ export function generateModdedWeapon(
   // Exemplar damage stacks — Terra confirmed these are great. Use IDs [28 32 40 55 59 62] cycling.
   // Terra's code uses two separate {9:[...]} groups. Cycles vary by mode.
   const exemplarIds = [28, 32, 40, 55, 59, 62];
-  const exemplarCycles = { stable: randInt(4, 8), op: randInt(8, 14), insane: randInt(14, 20) }[modPowerMode];
+  const exemplarCycles = { stable: randInt(4, 8), op: randInt(6, 11), insane: randInt(8, 14) }[modPowerMode];
   const buildExemplarGroup = (cycles: number) =>
     groupedToken(9, Array.from({ length: cycles * exemplarIds.length }, (_, i) => exemplarIds[i % exemplarIds.length]!));
   const exemplarStacks = [buildExemplarGroup(exemplarCycles), buildExemplarGroup(exemplarCycles)];
@@ -571,9 +582,9 @@ export function generateModdedWeapon(
   // default = guaranteed when no grenade reload is available; 35% chance otherwise.
   // Rowan's Charge {27:75} and +Fire Rate {27:15} split into separate grouped tokens (Code 7 pattern).
   // Reference: {27:[15×13]} then later {27:[75×10]} — each token independently sized.
-  const rowansChargeCount = { stable: randInt(3, 7), op: randInt(6, 14), insane: randInt(12, 20) }[modPowerMode];
+  const rowansChargeCount = { stable: randInt(3, 7), op: randInt(5, 11), insane: randInt(6, 14) }[modPowerMode];
   // Fire rate capped lower — {27:15} on top of the full-auto string drains ammo in seconds for fast weapon types.
-  const rowansFireRateCount = { stable: randInt(2, 4), op: randInt(3, 5), insane: randInt(4, 7) }[modPowerMode];
+  const rowansFireRateCount = { stable: randInt(2, 4), op: randInt(3, 5), insane: randInt(3, 5) }[modPowerMode];
   const rowansChargeStacks =
     options.specialMode === "inf-ammo"
       ? [groupedToken(27, Array(9).fill(75)), groupedToken(27, Array(7).fill(15))]
@@ -646,8 +657,9 @@ export function generateModdedWeapon(
   const chosenBarrelRow = weaponRows.find((r) => norm(r.partType) === "barrel" && Number(r.partId) === chosenBarrelId);
   const barrelStats = chosenBarrelRow ? parseBarrelStats(chosenBarrelRow.string) : { name: "", damage: 0, pellets: 1, fireRate: 0 };
   // Always paste a visual barrel to the left of the primary barrel (game reads left-to-right, leftmost barrel sets the visual).
-  // Priority: visual:true entries from JSON → all entries from JSON → hardcoded fallback list.
-  // Hardcoded fallback guarantees a dramatic visual barrel even when the JSON fetch fails silently.
+  // Rule: first barrel MUST be from a visual-only pool. Never use entries that don't have visual: true.
+  // Priority: (1) entries with visual:true from JSON, (2) hardcoded fallback. Never use the full JSON list
+  // when it contains non-visual barrels (e.g. AI-generated list with mixed visual/non-visual).
   const FALLBACK_VISUAL_BARRELS: VisualBarrelEntry[] = [
     { name: "BottledLightning", code: "{289:26}", visual: true },
     { name: "bugbear",          code: "{17:54}",  visual: true },
@@ -668,9 +680,7 @@ export function generateModdedWeapon(
     { name: "symmetry",         code: "{26:72}",  visual: true },
   ];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
-  const allVisualEntries = visualOnly.length > 0 ? visualOnly : (options.visualBarrelEntries ?? []);
-  const visualBarrelPool = allVisualEntries.length > 0 ? allVisualEntries : FALLBACK_VISUAL_BARRELS;
-  // Always picks from the curated pool — no fallback to allUniqueBarrels/crossPrefixBarrels for visual slot.
+  const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
   const uniqueFirstBarrelToken = pick(visualBarrelPool).code.trim();
   // ── Terra's barrel cap: max 5 unique barrel codes per gun ──────────────────────────────────
   // visual(1) + primary(1) already used = 3 slots remaining.
@@ -678,8 +688,13 @@ export function generateModdedWeapon(
   // Stacking the same barrel multiple times amplifies its effect without adding new unique codes.
   // Cross-prefix: pick 0-1 unique barrel from a different weapon type prefix.
   const extraBarrelUniqueCount = { stable: 1, op: 2, insane: 2 }[modPowerMode];
-  const crossBarrelUniqueCount = { stable: 0, op: randInt(0, 1), insane: 1 }[modPowerMode];
-  const extraBarrelStackSize = { stable: randInt(8, 15), op: randInt(15, 25), insane: randInt(25, 40) }[modPowerMode];
+  const crossBarrelUniqueCount =
+    modPowerMode === "stable"
+      ? 0
+      : modPowerMode === "op"
+        ? (Math.random() < 0.25 ? 1 : 0)
+        : (Math.random() < 0.50 ? 1 : 0); // insane = previous OP-ish frequency
+  const extraBarrelStackSize = { stable: randInt(8, 15), op: randInt(12, 20), insane: randInt(15, 25) }[modPowerMode];
   const extraSamePrefixBarrelIds = (() => {
     const pool = usableSamePrefixBarrels.filter((id) => id !== chosenBarrelId);
     return [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(extraBarrelUniqueCount, pool.length));
@@ -705,7 +720,7 @@ export function generateModdedWeapon(
 
   // Stacked Vladof 50-round magazines {18:[14×N]} — Code 7 uses 12 stacked mags.
   // Stacking multiples reinforces the mag reference for the spawner and adds ammo capacity anchors.
-  const vladof50MagCount = { stable: randInt(4, 8), op: randInt(8, 14), insane: randInt(12, 20) }[modPowerMode];
+  const vladof50MagCount = { stable: randInt(4, 8), op: randInt(6, 11), insane: randInt(8, 14) }[modPowerMode];
   const magazineToken = groupedToken(18, Array(vladof50MagCount).fill(14));
   // No Order/COV prefix; we use the same magazine on every gun.
   const gripToken = pickToken(["grip"]);
@@ -972,8 +987,8 @@ export function generateModdedWeapon(
   // {273:29} = Torgue HW "Scanning"              — rockets home toward nearby targets.
   const ammoEffRanges = {
     stable: { fc: [8,  16] as const, as: [8,  16] as const, ven: [8,  16] as const, he: [4,  8] as const },
-    op:     { fc: [20, 36] as const, as: [15, 25] as const, ven: [15, 25] as const, he: [6,  12] as const },
-    insane: { fc: [36, 80] as const, as: [25, 60] as const, ven: [25, 60] as const, he: [10, 24] as const },
+    op:     { fc: [14, 26] as const, as: [12, 21] as const, ven: [12, 21] as const, he: [5,  10] as const },
+    insane: { fc: [20, 36] as const, as: [15, 25] as const, ven: [15, 25] as const, he: [6,  12] as const },
   }[modPowerMode];
   // Terra's full-auto string — these three exact stacks together make any gun fully automatic.
   // {281:[3×36]} Free Charger × 36, {275:[23×9]} Heat Exchange × 9, {26:[30×3]} Order SR mag × 3.
@@ -995,9 +1010,9 @@ export function generateModdedWeapon(
   // {3:6}  = Jakobs Pistol +Crit Damage body accessory — cross-prefix crit stacking.
   // {22:72} = Vladof SMG +Damage barrel accessory — cross-prefix damage stacking.
   // {18:31} = Vladof AR barrel accessory — additional cross-prefix stacking (Code 7: 14 stacks).
-  const crossCritRanges   = { stable: [6, 12] as const, op: [10, 20] as const, insane: [15, 40] as const }[modPowerMode];
-  const crossDmgRanges    = { stable: [4,  8] as const, op: [6,  14] as const, insane: [10, 24] as const }[modPowerMode];
-  const crossBarrelAccRanges = { stable: [4, 8] as const, op: [8, 16] as const, insane: [12, 24] as const }[modPowerMode];
+  const crossCritRanges   = { stable: [6, 12] as const, op: [8, 16] as const, insane: [10, 20] as const }[modPowerMode];
+  const crossDmgRanges    = { stable: [4,  8] as const, op: [5, 11] as const, insane: [6,  14] as const }[modPowerMode];
+  const crossBarrelAccRanges = { stable: [4, 8] as const, op: [6, 12] as const, insane: [8, 16] as const }[modPowerMode];
   const jakobsCritStacks   = [groupedToken(3,  Array.from({ length: randInt(crossCritRanges[0],    crossCritRanges[1])    }, () => 6))];
   const vladofSmgDmgStacks  = [groupedToken(22, Array.from({ length: randInt(crossDmgRanges[0],    crossDmgRanges[1])     }, () => 72))];
   const vladofArBarrelStacks = [groupedToken(18, Array.from({ length: randInt(crossBarrelAccRanges[0], crossBarrelAccRanges[1]) }, () => 31))];
@@ -1035,7 +1050,7 @@ export function generateModdedWeapon(
     "{16:84}", // VLA_SR — Vladof Sniper Tediore MIRV
   ];
   // Pick N unique codes from the pool (shuffle + slice).
-  const mirvPickCount = { stable: 4, op: 8, insane: 12 }[modPowerMode];
+  const mirvPickCount = { stable: 4, op: 6, insane: 8 }[modPowerMode];
   const mirvInserts: string[] = [...mirvPool]
     .sort(() => Math.random() - 0.5)
     .slice(0, mirvPickCount);
@@ -1045,12 +1060,12 @@ export function generateModdedWeapon(
   // Terra's perfect gun: ID 42 appears 50×. Added with high weight.
   // Prefix 234 = class mod perks. Cross-inserting these imports skill behaviors into the weapon.
   const classModPerkIds = [42, 42, 42, 42, 42, 21, 21, 21, 22, 22, 22, 23, 26, 28, 28, 28, 30, 30, 30, 31, 31, 31, 31];
-  const classModPerkCount = { stable: randInt(20, 35), op: randInt(35, 55), insane: randInt(50, 80) }[modPowerMode];
+  const classModPerkCount = { stable: randInt(20, 35), op: randInt(28, 45), insane: randInt(35, 55) }[modPowerMode];
   const classModCrossInsert = [groupedToken(234, Array.from({ length: classModPerkCount }, () => pick(classModPerkIds)))];
 
   // ── Terra's cross-manufacturer enhancement & shield inserts (confirmed from perfect gun) ──
   // {287:[9×N]} = Tediore Shield manufacturer — Terra uses 150 stacks. Visual/behavior enhancer.
-  const tedioreShieldCount = { stable: randInt(50, 80), op: randInt(100, 150), insane: randInt(150, 200) }[modPowerMode];
+  const tedioreShieldCount = { stable: randInt(50, 80), op: randInt(75, 115), insane: randInt(100, 150) }[modPowerMode];
   const tedioreShieldInsert = [groupedToken(287, Array(tedioreShieldCount).fill(9))];
 
   // Enhancement manufacturer cross-inserts — Terra's exact pattern [1 1 9 9 2 2 3 3]:
@@ -1088,7 +1103,7 @@ export function generateModdedWeapon(
   // Falls back to hardcoded Terra pattern when no recipes are provided.
   const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
   // Recipe n values are the STABLE baseline. Effects are multiplicative so op/insane multiply up significantly.
-  const scaleForMode = { stable: 1.0, op: 2.0, insane: 3.5 }[modPowerMode];
+  const scaleForMode = { stable: 1.0, op: 1.5, insane: 2.0 }[modPowerMode];
   // Perks that CRASH the game above a certain stack count — hard cap regardless of mode.
   // 73 = Expansive, 76 = Nuke — both crash above 5 stacks.
   const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
@@ -1098,28 +1113,58 @@ export function generateModdedWeapon(
   // 71    = Express   (reduces grenade cooldown — meaningless/harmful on a weapon).
   // 87,88 = additional grenade firmware IDs.
   const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,70,71,87,88]);
-  const recipes = options.grenadeVisualRecipes?.filter((r) => r?.groups?.length > 0) ?? [];
+  const rawList = options.grenadeVisualRecipes ?? [];
+  const recipes = rawList.filter((r) => {
+    const g = (r as { groups?: unknown[]; group?: unknown }).groups ?? (r as { group?: unknown }).group;
+    const groups = Array.isArray(g) ? g : g != null ? [g] : [];
+    return groups.length > 0;
+  });
   let terraGrenadePerkBlock: string;
   if (recipes.length > 0) {
-    const recipe = pick(recipes);
-    const groupTokens = recipe.groups.map((group) => {
-      const ids: number[] = [];
-      for (const entry of group.entries) {
-        if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
-        const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
-        const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
-          ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
-          : rawCount;
-        for (let i = 0; i < count; i++) ids.push(entry.id);
-      }
-      return ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null;
-    }).filter((t): t is string => t !== null);
-    terraGrenadePerkBlock = groupTokens.join(" ");
+    // Enforce grenade recipes: keep trying until we get at least one non-empty token.
+    const remaining = [...recipes];
+    let chosenTokens: string[] = [];
+    while (remaining.length > 0 && chosenTokens.length === 0) {
+      const idx = Math.floor(Math.random() * remaining.length);
+      const recipe = remaining[idx]!;
+      remaining.splice(idx, 1);
+      const recipeGroups = Array.isArray(recipe.groups) ? recipe.groups : (recipe as { group?: unknown }).group != null ? [(recipe as { group: unknown }).group] : [];
+      const groupTokens = recipeGroups.map((group: { entries?: { id: number; n: number }[]; entry?: { id: number; n: number }[] }) => {
+        const entries = Array.isArray(group?.entries) ? group.entries : Array.isArray((group as { entry?: unknown }).entry) ? (group as { entry: { id: number; n: number }[] }).entry : [];
+        const ids: number[] = [];
+        for (const entry of entries) {
+          if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
+          const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
+          const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
+            ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
+            : rawCount;
+          for (let i = 0; i < count; i++) ids.push(entry.id);
+        }
+        return ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null;
+      }).filter((t): t is string => t !== null);
+      if (groupTokens.length > 0 && groupTokens.join(" ").trim().length > 0) chosenTokens = groupTokens;
+    }
+    if (chosenTokens.length > 0) {
+      terraGrenadePerkBlock = chosenTokens.join(" ");
+    } else {
+      const baseHeavyStack = { stable: randInt(6, 8), op: randInt(8, 9), insane: 10 }[modPowerMode];
+      const dominantStack  = { stable: randInt(16, 24), op: randInt(23, 35), insane: randInt(30, 45) }[modPowerMode];
+      const heavyStack2    = { stable: randInt(10, 16), op: randInt(14, 22), insane: randInt(18, 28) }[modPowerMode];
+      const terraPerkIds: number[] = [
+        ...Array(dominantStack).fill(72),
+        ...Array(heavyStack2).fill(39),
+        ...Array(heavyStack2).fill(75),
+        ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap((id) => Array(baseHeavyStack).fill(id)),
+        24, 40, 53, 62, 66, 76,
+        77, 21,
+      ].filter((id) => !GRENADE_245_FORBIDDEN.has(id));
+      terraGrenadePerkBlock = `{245:[${terraPerkIds.join(" ")}]}`;
+    }
   } else {
     // Terra's perfect gun fallback pattern: 72 dominant visual, then secondary + standard perks.
-    const baseHeavyStack = { stable: randInt(6, 8), op: 10, insane: randInt(10, 14) }[modPowerMode];
-    const dominantStack  = { stable: randInt(16, 24), op: randInt(30, 45), insane: randInt(40, 60) }[modPowerMode];
-    const heavyStack2    = { stable: randInt(10, 16), op: randInt(18, 28), insane: randInt(25, 40) }[modPowerMode];
+    const baseHeavyStack = { stable: randInt(6, 8), op: randInt(8, 9), insane: 10 }[modPowerMode];
+    const dominantStack  = { stable: randInt(16, 24), op: randInt(23, 35), insane: randInt(30, 45) }[modPowerMode];
+    const heavyStack2    = { stable: randInt(10, 16), op: randInt(14, 22), insane: randInt(18, 28) }[modPowerMode];
     const terraPerkIds: number[] = [
       ...Array(dominantStack).fill(72),
       ...Array(heavyStack2).fill(39),
@@ -1176,7 +1221,7 @@ export function generateModdedWeapon(
   const extremeStackPartPool = weaponRows.filter(
     (r) => norm(r.partType) === "barrel accessory" || norm(r.partType) === "body accessory",
   );
-  const extremeStackCount = { stable: randInt(15, 20), op: randInt(20, 28), insane: randInt(25, 35) }[modPowerMode];
+  const extremeStackCount = { stable: randInt(15, 20), op: randInt(18, 24), insane: randInt(20, 28) }[modPowerMode];
   const extremeSamePrefixStack = (() => {
     if (!extremeStackPartPool.length) return [];
     const shuffled = [...extremeStackPartPool].sort(() => Math.random() - 0.5);
@@ -1280,6 +1325,48 @@ export function generateModdedWeapon(
   const updatedDecoded = safeSkin
     ? `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} | "c", "${safeSkin}" |`
     : `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${newComponentStr} |`;
+
+  // Spawn safety: if a COV magazine override is present, regenerate (instead of patching/replacing tokens).
+  // Detect COV magazine codes from the universal DB and search explicit {prefix:part} + {prefix:[...]} tokens.
+  const covMagazineCodes = (() => {
+    const set = new Set<string>();
+    for (const row of universalPartCodes) {
+      if (norm(row.partType) !== "magazine") continue;
+      if (!/cov/.test(norm(row.manufacturer ?? ""))) continue;
+      const p = parseCodePair(row.code);
+      if (!p) continue;
+      set.add(`${p.prefix}:${p.part}`);
+    }
+    return set;
+  })();
+  if (covMagazineCodes.size > 0) {
+    // Also detect "simple" tokens {id} which imply {headerPrefix:id} for the current weapon prefix.
+    const covMagazineSimpleIds = (() => {
+      const set = new Set<number>();
+      for (const row of weaponRows) {
+        if (norm(row.partType) !== "magazine") continue;
+        const m = norm(row.manufacturer ?? "");
+        const s = norm(`${row.string ?? ""} ${row.stat ?? ""}`);
+        if (!/\bcov\b/.test(m) && !/\bcov\b/.test(s) && !/heat\s*gauge/.test(s)) continue;
+        const id = Number(row.partId);
+        if (Number.isFinite(id)) set.add(id);
+      }
+      return set;
+    })();
+    const hasCov = finalParts.some((p) => {
+      if (typeof p === "string") return false;
+      if (p.type === "simple") return covMagazineSimpleIds.has(p.id);
+      if (p.type === "part") return covMagazineCodes.has(`${p.mfgId}:${p.id}`);
+      if (p.type === "group") return p.subIds.some((sid) => covMagazineCodes.has(`${p.id}:${sid}`));
+      return false;
+    });
+    if (hasCov) {
+      if (retryDepth < 10) {
+        return generateModdedWeapon(weaponEditData, universalPartCodes, { ...(options as object), __retryDepth: retryDepth + 1 } as GenerateModdedWeaponOptions);
+      }
+      throw new Error("Generated weapon had a COV magazine override; try again.");
+    }
+  }
 
   // DPS estimate — uses real base stats from the barrel's String field.
   const dmgStackCount = countGroupedStacks(damageStacks);
