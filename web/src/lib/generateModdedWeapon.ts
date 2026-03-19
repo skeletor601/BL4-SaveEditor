@@ -330,6 +330,7 @@ export function generateModdedWeapon(
   // Hardcoded Ripper Shotgun Convergence. Seed 6211 (DrLecter's signature).
   // Stock base hand-built from a real auto-filled Convergence, all explicit {7:xx} format.
   const isClaudeGun = Math.random() < 0.05; // 1 in 20
+  // Stock base hand-built from a real auto-filled Convergence, all explicit {7:xx} format.
   const CLAUDE_GUN_STOCK_BASE = "7, 0, 1, 50| 2, 6211|| {1:13} {7:2} {7:64} {7:[66 66 66 66 66]} {7:[68 68 68 68 68]} {7:[69 69 69 69 69]} {7:[70 70 70 70 70]} {7:[71 71 71 71 71]} {7:[72 72 72 72 72]} {7:[16 16]} {7:41} {7:42} {7:43} {7:50} {7:12} {7:74} {7:75} {7:28} {7:[34 34 34 34 34]} {7:[35 35 35 35 35]} {7:[36 36 36 36 36]} {7:[48 48 48 48 48]} |";
   /** Only use skins from the skin selector (skinOptions), excluding Christmas. No stock/default skin. */
   const nonChristmasSkins = (options.skinOptions ?? []).filter(
@@ -1518,8 +1519,12 @@ export function generateModdedWeapon(
     // Heavy barrel accessories on ALL guns (MIRV, Two-Shot, Triple Barrel, etc.)
     ...heavyBarrelAccessoryTokens,
 
-    // ── Modded additions (non-barrel) ──
+    // ── Modded additions ──
     ...altFireTokens,
+    homingToken,                                             // {273:1} — barrel accessory, stays here
+    scanningHomingToken,                                     // {273:29} — barrel accessory, stays here
+    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
+    ...homingStacks273,
     ...damageStacks,
     ...weaponTypeDamageStacks,
     ...movementSpeedStacks,
@@ -1549,13 +1554,10 @@ export function generateModdedWeapon(
     // Underbarrel — ALWAYS added from desirable list or legacy path
     ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
     ...(underbarrelToken ? [underbarrelToken] : []),
-    // ── Effect barrels LAST — "as far away as possible" from visual barrel (Terra's rule) ──
-    multiProjectileToken,                                    // {289:[17 16 17]} MIRV/Two-Shot
-    homingToken,                                             // {273:1}
-    scanningHomingToken,                                     // {273:29}
-    ...seamstressExtras,                                     // {13:70} + {11:75} + {11:81}
-    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
-    ...homingStacks273,
+    // ── Effect BARRELS at END — "as far away as possible" from visual barrel (Terra's rule) ──
+    // Only actual barrels here, not accessories or non-barrel tokens
+    ...seamstressExtras,                                     // {13:70} + {11:75} Anarchy + {11:81} Eigenburst (only if Seamstress UB)
+    multiProjectileToken,                                    // {289:[17 16 17]} MIRV/Two-Shot barrels
     ...rowansChargeStacks,                                   // {27:[75×N]} Stalker / Rowan's Charge
     ...samePrefixBarrelParts,                                // Extra same-prefix barrels
     ...crossParts,                                           // Cross-prefix barrels
