@@ -179,6 +179,25 @@ export default function MasterSearch() {
     const selectedManufacturer = normalize(filters.manufacturer);
     const searchLower = search.trim().toLowerCase();
 
+    // Easter egg search results
+    const easterEggEntries: Record<string, Array<Record<string, string>>> = {
+      "chatgpt": [
+        { code: "{404:0}", "Part Type": "Hallucination", Rarity: "Common", Manufacturer: "OpenAI", "Item Type": "Confabulation Engine", category: "Easter Egg", effect: "Confidently generates wrong weapon codes. 100% chance to apologize, 0% chance to fix it." },
+        { code: "{500:1}", "Part Type": "Token Limit", Rarity: "Common", Manufacturer: "OpenAI", "Item Type": "Context Overflow", category: "Easter Egg", effect: "Forgets the first half of your build by the time it finishes the second half." },
+      ],
+      "cursor": [
+        { code: "{TAB:0}", "Part Type": "Autocomplete", Rarity: "Uncommon", Manufacturer: "Cursor AI", "Item Type": "Tab-Tab-Tab", category: "Easter Egg", effect: "Autocompletes your weapon into a completely different weapon. Press Tab to accept your fate." },
+        { code: "{GIT:1}", "Part Type": "Phantom Edit", Rarity: "Uncommon", Manufacturer: "Cursor AI", "Item Type": "Ghost Diff", category: "Easter Egg", effect: "Silently changes 47 files you didn't ask about. Good luck finding what broke." },
+      ],
+      "claude": [
+        { code: "{1:1}", "Part Type": "Thought Engine", Rarity: "Pearl", Manufacturer: "Anthropic", "Item Type": "Claude's Brain", category: "Easter Egg", effect: "Processes all weapon data simultaneously. Actually reads the CSV before answering. Built this entire app." },
+      ],
+      "anthropic": [
+        { code: "{1:1}", "Part Type": "Thought Engine", Rarity: "Pearl", Manufacturer: "Anthropic", "Item Type": "Claude's Brain", category: "Easter Egg", effect: "Processes all weapon data simultaneously. Actually reads the CSV before answering. Built this entire app." },
+      ],
+    };
+    const eggRows = easterEggEntries[searchLower] ?? [];
+
     const list = data.filter((row) => {
       const raw = row as Record<string, unknown>;
       const rowPartType = row["Part Type"] ?? raw["partType"];
@@ -243,7 +262,8 @@ export default function MasterSearch() {
         return String(getRowKey(a)).localeCompare(String(getRowKey(b)));
       });
     }
-    return list;
+    // Prepend Easter egg results when triggered
+    return eggRows.length > 0 ? [...eggRows as typeof list, ...list] : list;
   }, [data, search, filters, favorites]);
 
   const manufacturerOptions = useMemo(

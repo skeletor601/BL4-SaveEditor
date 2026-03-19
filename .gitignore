@@ -34,6 +34,10 @@ dist/
 *.log
 logs/
 
+# Backup files and trash
+*.bak
+trash/
+
 # External reference HTML/data source directories (desktop save editor)
 # These live outside or alongside this repo and should never be checked in.
 Borderlands4-SaveEditor-3.4.5.2/

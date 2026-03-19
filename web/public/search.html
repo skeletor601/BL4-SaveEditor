@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Quick Search</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+      .card { max-width: 720px; margin: 0 auto; padding: 16px; border: 1px solid #ddd; border-radius: 12px; }
+      label { display:block; font-size: 12px; color:#444; margin: 12px 0 6px; }
+      input, select, button { width: 100%; padding: 10px 12px; font-size: 16px; }
+      button { margin-top: 12px; cursor: pointer; }
+      .row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+      @media (min-width: 700px) { .row { grid-template-columns: 1fr 1fr; } }
+      .hint { font-size: 12px; color:#666; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2 style="margin:0 0 8px;">Quick Search</h2>
+      <form id="f">
+        <div class="row">
+          <div>
+            <label for="engine">Search engine</label>
+            <select id="engine">
+              <option value="ddg">DuckDuckGo</option>
+              <option value="brave">Brave Search</option>
+              <option value="bing">Bing</option>
+            </select>
+          </div>
+          <div>
+            <label for="site">Optional: restrict to site/domain</label>
+            <input id="site" placeholder="example.com (leave blank for web)" />
+          </div>
+        </div>
+
+        <label for="q">Query</label>
+        <input id="q" placeholder="Type your search…" autofocus />
+
+        <button type="submit">Search</button>
+        <div class="hint">
+          Tip: use quotes for exact match, e.g. "grenade_visual_recipes".
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const f = document.getElementById("f");
+      const qEl = document.getElementById("q");
+      const siteEl = document.getElementById("site");
+      const engineEl = document.getElementById("engine");
+
+      function buildUrl(engine, query) {
+        const q = encodeURIComponent(query);
+        if (engine === "ddg") return `https://duckduckgo.com/?q=${q}`;
+        if (engine === "brave") return `https://search.brave.com/search?q=${q}`;
+        if (engine === "bing") return `https://www.bing.com/search?q=${q}`;
+        return `https://duckduckgo.com/?q=${q}`;
+      }
+
+      f.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const raw = (qEl.value || "").trim();
+        if (!raw) return;
+
+        const site = (siteEl.value || "").trim();
+        const query = site ? `site:${site} ${raw}` : raw;
+
+        const url = buildUrl(engineEl.value, query);
+        window.open(url, "_blank", "noopener,noreferrer");
+      });
+    </script>
+  </body>
+</html>
+

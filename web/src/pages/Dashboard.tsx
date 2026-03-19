@@ -9,7 +9,7 @@ const cards: { to: string; title: string; desc: string; icon: DashboardIconKind 
   { to: "/character",    title: "Character Studio", desc: "Select save, character edits, YAML view",           icon: "character" },
   { to: "/inventory",    title: "Inventory Ops",    desc: "Backpack, decoder, translator, code spawn",         icon: "inventory" },
   { to: "/gear-forge",   title: "Gear Forge",       desc: "Build + edit command center with live codec",       icon: "gear"      },
-  { to: "/master-search",title: "Master Search",    desc: "Deep part lookup across 9,600+ item database entries", icon: "search" },
+  { to: "/master-search",title: "Master Search",    desc: "Deep part lookup across 5,200+ item database entries", icon: "search" },
   { to: "/beta",         title: "Beta Lab",         desc: "Try new experiments and send feedback",             icon: "beta"      },
 ];
 

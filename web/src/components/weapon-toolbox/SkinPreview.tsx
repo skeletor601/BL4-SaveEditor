@@ -15,6 +15,8 @@ export default function SkinPreview({ token, label, className = "" }: SkinPrevie
   const [imgError, setImgError] = useState(false);
 
   const imageUrl = getSkinImageUrl(token);
+  // Reset error state when skin changes so new image can load
+  useEffect(() => { setImgError(false); }, [token]);
   const showPreview = token && imageUrl && !imgError;
 
   const handleImageLoad = useCallback(() => {

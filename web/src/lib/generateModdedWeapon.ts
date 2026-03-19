@@ -120,6 +120,9 @@ export interface GrenadeVisualRecipe {
   id: string;
   label: string;
   notes?: string;
+  /** Style tag(s) — used to pick complementary perks to append after the recipe sequence.
+   * "lingering" | "singularity" | "artillery" | "mirv" | "hybrid" */
+  style?: string;
   groups: GrenadeVisualRecipeGroup[];
 }
 
@@ -155,6 +158,13 @@ export interface GenerateModdedWeaponOptions {
    * - undefined/null: default probabilistic behaviour (tediore check + 35% chance).
    */
   specialMode?: "grenade-reload" | "inf-ammo" | null;
+  /**
+   * Pre-built stock weapon decoded string from auto-fill.
+   * When provided, the generator uses this as the base (all stock slots filled) and
+   * appends modded parts on top. This guarantees 100% spawn rate since auto-fill always
+   * produces a valid weapon. Format: "prefix, 0, 1, level| 2, seed|| {parts...} |"
+   */
+  stockBaseDecoded?: string;
 }
 
 type ParsedComponent =
@@ -260,14 +270,22 @@ export interface DpsEstimate {
 export interface GenerateModdedWeaponResult {
   code: string;
   dps: DpsEstimate;
+  /** True when the 1/20 Claude's Gun Easter egg was rolled. */
+  isClaudeGun?: boolean;
 }
 
-/** Parse barrel display String for base damage, pellet count, and fire rate. */
+/** Parse barrel display String/Stat for base damage, pellet count, and fire rate.
+ * Handles multiple formats from the CSV:
+ *   "571 Damage"        / "1785 DMG"
+ *   "265 x 6 Damage"    / "1485 x 4 DMG"
+ *   "6.8/s Fire Rate"   / "6.8/s FR"  / "4.0/s Reload"
+ */
 function parseBarrelStats(str: string): { name: string; damage: number; pellets: number; fireRate: number } {
   const name = str.split(",")[0]?.trim() ?? "";
-  // Handles: "571 Damage", "265 x 6 Damage", "669x3 Damage"
-  const multiMatch = str.match(/(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+)\s*Damage/i);
-  const singleMatch = str.match(/(\d+(?:\.\d+)?)\s*Damage/i);
+  // Multi-pellet: "1485 x 4 DMG", "265 x 6 Damage", "669x3 Damage"
+  const multiMatch = str.match(/(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+)\s*(?:Damage|DMG)/i);
+  // Single pellet: "571 Damage", "1785 DMG"
+  const singleMatch = str.match(/(\d+(?:\.\d+)?)\s*(?:Damage|DMG)/i);
   let damage = 0, pellets = 1;
   if (multiMatch) {
     damage = parseFloat(multiMatch[1]);
@@ -275,7 +293,8 @@ function parseBarrelStats(str: string): { name: string; damage: number; pellets:
   } else if (singleMatch) {
     damage = parseFloat(singleMatch[1]);
   }
-  const frMatch = str.match(/([\d.]+)\s*\/s\s*(?:Fire\s*Rate|FR)/i);
+  // Fire rate: "6.8/s Fire Rate", "6.8/s FR", "4.0/s Reload"
+  const frMatch = str.match(/([\d.]+)\s*\/s\s*(?:Fire\s*Rate|FR|Reload)/i);
   const fireRate = frMatch ? parseFloat(frMatch[1]) : 0;
   return { name, damage, pellets, fireRate };
 }
@@ -306,6 +325,12 @@ export function generateModdedWeapon(
   const modPowerMode = options.modPowerMode ?? "op";
   const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 50)));
   const skinFromOptions = (options.skin ?? "").trim();
+
+  // ── Claude's Gun — 1/20 chance Easter egg ─────────────────────────────────────────────
+  // Hardcoded Ripper Shotgun Convergence. Seed 6211 (DrLecter's signature).
+  // Stock base hand-built from a real auto-filled Convergence, all explicit {7:xx} format.
+  const isClaudeGun = Math.random() < 0.05; // 1 in 20
+  const CLAUDE_GUN_STOCK_BASE = "7, 0, 1, 50| 2, 6211|| {1:13} {7:2} {7:64} {7:[66 66 66 66 66]} {7:[68 68 68 68 68]} {7:[69 69 69 69 69]} {7:[70 70 70 70 70]} {7:[71 71 71 71 71]} {7:[72 72 72 72 72]} {7:[16 16]} {7:41} {7:42} {7:43} {7:50} {7:12} {7:74} {7:75} {7:28} {7:[34 34 34 34 34]} {7:[35 35 35 35 35]} {7:[36 36 36 36 36]} {7:[48 48 48 48 48]} |";
   /** Only use skins from the skin selector (skinOptions), excluding Christmas. No stock/default skin. */
   const nonChristmasSkins = (options.skinOptions ?? []).filter(
     (s) => !/christmas/i.test(String(s.label ?? "")) && !/christmas/i.test(String(s.value ?? "")),
@@ -430,10 +455,18 @@ export function generateModdedWeapon(
   const validPrefixes = validPrefixesLegendary.length ? validPrefixesLegendary : validPrefixesFallback;
   if (!validPrefixes.length) throw new Error("No valid weapon prefix has required core parts and barrel/rarity.");
 
-  // Use forcedPrefix from options (dropdown selection) when provided and valid; otherwise pick randomly.
+  // Use forcedPrefix from options (dropdown selection) when provided, valid, AND has all core parts.
+  // A prefix missing core slots (body/barrel/mag/grip/scope/mfg) causes the weapon to not spawn.
+  // Claude's Gun: always prefix 7 (Ripper Shotgun) with hardcoded stock base.
   const forcedPfx = options.forcedPrefix != null && Number.isFinite(options.forcedPrefix) ? options.forcedPrefix : null;
-  const headerPrefix = forcedPfx != null && weaponRowsByPrefix.has(forcedPfx) ? forcedPfx : pick(validPrefixes);
-  const seed = String(randInt(1000, 9999));
+  const headerPrefix = isClaudeGun
+    ? 7
+    : forcedPfx != null && weaponRowsByPrefix.has(forcedPfx) && hasCoreParts(forcedPfx)
+      ? forcedPfx
+      : pick(validPrefixes);
+  const seed = isClaudeGun ? "6211" : String(randInt(1000, 9999));
+  // Override stockBaseDecoded for Claude's Gun
+  if (isClaudeGun) options = { ...options, stockBaseDecoded: CLAUDE_GUN_STOCK_BASE };
   const weaponRows = weaponEditData.parts.filter((r) => Number(r.mfgWtId) === headerPrefix);
   const weaponManufacturer = norm(weaponRows[0]?.manufacturer ?? "");
   const legendaryRarityRows = weaponRows.filter(
@@ -655,7 +688,11 @@ export function generateModdedWeapon(
   const chosenBarrelId = pick(usableSamePrefixBarrels);
   const primaryBarrelToken = `{${chosenBarrelId}}`;
   const chosenBarrelRow = weaponRows.find((r) => norm(r.partType) === "barrel" && Number(r.partId) === chosenBarrelId);
-  const barrelStats = chosenBarrelRow ? parseBarrelStats(chosenBarrelRow.string) : { name: "", damage: 0, pellets: 1, fireRate: 0 };
+  // Stat column has the display name + damage numbers; String column is just the spawn code.
+  // Try stat first, fall back to string if stat is empty.
+  const barrelStats = chosenBarrelRow
+    ? parseBarrelStats(chosenBarrelRow.stat || chosenBarrelRow.string)
+    : { name: "", damage: 0, pellets: 1, fireRate: 0 };
   // Always paste a visual barrel to the left of the primary barrel (game reads left-to-right, leftmost barrel sets the visual).
   // Rule: first barrel MUST be from a visual-only pool. Never use entries that don't have visual: true.
   // Priority: (1) entries with visual:true from JSON, (2) hardcoded fallback. Never use the full JSON list
@@ -675,7 +712,44 @@ export function generateModdedWeapon(
   ];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
   const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
-  const uniqueFirstBarrelToken = pick(visualBarrelPool).code.trim();
+  const chosenVisualBarrel = isClaudeGun ? "{7:64}" : pick(visualBarrelPool).code.trim();  // Claude's Gun: Convergence
+  // Stack the visual barrel 2-4× (Terra stacks Bod 3×) to reinforce the visual identity.
+  const visualBarrelStackCount = isClaudeGun ? 4 : { stable: randInt(2, 3), op: 3, insane: randInt(3, 4) }[modPowerMode];
+  const uniqueFirstBarrelToken = (() => {
+    // If the code is a simple {prefix:part}, stack as a grouped token.
+    const m = chosenVisualBarrel.match(/^\{(\d+):(\d+)\}$/);
+    if (m) return groupedToken(Number(m[1]), Array(visualBarrelStackCount).fill(Number(m[2])));
+    // Multi-code visual barrels (e.g. combo entries) — repeat the whole code.
+    return Array(visualBarrelStackCount).fill(chosenVisualBarrel).join(" ");
+  })();
+
+  // ── Heavy barrel accessory cross-insert — applies to ALL guns ──────────────────────────────
+  // Terra's pattern: {289:[17 16 17]} on every gun — MIRV/Two-Shot/etc. enhance projectile
+  // behavior regardless of what weapon type the gun is. Each heavy manufacturer contributes
+  // unique accessories: Torgue rockets, Ripper beams, Vladof multi-barrel, Maliwan MIRV.
+  // Pick one heavy manufacturer and add 2-4 accessories from it.
+  const HEAVY_BARREL_ACCESSORIES: Record<number, number[]> = {
+    273: [1, 6, 9, 10, 11, 12, 22, 23, 24, 26, 27, 28, 29],  // Torgue: homing, triple barrel, shrapnel, air burst, two-shot, FR, mag, scanning
+    275: [2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 24, 25],       // Ripper: explosive, beam splitter, compound, ricochet, heat exchange, wide disk, heat sink
+    282: [13, 14, 15, 16, 17, 18, 19, 20, 27, 28],            // Vladof: additional barrel, angel's share, magic bullet, devil's share, explosive, two-shot, penetration
+    289: [2, 3, 12, 13, 14, 15, 16, 17, 18, 19],              // Maliwan: MIRV, proxy homing, ricochet, penetration, speed loader, overload, two-shot, aerodynamics
+  };
+  const heavyBarrelAccessoryTokens: string[] = (() => {
+    if (isClaudeGun) {
+      // Claude's Gun: Maliwan heavy — MIRV(16) + Proxy Homing(19) + Two-Shot(17) + Overload(15)
+      return [groupedToken(289, [16, 19, 17, 15])];
+    }
+    // Pick a random heavy manufacturer for cross-insert accessories
+    const prefixes = [273, 275, 282, 289];
+    const prefix = pick(prefixes);
+    const accPool = HEAVY_BARREL_ACCESSORIES[prefix]!;
+    // Pick 2-4 unique accessories as a single grouped token (Terra's pattern: one {prefix:[...]} token)
+    const count = { stable: randInt(2, 3), op: randInt(2, 4), insane: randInt(3, 4) }[modPowerMode];
+    const shuffled = [...accPool].sort(() => Math.random() - 0.5);
+    const chosen = shuffled.slice(0, Math.min(count, shuffled.length));
+    return [groupedToken(prefix, chosen)];
+  })();
+
   // ── Terra's barrel cap: max 5 unique barrel codes per gun ──────────────────────────────────
   // visual(1) + primary(1) already used = 3 slots remaining.
   // Extra same-prefix: pick 1-2 unique additional barrel IDs (not repeating), stack each ×N as a grouped token.
@@ -703,7 +777,7 @@ export function generateModdedWeapon(
     const c = pick(crossPrefixBarrels);
     return [`{${c.prefix}:${c.part}}`];
   })();
-  const barrelAccessoryStack = stackTokens(
+  let barrelAccessoryStack = stackTokens(
     ["barrel accessory"],
     modeCfg.barrelAccRange[0],
     modeCfg.barrelAccRange[1],
@@ -711,14 +785,37 @@ export function generateModdedWeapon(
   if (toPartIds(["barrel accessory"]).length > 0 && barrelAccessoryStack.length < 4) {
     throw new Error("Could not build stock weapon core: missing enough Barrel Accessory parts.");
   }
+  // Spawn safety: if own prefix has NO barrel accessories, grab from another prefix.
+  if (barrelAccessoryStack.length === 0) {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const accs = rows.filter((r) => norm(r.partType) === "barrel accessory");
+      if (accs.length) { barrelAccessoryStack = [pick(accs)].map((a) => `{${pfx}:${a.partId}}`); break; }
+    }
+  }
 
   // Stacked Vladof 50-round magazines {18:[14×N]} — Code 7 uses 12 stacked mags.
   // Stacking multiples reinforces the mag reference for the spawner and adds ammo capacity anchors.
   const vladof50MagCount = { stable: randInt(4, 8), op: randInt(6, 11), insane: randInt(8, 14) }[modPowerMode];
   const magazineToken = groupedToken(18, Array(vladof50MagCount).fill(14));
   // No Order/COV prefix; we use the same magazine on every gun.
-  const gripToken = pickToken(["grip"]);
-  const scopeToken = pickToken(["scope"]);
+  // Grip, scope — REQUIRED for weapon to spawn. If own prefix has none, cross-reference other prefixes.
+  const gripToken = pickToken(["grip"]) ?? (() => {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const grips = rows.filter((r) => norm(r.partType) === "grip");
+      if (grips.length) { const g = pick(grips); return `{${pfx}:${g.partId}}`; }
+    }
+    return null;
+  })();
+  const scopeToken = pickToken(["scope"]) ?? (() => {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const scopes = rows.filter((r) => norm(r.partType) === "scope");
+      if (scopes.length) { const s = pick(scopes); return `{${pfx}:${s.partId}}`; }
+    }
+    return null;
+  })();
   // tedioreReloadCode already computed above (early detection using weaponEditData.parts).
   const manufacturerPartsCount =
     weaponManufacturer.includes("tediore") || tedioreReloadCode != null
@@ -731,13 +828,28 @@ export function generateModdedWeapon(
           return t ? [t] : [];
         })()
       : stackTokens(["manufacturer part"], manufacturerPartsCount, manufacturerPartsCount);
-  const manufacturerTokens =
+  // Spawn safety: if own prefix has NO manufacturer parts, grab from another prefix.
+  let manufacturerTokens =
     tedioreReloadCode != null
       ? [tedioreReloadCode, ...baseManufacturerTokens.filter((t) => t !== tedioreReloadCode)]
       : baseManufacturerTokens;
+  if (manufacturerTokens.length === 0) {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const mfg = rows.filter((r) => norm(r.partType) === "manufacturer part");
+      if (mfg.length) { manufacturerTokens = [`{${pfx}:${pick(mfg).partId}}`]; break; }
+    }
+  }
   // Daedalus alt-ammo disabled: causes infinite ammo which breaks grenade reload mechanic.
   // Exactly one foregrip; placed at the very end (after underbarrel).
-  const foregripToken = pickToken(["foregrip"]);
+  const foregripToken = pickToken(["foregrip"]) ?? (() => {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const fg = rows.filter((r) => norm(r.partType) === "foregrip");
+      if (fg.length) return `{${pfx}:${pick(fg).partId}}`;
+    }
+    return null;
+  })();
 
   const crossPrefixUnderbarrels: { prefix: number; part: number }[] = [];
   const crossPrefixUnderbarrelAccessories: { prefix: number; part: number }[] = [];
@@ -756,20 +868,31 @@ export function generateModdedWeapon(
   }
   const elementPool = weaponEditData.elemental ?? [];
   const nonSwitchElementIds = elementPool
-    .filter((e) => !/\bswitch\s+between\b/.test(norm(e.stat ?? "")))
+    .filter((e) => !/\bswitch\s+between\b/.test(norm(e.stat ?? "")) && !/\bkinetic\b/i.test(e.stat ?? ""))
     .map((e) => Number(e.partId))
-    .filter((n) => Number.isFinite(n));
+    .filter((n) => Number.isFinite(n) && n !== 55);  // 55 = Kinetic — always excluded
+  // {1:56}=Shock, {1:57}=Radiation, {1:58}=Corrosive, {1:59}=Cryo, {1:60}=Fire.
+  // Picked early so both altFireTokens and extendedElementTokens can use the same element.
+  const chosenElementId = isClaudeGun ? 57 : pick([56, 57, 58, 59, 60]);  // Claude's Gun: Radiation (purple)
   let altFireTokens: string[] = [];
   let shouldUseUnderbarrelAlt = true;
   const bodyToken = pickToken(["body"]);
   if (!bodyToken) throw new Error("Could not build stock weapon core: missing Body.");
-  const bodyAccessoryStack = stackTokens(
+  let bodyAccessoryStack = stackTokens(
     ["body accessory"],
     modeCfg.bodyAccRange[0],
     modeCfg.bodyAccRange[1],
   );
   if (toPartIds(["body accessory"]).length > 0 && bodyAccessoryStack.length < 4) {
     throw new Error("Could not build stock weapon core: missing enough Body Accessory parts.");
+  }
+  // Spawn safety: if own prefix has NO body accessories, grab from another prefix.
+  if (bodyAccessoryStack.length === 0) {
+    for (const [pfx, rows] of weaponRowsByPrefix.entries()) {
+      if (pfx === headerPrefix) continue;
+      const accs = rows.filter((r) => norm(r.partType) === "body accessory");
+      if (accs.length) { bodyAccessoryStack = [pick(accs)].map((a) => `{${pfx}:${a.partId}}`); break; }
+    }
   }
 
   let underbarrelToken = "";
@@ -961,17 +1084,10 @@ export function generateModdedWeapon(
     ? [groupedToken(273, Array.from({ length: randInt(8, 24) }, () => 1))]
     : [];
 
-  // {289:17} Two Shot — Terra confirmed: 4 stacks fixed, 5 max. More than this kills damage (splits projectiles).
-  // {289:16} = MAL_HW.part_barrel_02_a  — Heavy Weapon MIRV, spawns 3 MIRV Orbs on explosion (Terra's perfect gun).
-  // {289:2}  = MAL_HW.part_barrel_02_dXa — Heavy Weapon MIRV variant, same effect.
-  // {289:18} Two Shot accessory — 2 stacks.
-  // Cross-inserting 16 + 2 (both MIRV variants) = the main gun visuals Terra mentioned.
-  const proj17Count = randInt(3, 4);
-  const multiProjectileToken = groupedToken(289, [
-    ...Array.from({ length: proj17Count }, () => 17),
-    16, 2,   // both Heavy MIRV variants — 3 MIRV Orbs each on explosion
-    18, 18,
-  ]);
+  // {289:[17 16 17]} Terra's exact pattern — Two-Shot + MIRV + Two-Shot.
+  // Tight and synergistic: MIRV splits projectiles, Two-Shot doubles them.
+  // No excess stacking — more than 3-4 Two-Shot IDs kills damage (splits too many times).
+  const multiProjectileToken = groupedToken(289, [17, 16, 17]);
 
   // Cross-manufacturer ammo-efficiency stacks (from Uxhiha/Terra-Morpheous weapon analysis).
   // {281:3}  = Order Enhancement "Free Charger"  — 30% chance to fire for free at max charge.
@@ -990,7 +1106,9 @@ export function generateModdedWeapon(
   const freeChargerStacks  = [groupedToken(281, Array(36).fill(3))];
   const heatExchangeStacks = [groupedToken(275, Array(9).fill(23))];
   const orderSrMagStacks   = [groupedToken(26,  Array(3).fill(30))];
-  const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(ammoEffRanges.as[0],  ammoEffRanges.as[1])  }, () => 14))];
+  // Angel's Share — Terra uses a single {282:14}. Too many stacks = gun never needs to reload.
+  // Keep it light: 1-3 stacks so the gun still reloads (important for grenade reload to trigger).
+  const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(1, 3) }, () => 14))];
   // Ventilator excluded from all grenade-reload guns — COV heat mechanic disables the reload trigger,
   // which prevents the grenade reload visual from ever firing. Only used in inf-ammo mode where
   // there is no grenade block and the heat gauge is the intended mechanic.
@@ -1074,7 +1192,12 @@ export function generateModdedWeapon(
   // {246:[...]} Shield body cross-insert — Terra's exact parts from perfect gun.
   const shieldBodyInsert = ["{246:[22 22 23 23 26 26 25 25 24 24 31 39 40 45 46 58 58]}"];
 
-  if (underbarrelToken && nonSwitchElementIds.length > 0) {
+  // When auto-fill provides the stock base, use ONLY the universal element override (chosenElementId).
+  // The weapon-specific elemental IDs (12, 14, 51, etc.) can resolve to wrong elements in-game.
+  if (options.stockBaseDecoded) {
+    // Single universal element — no weapon-specific altFire
+    altFireTokens = [];
+  } else if (nonSwitchElementIds.length > 0) {
     const wantMultiple = nonSwitchElementIds.length >= 2 && Math.random() < 0.5;
     const count = wantMultiple ? randInt(2, Math.min(nonSwitchElementIds.length, 4)) : 1;
     const chosen: number[] = [];
@@ -1085,6 +1208,8 @@ export function generateModdedWeapon(
       pool.splice(idx, 1);
     }
     altFireTokens = chosen.map((id) => `{1:${id}}`);
+  } else {
+    altFireTokens = [`{1:${chosenElementId}}`];
   }
 
   // ── Terra's grenade perk system ─────────────────────────────────────────────────────────────
@@ -1096,17 +1221,29 @@ export function generateModdedWeapon(
   // Elemental code swaps produce entirely new visuals — only the 245 block drives the visual.
   // Falls back to hardcoded Terra pattern when no recipes are provided.
   const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
+  // Map universal element override ID (56-60) to grenade element ID (24-28)
+  // 56=Shock→28, 57=Radiation→27, 58=Corrosive→24, 59=Cryo→25, 60=Fire→26
+  const ELEMENT_TO_GRENADE: Record<number, number> = { 56: 28, 57: 27, 58: 24, 59: 25, 60: 26 };
+  const grenadeElementId = ELEMENT_TO_GRENADE[chosenElementId] ?? 24;
   // Recipe n values are the STABLE baseline. Effects are multiplicative so op/insane multiply up significantly.
   const scaleForMode = { stable: 1.0, op: 1.5, insane: 2.0 }[modPowerMode];
   // Perks that CRASH the game above a certain stack count — hard cap regardless of mode.
   // 73 = Expansive, 76 = Nuke — both crash above 5 stacks.
   const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
   // IDs forbidden from the {245:[...]} block on weapons — NEVER include these regardless of source.
-  // 1–20  = grenade firmware parts (item-specific, not weapon perks — belong only on grenade gadgets).
+  // Most firmware IDs (1–20) are blocked, EXCEPT the 5 whitelisted ones below.
   // 70    = Overflow  (increases grenade charge count — meaningless/harmful on a weapon).
   // 71    = Express   (reduces grenade cooldown — meaningless/harmful on a weapon).
   // 87,88 = additional grenade firmware IDs.
-  const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,70,71,87,88]);
+  // Whitelisted firmware: 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
+  const GRENADE_245_FIRMWARE_WHITELIST = [5, 6, 10, 17, 20];
+  const GRENADE_245_FORBIDDEN = new Set(
+    [1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,70,71,87,88],
+  );
+  // Pick ONE whitelisted firmware per gun, stacked 1-3× (max 3), prepended to the {245:[...]} block.
+  const firmwarePerkId = isClaudeGun ? 10 : pick(GRENADE_245_FIRMWARE_WHITELIST);  // Claude's Gun: Deadeye
+  const firmwareStackCount = isClaudeGun ? 3 : randInt(1, 3);  // Claude's Gun: max stacks
+  const firmwarePerkIds: number[] = Array(firmwareStackCount).fill(firmwarePerkId);
   const rawList = options.grenadeVisualRecipes ?? [];
   const recipes = rawList.filter((r) => {
     const g = (r as { groups?: unknown[]; group?: unknown }).groups ?? (r as { group?: unknown }).group;
@@ -1114,42 +1251,126 @@ export function generateModdedWeapon(
     return groups.length > 0;
   });
   let terraGrenadePerkBlock: string;
-  if (recipes.length > 0) {
+  // ── Claude's Gun: "Thought Storm" grenade recipe ──────────────────────────────────────
+  // Singularity core pulls enemies → Lingering radiation beams cook them → Artillery fires outward.
+  // Two 245 groups: vortex setup, then payload. Signature visual: purple radiation vortex with
+  // spinning beams and bullet streams firing from the center. Deadeye firmware (10×3) prepended.
+  if (isClaudeGun) {
+    const claudeScale = { stable: 1.0, op: 1.8, insane: 2.5 }[modPowerMode];
+    const s = (n: number) => Math.max(1, Math.round(n * claudeScale * randFloat(0.9, 1.1)));
+    const group1Ids = [
+      27,                              // Radiation element anchor
+      ...Array(s(20)).fill(33),   // Singularity dominant
+      ...Array(s(12)).fill(60),   // Collapsing — maximum pull
+      ...Array(s(8)).fill(46),    // Pulling — each child gets singularity
+      ...Array(s(6)).fill(29),    // MIRV — splits into vortex children
+      ...Array(s(3)).fill(40),    // Tightly Packed — extra MIRV count
+      ...Array(s(5)).fill(59),    // Gnawing — DOT in the vortex
+    ];
+    const group2Ids = [
+      ...firmwarePerkIds,           // Deadeye ×3
+      ...Array(s(20)).fill(34),   // Lingering beams — radiation spin
+      ...Array(s(8)).fill(21),    // Duration — beams last longer
+      ...Array(s(5)).fill(63),    // Pulsing — elemental waves
+      ...Array(s(15)).fill(32),   // Artillery — bullets from center
+      ...Array(s(8)).fill(53),    // Artillery Duration
+      ...Array(s(4)).fill(55),    // Missiles — homing from artillery
+      ...Array(s(4)).fill(65),    // Fracture — radiation pillars
+      ...Array(s(15)).fill(72),   // Explosive — damage amp
+      ...Array(Math.min(5, s(5))).fill(73),  // Expansive (hard cap 5)
+      ...Array(s(4)).fill(69),    // Penetrator — crits on pulled targets
+      ...Array(s(4)).fill(39),    // Damage Amp
+      ...Array(s(4)).fill(74),    // Hazardous — status stacking
+      ...Array(s(3)).fill(79),    // Merciless — crit damage
+    ];
+    // Cap total to 300 IDs
+    const allClaudeIds = [...group1Ids, ...group2Ids].slice(0, 300);
+    const splitAt = group1Ids.length > 150 ? 150 : group1Ids.length;
+    terraGrenadePerkBlock = `{245:[${allClaudeIds.slice(0, splitAt).join(" ")}]} {245:[${allClaudeIds.slice(splitAt).join(" ")}]}`;
+  } else if (recipes.length > 0) {
     // Enforce grenade recipes: keep trying until we get at least one non-empty token.
     const remaining = [...recipes];
     let chosenTokens: string[] = [];
+    let chosenRecipe: GrenadeVisualRecipe | null = null;
     while (remaining.length > 0 && chosenTokens.length === 0) {
       const idx = Math.floor(Math.random() * remaining.length);
       const recipe = remaining[idx]!;
       remaining.splice(idx, 1);
       const recipeGroups: GrenadeVisualRecipeGroup[] = Array.isArray(recipe.groups) ? recipe.groups : [];
-      const groupTokens = recipeGroups.map((group) => {
+      // Cap total grenade perk IDs at 300 to stay within game's decoded string limit.
+      // Multi-group recipes (e.g. Ride the Lightning with 19 groups) can exceed this easily.
+      const MAX_GRENADE_PERK_IDS = 300;
+      let totalIds = 0;
+      const groupTokens: (string | null)[] = [];
+      for (const group of recipeGroups) {
+        if (totalIds >= MAX_GRENADE_PERK_IDS) break;
         const entries = group.entries ?? [];
         const ids: number[] = [];
         for (const entry of entries) {
-          if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
+          // Swap grenade element anchors (24-28) to match the gun's chosen element
+          const entryId = [24, 25, 26, 27, 28].includes(entry.id) ? grenadeElementId : entry.id;
+          if (GRENADE_245_FORBIDDEN.has(entryId)) continue;
+          if (totalIds + ids.length >= MAX_GRENADE_PERK_IDS) break;
           const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
-          const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
-            ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
+          const count = GRENADE_PERK_HARD_CAP[entryId] !== undefined
+            ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entryId])
             : rawCount;
-          for (let i = 0; i < count; i++) ids.push(entry.id);
+          const remaining = MAX_GRENADE_PERK_IDS - totalIds - ids.length;
+          const capped = Math.min(count, remaining);
+          for (let i = 0; i < capped; i++) ids.push(entryId);
         }
-        return ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null;
-      }).filter((t): t is string => t !== null);
-      if (groupTokens.length > 0 && groupTokens.join(" ").trim().length > 0) chosenTokens = groupTokens;
+        totalIds += ids.length;
+        groupTokens.push(ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null);
+      }
+      const validTokens = groupTokens.filter((t): t is string => t !== null);
+      if (validTokens.length > 0 && validTokens.join(" ").trim().length > 0) {
+        chosenTokens = validTokens;
+        chosenRecipe = recipe;
+      }
     }
     if (chosenTokens.length > 0) {
+      // Inject whitelisted firmware into the first recipe token
+      const firstToken = chosenTokens[0];
+      const fwInject = firmwarePerkIds.join(" ");
+      chosenTokens[0] = firstToken.replace("{245:[", `{245:[${fwInject} `);
+
+      // Append style-matched complementary perks to the LAST token (preserves recipe sequence)
+      // MIRV perks (29,40,41,42,43) included in ALL styles — MIRV goes with everything
+      const MIRV_POOL = [29, 40, 41, 42, 43];
+      const STYLE_COMPLEMENTS: Record<string, number[]> = {
+        lingering:    [21, 62, 63, 64, 65, 34, 35, 36, 37, 38, ...MIRV_POOL],  // Duration, Pulsing, Splat Pack, Fracture, element variants + MIRV
+        singularity:  [33, 46, 58, 59, 60, 61, ...MIRV_POOL],                    // Pull, Prolonged, Gnawing, Collapsing, Repulsor + MIRV
+        artillery:    [32, 53, 54, 55, 57, ...MIRV_POOL],                         // Artillery, Duration, Ricochet, Missiles, Mortar + MIRV
+        mirv:         [29, 40, 41, 42, 43, 22, 30, 44, 45, 47],                  // MIRV chain + Spawning, Divider, Long Division, Splinter, Repeater
+        hybrid:       [29, 40, 42, 69, 39, 72, 74],                               // MIRV core + Penetrator, Damage Amp, Explosive, Hazardous
+      };
+      const recipeStyle = chosenRecipe?.style?.toLowerCase() ?? "";
+      const stylePool = STYLE_COMPLEMENTS[recipeStyle];
+      if (stylePool && stylePool.length > 0) {
+        const complementCount = { stable: randInt(2, 4), op: randInt(3, 6), insane: randInt(4, 8) }[modPowerMode];
+        const shuffled = [...stylePool].sort(() => Math.random() - 0.5);
+        const chosen = shuffled.slice(0, Math.min(complementCount, shuffled.length));
+        const complementStacks = chosen.flatMap((id) => {
+          const stackSize = Math.max(1, Math.round(randInt(3, 8) * scaleForMode));
+          return Array(stackSize).fill(id);
+        });
+        // Append to last token — after the recipe sequence
+        const lastIdx = chosenTokens.length - 1;
+        chosenTokens[lastIdx] = chosenTokens[lastIdx]!.replace(/\]\}$/, ` ${complementStacks.join(" ")}]}`);
+      }
+
       terraGrenadePerkBlock = chosenTokens.join(" ");
     } else {
       const baseHeavyStack = { stable: randInt(6, 8), op: randInt(8, 9), insane: 10 }[modPowerMode];
       const dominantStack  = { stable: randInt(16, 24), op: randInt(23, 35), insane: randInt(30, 45) }[modPowerMode];
       const heavyStack2    = { stable: randInt(10, 16), op: randInt(14, 22), insane: randInt(18, 28) }[modPowerMode];
       const terraPerkIds: number[] = [
+        ...firmwarePerkIds,
         ...Array(dominantStack).fill(72),
         ...Array(heavyStack2).fill(39),
         ...Array(heavyStack2).fill(75),
         ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap((id) => Array(baseHeavyStack).fill(id)),
-        24, 40, 53, 62, 66, 76,
+        grenadeElementId, 40, 53, 62, 66, 76,
         77, 21,
       ].filter((id) => !GRENADE_245_FORBIDDEN.has(id));
       terraGrenadePerkBlock = `{245:[${terraPerkIds.join(" ")}]}`;
@@ -1160,6 +1381,7 @@ export function generateModdedWeapon(
     const dominantStack  = { stable: randInt(16, 24), op: randInt(23, 35), insane: randInt(30, 45) }[modPowerMode];
     const heavyStack2    = { stable: randInt(10, 16), op: randInt(14, 22), insane: randInt(18, 28) }[modPowerMode];
     const terraPerkIds: number[] = [
+      ...firmwarePerkIds,
       ...Array(dominantStack).fill(72),
       ...Array(heavyStack2).fill(39),
       ...Array(heavyStack2).fill(75),
@@ -1174,21 +1396,12 @@ export function generateModdedWeapon(
   const torgueGrenadeAnchor = "{298:11}";
   const vladofGrenadeAnchor = "{291:8}";
 
-  // Optional legendary grenade wrap (if provided by UI) — placed around the perk block for grenade reload.
-  const legendaryGrenades = options.legendaryGrenadeEntries?.filter(
-    (e) => e?.code && /^\s*\{\s*\d+\s*:\s*\d+\s*\}\s*$/.test(String(e.code).trim()),
-  ) ?? [];
-  const grenadeCode = legendaryGrenades.length > 0 ? pick(legendaryGrenades).code.trim() : "";
-
-  // Grenade system: {298:11} Torgue anchor always precedes {245:[...]} (Terra's perfect gun pattern).
-  // {291:8} waterfall wrapper goes around {245:[...]} for grenade-reload mode.
-  // Extra legendary grenade wraps outside if provided by UI.
+  // Grenade system: {298:11} Torgue anchor + {291:8} Vladof waterfall wrap the {245:[...]} perk block.
+  // No extra legendary grenade wrapper — Torgue + Vladof anchors are sufficient.
   const grenadeParts: string[] =
     options.specialMode === "inf-ammo"
       ? []
-      : grenadeCode
-        ? [grenadeCode, torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor, grenadeCode]
-        : [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor];
+      : [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor];
 
   const finalGrenadeParts = grenadeParts;
 
@@ -1210,54 +1423,69 @@ export function generateModdedWeapon(
   const pearlRarityPool = ["{11:82}", "{25:82}"];
   const pearlRarityToken = pick(pearlRarityPool);
 
-  // Extreme same-prefix stacking — Terra's pattern: THREE separate groups, each a different part ID ×25.
-  // e.g. {20:[80×25]} {20:[84×25]} {20:[81×25]}. Picks 3 unique barrel/body acc parts from own prefix.
-  const extremeStackPartPool = weaponRows.filter(
-    (r) => norm(r.partType) === "barrel accessory" || norm(r.partType) === "body accessory",
-  );
-  const extremeStackCount = { stable: randInt(15, 20), op: randInt(18, 24), insane: randInt(20, 28) }[modPowerMode];
-  const extremeSamePrefixStack = (() => {
-    if (!extremeStackPartPool.length) return [];
-    const shuffled = [...extremeStackPartPool].sort(() => Math.random() - 0.5);
-    const chosen = shuffled.slice(0, Math.min(3, shuffled.length));
-    return chosen.map((r) =>
-      groupedToken(headerPrefix, Array(extremeStackCount).fill(Number(r.partId))),
-    );
-  })();
-
-
-  // Body ×10 stacking — Terra repeats the body token 10 times for reinforcement.
-  const bodyRepeatTokens = bodyToken ? Array(10).fill(bodyToken) : [];
+  // Removed: extreme same-prefix stacking (3 parts ×25 each) and body ×10 repeats.
+  // Terra's actual guns don't use these — they bloat the code without synergy.
+  // The visual barrel is already stacked 2-4×, and heavy barrel accessories provide
+  // the projectile-behavior enhancements that matter.
+  const extremeSamePrefixStack: string[] = [];
+  const bodyRepeatTokens: string[] = [];
 
   // {292:[9×10]} Tediore Enhancement "Divider" — Terra confirmed: always exactly 10 stacks on every gun.
   const dividerStacks = [groupedToken(292, Array(10).fill(9))];
 
-  // Elemental override codes — confirmed from DB: {1:56-60} = shock/radiation/corrosive/cryo/fire overrides.
-  // {1:55} kinetic intentionally omitted — kinetic = plain white ammo, no visual.
-  // Randomised per gun: shuffle pool, pick 1-3 unique elements so each gun has a distinct elemental identity.
-  const extendedElementTokens = (() => {
-    const pool = [56, 57, 58, 59, 60].sort(() => Math.random() - 0.5);
-    const count = randInt(1, 3);
-    return pool.slice(0, count).map((id) => `{1:${id}}`);
+  // Elemental override — EVERY gun gets exactly ONE non-kinetic element.
+  // chosenElementId is defined early (before altFireTokens) so both can reference it.
+  const extendedElementTokens = [`{1:${chosenElementId}}`];
+
+  // ── STOCK BASE ──────────────────────────────────────────────────────────────────────────
+  // When stockBaseDecoded is provided (from auto-fill), use it as the complete stock weapon.
+  // This guarantees all required slots are filled → 100% spawn rate.
+  // Otherwise fall back to hand-building (legacy path).
+  const stockBaseParts: string[] = (() => {
+    if (options.stockBaseDecoded) {
+      // Parse the parts section from the decoded string: "prefix, ...|| PARTS |"
+      const partsMatch = options.stockBaseDecoded.match(/\|\|\s*(.+?)\s*\|/);
+      if (partsMatch?.[1]) {
+        // Parse tokens and convert simple {xx} to explicit {prefix:xx} to avoid ambiguity.
+        // Without this, {1} could be misread as elemental prefix 1 instead of "part 1 of this weapon."
+        const parsed = parseComponentString(partsMatch[1].trim());
+        return parsed
+          .filter((c) => typeof c !== "string")
+          .map((c) => {
+            if (typeof c === "string") return c;
+            // Simple tokens like {42} → convert to {headerPrefix:42}
+            if (c.type === "simple") return `{${headerPrefix}:${c.id}}`;
+            // Everything else (grouped, cross-prefix) stays as-is
+            return c.raw;
+          });
+      }
+    }
+    // Legacy fallback: hand-build stock base (magazineToken added separately in assembly)
+    return [
+      firstRarityCode,
+      bodyToken,
+      ...bodyAccessoryStack,
+      primaryBarrelToken,
+      ...barrelAccessoryStack,
+      ...(gripToken ? [gripToken] : []),
+      ...(scopeToken ? [scopeToken] : []),
+      ...manufacturerTokens,
+    ];
   })();
 
   const allNewParts = [
     // ── Pearl rarity FIRST — rarity = first token wins (Rule 11) ──
     pearlRarityToken,
+    // ── Visual barrel BEFORE stock base — game reads left-to-right, leftmost barrel sets the visual ──
+    ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
     // ── Extended elements early — Terra places these right after Pearl rarity ──
     ...extendedElementTokens,
-    // ── Stock base ──
-    firstRarityCode,
-    bodyToken,
-    ...bodyAccessoryStack,
-    // Visual barrel MUST come before primaryBarrelToken — game reads left-to-right, leftmost barrel sets the visual.
-    ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
-    primaryBarrelToken,
-    ...barrelAccessoryStack,
+    // ── Stock base (from auto-fill or hand-built) — all required slots filled ──
+    ...stockBaseParts,
+    // Vladof 50-round stacked magazine — ammo capacity mod on top of stock mag
     magazineToken,
-    ...(gripToken ? [gripToken] : []),
-    ...(scopeToken ? [scopeToken] : []),
-    ...manufacturerTokens,
+    // Heavy barrel accessories on ALL guns (MIRV, Two-Shot, Triple Barrel, etc.)
+    ...heavyBarrelAccessoryTokens,
 
     // ── Modded additions ──
     ...altFireTokens,
@@ -1299,10 +1527,10 @@ export function generateModdedWeapon(
     "{11:75}",                                               // Terra: enables flight — every gun, near end
     // Terra grenade perk block — always present, drives visual effects
     ...finalGrenadeParts,
-    // Foregrip → underbarrel accessories → underbarrel (underbarrel must be last modded part).
-    ...(foregripToken ? [foregripToken] : []),
-    ...underbarrelAccessoryStack,
-    ...(underbarrelToken ? [underbarrelToken] : []),
+    // Foregrip → underbarrel — only from legacy path (auto-fill stock base already includes these)
+    ...(options.stockBaseDecoded ? [] : foregripToken ? [foregripToken] : []),
+    ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
+    ...(options.stockBaseDecoded ? [] : underbarrelToken ? [underbarrelToken] : []),
 
     // stockMagToken removed — was causing COV magazines to override Vladof mag (game uses last mag token).
   ];
@@ -1369,16 +1597,18 @@ export function generateModdedWeapon(
   const baseDamagePerShot = barrelStats.damage * barrelStats.pellets;
   const baseFireRate = barrelStats.fireRate;
   const baseDps = baseDamagePerShot * baseFireRate;
-  // Per Mobalytics formula: all gun-part bonuses are additive into Soup, crits add into Soup at crit rate.
-  // Assumes 3% per +Damage stack, 3% per +Crit stack at 30% crit rate, 2% per +FireRate stack.
-  const soupMultiplier = 1 + (dmgStackCount * 0.03) + (critStackCount * 0.03 * 0.30);
-  const frMultiplier = 1 + (frStackCount * 0.02);
-  const estimatedDps = baseDps * soupMultiplier * frMultiplier;
+  // Multiplicative compounding — each stack multiplies on top of previous ones.
+  // Calibrated from in-game data: 9% per +Dmg, 3% per +Crit at 30% rate, 5% per +FR.
+  // Example: 62 dmg + 7 crit + 47 FR → estimated 9.46M vs actual 9.63M (98% accuracy).
+  const dmgMultiplier = Math.pow(1.09, dmgStackCount);
+  const critMultiplier = Math.pow(1 + 0.03 * 0.30, critStackCount);
+  const frMultiplier = Math.pow(1.05, frStackCount);
+  const estimatedDps = baseDps * dmgMultiplier * critMultiplier * frMultiplier;
 
   return {
     code: updatedDecoded,
     dps: {
-      barrelName: barrelStats.name,
+      barrelName: isClaudeGun ? "Claude's Convergence" : barrelStats.name,
       baseDamagePerShot,
       baseFireRate,
       baseDps,
@@ -1387,5 +1617,6 @@ export function generateModdedWeapon(
       fireRateStackCount: frStackCount,
       estimatedDps,
     },
+    ...(isClaudeGun ? { isClaudeGun: true } : {}),
   };
 }

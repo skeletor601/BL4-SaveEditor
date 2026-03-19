@@ -13,12 +13,15 @@ import BetaPage from "@/pages/BetaPage";
 import UnifiedItemBuilderPage from "@/pages/beta/UnifiedItemBuilderPage";
 import SaveComparisonPage from "@/pages/SaveComparisonPage";
 import CommunityVaultPage from "@/pages/CommunityVaultPage";
+import TestAppPage from "@/pages/TestAppPage";
+import TerraLabPage from "@/pages/TerraLabPage";
 
 function AppRoutes() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<TestAppPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/beta" element={<BetaPage />} />
         <Route path="/beta/unified-item-builder" element={<UnifiedItemBuilderPage />} />
         <Route path="/character" element={<Navigate to="/character/select-save" replace />} />
@@ -73,6 +76,8 @@ function AppRoutes() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/save-compare" element={<SaveComparisonPage />} />
         <Route path="/community" element={<CommunityVaultPage />} />
+        <Route path="/test-app" element={<TestAppPage />} />
+        <Route path="/terra" element={<TerraLabPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />
       </Routes>

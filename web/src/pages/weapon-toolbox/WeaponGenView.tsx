@@ -595,14 +595,15 @@ export default function WeaponGenView({
     setMessage(null);
     try {
       const base = window.location.origin || "";
+      const dataPath = typeof import.meta.env?.BASE_URL === "string" ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
       const [editRes, partsRes, visualBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
         fetchApi("weapon-edit/data"),
         fetchApi("parts/data"),
-        fetch(`${base}/data/visual_heavy_barrels.json`).catch(() => null),
-        fetch(`${base}/data/allowed_underbarrels.json`).catch(() => null),
-        fetch(`${base}/data/desirable_underbarrels.json`).catch(() => null),
-        fetch(`${base}/data/legendary_grenades.json`).catch(() => null),
-        fetch(`${base}/data/grenade_visual_recipes.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/visual_heavy_barrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/allowed_underbarrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/desirable_underbarrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/legendary_grenades.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/grenade_visual_recipes.json`).catch(() => null),
       ]);
       const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
       if (!editData?.parts?.length) { setMessage("Weapon edit data failed to load. Try again."); return; }
@@ -634,7 +635,16 @@ export default function WeaponGenView({
       const underbarrelsPayload = underbarrelsRes?.ok ? await underbarrelsRes.json().catch(() => null) : null;
       const desirableUnderbarrelEntries = underbarrelsPayload?.parts?.length > 0 ? underbarrelsPayload : Array.isArray(underbarrelsPayload) && underbarrelsPayload.length > 0 ? underbarrelsPayload : undefined;
       const legendaryGrenadeEntries = legendaryGrenadesRes?.ok ? ((await legendaryGrenadesRes.json().catch(() => [])) as Array<{ name: string; code: string }>) : [];
-      const grenadeVisualRecipes = visualRecipesRes?.ok ? ((await visualRecipesRes.json().catch(() => [])) as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[]) : [];
+      const grenadeVisualRecipesRaw = visualRecipesRes?.ok ? await visualRecipesRes.json().catch(() => null) : null;
+      const grenadeVisualRecipes = (() => {
+        if (grenadeVisualRecipesRaw == null) return [];
+        if (Array.isArray(grenadeVisualRecipesRaw)) return grenadeVisualRecipesRaw as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[];
+        if (typeof grenadeVisualRecipesRaw === "object") {
+          const arr = (grenadeVisualRecipesRaw as Record<string, unknown>).recipes ?? (grenadeVisualRecipesRaw as Record<string, unknown>).items ?? (grenadeVisualRecipesRaw as Record<string, unknown>).data;
+          if (Array.isArray(arr)) return arr as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[];
+        }
+        return [];
+      })();
       const nonChristmasSkins = (data?.skins ?? []).filter((s) => !/christmas/i.test(s.label) && !/christmas/i.test(s.value));
       const lvl = /^\d+$/.test(level) ? Number(level) : 50;
       const { code: decoded } = generateModdedWeapon(editData, universalPartCodes, {

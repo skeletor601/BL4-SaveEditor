@@ -12,11 +12,15 @@ const nav = [
   { to: "/settings", label: "Settings" },
 ];
 
+// Routes that use the new sidebar layout — show minimal header instead of full nav
+const MINIMAL_HEADER_ROUTES = ["/beta/unified-item-builder", "/test-app", "/terra"];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { theme, setTheme, themeConfig } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const overlay = themeConfig.bgOverlay;
+  const useMinimalHeader = MINIMAL_HEADER_ROUTES.some((r) => location.pathname.startsWith(r));
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -40,6 +44,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between min-h-[44px] h-14">
+          {useMinimalHeader ? (
+            <div className="flex items-center gap-4 w-full">
+              <Link to="/" className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <span>←</span>
+                <span className="font-semibold text-[var(--color-text)]">BL4 AIO</span>
+              </Link>
+              <span className="text-[10px] font-mono tracking-widest text-[var(--color-accent)]/50 hidden sm:inline">
+                {location.pathname.includes("unified") ? "GEAR LAB" : location.pathname.includes("terra") ? "TERRA LAB" : ""}
+              </span>
+            </div>
+          ) : (
           <div className="flex items-center gap-4">
             <button
               type="button"
@@ -55,7 +70,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               BL4 AIO Save Editor
             </Link>
           </div>
-          <nav className="hidden md:flex items-center gap-2">
+          )}
+          <nav className={`hidden md:flex items-center gap-2 ${useMinimalHeader ? "!hidden" : ""}`}>
             {nav.map(({ to, label }) => (
               <Link
                 key={to}

@@ -6,23 +6,66 @@
     "groups": [
       {
         "entries": [
-          {"id": 6,  "n": 1},
-          {"id": 24, "n": 1},
-          {"id": 23, "n": 1},
-          {"id": 43, "n": 23},
-          {"id": 34, "n": 23},
-          {"id": 72, "n": 130},
-          {"id": 39, "n": 1},
-          {"id": 69, "n": 1},
-          {"id": 78, "n": 1},
-          {"id": 5,  "n": 1},
-          {"id": 40, "n": 1},
-          {"id": 44, "n": 1},
-          {"id": 46, "n": 1},
-          {"id": 57, "n": 1}
+          {
+            "id": 6,
+            "n": 1
+          },
+          {
+            "id": 24,
+            "n": 1
+          },
+          {
+            "id": 23,
+            "n": 1
+          },
+          {
+            "id": 43,
+            "n": 23
+          },
+          {
+            "id": 34,
+            "n": 23
+          },
+          {
+            "id": 72,
+            "n": 130
+          },
+          {
+            "id": 39,
+            "n": 1
+          },
+          {
+            "id": 69,
+            "n": 1
+          },
+          {
+            "id": 78,
+            "n": 1
+          },
+          {
+            "id": 5,
+            "n": 1
+          },
+          {
+            "id": 40,
+            "n": 1
+          },
+          {
+            "id": 44,
+            "n": 1
+          },
+          {
+            "id": 46,
+            "n": 1
+          },
+          {
+            "id": 57,
+            "n": 1
+          }
         ]
       }
-    ]
+    ],
+    "style": "hybrid"
   },
   {
     "id": "white-tornado",
@@ -31,43 +74,202 @@
     "groups": [
       {
         "entries": [
-          {"id": 17, "n": 1},
-          {"id": 25, "n": 1},
-          {"id": 26, "n": 1},
-          {"id": 27, "n": 1},
-          {"id": 34, "n": 10},
-          {"id": 40, "n": 6},
-          {"id": 44, "n": 3},
-          {"id": 65, "n": 5}
+          {
+            "id": 17,
+            "n": 1
+          },
+          {
+            "id": 25,
+            "n": 1
+          },
+          {
+            "id": 26,
+            "n": 1
+          },
+          {
+            "id": 27,
+            "n": 1
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 6
+          },
+          {
+            "id": 44,
+            "n": 3
+          },
+          {
+            "id": 65,
+            "n": 5
+          }
         ]
       }
-    ]
+    ],
+    "style": "lingering"
   },
   {
     "id": "ride-the-lightning",
     "label": "Ride the Lightning",
     "notes": "Massive white/blue lightning columns filling entire screen, multiple branching bolts upward. Each group is a separate 245 token. Shock-themed.",
     "groups": [
-      {"entries": [{"id": 28, "n": 1}]},
-      {"entries": [{"id": 30, "n": 25}]},
-      {"entries": [{"id": 33, "n": 25}]},
-      {"entries": [{"id": 73, "n": 5}]},
-      {"entries": [{"id": 72, "n": 100}]},
-      {"entries": [{"id": 71, "n": 100}]},
-      {"entries": [{"id": 74, "n": 100}]},
-      {"entries": [{"id": 70, "n": 100}]},
-      {"entries": [{"id": 60, "n": 15}]},
-      {"entries": [{"id": 59, "n": 15}]},
-      {"entries": [{"id": 44, "n": 15}]},
-      {"entries": [{"id": 58, "n": 15}]},
-      {"entries": [{"id": 46, "n": 15}]},
-      {"entries": [{"id": 63, "n": 15}]},
-      {"entries": [{"id": 61, "n": 15}]},
-      {"entries": [{"id": 47, "n": 15}]},
-      {"entries": [{"id": 22, "n": 15}]},
-      {"entries": [{"id": 40, "n": 25}]},
-      {"entries": [{"id": 5,  "n": 1}]}
-    ]
+      {
+        "entries": [
+          {
+            "id": 28,
+            "n": 1
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 30,
+            "n": 25
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 25
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 71,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 74,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 70,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 60,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 59,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 44,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 58,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 46,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 63,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 61,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 47,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 22,
+            "n": 15
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 40,
+            "n": 25
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 5,
+            "n": 1
+          }
+        ]
+      }
+    ],
+    "style": "singularity"
   },
   {
     "id": "green-spinner",
@@ -76,28 +278,102 @@
     "groups": [
       {
         "entries": [
-          {"id": 6,  "n": 3},
-          {"id": 24, "n": 1},
-          {"id": 23, "n": 5},
-          {"id": 34, "n": 18},
-          {"id": 72, "n": 100},
-          {"id": 24, "n": 8},
-          {"id": 39, "n": 7},
-          {"id": 69, "n": 2},
-          {"id": 78, "n": 9},
-          {"id": 5,  "n": 5},
-          {"id": 40, "n": 5},
-          {"id": 44, "n": 5},
-          {"id": 46, "n": 4},
-          {"id": 5,  "n": 5},
-          {"id": 57, "n": 5}
+          {
+            "id": 6,
+            "n": 3
+          },
+          {
+            "id": 24,
+            "n": 1
+          },
+          {
+            "id": 23,
+            "n": 5
+          },
+          {
+            "id": 34,
+            "n": 18
+          },
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 24,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 7
+          },
+          {
+            "id": 69,
+            "n": 2
+          },
+          {
+            "id": 78,
+            "n": 9
+          },
+          {
+            "id": 5,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 5
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 46,
+            "n": 4
+          },
+          {
+            "id": 5,
+            "n": 5
+          },
+          {
+            "id": 57,
+            "n": 5
+          }
         ]
       },
-      {"entries": [{"id": 73, "n": 5}]},
-      {"entries": [{"id": 71, "n": 100}]},
-      {"entries": [{"id": 72, "n": 100}]},
-      {"entries": [{"id": 70, "n": 100}]}
-    ]
+      {
+        "entries": [
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 71,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 100
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 70,
+            "n": 100
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
   },
   {
     "id": "the-swarm",
@@ -106,28 +382,86 @@
     "groups": [
       {
         "entries": [
-          {"id": 6,  "n": 5},
-          {"id": 24, "n": 2},
-          {"id": 23, "n": 8},
-          {"id": 34, "n": 39},
-          {"id": 72, "n": 164},
-          {"id": 24, "n": 13},
-          {"id": 39, "n": 16},
-          {"id": 69, "n": 5},
-          {"id": 78, "n": 15},
-          {"id": 5,  "n": 11},
-          {"id": 40, "n": 10},
-          {"id": 44, "n": 12},
-          {"id": 46, "n": 9},
-          {"id": 5,  "n": 8},
-          {"id": 57, "n": 11},
-          {"id": 73, "n": 5},
-          {"id": 71, "n": 190},
-          {"id": 72, "n": 215},
-          {"id": 70, "n": 203}
+          {
+            "id": 6,
+            "n": 5
+          },
+          {
+            "id": 24,
+            "n": 2
+          },
+          {
+            "id": 23,
+            "n": 8
+          },
+          {
+            "id": 34,
+            "n": 39
+          },
+          {
+            "id": 72,
+            "n": 164
+          },
+          {
+            "id": 24,
+            "n": 13
+          },
+          {
+            "id": 39,
+            "n": 16
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 15
+          },
+          {
+            "id": 5,
+            "n": 11
+          },
+          {
+            "id": 40,
+            "n": 10
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 46,
+            "n": 9
+          },
+          {
+            "id": 5,
+            "n": 8
+          },
+          {
+            "id": 57,
+            "n": 11
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 71,
+            "n": 190
+          },
+          {
+            "id": 72,
+            "n": 215
+          },
+          {
+            "id": 70,
+            "n": 203
+          }
         ]
       }
-    ]
+    ],
+    "style": "lingering"
   },
   {
     "id": "spinning-monster",
@@ -136,30 +470,94 @@
     "groups": [
       {
         "entries": [
-          {"id": 24, "n": 1},
-          {"id": 39, "n": 25},
-          {"id": 30, "n": 5},
-          {"id": 34, "n": 5},
-          {"id": 66, "n": 25},
-          {"id": 21, "n": 1},
-          {"id": 65, "n": 5},
-          {"id": 62, "n": 1},
-          {"id": 44, "n": 5},
-          {"id": 69, "n": 5},
-          {"id": 63, "n": 10},
-          {"id": 64, "n": 10},
-          {"id": 45, "n": 10},
-          {"id": 40, "n": 5},
-          {"id": 10, "n": 1},
-          {"id": 78, "n": 10},
-          {"id": 77, "n": 1},
-          {"id": 75, "n": 15},
-          {"id": 72, "n": 45},
-          {"id": 73, "n": 10},
-          {"id": 79, "n": 19}
+          {
+            "id": 24,
+            "n": 1
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 34,
+            "n": 5
+          },
+          {
+            "id": 66,
+            "n": 25
+          },
+          {
+            "id": 21,
+            "n": 1
+          },
+          {
+            "id": 65,
+            "n": 5
+          },
+          {
+            "id": 62,
+            "n": 1
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 63,
+            "n": 10
+          },
+          {
+            "id": 64,
+            "n": 10
+          },
+          {
+            "id": 45,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 5
+          },
+          {
+            "id": 10,
+            "n": 1
+          },
+          {
+            "id": 78,
+            "n": 10
+          },
+          {
+            "id": 77,
+            "n": 1
+          },
+          {
+            "id": 75,
+            "n": 15
+          },
+          {
+            "id": 72,
+            "n": 45
+          },
+          {
+            "id": 73,
+            "n": 10
+          },
+          {
+            "id": 79,
+            "n": 19
+          }
         ]
       }
-    ]
+    ],
+    "style": "lingering"
   },
   {
     "id": "dancing-stars",
@@ -168,22 +566,1113 @@
     "groups": [
       {
         "entries": [
-          {"id": 23, "n": 1},
-          {"id": 43, "n": 9},
-          {"id": 34, "n": 8},
-          {"id": 72, "n": 85},
-          {"id": 24, "n": 1},
-          {"id": 39, "n": 1},
-          {"id": 69, "n": 1},
-          {"id": 78, "n": 1},
-          {"id": 5,  "n": 1},
-          {"id": 40, "n": 1},
-          {"id": 44, "n": 5},
-          {"id": 46, "n": 1},
-          {"id": 5,  "n": 1},
-          {"id": 57, "n": 1}
+          {
+            "id": 23,
+            "n": 1
+          },
+          {
+            "id": 43,
+            "n": 9
+          },
+          {
+            "id": 34,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 85
+          },
+          {
+            "id": 24,
+            "n": 1
+          },
+          {
+            "id": 39,
+            "n": 1
+          },
+          {
+            "id": 69,
+            "n": 1
+          },
+          {
+            "id": 78,
+            "n": 1
+          },
+          {
+            "id": 40,
+            "n": 1
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 46,
+            "n": 1
+          },
+          {
+            "id": 57,
+            "n": 1
+          }
         ]
       }
-    ]
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "singularity-storm",
+    "label": "Singularity Storm",
+    "notes": "Singularity-focused: massive pull vortex with MIRV spawns getting sucked in. Singularity (33) dominates, Collapsing (60) strengthens pull, MIRV (29+40) adds projectile chaos inside the vortex. Gnawing (59) for DOT.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 40
+          },
+          {
+            "id": 60,
+            "n": 20
+          },
+          {
+            "id": 58,
+            "n": 15
+          },
+          {
+            "id": 59,
+            "n": 15
+          },
+          {
+            "id": 29,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 6
+          },
+          {
+            "id": 42,
+            "n": 4
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 72,
+            "n": 30
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 66,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "artillery-barrage",
+    "label": "Artillery Barrage",
+    "notes": "Artillery-focused: sustained bullet/missile fire from grenade. Artillery (32) dominant with Duration (53) extending fire time. Missiles (55) and Mortars (57) add homing projectiles. Ricochet (54) makes bullets bounce between enemies. Divider (30+44) spawns extra grenades that also fire.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 32,
+            "n": 35
+          },
+          {
+            "id": 53,
+            "n": 20
+          },
+          {
+            "id": 54,
+            "n": 12
+          },
+          {
+            "id": 55,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 10
+          },
+          {
+            "id": 30,
+            "n": 6
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 69,
+            "n": 4
+          },
+          {
+            "id": 72,
+            "n": 25
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 56,
+            "n": 5
+          },
+          {
+            "id": 75,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "lingering-inferno",
+    "label": "Lingering Inferno",
+    "notes": "Lingering-focused: rotating beams dominate with extended duration. Lingering (34) stacked heavy for multiple overlapping beam sets. Duration (21+62) extends the effect. Pulsing (63) adds elemental waves between beam rotations. Fracture (65) adds pillars. MIRV (29) splits into more lingering sources.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 50
+          },
+          {
+            "id": 21,
+            "n": 15
+          },
+          {
+            "id": 62,
+            "n": 15
+          },
+          {
+            "id": 63,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 64,
+            "n": 6
+          },
+          {
+            "id": 29,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 4
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 66,
+            "n": 4
+          },
+          {
+            "id": 74,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "black-hole",
+    "label": "Black Hole",
+    "notes": "Singularity + Lingering hybrid: singularity pulls enemies into lingering beam zone. Singularity (33) opens with strong pull, then Lingering (34) beams activate inside the vortex. Gnawing (59) DOT stacks on pulled enemies. Repulsor (61) pushes then re-pulls for sustained damage cycling.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 30
+          },
+          {
+            "id": 34,
+            "n": 30
+          },
+          {
+            "id": 60,
+            "n": 15
+          },
+          {
+            "id": 59,
+            "n": 12
+          },
+          {
+            "id": 61,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 10
+          },
+          {
+            "id": 63,
+            "n": 8
+          },
+          {
+            "id": 46,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "rain-of-fire",
+    "label": "Rain of Fire",
+    "notes": "Artillery + MIRV hybrid: artillery grenade fires bullets while MIRV splits spawn more artillery sources. Each MIRV child also fires artillery. Mortar (57) adds top-down bombardment. Spring (31+43) makes grenades bounce in place, firing artillery at each bounce point.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 32,
+            "n": 25
+          },
+          {
+            "id": 29,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 8
+          },
+          {
+            "id": 43,
+            "n": 6
+          },
+          {
+            "id": 53,
+            "n": 15
+          },
+          {
+            "id": 57,
+            "n": 12
+          },
+          {
+            "id": 55,
+            "n": 8
+          },
+          {
+            "id": 31,
+            "n": 4
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "vortex-cannon",
+    "label": "Vortex Cannon",
+    "notes": "Singularity + Artillery hybrid: singularity pulls enemies into a kill zone, then artillery fires into the cluster. Collapsing (60) maximizes pull radius, Artillery (32) with Duration (53) sustains fire into the vortex center. Penetrator (69) ensures bullets hit stacked enemies.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 25
+          },
+          {
+            "id": 32,
+            "n": 25
+          },
+          {
+            "id": 60,
+            "n": 12
+          },
+          {
+            "id": 53,
+            "n": 12
+          },
+          {
+            "id": 54,
+            "n": 8
+          },
+          {
+            "id": 58,
+            "n": 10
+          },
+          {
+            "id": 55,
+            "n": 6
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 46,
+            "n": 6
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 75,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "beam-splitter",
+    "label": "Beam Splitter",
+    "notes": "Lingering + Divider: lingering beams on the main grenade, which divides into multiple child grenades that each spawn their own beam sets. Long Division (44) + Repeater (47) maximize child count. Each child gets its own lingering zone creating a web of overlapping beams.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 35
+          },
+          {
+            "id": 30,
+            "n": 10
+          },
+          {
+            "id": 44,
+            "n": 10
+          },
+          {
+            "id": 47,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 12
+          },
+          {
+            "id": 62,
+            "n": 10
+          },
+          {
+            "id": 63,
+            "n": 8
+          },
+          {
+            "id": 45,
+            "n": 5
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 72,
+            "n": 15
+          },
+          {
+            "id": 74,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "neutron-star",
+    "label": "Neutron Star",
+    "notes": "All three styles combined: Singularity core pulls enemies, Lingering beams cook them, Artillery fires outward. Maximum visual chaos. Each style at moderate stacks so they coexist. Expansive (73) widens the whole effect. Damage Amp (39) debuffs everything caught inside.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 20
+          },
+          {
+            "id": 34,
+            "n": 20
+          },
+          {
+            "id": 32,
+            "n": 20
+          },
+          {
+            "id": 60,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 8
+          },
+          {
+            "id": 53,
+            "n": 8
+          },
+          {
+            "id": 59,
+            "n": 6
+          },
+          {
+            "id": 63,
+            "n": 6
+          },
+          {
+            "id": 55,
+            "n": 6
+          },
+          {
+            "id": 29,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 3
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 66,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "blade-dancer",
+    "label": "Blade Dancer",
+    "notes": "Bouncing Blade (67) as the star — knives ricochet between enemies while Divider (30) and Long Division (44) multiply the grenade count, each spawning more blades. Penetrator (69) ensures crits on sliced targets. Splinter (45) aims child grenades at enemies.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 67,
+            "n": 30
+          },
+          {
+            "id": 30,
+            "n": 10
+          },
+          {
+            "id": 44,
+            "n": 8
+          },
+          {
+            "id": 45,
+            "n": 6
+          },
+          {
+            "id": 69,
+            "n": 8
+          },
+          {
+            "id": 22,
+            "n": 6
+          },
+          {
+            "id": 75,
+            "n": 10
+          },
+          {
+            "id": 79,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 15
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 56,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "gravity-well",
+    "label": "Gravity Well",
+    "notes": "Pure Singularity control build. Collapsing (60) at extreme stacks for maximum pull radius. Multiple singularity sources via MIRV (29) — each child spawns its own singularity (46). Repulsor (61) creates push-pull oscillation. Gnawing (59) DOT on everything trapped.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 50
+          },
+          {
+            "id": 60,
+            "n": 30
+          },
+          {
+            "id": 46,
+            "n": 15
+          },
+          {
+            "id": 29,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 5
+          },
+          {
+            "id": 61,
+            "n": 10
+          },
+          {
+            "id": 59,
+            "n": 15
+          },
+          {
+            "id": 58,
+            "n": 12
+          },
+          {
+            "id": 72,
+            "n": 15
+          },
+          {
+            "id": 39,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "carpet-bomb",
+    "label": "Carpet Bomb",
+    "notes": "Artillery + Spring bounce: grenade bounces in place firing artillery at each point. Tightly Coiled (49) + Apex (50) maximize explosions per bounce. Compounding (51) increases damage with each bounce. Mortar (57) rains down from above while bullets fire horizontally.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 32,
+            "n": 30
+          },
+          {
+            "id": 31,
+            "n": 8
+          },
+          {
+            "id": 49,
+            "n": 6
+          },
+          {
+            "id": 50,
+            "n": 5
+          },
+          {
+            "id": 51,
+            "n": 8
+          },
+          {
+            "id": 53,
+            "n": 15
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 54,
+            "n": 8
+          },
+          {
+            "id": 52,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "elemental-cascade",
+    "label": "Elemental Cascade",
+    "notes": "Lingering with all elemental variants stacked. Each Lingering element (34-38) spawns its own beam color. Pulsing (63) radiates waves between beams. Splat Pack (64) leaves elemental puddles. Alchemic (66) pushes status chance to extreme. Fracture (65) adds pillars in every element.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 20
+          },
+          {
+            "id": 35,
+            "n": 15
+          },
+          {
+            "id": 36,
+            "n": 15
+          },
+          {
+            "id": 37,
+            "n": 15
+          },
+          {
+            "id": 38,
+            "n": 15
+          },
+          {
+            "id": 63,
+            "n": 10
+          },
+          {
+            "id": 64,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 66,
+            "n": 10
+          },
+          {
+            "id": 21,
+            "n": 10
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 15
+          },
+          {
+            "id": 78,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "mirv-madness",
+    "label": "MIRV Madness",
+    "notes": "Pure MIRV chain reaction. MIRV (29) spawns children, Micro MIRV (42) makes those children spawn more, Tightly Packed (40) adds extra per split. Spring MIRV (43) bounces and explodes. Rubberized (41) bounces 5 times. Spawning (22) adds grenades on each bounce. Exponential explosion count.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 29,
+            "n": 15
+          },
+          {
+            "id": 42,
+            "n": 12
+          },
+          {
+            "id": 40,
+            "n": 10
+          },
+          {
+            "id": 43,
+            "n": 8
+          },
+          {
+            "id": 41,
+            "n": 6
+          },
+          {
+            "id": 22,
+            "n": 8
+          },
+          {
+            "id": 30,
+            "n": 6
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 25
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 77,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "death-blossom",
+    "label": "Death Blossom",
+    "notes": "Lingering + Artillery hybrid variant: rotating beams (34) sweep the area while artillery (32) fires outward from the same point. Duration stacks (21+53) keep both active longer. Missiles (55) home in from the artillery. Penetrator (69) crits on beam-hit targets.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 30
+          },
+          {
+            "id": 32,
+            "n": 20
+          },
+          {
+            "id": 21,
+            "n": 12
+          },
+          {
+            "id": 53,
+            "n": 10
+          },
+          {
+            "id": 55,
+            "n": 8
+          },
+          {
+            "id": 63,
+            "n": 6
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 54,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 75,
+            "n": 6
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 66,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "event-horizon",
+    "label": "Event Horizon",
+    "notes": "Singularity + MIRV: singularity at center with MIRV children orbiting and exploding. Collapsing (60) makes pull inescapable. Each MIRV child has its own singularity (46). Micro MIRV (42) creates a third generation. Gnawing (59) DOT on everything. Nuke (76) for massive final explosion.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 35
+          },
+          {
+            "id": 29,
+            "n": 12
+          },
+          {
+            "id": 42,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 6
+          },
+          {
+            "id": 46,
+            "n": 12
+          },
+          {
+            "id": 60,
+            "n": 15
+          },
+          {
+            "id": 59,
+            "n": 10
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 76,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 74,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "hailstorm",
+    "label": "Hailstorm",
+    "notes": "Artillery + Divider rain: Repeater (47) drops grenades downward while midflight, each firing artillery. Mortar (57) adds top-down bombardment. Maglock (56) homes the main grenade to a target. Multiple 245 tokens — first token sets up dividers, second is the artillery payload.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 47,
+            "n": 12
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 6
+          },
+          {
+            "id": 56,
+            "n": 5
+          },
+          {
+            "id": 22,
+            "n": 5
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 32,
+            "n": 30
+          },
+          {
+            "id": 53,
+            "n": 15
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 55,
+            "n": 8
+          },
+          {
+            "id": 54,
+            "n": 6
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 4
+          },
+          {
+            "id": 69,
+            "n": 3
+          }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "supernova",
+    "label": "Supernova",
+    "notes": "Lingering + Singularity + MIRV triple threat. Singularity pulls, lingering beams activate, then MIRV splits into children that each pull and beam again. Expansive (73) and Nuke (76) make the final detonation massive. Two 245 groups: setup group then payload group.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 33,
+            "n": 15
+          },
+          {
+            "id": 60,
+            "n": 8
+          },
+          {
+            "id": 46,
+            "n": 6
+          },
+          {
+            "id": 29,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 4
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 35
+          },
+          {
+            "id": 21,
+            "n": 12
+          },
+          {
+            "id": 63,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 59,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 76,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
   }
 ]

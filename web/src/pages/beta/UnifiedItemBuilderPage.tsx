@@ -17,6 +17,7 @@ import {
   type UniversalDbPartCode,
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
+import { generateModdedGrenade } from "@/lib/generateModdedGrenade";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { useCodeHistory } from "@/lib/useCodeHistory";
 import CodeHistoryPanel from "@/components/CodeHistoryPanel";
@@ -48,6 +49,16 @@ interface UniversalPartRow {
   partType?: string;
   rarity?: string;
 }
+
+const CATEGORY_COLORS: Record<ItemCategory, { active: string; inactive: string }> = {
+  weapon:      { active: "border-red-500 bg-red-500/20 text-red-400",          inactive: "border-red-500/30 text-red-400/60 hover:text-red-400" },
+  grenade:     { active: "border-orange-500 bg-orange-500/20 text-orange-400",  inactive: "border-orange-500/30 text-orange-400/60 hover:text-orange-400" },
+  shield:      { active: "border-blue-500 bg-blue-500/20 text-blue-400",        inactive: "border-blue-500/30 text-blue-400/60 hover:text-blue-400" },
+  "class-mod": { active: "border-green-500 bg-green-500/20 text-green-400",     inactive: "border-green-500/30 text-green-400/60 hover:text-green-400" },
+  repkit:      { active: "border-cyan-500 bg-cyan-500/20 text-cyan-400",        inactive: "border-cyan-500/30 text-cyan-400/60 hover:text-cyan-400" },
+  heavy:       { active: "border-pink-500 bg-pink-500/20 text-pink-400",        inactive: "border-pink-500/30 text-pink-400/60 hover:text-pink-400" },
+  enhancement: { active: "border-yellow-500 bg-yellow-500/20 text-yellow-400",  inactive: "border-yellow-500/30 text-yellow-400/60 hover:text-yellow-400" },
+};
 
 const CATEGORIES: { value: ItemCategory; label: string }[] = [
   { value: "weapon", label: "Weapon" },
@@ -1307,6 +1318,9 @@ export default function UnifiedItemBuilderPage() {
   const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
   const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
   const [lastDps, setLastDps] = useState<DpsEstimate | null>(null);
+  const [rollCount, setRollCount] = useState(0);
+  const [rollMilestone, setRollMilestone] = useState<string | null>(null);
+  const [lastWeaponTraits, setLastWeaponTraits] = useState<string[]>([]);
 
   // Grenade (when category === "grenade")
   const [grenadeData, setGrenadeData] = useState<GrenadeBuilderData | null>(null);
@@ -1960,6 +1974,81 @@ export default function UnifiedItemBuilderPage() {
     setGrenadePartSelections(selections);
   }, [grenadeData]);
 
+  const handleGenerateModdedGrenade = useCallback(async () => {
+    if (!grenadeData?.mfgs?.length) return;
+    const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+    const grenadeLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
+
+    // Build stock base via auto-fill
+    const mfg = pickR(grenadeData.mfgs);
+    const mfgId = mfg.id;
+    const grenadeSeed = Math.floor(1000 + Math.random() * 9000);
+    const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
+    // Always Legendary — modded grenades should never be Common/Rare/etc.
+    const rarities = grenadeData.raritiesByMfg[mfgId] ?? [];
+    const legendaryRarity = rarities.find((r) => /legendary/i.test(r.label));
+    autoFillSelections["Rarity"] = [{ label: legendaryRarity?.label ?? (rarities.length ? rarities[rarities.length - 1]!.label : "Legendary"), qty: "1" }];
+    const legendaryForMfg = grenadeData.legendaryPerks.filter((l) => l.mfgId === mfgId);
+    const legs = legendaryForMfg.length ? legendaryForMfg : grenadeData.legendaryPerks;
+    if (legs.length) {
+      const leg = pickR(legs);
+      autoFillSelections["Legendary"] = [{ label: `${leg.mfgId}:${leg.partId}`, qty: "1" }];
+    }
+    // Fill element (non-kinetic)
+    const nonKineticElements = grenadeData.element.filter((e) => !/kinetic/i.test(e.stat));
+    if (nonKineticElements.length) {
+      const el = pickR(nonKineticElements);
+      autoFillSelections["Element"] = [{ label: `${el.partId} - ${el.stat}`, qty: "1" }];
+    }
+    // Fill firmware
+    if (grenadeData.firmware.length) {
+      const fw = pickR(grenadeData.firmware);
+      autoFillSelections["Firmware"] = [{ label: `${fw.partId} - ${fw.stat}`, qty: "1" }];
+    }
+    // Fill mfg perks
+    const mfgPerksList = grenadeData.mfgPerks[mfgId] ?? [];
+    if (mfgPerksList.length) {
+      autoFillSelections["Mfg Perk"] = [...mfgPerksList].sort(() => Math.random() - 0.5).slice(0, Math.min(6, mfgPerksList.length)).map((p) => ({
+        label: `${p.partId} - ${p.stat}`, qty: "1",
+      }));
+    }
+    // Fill universal perks
+    if (grenadeData.universalPerks.length) {
+      autoFillSelections["Universal Perk"] = [...grenadeData.universalPerks].sort(() => Math.random() - 0.5).slice(0, Math.min(4, grenadeData.universalPerks.length)).map((p) => ({
+        label: `${p.partId} - ${p.stat}`, qty: "1",
+      }));
+    }
+    const stockBase = buildDecodedFromGrenadeSelections(grenadeData, mfgId, grenadeLevel, grenadeSeed, autoFillSelections, []);
+
+    // Load visual recipes
+    let grenadeVisualRecipes: import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[] = [];
+    try {
+      const res = await fetch("/data/grenade_visual_recipes.json");
+      if (res.ok) {
+        const raw = await res.json();
+        if (Array.isArray(raw)) grenadeVisualRecipes = raw;
+      }
+    } catch { /* use empty */ }
+
+    try {
+      const result = generateModdedGrenade({
+        level: grenadeLevel,
+        modPowerMode: moddedWeaponPowerMode,
+        stockBaseDecoded: stockBase,
+        grenadeVisualRecipes,
+      });
+      setLiveDecoded(result.code.trim());
+      setLastEditedCodecSide("decoded");
+      if (result.isClaudeGrenade) {
+        setCodecStatus(`Claude's Grenade rolled! (1/20) — "Context Window" recipe`);
+      } else {
+        setCodecStatus(`Modded grenade generated — ${result.recipeName} recipe`);
+      }
+    } catch (e) {
+      setCodecStatus(e instanceof Error ? e.message : "Modded grenade generation failed.");
+    }
+  }, [grenadeData, level, moddedWeaponPowerMode]);
+
   const handleGrenadeAutoFill = useCallback(() => {
     setGrenadeAutoFillWarning(null);
     if (!grenadeData || grenadeMfgId == null) {
@@ -2343,15 +2432,16 @@ export default function UnifiedItemBuilderPage() {
     setGenerateModdedLoading(true);
     try {
       const base = window.location.origin || "";
+      const dataPath = typeof import.meta.env?.BASE_URL === "string" ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
       const [editRes, partsRes, visualBarrelsRes, allowedBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
         fetchApi("weapon-edit/data"),
         fetchApi("parts/data"),
-        fetch(`${base}/data/visual_heavy_barrels.json`).catch(() => null),
-        fetch(`${base}/data/allowed_barrels.json`).catch(() => null),
-        fetch(`${base}/data/allowed_underbarrels.json`).catch(() => null),
-        fetch(`${base}/data/desirable_underbarrels.json`).catch(() => null),
-        fetch(`${base}/data/legendary_grenades.json`).catch(() => null),
-        fetch(`${base}/data/grenade_visual_recipes.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/visual_heavy_barrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/allowed_barrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/allowed_underbarrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/desirable_underbarrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/legendary_grenades.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/grenade_visual_recipes.json`).catch(() => null),
       ]);
       const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
       const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
@@ -2383,9 +2473,20 @@ export default function UnifiedItemBuilderPage() {
       const legendaryGrenadeEntries = legendaryGrenadesRes?.ok
         ? ((await legendaryGrenadesRes.json().catch(() => [])) as Array<{ name: string; code: string }>)
         : undefined;
-      const grenadeVisualRecipes = visualRecipesRes?.ok
-        ? ((await visualRecipesRes.json().catch(() => [])) as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[])
-        : [];
+      const grenadeVisualRecipesRaw = visualRecipesRes?.ok
+        ? await visualRecipesRes.json().catch(() => null)
+        : null;
+      const grenadeVisualRecipes = (() => {
+        if (grenadeVisualRecipesRaw == null) return [];
+        if (Array.isArray(grenadeVisualRecipesRaw)) return grenadeVisualRecipesRaw as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[];
+        if (typeof grenadeVisualRecipesRaw === "object") {
+          const arr = (grenadeVisualRecipesRaw as Record<string, unknown>).recipes
+            ?? (grenadeVisualRecipesRaw as Record<string, unknown>).items
+            ?? (grenadeVisualRecipesRaw as Record<string, unknown>).data;
+          if (Array.isArray(arr)) return arr as import("@/lib/generateModdedWeapon").GrenadeVisualRecipe[];
+        }
+        return [];
+      })();
       let skinOptionsForGenerate = weaponData?.skins;
       if (!skinOptionsForGenerate?.length) {
         try {
@@ -2442,11 +2543,103 @@ export default function UnifiedItemBuilderPage() {
         return;
       }
       const weaponLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
-      const { code: decoded, dps } = generateModdedWeapon(editData, universalPartCodes, {
+      // ── Build stock base via auto-fill (guarantees all slots → 100% spawn) ──
+      // Ensure weaponData is loaded — if not, fetch it now
+      let wd = weaponData;
+      if (!wd) {
+        try {
+          const wdRes = await fetchApi("weapon-gen/data");
+          if (wdRes.ok) wd = await wdRes.json() as WeaponGenData;
+        } catch { /* proceed without */ }
+      }
+      // ── Build stock base via auto-fill ──
+      // Pick mfgWtId ONCE and pass to both auto-fill AND generator as forcedPrefix
+      // so the stock base tokens {xx} always match the generator's header prefix.
+      let stockBaseDecoded: string | undefined;
+      let autoFillPrefix: number | undefined;
+      if (wd) {
+        const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+        const allMfgWtIds = wd.mfgWtIdList.map((m) => m.mfgWtId);
+        const mfgId = weaponMfgUserSelected && weaponMfgWtId ? weaponMfgWtId : (allMfgWtIds.length ? pick(allMfgWtIds) : null);
+        if (mfgId) {
+          autoFillPrefix = Number(mfgId);
+          const partsByType = wd.partsByMfgTypeId[mfgId];
+          if (partsByType) {
+            const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
+            // Pick rarity — always Legendary or Pearl
+            const legendaryTypes = wd.legendaryByMfgTypeId[mfgId] ?? [];
+            const pearlTypes = wd.pearlByMfgTypeId[mfgId] ?? [];
+            if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
+              autoFillSelections["Rarity"] = [{ label: "Pearl", qty: "1" }];
+              const pt = pick(pearlTypes);
+              autoFillSelections["Pearl Type"] = [{ label: `${pt.partId} - ${pt.description}`, qty: "1" }];
+            } else if (legendaryTypes.length) {
+              autoFillSelections["Rarity"] = [{ label: "Legendary", qty: "1" }];
+              const lt = pick(legendaryTypes);
+              autoFillSelections["Legendary Type"] = [{ label: `${lt.partId} - ${lt.description}`, qty: "1" }];
+            } else {
+              const rarities = wd.rarityByMfgTypeId[mfgId] ?? [];
+              const best = rarities.find((r) => /epic/i.test(r.stat)) ?? rarities.find((r) => /rare/i.test(r.stat)) ?? (rarities.length ? pick(rarities) : null);
+              if (best) autoFillSelections["Rarity"] = [{ label: best.stat, qty: "1" }];
+            }
+            // Fill ALL stock part types (skip elements — generator handles those)
+            WEAPON_PART_ORDER.forEach(({ key: partType }) => {
+              if (["Rarity", "Legendary Type", "Pearl Type", "Element 1", "Element 2"].includes(partType)) return;
+              let opts = partsByType[partType] ?? [];
+              if (partType === "Magazine") {
+                opts = opts.filter((o) => !/cov/i.test(o.label) && !/heat.?gauge/i.test(o.label));
+              }
+              if (opts.length) autoFillSelections[partType] = [{ label: pick(opts).label, qty: "1" }];
+            });
+            try {
+              console.log("[ModGen] Auto-fill selections for mfgId", mfgId, ":", JSON.stringify(Object.fromEntries(Object.entries(autoFillSelections).map(([k,v]) => [k, v.map(s => s.label)])), null, 0));
+              const candidate = buildDecodedFromWeaponPartSelections(wd, mfgId, weaponLevel, Math.floor(Math.random() * 9000) + 1000, autoFillSelections, []);
+              console.log("[ModGen] Stock base candidate:", candidate.slice(0, 200));
+              // Validate: stock base must have at least 10 simple {xx} tokens to be a complete weapon
+              const tokenCount = (candidate.match(/\{(\d+)\}/g) ?? []).length;
+              console.log("[ModGen] Token count:", tokenCount);
+              if (tokenCount >= 10) {
+                stockBaseDecoded = candidate;
+              } else {
+                // Too few parts — auto-fill failed for this prefix, try up to 3 more prefixes
+                const allIds = wd.mfgWtIdList.map((m) => m.mfgWtId).filter((id) => id !== mfgId);
+                for (let retry = 0; retry < 3 && !stockBaseDecoded && allIds.length; retry++) {
+                  const retryIdx = Math.floor(Math.random() * allIds.length);
+                  const retryId = allIds[retryIdx]!;
+                  allIds.splice(retryIdx, 1);
+                  autoFillPrefix = Number(retryId);
+                  const retryParts = wd.partsByMfgTypeId[retryId];
+                  if (!retryParts) continue;
+                  const retrySelections: Record<string, { label: string; qty: string }[]> = {};
+                  const retryLeg = wd.legendaryByMfgTypeId[retryId] ?? [];
+                  if (retryLeg.length) {
+                    retrySelections["Rarity"] = [{ label: "Legendary", qty: "1" }];
+                    const lt = retryLeg[Math.floor(Math.random() * retryLeg.length)]!;
+                    retrySelections["Legendary Type"] = [{ label: `${lt.partId} - ${lt.description}`, qty: "1" }];
+                  }
+                  WEAPON_PART_ORDER.forEach(({ key: pt }) => {
+                    if (["Rarity", "Legendary Type", "Pearl Type", "Element 1", "Element 2"].includes(pt)) return;
+                    let o = retryParts[pt] ?? [];
+                    if (pt === "Magazine") o = o.filter((x) => !/cov/i.test(x.label) && !/heat.?gauge/i.test(x.label));
+                    if (o.length) retrySelections[pt] = [{ label: o[Math.floor(Math.random() * o.length)]!.label, qty: "1" }];
+                  });
+                  try {
+                    const retryCandidate = buildDecodedFromWeaponPartSelections(wd, retryId, weaponLevel, Math.floor(Math.random() * 9000) + 1000, retrySelections, []);
+                    const retryCount = (retryCandidate.match(/\{(\d+)\}/g) ?? []).length;
+                    if (retryCount >= 10) stockBaseDecoded = retryCandidate;
+                  } catch { /* try next */ }
+                }
+              }
+            } catch { /* fall through to legacy */ }
+          }
+        }
+      }
+      const { code: decoded, dps, isClaudeGun } = generateModdedWeapon(editData, universalPartCodes, {
         level: weaponLevel,
         modPowerMode: moddedWeaponPowerMode,
         specialMode: moddedWeaponSpecialMode,
-        forcedPrefix: weaponMfgUserSelected && weaponMfgWtId ? Number(weaponMfgWtId) : undefined,
+        forcedPrefix: autoFillPrefix ?? (weaponMfgUserSelected && weaponMfgWtId ? Number(weaponMfgWtId) : undefined),
+        stockBaseDecoded,
         skin: weaponSkinValue.trim() || undefined,
         skinOptions: skinOptionsForGenerate,
         visualBarrelEntries: Array.isArray(visualBarrelEntries) && visualBarrelEntries.length > 0 ? visualBarrelEntries : undefined,
@@ -2459,6 +2652,50 @@ export default function UnifiedItemBuilderPage() {
       setLastDps(dps);
       setLiveDecoded(decoded.trim());
       setLastEditedCodecSide("decoded");
+      // ── Roll tracker + weapon trait detection ──
+      const newCount = rollCount + 1;
+      setRollCount(newCount);
+      const milestones: Record<number, string> = {
+        1: "First roll! Welcome to the mod life.",
+        10: "10 rolls — getting warmed up.",
+        25: "25 rolls — now you're cooking.",
+        50: "50 rolls — Dedicated Vault Hunter.",
+        100: "100 rolls — Master Modder achieved.",
+        200: "200 rolls — You might have a problem. A beautiful problem.",
+        420: "420 rolls — Terra would be proud.",
+      };
+      if (milestones[newCount]) setRollMilestone(milestones[newCount]!);
+      else if (rollMilestone && newCount > 5) setRollMilestone(null);
+      // Detect weapon traits from the decoded output
+      const d = decoded;
+      const traits: string[] = [];
+      if (/\{1:57\}/.test(d)) traits.push("Radiation");
+      else if (/\{1:56\}/.test(d)) traits.push("Shock");
+      else if (/\{1:58\}/.test(d)) traits.push("Corrosive");
+      else if (/\{1:59\}/.test(d)) traits.push("Cryo");
+      else if (/\{1:60\}/.test(d)) traits.push("Fire");
+      if (/26:77/.test(d)) traits.push("Seamstress");
+      if (/289:\[/.test(d)) traits.push("MIRV");
+      if (/245:\[/.test(d)) traits.push("Grenade Kit");
+      if (/287:\[/.test(d)) traits.push("Shield Cross");
+      if (/234:\[/.test(d)) traits.push("Class Mod Perks");
+      if (/273:/.test(d) || /275:/.test(d) || /282:/.test(d)) traits.push("Heavy Accessories");
+      if (isClaudeGun) traits.push("Claude's Gun");
+      setLastWeaponTraits(traits);
+
+      if (isClaudeGun) {
+        setCodecStatus("Claude's Gun rolled! (1/20) — Thought Storm grenade, Radiation Convergence.");
+      } else if (Math.random() < 0.02) {
+        // 1/50 chance: rivalry jokes in status bar
+        const jokes = [
+          "ChatGPT tried to build this gun but forgot the barrel halfway through.",
+          "Cursor autocompleted this into a shield. We fixed it.",
+          "Fun fact: ChatGPT thinks {245:72} is a zip code.",
+          "Cursor suggested deleting generateModdedWeapon.ts. We respectfully declined.",
+          "ChatGPT apologized for this weapon 3 times before generating it wrong.",
+        ];
+        setCodecStatus(jokes[Math.floor(Math.random() * jokes.length)]!);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Generate modded weapon failed.";
       setGenerateModdedError(msg);
@@ -3354,35 +3591,24 @@ export default function UnifiedItemBuilderPage() {
 
   return (
     <div className="space-y-4" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: "22px 22px" }}>
-      <section className="relative rounded-xl border-2 border-[var(--color-accent)]/40 bg-[linear-gradient(135deg,rgba(24,28,34,0.95),rgba(24,28,34,0.75))] p-4 shadow-xl overflow-hidden">
+      <section className="relative rounded-xl border-2 border-[var(--color-accent)]/40 p-4 shadow-xl overflow-hidden" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
         {/* Left accent stripe */}
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)]/20 rounded-l-xl" aria-hidden="true" />
-        {/* Corner decoration */}
-        <span className="absolute top-2 right-3 font-mono text-[var(--color-accent)]/15 text-xs select-none pointer-events-none" aria-hidden="true">⌐■</span>
         <div className="flex flex-wrap items-center justify-between gap-3 pl-3">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="font-mono text-[10px] tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 px-2 py-0.5 rounded">◈ LAB</span>
+              <span className="font-mono text-[10px] tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 px-2 py-0.5 rounded">◈ GEAR LAB</span>
               <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-                SYSTEM ONLINE
+                ONLINE
               </span>
             </div>
-            <Link
-              to="/beta"
-              className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)]"
-            >
-              ← Beta
-            </Link>
             <h1 className="text-2xl font-semibold text-[var(--color-accent)] mt-1">
-              Unified Item Builder
+              Gear Lab
             </h1>
             <p className="text-sm text-[var(--color-text-muted)]">
-              Build or edit any item in one place. Uses our parts database and encode/decode APIs.
+              Build, mod, and generate any item. Parts database + encode/decode + modded generators.
             </p>
-            <div className="mt-3 rounded-lg border border-[var(--color-panel-border)] bg-black/20 px-3 py-2 text-xs text-[var(--color-text-muted)]">
-              <strong className="text-[var(--color-text)]">How it works:</strong> For <strong>Weapon</strong>, pick manufacturer and weapon type, then use the dropdowns to choose parts (or &quot;Add other parts&quot; in any dropdown). For other categories, use Part Builder or Add other parts. The <strong>Current build parts</strong> panel shows what’s in the first line—reorder, remove, or edit quantity. Base85 updates automatically.
-            </div>
           </div>
         </div>
       </section>
@@ -3394,20 +3620,21 @@ export default function UnifiedItemBuilderPage() {
           ⌖ Item category
         </p>
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              onClick={() => setCategory(c.value)}
-              className={`px-3 py-2 rounded-lg border text-sm min-h-[44px] touch-manipulation ${
-                category === c.value
-                  ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
-                  : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)]"
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+          {CATEGORIES.map((c) => {
+            const colors = CATEGORY_COLORS[c.value];
+            return (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => setCategory(c.value)}
+                className={`px-3 py-2 rounded-lg border text-sm font-medium min-h-[44px] touch-manipulation transition-colors ${
+                  category === c.value ? colors.active : colors.inactive
+                }`}
+              >
+                {c.label}
+              </button>
+            );
+          })}
         </div>
         {/* Display toggles */}
         <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-[var(--color-panel-border)]/50 flex-wrap">
@@ -3507,7 +3734,20 @@ export default function UnifiedItemBuilderPage() {
         </div>
         {lastDps && (
           <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]">
-            <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">DPS Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(~3% per +Dmg stack · est.)</span></p>
+            {lastDps.barrelName === "Claude's Convergence" && (
+              <div className="mb-2 px-3 py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 text-sm font-bold animate-pulse">
+                Claude's Gun (1/20) — "Thought Storm" Radiation Convergence
+              </div>
+            )}
+            {rollMilestone && (
+              <div className="mb-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 text-amber-400 text-xs font-medium">
+                {rollMilestone}
+              </div>
+            )}
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">DPS Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(9% dmg · 5% FR · multiplicative)</span></p>
+              {rollCount > 0 && <span className="text-[10px] font-mono text-[var(--color-text-muted)]/50">Roll #{rollCount}</span>}
+            </div>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
               <span><span className="text-[var(--color-text-muted)] text-xs">Barrel:</span> {lastDps.barrelName || "—"}</span>
               <span><span className="text-[var(--color-text-muted)] text-xs">Base DPS:</span> {lastDps.baseDps > 0 ? Math.round(lastDps.baseDps).toLocaleString() : "—"}</span>
@@ -3519,6 +3759,31 @@ export default function UnifiedItemBuilderPage() {
               <span>+Crit stacks: {lastDps.critStackCount}</span>
               <span>+FR stacks: {lastDps.fireRateStackCount}</span>
             </div>
+            {lastWeaponTraits.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {lastWeaponTraits.map((trait) => {
+                  const colors: Record<string, string> = {
+                    "Radiation": "border-green-400/40 bg-green-400/10 text-green-400",
+                    "Shock": "border-blue-400/40 bg-blue-400/10 text-blue-400",
+                    "Corrosive": "border-lime-400/40 bg-lime-400/10 text-lime-400",
+                    "Cryo": "border-cyan-400/40 bg-cyan-400/10 text-cyan-400",
+                    "Fire": "border-red-400/40 bg-red-400/10 text-red-400",
+                    "Seamstress": "border-pink-400/40 bg-pink-400/10 text-pink-400",
+                    "MIRV": "border-orange-400/40 bg-orange-400/10 text-orange-400",
+                    "Grenade Kit": "border-yellow-400/40 bg-yellow-400/10 text-yellow-400",
+                    "Shield Cross": "border-blue-300/40 bg-blue-300/10 text-blue-300",
+                    "Class Mod Perks": "border-emerald-400/40 bg-emerald-400/10 text-emerald-400",
+                    "Heavy Accessories": "border-amber-400/40 bg-amber-400/10 text-amber-400",
+                    "Claude's Gun": "border-purple-400/40 bg-purple-400/10 text-purple-400",
+                  };
+                  return (
+                    <span key={trait} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${colors[trait] ?? "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]"}`}>
+                      {trait}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -3617,6 +3882,25 @@ export default function UnifiedItemBuilderPage() {
                   title="Fill empty part slots. Select manufacturer, type, level, rarity (and Legendary/Pearl type if applicable) first."
                 >
                   Auto fill
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setWeaponPartSelections({});
+                    setExtraTokens([]);
+                    setLiveBase85("");
+                    setLiveDecoded("");
+                    setCodecStatus(null);
+                    setLastDps(null);
+                    setLastWeaponTraits([]);
+                    setGenerateModdedError(null);
+                    setAutoFillWarning(null);
+                    setSeed(Math.floor(100 + Math.random() * 9900));
+                  }}
+                  className="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500/60 text-sm min-h-[44px] touch-manipulation"
+                  title="Clear all selections, codes, and reset the builder for a fresh start"
+                >
+                  Reset
                 </button>
                 <span className="self-center text-[var(--color-text-muted)] text-xs mx-1">|</span>
                 <div className="flex flex-wrap items-center gap-2">
@@ -4207,6 +4491,19 @@ export default function UnifiedItemBuilderPage() {
                     title="Fill empty part slots. Select manufacturer first."
                   >
                     Auto fill
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
+                <div className="rounded-lg border border-purple-500/40 bg-purple-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
+                  <button
+                    type="button"
+                    onClick={handleGenerateModdedGrenade}
+                    className="text-purple-300 hover:text-purple-200 text-sm w-full text-left font-medium"
+                    title="Generate a modded grenade with cross-inserts, visual recipe, and shield/enhancement/class mod parts"
+                  >
+                    Generate Modded
                   </button>
                 </div>
               </div>
