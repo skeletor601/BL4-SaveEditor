@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme, THEMES, THEME_META } from "@/contexts/ThemeContext";
 import { CHANGE_LOG } from "@/data/changelog";
 
 // ── Tab definitions ──────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ function useQuickStats() {
 
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function TestAppPage() {
-  const { themeConfig } = useTheme();
+  const { theme, setTheme, themeConfig } = useTheme();
   const [activeTab, setActiveTab] = useState<TabId>("command");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -112,7 +112,22 @@ export default function TestAppPage() {
 
         {/* Bottom section */}
         {!sidebarCollapsed && (
-          <div className="px-3 py-3 border-t border-[var(--color-panel-border)] space-y-2">
+          <div className="px-3 py-3 border-t border-[var(--color-panel-border)] space-y-3">
+            {/* Theme switcher */}
+            <div>
+              <span className="text-[9px] font-mono tracking-widest text-[var(--color-text-muted)] uppercase">Theme</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {THEMES.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTheme(t)}
+                    title={THEME_META[t].label}
+                    className={`w-5 h-5 rounded-full border-2 transition-transform hover:scale-110 ${theme === t ? "border-white scale-110" : "border-transparent opacity-70 hover:opacity-100"}`}
+                    style={{ backgroundColor: THEME_META[t].accent }}
+                  />
+                ))}
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] font-mono tracking-wider text-emerald-400">SYSTEM ONLINE</span>
@@ -165,8 +180,22 @@ export default function TestAppPage() {
                 );
               })}
             </div>
-            <div className="px-3 py-3 border-t border-[var(--color-panel-border)]">
-              <Link to="/settings" className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)]" onClick={() => setMobileMenuOpen(false)}>Settings & Credits</Link>
+            <div className="px-3 py-3 border-t border-[var(--color-panel-border)] space-y-3">
+              <div>
+                <span className="text-[9px] font-mono tracking-widest text-[var(--color-text-muted)] uppercase">Theme</span>
+                <div className="flex flex-wrap gap-2 mt-1.5">
+                  {THEMES.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTheme(t)}
+                      title={THEME_META[t].label}
+                      className={`w-7 h-7 rounded-full border-2 transition-transform ${theme === t ? "border-white scale-110" : "border-transparent opacity-70"}`}
+                      style={{ backgroundColor: THEME_META[t].accent }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <Link to="/settings" className="block text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)]" onClick={() => setMobileMenuOpen(false)}>Settings & Credits</Link>
             </div>
           </nav>
         </div>
