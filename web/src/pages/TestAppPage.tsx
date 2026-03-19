@@ -41,6 +41,7 @@ export default function TestAppPage() {
   const { themeConfig } = useTheme();
   const [activeTab, setActiveTab] = useState<TabId>("command");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const stats = useQuickStats();
   const overlay = themeConfig.bgOverlay;
 
@@ -56,9 +57,9 @@ export default function TestAppPage() {
         }}
       />
 
-      {/* ── Sidebar ────────────────────────────────────────────────────────── */}
+      {/* ── Sidebar (desktop only) ─────────────────────────────────────────── */}
       <aside
-        className={`relative z-10 flex flex-col border-r border-[var(--color-panel-border)] backdrop-blur-xl transition-all duration-300 ${
+        className={`relative z-10 hidden md:flex flex-col border-r border-[var(--color-panel-border)] backdrop-blur-xl transition-all duration-300 ${
           sidebarCollapsed ? "w-16" : "w-64"
         }`}
         style={{ backgroundColor: "rgba(12, 14, 18, 0.92)" }}
@@ -126,15 +127,71 @@ export default function TestAppPage() {
         )}
       </aside>
 
+      {/* ── Mobile overlay menu ────────────────────────────────────────────── */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div className="absolute inset-0 bg-black/60" />
+          <nav
+            className="absolute left-0 top-0 bottom-0 w-64 flex flex-col border-r border-[var(--color-panel-border)] overflow-y-auto"
+            style={{ backgroundColor: "rgba(12, 14, 18, 0.98)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-4 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-[var(--color-text)]">BL4 AIO</div>
+                <div className="text-[10px] font-mono tracking-widest text-[var(--color-accent)]">SAVE EDITOR</div>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text)]">✕</button>
+            </div>
+            <div className="flex-1 py-3 px-2 space-y-1">
+              {TABS.map((tab) => {
+                const active = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left ${
+                      active
+                        ? "bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/40 text-[var(--color-accent)]"
+                        : "border border-transparent text-[var(--color-text-muted)]"
+                    }`}
+                  >
+                    <span className={`text-lg w-8 h-8 flex items-center justify-center rounded-lg shrink-0 ${active ? "bg-[var(--color-accent)]/20" : "bg-white/5"}`}>{tab.icon}</span>
+                    <div className="min-w-0">
+                      <div className={`text-sm font-medium truncate ${active ? "text-[var(--color-accent)]" : ""}`}>{tab.label}</div>
+                      <div className="text-[10px] text-[var(--color-text-muted)] truncate">{tab.sublabel}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="px-3 py-3 border-t border-[var(--color-panel-border)]">
+              <Link to="/settings" className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)]" onClick={() => setMobileMenuOpen(false)}>Settings & Credits</Link>
+            </div>
+          </nav>
+        </div>
+      )}
+
       {/* ── Main content ───────────────────────────────────────────────────── */}
       <main className="relative z-10 flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
         <header
-          className="shrink-0 border-b border-[var(--color-panel-border)] px-6 flex items-center justify-between min-h-[56px]"
+          className="shrink-0 border-b border-[var(--color-panel-border)] px-4 md:px-6 flex items-center justify-between min-h-[56px]"
           style={{ backgroundColor: "rgba(18, 21, 27, 0.88)", backdropFilter: "blur(12px)" }}
         >
-          <div className="flex items-center gap-4">
-            <h1 className="text-lg font-semibold text-[var(--color-text)]">
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-[var(--color-panel-border)] text-[var(--color-accent)]"
+            >
+              <span className="block space-y-1">
+                <span className="block w-5 h-0.5 bg-current" />
+                <span className="block w-5 h-0.5 bg-current" />
+                <span className="block w-5 h-0.5 bg-current" />
+              </span>
+            </button>
+            <h1 className="text-base md:text-lg font-semibold text-[var(--color-text)]">
               {TABS.find((t) => t.id === activeTab)?.label}
             </h1>
             <span className="hidden sm:inline text-xs text-[var(--color-text-muted)] font-mono">
@@ -143,7 +200,7 @@ export default function TestAppPage() {
           </div>
           <div className="flex items-center gap-3">
             {stats && (
-              <div className="hidden md:flex items-center gap-4 text-[10px] font-mono text-[var(--color-text-muted)]">
+              <div className="hidden lg:flex items-center gap-4 text-[10px] font-mono text-[var(--color-text-muted)]">
                 <span>{stats.parts.toLocaleString()}+ parts</span>
                 <span>{stats.weapons.toLocaleString()} weapons</span>
                 <span>{stats.categories} categories</span>
