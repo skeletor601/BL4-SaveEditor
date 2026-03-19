@@ -595,7 +595,7 @@ export default function WeaponGenView({
     setMessage(null);
     try {
       const base = window.location.origin || "";
-      const dataPath = typeof import.meta.env?.BASE_URL === "string" ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
+      const dataPath = "";
       const [editRes, partsRes, visualBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
         fetchApi("weapon-edit/data"),
         fetchApi("parts/data"),
