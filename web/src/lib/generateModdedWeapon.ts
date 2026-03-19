@@ -323,7 +323,7 @@ export function generateModdedWeapon(
   const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
 
   const modPowerMode = options.modPowerMode ?? "op";
-  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 50)));
+  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 60)));
   const skinFromOptions = (options.skin ?? "").trim();
 
   // ── Claude's Gun — 1/20 chance Easter egg ─────────────────────────────────────────────

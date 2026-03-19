@@ -1,5 +1,5 @@
 export interface ClassModNameInfo {
-  character: "Amon" | "Harlowe" | "Rafa" | "Vex";
+  character: "Amon" | "Harlowe" | "Rafa" | "Vex" | "C4SH";
   description: string;
 }
 
@@ -41,6 +41,10 @@ export const CLASS_MOD_NAME_DESCRIPTIONS: Record<string, ClassModNameInfo> = {
   "technomancer":      { character: "Vex", description: "Eldritch Blast deals additional Ordnance damage. Killing enemies or using grenades resets its cooldown." },
   "teen witch":        { character: "Vex", description: "When at max HP, Lifesteal partially applies to shields. When at max Shield, Lifesteal partially grants Overshield." },
   "undead eye":        { character: "Vex", description: "Killing enemies with Sniper Rifles triggers Blood Shot. Critically hitting has a 33% chance to trigger Blood Shot as well." },
+
+  // ── C4SH (The Rogue) ─────────────────────────────────────────────────────
+  // Class mod names TBD — will be populated when the update drops.
+  // Placeholder entries for the action skill augment names (may also appear as class mod names):
 };
 
 const CHARACTER_COLORS: Record<string, string> = {
@@ -48,6 +52,7 @@ const CHARACTER_COLORS: Record<string, string> = {
   Harlowe: "text-cyan-300",
   Rafa:    "text-green-300",
   Vex:     "text-purple-300",
+  C4SH:    "text-red-300",
 };
 
 export function getClassModNameInfo(nameEN: string): ClassModNameInfo | undefined {

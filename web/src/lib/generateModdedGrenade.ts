@@ -73,7 +73,7 @@ export function generateModdedGrenade(
   options: GenerateModdedGrenadeOptions = {},
 ): GenerateModdedGrenadeResult {
   const modPowerMode = options.modPowerMode ?? "op";
-  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 50)));
+  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 60)));
 
   // ── Claude's Grenade Easter egg — 1/20 chance ──────────────────────────────
   // "Context Window": Singularity pulls everything in, all 5 Lingering elements fire outward.

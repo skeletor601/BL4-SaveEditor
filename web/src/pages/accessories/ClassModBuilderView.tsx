@@ -124,7 +124,7 @@ export default function ClassModBuilderView() {
   const [className, setClassName] = useState("Amon");
   const [rarity, setRarity] = useState("Legendary");
   const [nameOption, setNameOption] = useState<ClassModNameOption | null>(null);
-  const [level, setLevel] = useState("50");
+  const [level, setLevel] = useState("60");
   const [seed, setSeed] = useState(() => String(Math.floor(Math.random() * 9999) + 1));
   const [skillPoints, setSkillPoints] = useState<Record<string, number>>({});
   const [legendarySelected, setLegendarySelected] = useState<number[]>([]);

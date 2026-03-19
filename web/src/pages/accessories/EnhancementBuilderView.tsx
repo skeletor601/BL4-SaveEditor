@@ -45,7 +45,7 @@ export default function EnhancementBuilderView() {
   const [builderData, setBuilderData] = useState<EnhancementBuilderData | null>(null);
   const [mfgName, setMfgName] = useState("");
   const [rarity, setRarity] = useState("Legendary");
-  const [level, setLevel] = useState("50");
+  const [level, setLevel] = useState("60");
   const [seed] = useState(() => String(Math.floor(Math.random() * 9000) + 1000));
   const [perkChecked, setPerkChecked] = useState<Set<number>>(new Set());
   const [stackFilter, setStackFilter] = useState("");

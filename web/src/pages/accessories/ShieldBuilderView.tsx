@@ -53,7 +53,7 @@ export default function ShieldBuilderView() {
   const { saveData, getYamlText, updateSaveData } = useSave();
   const [builderData, setBuilderData] = useState<ShieldBuilderData | null>(null);
   const [mfgId, setMfgId] = useState<number>(279);
-  const [level, setLevel] = useState("50");
+  const [level, setLevel] = useState("60");
   const [rarityId, setRarityId] = useState<number | null>(null);
   const [elementPartId, setElementPartId] = useState<number | null>(null);
   const [firmwarePartId, setFirmwarePartId] = useState<number | null>(null);

@@ -88,8 +88,8 @@ function validateCode(decoded: string, partsDb: PartDbEntry[]): ValidationResult
     return results;
   }
 
-  if (header.level < 1 || header.level > 50) {
-    results.push({ status: "warning", label: "Level", details: [`Level ${header.level} is outside normal range (1-50)`] });
+  if (header.level < 1 || header.level > 60) {
+    results.push({ status: "warning", label: "Level", details: [`Level ${header.level} is outside normal range (1-60)`] });
   } else {
     results.push({ status: "pass", label: "Level", details: [`Level ${header.level}`] });
   }

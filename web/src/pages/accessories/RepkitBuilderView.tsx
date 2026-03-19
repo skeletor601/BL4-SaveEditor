@@ -60,7 +60,7 @@ export default function RepkitBuilderView() {
   const { saveData, getYamlText, updateSaveData } = useSave();
   const [builderData, setBuilderData] = useState<RepkitBuilderData | null>(null);
   const [mfgId, setMfgId] = useState<number>(277);
-  const [level, setLevel] = useState("50");
+  const [level, setLevel] = useState("60");
   const [rarityId, setRarityId] = useState<number | null>(null);
   const [prefixPartId, setPrefixPartId] = useState<number | null>(null);
   const [firmwarePartId, setFirmwarePartId] = useState<number | null>(null);

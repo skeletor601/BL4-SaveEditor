@@ -18,6 +18,7 @@ import {
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { generateModdedGrenade } from "@/lib/generateModdedGrenade";
+import { MAX_LEVEL, DEFAULT_LEVEL } from "@/lib/gameConstants";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { useCodeHistory } from "@/lib/useCodeHistory";
 import CodeHistoryPanel from "@/components/CodeHistoryPanel";
@@ -1252,7 +1253,7 @@ function slotRarityStyle(rarity: string | undefined): { border: string; bg: stri
 export default function UnifiedItemBuilderPage() {
   const { addEntry: addHistoryEntry } = useCodeHistory();
   const [category, setCategory] = usePersistedState<ItemCategory>("uib.category", "weapon");
-  const [level, setLevel] = usePersistedState("uib.level", 50);
+  const [level, setLevel] = usePersistedState("uib.level", DEFAULT_LEVEL);
   const [seed, setSeed] = usePersistedState("uib.seed", 1);
   const [signatureSeed, setSignatureSeed] = usePersistedState<number | null>("uib.signatureSeed", null);
   const [liveBase85, setLiveBase85] = usePersistedState("uib.liveBase85", "");
@@ -1863,7 +1864,7 @@ export default function UnifiedItemBuilderPage() {
     setWeaponManufacturer(entry.manufacturer);
     setWeaponWeaponType(entry.weaponType);
     setWeaponMfgUserSelected(true);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setExtraTokens([]);
     const mfgWtId = entry.mfgWtId;
@@ -1936,7 +1937,7 @@ export default function UnifiedItemBuilderPage() {
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     const mfg = pick(grenadeData.mfgs);
     setGrenadeMfgId(mfg.id);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setGrenadeExtraTokens([]);
     const rarities = grenadeData.raritiesByMfg[mfg.id] ?? [];
@@ -2116,7 +2117,7 @@ export default function UnifiedItemBuilderPage() {
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     const mfg = pick(shieldData.mfgs);
     setShieldMfgId(mfg.id);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setShieldExtraTokens([]);
     const rarities = shieldData.raritiesByMfg[mfg.id] ?? [];
@@ -2222,7 +2223,7 @@ export default function UnifiedItemBuilderPage() {
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     const mfg = pick(repkitData.mfgs);
     setRepkitMfgId(mfg.id);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setRepkitExtraTokens([]);
     const rarities = repkitData.raritiesByMfg[mfg.id] ?? [];
@@ -2278,7 +2279,7 @@ export default function UnifiedItemBuilderPage() {
     const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
     const mfg = pick(heavyData.mfgs);
     setHeavyMfgId(mfg.id);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setHeavyExtraTokens([]);
     const selections: Record<string, { label: string; qty: string }[]> = {};
@@ -2332,7 +2333,7 @@ export default function UnifiedItemBuilderPage() {
     const mfg = enhancementData.manufacturers[mfgName];
     if (!mfg) return;
     setEnhancementMfgName(mfgName);
-    setLevel(Math.floor(1 + Math.random() * 50));
+    setLevel(Math.floor(1 + Math.random() * MAX_LEVEL));
     setSeed(Math.floor(100 + Math.random() * 9900));
     setEnhancementExtraTokens([]);
     const selections: Record<string, { label: string; qty: string }[]> = {};
@@ -2713,7 +2714,7 @@ export default function UnifiedItemBuilderPage() {
     }
     const hasLevel = /^\d+$/.test(String(level)) && Number(level) >= 1 && Number(level) <= 50;
     if (!hasLevel) {
-      setAutoFillWarning("Please set a valid level (1–50) first.");
+      setAutoFillWarning(`Please set a valid level (1–${MAX_LEVEL}) first.`);
       return;
     }
     const rarityList = weaponPartSelections["Rarity"] ?? [];
@@ -3835,7 +3836,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -4459,7 +4460,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -4876,7 +4877,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -5258,7 +5259,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -6130,7 +6131,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -6546,7 +6547,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -6930,7 +6931,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -7481,7 +7482,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
@@ -8106,7 +8107,7 @@ export default function UnifiedItemBuilderPage() {
                 <input
                   type="number"
                   min={1}
-                  max={50}
+                  max={MAX_LEVEL}
                   value={level}
                   onChange={(e) => setLevel(Number(e.target.value) || 50)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"

@@ -9,6 +9,7 @@ const CHARACTER_BORDER: Record<string, string> = {
   Harlowe: "border-cyan-500/50",
   Rafa:    "border-green-500/50",
   Vex:     "border-purple-500/50",
+  C4SH:    "border-red-500/50",
 };
 
 const CHARACTER_GRAD: Record<string, string> = {
@@ -16,6 +17,7 @@ const CHARACTER_GRAD: Record<string, string> = {
   Harlowe: "from-cyan-500/15 to-transparent",
   Rafa:    "from-green-500/15 to-transparent",
   Vex:     "from-purple-500/15 to-transparent",
+  C4SH:    "from-red-500/15 to-transparent",
 };
 
 const CHARACTER_BADGE: Record<string, string> = {
@@ -23,6 +25,7 @@ const CHARACTER_BADGE: Record<string, string> = {
   Harlowe: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300",
   Rafa:    "bg-green-500/20 border-green-500/40 text-green-300",
   Vex:     "bg-purple-500/20 border-purple-500/40 text-purple-300",
+  C4SH:    "bg-red-500/20 border-red-500/40 text-red-300",
 };
 
 const CHARACTER_NAME_COLOR: Record<string, string> = {
@@ -30,6 +33,7 @@ const CHARACTER_NAME_COLOR: Record<string, string> = {
   Harlowe: "text-cyan-200",
   Rafa:    "text-green-200",
   Vex:     "text-purple-200",
+  C4SH:    "text-red-200",
 };
 
 export interface ClassModNameCardData {

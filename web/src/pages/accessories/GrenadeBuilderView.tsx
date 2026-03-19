@@ -74,7 +74,7 @@ export default function GrenadeBuilderView() {
   const { addEntry: addHistoryEntry } = useCodeHistory();
   const [builderData, setBuilderData] = useState<GrenadeBuilderData | null>(null);
   const [mfgId, setMfgId] = useState<number>(263);
-  const [level, setLevel] = useState("50");
+  const [level, setLevel] = useState("60");
   const [mfgPerkChecked, setMfgPerkChecked] = useState<Set<number>>(new Set());
   const [selectedParts, setSelectedParts] = useState<SelectedPart[]>([]);
   const [rawOutput, setRawOutput] = useState("");

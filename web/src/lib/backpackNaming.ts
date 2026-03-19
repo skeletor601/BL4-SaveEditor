@@ -80,6 +80,13 @@ export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<
     if (isRarity) rarityCandidates.push(base);
     else barrelCandidates.push(base);
   }
+  // Weapons: name by barrel (Hellwalker, Convergence, etc.) not rarity
+  // Everything else: name by rarity as before
+  const WEAPON_PREFIXES = new Set([2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]);
+  const isWeapon = itemTypeId != null && WEAPON_PREFIXES.has(itemTypeId);
+  if (isWeapon) {
+    return barrelCandidates[0] ?? rarityCandidates[0];
+  }
   return rarityCandidates[0] ?? barrelCandidates[0];
 }
 

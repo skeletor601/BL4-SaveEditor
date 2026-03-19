@@ -1,0 +1,81 @@
+{
+  "character": "C4SH",
+  "title": "The Rogue",
+  "trait": {
+    "name": "Windfall",
+    "description": "C4SH accumulates Fortune stacks upon eliminating enemies. Has chances to trigger Windfall during automatic reloads or Action Skill usage. Consumes Fortune for enhanced damage output and upgraded abilities."
+  },
+  "action_skills": [
+    {
+      "name": "Cross-Fire",
+      "tree": "Chaos Walking",
+      "color": "red",
+      "description": "Holster your current weapon and brandish C4SH's dual revolvers to unleash a hail of bullets. Includes melee knockback and targeted lock-on secondary effects."
+    },
+    {
+      "name": "Sleight of Hand",
+      "tree": "Luck of the Draw",
+      "color": "blue",
+      "description": "Draw cards in each hand to quickly toss out a volley of spells like Fireball or Magic Missile. Randomization increases with more card types."
+    },
+    {
+      "name": "Cleromancy",
+      "tree": "Roll the Bones",
+      "color": "green",
+      "description": "Roll supernatural Bone Dice which summon a Bone Totem with unique effects based on the roll results. Some provide buffs, others deal turret-like damage."
+    }
+  ],
+  "skill_trees": [
+    {
+      "name": "Chaos Walking",
+      "action_skill": "Cross-Fire",
+      "color": "red",
+      "augments": [
+        { "name": "And Hell Followed With Him", "description": "TBD — populate when data is available" },
+        { "name": "Midnight Showdown", "description": "TBD" },
+        { "name": "Show Your Marrow", "description": "TBD" },
+        { "name": "Slick Thunder", "description": "TBD" },
+        { "name": "Desperado", "description": "TBD" },
+        { "name": "Reckoning", "description": "TBD" },
+        { "name": "Sawed-Off", "description": "TBD" },
+        { "name": "I Like Those Odds", "description": "TBD" },
+        { "name": "Dash and Reload", "description": "TBD" }
+      ],
+      "skills": []
+    },
+    {
+      "name": "Luck of the Draw",
+      "action_skill": "Sleight of Hand",
+      "color": "blue",
+      "augments": [
+        { "name": "Thunder the Table", "description": "TBD" },
+        { "name": "Cowboy", "description": "TBD" },
+        { "name": "Big Pull", "description": "TBD" },
+        { "name": "The Cooler", "description": "TBD" },
+        { "name": "Bet on Red", "description": "TBD" },
+        { "name": "Dead Man's Hand", "description": "TBD" },
+        { "name": "Sweeten the Pot", "description": "TBD" },
+        { "name": "Furious Fingers", "description": "TBD" }
+      ],
+      "skills": []
+    },
+    {
+      "name": "Roll the Bones",
+      "action_skill": "Cleromancy",
+      "color": "green",
+      "augments": [
+        { "name": "Heavenly Sevens", "description": "TBD" },
+        { "name": "Five is Alive", "description": "TBD" },
+        { "name": "Three's Company", "description": "TBD" },
+        { "name": "Commotion's Eleven", "description": "TBD" },
+        { "name": "Mighty Nine", "description": "TBD" },
+        { "name": "Eights of Hel", "description": "TBD" },
+        { "name": "Dirty Dozen", "description": "TBD" },
+        { "name": "Easy Sixes", "description": "TBD" }
+      ],
+      "skills": []
+    }
+  ],
+  "class_mods": [],
+  "notes": "C4SH has no capstone skills but gains an extra augment slot (up to 4 simultaneous augments). Data populated from Mobalytics March 2026 — skill descriptions and class mod names TBD when game update drops."
+}
