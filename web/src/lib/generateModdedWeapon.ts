@@ -1459,12 +1459,7 @@ export function generateModdedWeapon(
   };
   const pearlRarityToken = VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]);
 
-  // Removed: extreme same-prefix stacking (3 parts ×25 each) and body ×10 repeats.
-  // Terra's actual guns don't use these — they bloat the code without synergy.
-  // The visual barrel is already stacked 2-4×, and heavy barrel accessories provide
-  // the projectile-behavior enhancements that matter.
-  const extremeSamePrefixStack: string[] = [];
-  const bodyRepeatTokens: string[] = [];
+  // Removed: extreme same-prefix stacking and body ×10 repeats (bloat without synergy).
 
   // {292:[9×10]} Tediore Enhancement "Divider" — Terra confirmed: always exactly 10 stacks on every gun.
   const dividerStacks = [groupedToken(292, Array(10).fill(9))];
@@ -1523,21 +1518,8 @@ export function generateModdedWeapon(
     // Heavy barrel accessories on ALL guns (MIRV, Two-Shot, Triple Barrel, etc.)
     ...heavyBarrelAccessoryTokens,
 
-    // ── Modded additions ──
+    // ── Modded additions (non-barrel) ──
     ...altFireTokens,
-    ...samePrefixBarrelParts,
-    ...crossParts,
-    // Three extreme same-prefix stacks — Terra pattern: 3 different part IDs each ×25
-    ...extremeSamePrefixStack,
-    // Body ×10 stacking — Terra's pattern
-    ...bodyRepeatTokens,
-    multiProjectileToken,
-    homingToken,
-    scanningHomingToken,
-    ...seamstressExtras,
-    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
-    ...homingStacks273,
-    ...rowansChargeStacks,
     ...damageStacks,
     ...weaponTypeDamageStacks,
     ...movementSpeedStacks,
@@ -1551,23 +1533,33 @@ export function generateModdedWeapon(
     ...jakobsCritStacks,
     ...vladofSmgDmgStacks,
     ...vladofArBarrelStacks,
-    ...mirvInserts,                                          // Tediore MIRV cross-inserts — adds MIRV splitting to gun shots
+    ...mirvInserts,                                          // Tediore MIRV cross-inserts
     ...classModCrossInsert,
-    ...tedioreShieldInsert,                                  // {287:[9×N]} Tediore Shield cross-insert (Terra's perfect gun)
-    ...daedalusEnhInsert,                                    // {299:[1 1 9 9 2 2 3 3]} Terra enhancement pattern
+    ...tedioreShieldInsert,                                  // {287:[9×N]} Tediore Shield
+    ...daedalusEnhInsert,                                    // {299:[1 1 9 9 2 2 3 3]}
     ...jakobsEnhInsert,                                      // {268:[1 1 9 9 2 2 3 3]}
     ...maliwanEnhInsert,                                     // {271:[1 1 9 9 2 2 3 3]}
     ...tedioreEnhInsert,                                     // {292:[9 9 2 2 3 3 9 9 9 9 9]}
-    ...shieldBodyInsert,                                     // {246:[22 22 23 23 26 26 25 25 24 24 31 39 40 45 46 58 58]}
+    ...shieldBodyInsert,                                     // {246:[...]}
     ...dividerStacks,
-    "{11:75}",                                               // Terra: enables flight — every gun, near end
-    // Terra grenade perk block — always present, drives visual effects
+    // Terra grenade perk block — drives visual effects
     ...finalGrenadeParts,
-    // Foregrip — only from legacy path (auto-fill stock base includes it)
+    // Foregrip — only from legacy path
     ...(options.stockBaseDecoded ? [] : foregripToken ? [foregripToken] : []),
     // Underbarrel — ALWAYS added from desirable list or legacy path
     ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
     ...(underbarrelToken ? [underbarrelToken] : []),
+    // ── Effect barrels LAST — "as far away as possible" from visual barrel (Terra's rule) ──
+    multiProjectileToken,                                    // {289:[17 16 17]} MIRV/Two-Shot
+    homingToken,                                             // {273:1}
+    scanningHomingToken,                                     // {273:29}
+    ...seamstressExtras,                                     // {13:70} + {11:75} + {11:81}
+    ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
+    ...homingStacks273,
+    ...rowansChargeStacks,                                   // {27:[75×N]} Stalker / Rowan's Charge
+    ...samePrefixBarrelParts,                                // Extra same-prefix barrels
+    ...crossParts,                                           // Cross-prefix barrels
+    "{11:75}",                                               // Flight barrel — absolute last
 
     // stockMagToken removed — was causing COV magazines to override Vladof mag (game uses last mag token).
   ];
