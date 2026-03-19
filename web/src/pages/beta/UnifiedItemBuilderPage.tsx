@@ -2591,6 +2591,9 @@ export default function UnifiedItemBuilderPage() {
               if (partType === "Magazine") {
                 opts = opts.filter((o) => !/cov/i.test(o.label) && !/heat.?gauge/i.test(o.label));
               }
+              // Skip underbarrel + underbarrel accessory from auto-fill — not required for spawn
+              // Generator adds desirable underbarrels from the curated JSON list instead
+              if (partType === "Underbarrel" || partType === "Underbarrel Accessory") return;
               if (opts.length) autoFillSelections[partType] = [{ label: pick(opts).label, qty: "1" }];
             });
             try {

@@ -1563,10 +1563,11 @@ export function generateModdedWeapon(
     "{11:75}",                                               // Terra: enables flight — every gun, near end
     // Terra grenade perk block — always present, drives visual effects
     ...finalGrenadeParts,
-    // Foregrip → underbarrel — only from legacy path (auto-fill stock base already includes these)
+    // Foregrip — only from legacy path (auto-fill stock base includes it)
     ...(options.stockBaseDecoded ? [] : foregripToken ? [foregripToken] : []),
+    // Underbarrel — ALWAYS added from desirable list or legacy path
     ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
-    ...(options.stockBaseDecoded ? [] : underbarrelToken ? [underbarrelToken] : []),
+    ...(underbarrelToken ? [underbarrelToken] : []),
 
     // stockMagToken removed — was causing COV magazines to override Vladof mag (game uses last mag token).
   ];
