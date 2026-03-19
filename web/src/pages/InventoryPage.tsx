@@ -3,12 +3,14 @@ import BackpackView from "@/pages/inventory/BackpackView";
 import PartsTranslatorView from "@/pages/inventory/PartsTranslatorView";
 import DecoderView from "@/pages/inventory/DecoderView";
 import CodeSpawnView from "@/pages/inventory/CodeSpawnView";
+import CodeValidator from "@/components/inventory/CodeValidator";
 
 const branches = [
   { path: "decoder", label: "Decoder" },
   { path: "parts-translator", label: "Parts Translator" },
   { path: "backpack", label: "Backpack" },
   { path: "code-spawn", label: "Code spawn" },
+  { path: "validator", label: "Validator" },
 ];
 
 export default function InventoryPage() {
@@ -41,6 +43,7 @@ export default function InventoryPage() {
           <Route path="parts-translator" element={<PartsTranslatorView />} />
           <Route path="backpack" element={<BackpackView />} />
           <Route path="code-spawn" element={<CodeSpawnView />} />
+          <Route path="validator" element={<CodeValidator />} />
           <Route path="*" element={<Navigate to="/inventory/decoder" replace />} />
         </Routes>
       </div>

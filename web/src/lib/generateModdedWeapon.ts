@@ -1417,11 +1417,47 @@ export function generateModdedWeapon(
   // 2. Modded additions on top (extra barrels, stacks, grenade reload, underbarrel).
   // 3. Stock magazine last — gives spawner a native mag code, renders after everything else
   //    so it doesn't override the visual during firing.
-  // Pearl rarity pool — confirmed {prefix:82} codes from decoded weapons.
-  // {11:82} = Tediore SG Eigenburst rarity, {25:82} = Maliwan SR rarity.
-  // More will be added as new codes are decoded. Always the absolute first token.
-  const pearlRarityPool = ["{11:82}", "{25:82}"];
-  const pearlRarityToken = pick(pearlRarityPool);
+  // Rarity code matched to visual barrel — so the gun's NAME matches its visual.
+  // e.g. Hellwalker barrel {9:82} → rarity {9:83} → gun displays as "Hellwalker"
+  // Fallback: {11:82} Eigenburst if visual barrel has no mapping.
+  const VISUAL_BARREL_RARITY: Record<string, string> = {
+    "{2:1}": "{2:54}",     // Zipper
+    "{6:54}": "{6:1}",     // Roach
+    "{7:64}": "{7:100}",   // Convergence
+    "{8:52}": "{8:53}",    // Bod (talks!)
+    "{8:54}": "{8:55}",    // Acey May
+    "{8:57}": "{8:58}",    // Missilaser
+    "{9:82}": "{9:83}",    // Hellwalker (pentagram shots)
+    "{9:86}": "{9:85}",    // Rainbow Vomit
+    "{9:90}": "{9:80}",    // TKs Wave
+    "{10:56}": "{10:1}",   // Kaleidosplode
+    "{10:58}": "{10:57}",  // Sweet Embrace
+    "{10:62}": "{10:80}",  // Mantra
+    "{11:77}": "{11:78}",  // Forsaken Chaos
+    "{11:81}": "{11:82}",  // Eigenburst
+    "{12:56}": "{12:57}",  // Lead Balloon
+    "{13:57}": "{13:72}",  // Lumberjack
+    "{13:77}": "{13:73}",  // Star Helix
+    "{14:78}": "{14:35}",  // LaserDisc
+    "{16:68}": "{16:69}",  // Midnight Defiance
+    "{18:64}": "{18:65}",  // Wombo Combo
+    "{18:99}": "{18:63}",  // Bubbles
+    "{19:17}": "{19:1}",   // Prince Harming
+    "{19:20}": "{19:19}",  // Hellfire
+    "{21:59}": "{21:60}",  // Ohm I Got
+    "{21:62}": "{21:63}",  // Plasma Coil
+    "{21:80}": "{21:60}",  // Songbird
+    "{22:66}": "{22:67}",  // Kaoson
+    "{22:68}": "{22:1}",   // Onslaught
+    "{22:87}": "{22:88}",  // Birts Bees
+    "{22:91}": "{22:1}",   // Mercury
+    "{23:20}": "{23:19}",  // Stray
+    "{25:20}": "{25:59}",  // Complex Root
+    "{25:60}": "{25:61}",  // Katagawas Revenge
+    "{25:81}": "{25:82}",  // Conflux
+    "{27:73}": "{27:1}",   // Bonnie and Clyde
+  };
+  const pearlRarityToken = VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]);
 
   // Removed: extreme same-prefix stacking (3 parts ×25 each) and body ×10 repeats.
   // Terra's actual guns don't use these — they bloat the code without synergy.

@@ -1254,6 +1254,7 @@ export default function UnifiedItemBuilderPage() {
   const [category, setCategory] = usePersistedState<ItemCategory>("uib.category", "weapon");
   const [level, setLevel] = usePersistedState("uib.level", 50);
   const [seed, setSeed] = usePersistedState("uib.seed", 1);
+  const [signatureSeed, setSignatureSeed] = usePersistedState<number | null>("uib.signatureSeed", null);
   const [liveBase85, setLiveBase85] = usePersistedState("uib.liveBase85", "");
   const [liveDecoded, setLiveDecoded] = usePersistedState("uib.liveDecoded", "");
   const [lastEditedCodecSide, setLastEditedCodecSide] = useState<"base85" | "decoded" | null>(null);
@@ -3842,14 +3843,38 @@ export default function UnifiedItemBuilderPage() {
               </div>
               <div>
                 <label className="block text-xs text-[var(--color-accent)] mb-1">Seed</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={9999}
-                  value={seed}
-                  onChange={(e) => setSeed(Number(e.target.value) || 1)}
-                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
-                />
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    min={1}
+                    max={9999}
+                    value={seed}
+                    onChange={(e) => setSeed(Number(e.target.value) || 1)}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
+                  />
+                  {signatureSeed ? (
+                    <button
+                      type="button"
+                      onClick={() => setSeed(signatureSeed)}
+                      title={`Apply your signature: ${signatureSeed}`}
+                      className="px-2 py-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-400 text-[10px] font-bold min-h-[44px] hover:bg-amber-500/20 touch-manipulation whitespace-nowrap"
+                    >
+                      {signatureSeed}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = prompt("Set your signature seed — your digital modder signature on every gun:");
+                        if (val && /^\d{1,4}$/.test(val.trim())) setSignatureSeed(Number(val.trim()));
+                      }}
+                      title="Set a signature seed — your digital modder signature"
+                      className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-[10px] min-h-[44px] hover:border-amber-500/40 hover:text-amber-400 touch-manipulation"
+                    >
+                      Sign
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button

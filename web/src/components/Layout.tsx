@@ -13,7 +13,8 @@ const nav = [
 ];
 
 // Routes that use the new sidebar layout — show minimal header instead of full nav
-const MINIMAL_HEADER_ROUTES = ["/beta/unified-item-builder", "/test-app", "/terra"];
+// All routes get the minimal header — the new sidebar homepage is the main nav now
+const MINIMAL_HEADER_ROUTES = ["/beta", "/test-app", "/terra", "/character", "/inventory", "/gear-forge", "/master-search", "/settings", "/save-compare", "/community"];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
