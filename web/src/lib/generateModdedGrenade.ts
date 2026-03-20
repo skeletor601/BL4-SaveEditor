@@ -35,9 +35,11 @@ const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - 
 const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
 const groupedToken = (prefix: number, ids: number[]): string => `{${prefix}:[${ids.join(" ")}]}`;
 
-// IDs forbidden from the {245:[...]} block — same rules as weapon generator.
+// IDs forbidden from the {245:[...]} block for standalone grenades.
+// Overflow (70) and Express (71) are ALLOWED here — they're great on grenades (more charges, faster cooldown).
+// Only blocked in the WEAPON generator's grenade reload block.
 const GRENADE_245_FIRMWARE_WHITELIST = [5, 6, 10, 17, 20];
-const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,70,71,87,88]);
+const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,87,88]);
 const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
 
 // Non-kinetic element IDs for {245:XX} element codes
@@ -292,6 +294,8 @@ function buildFallbackPerkBlock(
     ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap(
       (id) => Array(ri(4, 8)).fill(id),
     ),
+    ...Array(ri(8, 16)).fill(70),  // Overflow — extra grenade charges
+    ...Array(ri(8, 16)).fill(71),  // Express — faster grenade cooldown
     24, 40, 53, 62, 66, 76, 77, 21,
   ].filter((id) => !GRENADE_245_FORBIDDEN.has(id));
   return `{245:[${ids.join(" ")}]}`;
