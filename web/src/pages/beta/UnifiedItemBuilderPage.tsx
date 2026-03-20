@@ -4009,10 +4009,10 @@ export default function UnifiedItemBuilderPage() {
                 <button
                   type="button"
                   onClick={resetWeaponBuilder}
-                  className="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500/60 text-sm min-h-[44px] touch-manipulation"
+                  className="px-4 py-2 rounded-lg border-2 border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:border-red-500/70 font-bold text-sm min-h-[44px] touch-manipulation"
                   title="Clear all selections, codes, and reset the builder for a fresh start"
                 >
-                  Reset
+                  Reset Builder
                 </button>
                 <span className="self-center text-[var(--color-text-muted)] text-xs mx-1">|</span>
                 <div className="flex flex-wrap items-center gap-2">

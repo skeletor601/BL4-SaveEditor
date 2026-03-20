@@ -31,22 +31,24 @@ const TABS: TabDef[] = [
 function useQuickStats() {
   const [stats, setStats] = useState<{ parts: number; weapons: number; categories: number; totalVisits: number; uniqueVisitors: number; weaponsGenerated: number; grenadesGenerated: number } | null>(null);
   useEffect(() => {
-    // Track visit
-    fetchApi("stats/visit", { method: "POST" }).catch(() => {});
-    // Fetch live stats
-    fetchApi("stats").then((r) => r.json()).then((data) => {
-      setStats({
-        parts: 5210,
-        weapons: 2209,
-        categories: 8,
-        totalVisits: data.totalVisits ?? 0,
-        uniqueVisitors: data.uniqueVisitors ?? 0,
-        weaponsGenerated: data.weaponsGenerated ?? 0,
-        grenadesGenerated: data.grenadesGenerated ?? 0,
+    // Track visit first, then fetch updated stats
+    fetchApi("stats/visit", { method: "POST" })
+      .catch(() => {})
+      .finally(() => {
+        fetchApi("stats").then((r) => r.json()).then((data) => {
+          setStats({
+            parts: 5210,
+            weapons: 2209,
+            categories: 8,
+            totalVisits: data.totalVisits ?? 0,
+            uniqueVisitors: data.uniqueVisitors ?? 0,
+            weaponsGenerated: data.weaponsGenerated ?? 0,
+            grenadesGenerated: data.grenadesGenerated ?? 0,
+          });
+        }).catch(() => {
+          setStats({ parts: 5210, weapons: 2209, categories: 8, totalVisits: 0, uniqueVisitors: 0, weaponsGenerated: 0, grenadesGenerated: 0 });
+        });
       });
-    }).catch(() => {
-      setStats({ parts: 5210, weapons: 2209, categories: 8, totalVisits: 0, uniqueVisitors: 0, weaponsGenerated: 0, grenadesGenerated: 0 });
-    });
   }, []);
   return stats;
 }
