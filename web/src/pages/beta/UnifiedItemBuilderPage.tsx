@@ -2658,8 +2658,8 @@ export default function UnifiedItemBuilderPage() {
       setLiveDecoded(decoded.trim());
       setLastEditedCodecSide("decoded");
       // ── Roll tracker + weapon trait detection ──
-      const newCount = rollCount + 1;
-      setRollCount(newCount);
+      let newCount = 0;
+      setRollCount((prev) => { newCount = prev + 1; return newCount; });
       const milestones: Record<number, string> = {
         1: "First roll! Welcome to the mod life.",
         10: "10 rolls — getting warmed up.",
