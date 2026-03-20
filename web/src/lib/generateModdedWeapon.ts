@@ -729,26 +729,25 @@ export function generateModdedWeapon(
   // behavior regardless of what weapon type the gun is. Each heavy manufacturer contributes
   // unique accessories: Torgue rockets, Ripper beams, Vladof multi-barrel, Maliwan MIRV.
   // Pick one heavy manufacturer and add 2-4 accessories from it.
-  const HEAVY_BARREL_ACCESSORIES: Record<number, number[]> = {
-    273: [1, 6, 9, 10, 11, 12, 22, 23, 24, 26, 27, 28, 29],  // Torgue: homing, triple barrel, shrapnel, air burst, two-shot, FR, mag, scanning
-    275: [2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 24, 25],       // Ripper: explosive, beam splitter, compound, ricochet, heat exchange, wide disk, heat sink
-    282: [13, 14, 15, 16, 17, 18, 19, 20, 27, 28],            // Vladof: additional barrel, angel's share, magic bullet, devil's share, explosive, two-shot, penetration
-    289: [2, 3, 12, 13, 14, 15, 16, 17, 18, 19],              // Maliwan: MIRV, proxy homing, ricochet, penetration, speed loader, overload, two-shot, aerodynamics
-  };
+  // Heavy barrel accessory reference (kept for documentation):
+  // 273 Torgue: 1=homing, 6/9/12/22=triple barrel, 10/11/23/24=air burst/shrapnel, 26=two-shot, 27=FR, 28=mag, 29=scanning
+  // 275 Ripper: 2/18=explosive, 3/21=beam splitter, 4/9/24=compound, 5/7/25=ricochet, 22/6/8=wide disk, 23=heat exchange
+  // 282 Vladof: 13=additional barrel, 14=angel's share, 15/27=magic bullet, 16/28=devil's share, 17=additional barrels, 18=explosive, 19=two-shot, 20=penetration
+  // 289 Maliwan: 2/16=MIRV, 3/19=proxy homing, 12=ricochet, 13=penetration, 14=speed loader, 15=overload, 17=two-shot, 18=aerodynamics
+  // Heavy barrel accessories from ALL manufacturers — Terra's approach.
+  // Not just one random manufacturer — use specific desirable parts from each.
   const heavyBarrelAccessoryTokens: string[] = (() => {
     if (isClaudeGun) {
-      // Claude's Gun: Maliwan heavy — MIRV(16) + Proxy Homing(19) + Two-Shot(17) + Overload(15)
       return [groupedToken(289, [16, 19, 17, 15])];
     }
-    // Pick a random heavy manufacturer for cross-insert accessories
-    const prefixes = [273, 275, 282, 289];
-    const prefix = pick(prefixes);
-    const accPool = HEAVY_BARREL_ACCESSORIES[prefix]!;
-    // Pick 2-4 unique accessories as a single grouped token (Terra's pattern: one {prefix:[...]} token)
-    const count = { stable: randInt(2, 3), op: randInt(2, 4), insane: randInt(3, 4) }[modPowerMode];
-    const shuffled = [...accPool].sort(() => Math.random() - 0.5);
-    const chosen = shuffled.slice(0, Math.min(count, shuffled.length));
-    return [groupedToken(prefix, chosen)];
+    const tokens: string[] = [];
+    // Torgue (273): Scanning + Fire Rate
+    tokens.push(groupedToken(273, [29, 27]));
+    // Vladof (282): Explosive Rounds + Additional Barrels
+    tokens.push("{282:18}", "{282:17}");
+    // Maliwan (289): Proxy Homing + Aerodynamics
+    tokens.push(groupedToken(289, [3, 19]));
+    return tokens;
   })();
 
   // ── Terra's barrel cap: max 5 unique barrel codes per gun ──────────────────────────────────
@@ -1085,10 +1084,10 @@ export function generateModdedWeapon(
     ? [groupedToken(273, Array.from({ length: randInt(8, 24) }, () => 1))]
     : [];
 
-  // {289:[17 16 17]} Terra's exact pattern — Two-Shot + MIRV + Two-Shot.
-  // Tight and synergistic: MIRV splits projectiles, Two-Shot doubles them.
-  // No excess stacking — more than 3-4 Two-Shot IDs kills damage (splits too many times).
-  const multiProjectileToken = groupedToken(289, [17, 16, 17]);
+  // Two-Shot ×10 — Terra's gun stacks 10 for maximum projectile multiplication.
+  // MIRV separate — splits projectiles into orbs.
+  const twoShotCount = { stable: randInt(5, 7), op: randInt(8, 10), insane: 10 }[modPowerMode];
+  const multiProjectileToken = groupedToken(289, Array(twoShotCount).fill(17));
 
   // Cross-manufacturer ammo-efficiency stacks (from Uxhiha/Terra-Morpheous weapon analysis).
   // {281:3}  = Order Enhancement "Free Charger"  — 30% chance to fire for free at max charge.
@@ -1096,26 +1095,21 @@ export function generateModdedWeapon(
   // {286:1}  = COV Enhancement "Ventilator"      — 25% chance 0 Heat when fired.
   // {275:23} = Ripper HW "Heat Exchange"         — fires full auto after initial charge.
   // {273:29} = Torgue HW "Scanning"              — rockets home toward nearby targets.
-  const ammoEffRanges = {
-    stable: { fc: [8,  16] as const, as: [8,  16] as const, ven: [8,  16] as const, he: [4,  8] as const },
-    op:     { fc: [14, 26] as const, as: [12, 21] as const, ven: [12, 21] as const, he: [5,  10] as const },
-    insane: { fc: [20, 36] as const, as: [15, 25] as const, ven: [15, 25] as const, he: [6,  12] as const },
-  }[modPowerMode];
-  // Terra's full-auto string — these three exact stacks together make any gun fully automatic.
+  // ammoEffRanges removed — full-auto string is now fixed doubled values per Terra's pattern.
+  // Terra's full-auto string DOUBLED — two copies of Free Charger + Heat Exchange.
+  // Terra's gun has both sets for maximum full-auto reliability.
   // {281:[3×36]} Free Charger × 36, {275:[23×9]} Heat Exchange × 9, {26:[30×3]} Order SR mag × 3.
-  // Fixed values — do not vary by mode.
-  const freeChargerStacks  = [groupedToken(281, Array(36).fill(3))];
-  const heatExchangeStacks = [groupedToken(275, Array(9).fill(23))];
+  const freeChargerStacks  = [groupedToken(281, Array(36).fill(3)), groupedToken(281, Array(36).fill(3))];
+  const heatExchangeStacks = [groupedToken(275, Array(9).fill(23)), groupedToken(275, Array(9).fill(23))];
   const orderSrMagStacks   = [groupedToken(26,  Array(3).fill(30))];
   // Angel's Share — Terra uses a single {282:14}. Too many stacks = gun never needs to reload.
   // Keep it light: 1-3 stacks so the gun still reloads (important for grenade reload to trigger).
   const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(1, 3) }, () => 14))];
-  // Ventilator excluded from all grenade-reload guns — COV heat mechanic disables the reload trigger,
-  // which prevents the grenade reload visual from ever firing. Only used in inf-ammo mode where
-  // there is no grenade block and the heat gauge is the intended mechanic.
-  const ventilatorStacks = options.specialMode === "inf-ammo"
-    ? [groupedToken(286, Array.from({ length: randInt(ammoEffRanges.ven[0], ammoEffRanges.ven[1]) }, () => 1))]
-    : [];
+  // Ventilator on ALL guns except grenade-reload (COV heat mechanic disables reload trigger).
+  // Terra uses {286:[1×6]} on regular guns. Scales by mode.
+  const ventilatorStacks = options.specialMode === "grenade-reload"
+    ? []
+    : [groupedToken(286, Array.from({ length: { stable: randInt(3, 5), op: randInt(5, 7), insane: randInt(6, 8) }[modPowerMode] }, () => 1))];
   // {273:29} Scanning — rockets home toward nearby targets; complements {273:1} Reticle Homing.
   const scanningHomingToken = "{273:29}";
 
@@ -1465,9 +1459,9 @@ export function generateModdedWeapon(
   // {292:[9×10]} Tediore Enhancement "Divider" — Terra confirmed: always exactly 10 stacks on every gun.
   const dividerStacks = [groupedToken(292, Array(10).fill(9))];
 
-  // Elemental override — EVERY gun gets exactly ONE non-kinetic element.
-  // chosenElementId is defined early (before altFireTokens) so both can reference it.
-  const extendedElementTokens = [`{1:${chosenElementId}}`];
+  // ALL 6 elements — Terra's approach: {1:[55 56 57 58 59 60]} gives the gun every element type.
+  // chosenElementId still used for grenade block element matching.
+  const extendedElementTokens = ["{1:[55 56 57 58 59 60]}"];
 
   // ── STOCK BASE ──────────────────────────────────────────────────────────────────────────
   // When stockBaseDecoded is provided (from auto-fill), use it as the complete stock weapon.

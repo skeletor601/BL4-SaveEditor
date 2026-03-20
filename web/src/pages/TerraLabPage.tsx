@@ -125,6 +125,9 @@ export default function TerraLabPage() {
           </div>
         </div>
 
+        {/* Terra's Code Vault */}
+        <TerraVault />
+
         {/* Live Feedback System */}
         <FeedbackPanel author="Terra" />
 
@@ -177,6 +180,186 @@ function CheckItem({ label }: { label: string }) {
 }
 
 // ── Feedback Panel ──────────────────────────────────────────────────────────
+// ── Terra's Code Vault ──────────────────────────────────────────────────────
+interface VaultEntry {
+  id: string;
+  label: string;
+  code: string;
+  type: string;
+  tags: string[];
+  notes: string;
+  author: string;
+  timestamp: number;
+}
+
+const ITEM_TYPES = ["weapon", "grenade", "shield", "class-mod", "repkit", "enhancement", "heavy", "other"] as const;
+const ITEM_TYPE_COLORS: Record<string, string> = {
+  weapon: "border-red-500/40 bg-red-500/10 text-red-400",
+  grenade: "border-orange-500/40 bg-orange-500/10 text-orange-400",
+  shield: "border-blue-500/40 bg-blue-500/10 text-blue-400",
+  "class-mod": "border-green-500/40 bg-green-500/10 text-green-400",
+  repkit: "border-cyan-500/40 bg-cyan-500/10 text-cyan-400",
+  enhancement: "border-yellow-500/40 bg-yellow-500/10 text-yellow-400",
+  heavy: "border-pink-500/40 bg-pink-500/10 text-pink-400",
+  other: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]",
+};
+
+function TerraVault() {
+  const [entries, setEntries] = useState<VaultEntry[]>([]);
+  const [label, setLabel] = useState("");
+  const [code, setCode] = useState("");
+  const [type, setType] = useState<string>("weapon");
+  const [tags, setTags] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const loadEntries = useCallback(async () => {
+    try {
+      const res = await fetchApi("terra-vault");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setEntries(data);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { loadEntries(); }, [loadEntries]);
+
+  const handleSave = async () => {
+    if (!code.trim() || !label.trim()) return;
+    setSaving(true);
+    setStatus(null);
+    try {
+      const res = await fetchApi("terra-vault", {
+        method: "POST",
+        body: JSON.stringify({
+          label: label.trim(),
+          code: code.trim(),
+          type,
+          tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
+          notes: notes.trim(),
+          author: "Terra",
+        }),
+      });
+      if (res.ok) {
+        setLabel(""); setCode(""); setTags(""); setNotes("");
+        setStatus("Saved!");
+        loadEntries();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatus(data.error ?? "Failed.");
+      }
+    } catch {
+      setStatus("Failed — API might be down.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this code?")) return;
+    try {
+      await fetchApi(`terra-vault/${id}`, { method: "DELETE" });
+      loadEntries();
+    } catch { /* ignore */ }
+  };
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch { /* ignore */ }
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const timeAgo = (ts: number) => {
+    const diff = Date.now() - ts;
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return new Date(ts).toLocaleDateString();
+  };
+
+  const filtered = filter === "all" ? entries : entries.filter((e) => e.type === filter);
+
+  return (
+    <div className="rounded-xl border border-amber-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+      <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-amber-400">Terra's Code Vault</h3>
+          <p className="text-[10px] text-[var(--color-text-muted)]">{entries.length} codes stored — DrLecter studies these to improve the generators</p>
+        </div>
+        <span className="text-[10px] font-mono text-amber-400/50">{entries.length}/500</span>
+      </div>
+
+      {/* Save new code */}
+      <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {ITEM_TYPES.map((t) => (
+            <button key={t} onClick={() => setType(t)}
+              className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${type === t ? ITEM_TYPE_COLORS[t] : "border-transparent text-[var(--color-text-muted)]/50"}`}
+            >{t}</button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Name this code (e.g. 'God Roll Hellwalker')"
+            className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm focus:border-amber-500 focus:outline-none" />
+          <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tags (comma separated)"
+            className="w-40 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-amber-500 focus:outline-none" />
+        </div>
+        <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste decoded or Base85 code here..."
+          className="w-full h-16 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs font-mono resize-y focus:border-amber-500 focus:outline-none" />
+        <div className="flex gap-2">
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional — what makes this code special?)"
+            className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-amber-500 focus:outline-none" />
+          <button onClick={handleSave} disabled={saving || !code.trim() || !label.trim()}
+            className="px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 text-sm font-medium hover:bg-amber-500/30 disabled:opacity-50 min-h-[40px]"
+          >{saving ? "Saving..." : "Save to Vault"}</button>
+        </div>
+        {status && <p className="text-xs text-amber-400">{status}</p>}
+      </div>
+
+      {/* Filter + entries */}
+      <div className="px-4 py-2 border-b border-[var(--color-panel-border)] flex flex-wrap gap-1.5">
+        {["all", ...ITEM_TYPES].map((f) => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${filter === f ? "border-amber-500/40 bg-amber-500/10 text-amber-400" : "border-transparent text-[var(--color-text-muted)]/50"}`}
+          >{f} ({f === "all" ? entries.length : entries.filter((e) => e.type === f).length})</button>
+        ))}
+      </div>
+
+      <div className="max-h-[500px] overflow-y-auto divide-y divide-[var(--color-panel-border)]/50">
+        {filtered.length === 0 ? (
+          <div className="p-6 text-center text-xs text-[var(--color-text-muted)]">No codes yet. Save your best builds here!</div>
+        ) : filtered.map((e) => (
+          <div key={e.id} className="px-4 py-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button onClick={() => toggleExpand(e.id)} className="text-xs font-bold text-[var(--color-text)] hover:text-amber-400">{e.label}</button>
+              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${ITEM_TYPE_COLORS[e.type] ?? ITEM_TYPE_COLORS.other}`}>{e.type}</span>
+              {e.tags.map((t) => <span key={t} className="px-1.5 py-0.5 rounded text-[8px] bg-white/5 text-[var(--color-text-muted)] border border-[var(--color-panel-border)]">{t}</span>)}
+              <span className="text-[10px] text-[var(--color-text-muted)]">{timeAgo(e.timestamp)}</span>
+              <button onClick={() => handleCopy(e.code)} className="text-[10px] text-[var(--color-text-muted)] hover:text-amber-400">Copy</button>
+              <button onClick={() => handleDelete(e.id)} className="text-[10px] text-[var(--color-text-muted)] hover:text-red-400">Delete</button>
+            </div>
+            {e.notes && <p className="text-[10px] text-[var(--color-text-muted)] mt-1 italic">{e.notes}</p>}
+            {expanded.has(e.id) && (
+              <pre className="mt-2 p-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[10px] text-[var(--color-text)] font-mono whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto">{e.code}</pre>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 interface FeedbackEntry {
   id: string;
   author: string;
