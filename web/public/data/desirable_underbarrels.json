@@ -31,86 +31,6 @@
       "partType": "democharge"
     },
     {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{13:60}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{2:45}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{8:44}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{20:47}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{7:53}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{19:48}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{23:46}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{14:69}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{5:51}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{11:56}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{17:42}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{6:42}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{12:42}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{18:85}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{22:49}",
-      "partType": "elementswitch"
-    },
-    {
-      "name": "part underbarrel 06 malswitch",
-      "code": "{16:45}",
-      "partType": "elementswitch"
-    },
-    {
       "name": "part underbarrel om spacelaser",
       "code": "{13:75}",
       "partType": "elementswitch"
@@ -129,16 +49,6 @@
       "name": "part underbarrel 03 flamethrower",
       "code": "{22:52}",
       "partType": "flamethrower"
-    },
-    {
-      "name": "part underbarrel 02 meathook",
-      "code": "{9:46}",
-      "partType": "gravityharpoon"
-    },
-    {
-      "name": "part underbarrel 02 gravitywell",
-      "code": "{4:72}",
-      "partType": "gravitywell"
     },
     {
       "name": "part underbarrel 01 grenade",

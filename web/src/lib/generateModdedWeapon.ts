@@ -984,10 +984,12 @@ export function generateModdedWeapon(
       }
     }
     // Guaranteed fallback — every gun ALWAYS gets an underbarrel, no exceptions, no mode dependencies.
-    // Pick from the curated desirable list (unfiltered — we trust these are all safe choices).
-    // Absolute last resort: {26:77} Seamstress, which is always in the desirable list.
+    // 15% chance to force Seamstress {26:77} — Terra's favorite, enables needle launcher + flight.
+    // Otherwise pick from the curated desirable list.
     if (!underbarrelToken) {
-      if (ubPartsRaw.length > 0) {
+      if (Math.random() < 0.15) {
+        underbarrelToken = "{26:77}";
+      } else if (ubPartsRaw.length > 0) {
         underbarrelToken = pick(ubPartsRaw as DesirableUnderbarrelEntry[]).code.trim();
       } else {
         underbarrelToken = "{26:77}";
