@@ -1264,7 +1264,7 @@ export default function UnifiedItemBuilderPage() {
   const [addToBackpackLoading, setAddToBackpackLoading] = useState(false);
   const [showCleanCodeDialog, setShowCleanCodeDialog] = useState(false);
   const codecRequestId = useRef(0);
-  const { saveData, getYamlText, updateSaveData } = useSave();
+  const { saveData, getYamlText, updateSaveData, canOverwriteInPlace, overwriteSaveInPlace, savePlatform, saveUserId } = useSave();
   const navigate = useNavigate();
   const [flagValue, setFlagValue] = usePersistedState("unified-item-builder.flagValue", 1);
   const [masterUnlockGuidelines, setMasterUnlockGuidelines] = usePersistedState("unified-item-builder.masterUnlock", false);
@@ -3732,6 +3732,19 @@ export default function UnifiedItemBuilderPage() {
             className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-sm min-h-[44px] touch-manipulation"
           >
             {addToBackpackLoading ? "Adding…" : "Add to Backpack"}
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              setCodecStatus("Overwriting save...");
+              const ok = await overwriteSaveInPlace();
+              setCodecStatus(ok ? "Save overwritten successfully!" : "Overwrite failed — check error above.");
+            }}
+            disabled={!saveData || !savePlatform || !saveUserId}
+            title="Encrypt and save your .sav file"
+            className="px-4 py-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)] font-medium hover:bg-[var(--color-accent)]/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm min-h-[44px] touch-manipulation"
+          >
+            Overwrite Save
           </button>
           {!saveData && (
             <span className="text-xs text-[var(--color-text-muted)]">Load a save (Character → Select Save) to add to backpack.</span>

@@ -17,6 +17,7 @@ export default function SelectSaveView() {
   const inputRef = useRef<HTMLInputElement>(null);
   const savInputRef = useRef<HTMLInputElement>(null);
   const savFileHandleRef = useRef<any | null>(null);
+  const { setSavFileHandle } = useSave();
   const [, setSavBytes] = useState<Uint8Array | null>(null);
   const [savFileName, setSavFileName] = useState<string | null>(null);
   const [userIdInput, setUserIdInput] = useState(getStoredUserId);
@@ -62,6 +63,7 @@ export default function SelectSaveView() {
         const bytes = new Uint8Array(buf);
         setSavBytes(bytes);
         savFileHandleRef.current = null;
+        setSavFileHandle(null);
         setSavFileName(f.name);
         const uid = userIdInput.trim();
         if (!uid) return;
@@ -104,6 +106,7 @@ export default function SelectSaveView() {
         const buf = await file.arrayBuffer();
         const bytes = new Uint8Array(buf);
         savFileHandleRef.current = handle;
+        setSavFileHandle(handle);
         setSavFileName(file.name);
         setIsDecrypting(true);
         try {

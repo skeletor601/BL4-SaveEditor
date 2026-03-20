@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { parse as yamlParse, stringify as yamlStringify } from "yaml";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
@@ -69,6 +69,12 @@ interface SaveContextValue {
   updateSaveData: (data: SaveData, yamlText?: string) => void;
   /** Current YAML as string (raw from decrypt when no edits, else stringified). For YAML View. */
   getYamlText: () => string;
+  /** Store the FileSystemFileHandle from showOpenFilePicker for true one-click overwrite. */
+  setSavFileHandle: (handle: unknown) => void;
+  /** True when we have a file handle for direct overwrite (no dialog). */
+  canOverwriteInPlace: boolean;
+  /** One-click overwrite: encrypt + write directly to the original .sav file. No dialog. Works in Chrome + Brave. */
+  overwriteSaveInPlace: () => Promise<boolean>;
 }
 
 const SaveContext = createContext<SaveContextValue | null>(null);
@@ -85,6 +91,14 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
   const [rawBytesBase64, setRawBytesBase64] = useState<string | null>(null);
 
   const summary = useMemo(() => getSummary(saveData), [saveData]);
+
+  // File handle for true one-click overwrite (File System Access API — Chrome + Brave)
+  const savFileHandleRef = useRef<unknown>(null);
+  const [canOverwriteInPlace, setCanOverwriteInPlace] = useState(false);
+  const setSavFileHandle = useCallback((handle: unknown) => {
+    savFileHandleRef.current = handle;
+    setCanOverwriteInPlace(handle != null && typeof (handle as { createWritable?: unknown }).createWritable === "function");
+  }, []);
 
   const loadFromText = useCallback((text: string, format: "json" | "yaml") => {
     setLoadError(null);
@@ -304,6 +318,62 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
     return "";
   }, [rawYamlUtf8, saveData]);
 
+  /** One-click overwrite: encrypt current save and write directly to original .sav file. */
+  const overwriteSaveInPlace = useCallback(async (): Promise<boolean> => {
+    if (!saveData || !saveUserId || !savePlatform) {
+      setLoadError("Decrypt a .sav first (with User ID and platform) before overwriting.");
+      return false;
+    }
+    setLoadError(null);
+    const defaultName = saveFileName?.replace(/\.(json|yaml|yml|txt)$/i, ".sav") ?? "bl4-save.sav";
+    const body: Record<string, unknown> = {
+      user_id: saveUserId,
+      platform: savePlatform,
+      filename: defaultName,
+    };
+    if (rawBytesBase64) {
+      body.raw_bytes_base64 = rawBytesBase64;
+    } else {
+      body.yaml_content = rawYamlUtf8 ?? yamlStringify(saveData, { indent: 2 });
+    }
+    try {
+      const res = await fetchApi("save/encrypt", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setLoadError(typeof data.error === "string" ? data.error : "Encrypt failed.");
+        return false;
+      }
+      const buf = await res.arrayBuffer();
+      const blob = new Blob([buf], { type: "application/octet-stream" });
+
+      // Try direct file write (File System Access API — Chrome + Brave)
+      const handle = savFileHandleRef.current as { createWritable?: () => Promise<WritableStream> } | null;
+      if (handle && typeof handle.createWritable === "function") {
+        try {
+          const writable = await handle.createWritable();
+          await (writable as unknown as { write: (d: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
+          await (writable as unknown as { close: () => Promise<void> }).close();
+          return true;
+        } catch {
+          // Fall through to download
+        }
+      }
+      // Fallback: trigger download with original filename
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = defaultName;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      return true;
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : "Encrypt failed. Is the API running?");
+      return false;
+    }
+  }, [saveData, saveUserId, savePlatform, saveFileName, rawYamlUtf8, rawBytesBase64]);
+
   const exportAsJson = useCallback(
     (filename?: string) => {
       if (!saveData) return;
@@ -352,6 +422,9 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       hasRawBytesForRoundtrip: rawBytesBase64 != null,
       updateSaveData,
       getYamlText,
+      setSavFileHandle,
+      canOverwriteInPlace,
+      overwriteSaveInPlace,
     }),
     [
       saveData,
@@ -371,6 +444,9 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       rawBytesBase64,
       updateSaveData,
       getYamlText,
+      setSavFileHandle,
+      canOverwriteInPlace,
+      overwriteSaveInPlace,
     ]
   );
 
