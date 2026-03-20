@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTheme, THEMES, THEME_META } from "@/contexts/ThemeContext";
+import { fetchApi } from "@/lib/apiClient";
 import { CHANGE_LOG } from "@/data/changelog";
 
 // ── Tab definitions ──────────────────────────────────────────────────────────
@@ -28,10 +29,24 @@ const TABS: TabDef[] = [
 
 // ── Quick stats (loaded from API) ────────────────────────────────────────────
 function useQuickStats() {
-  const [stats, setStats] = useState<{ parts: number; weapons: number; categories: number } | null>(null);
+  const [stats, setStats] = useState<{ parts: number; weapons: number; categories: number; totalVisits: number; uniqueVisitors: number; weaponsGenerated: number; grenadesGenerated: number } | null>(null);
   useEffect(() => {
-    // Approximate from known data
-    setStats({ parts: 5210, weapons: 2209, categories: 8 });
+    // Track visit
+    fetchApi("stats/visit", { method: "POST" }).catch(() => {});
+    // Fetch live stats
+    fetchApi("stats").then((r) => r.json()).then((data) => {
+      setStats({
+        parts: 5210,
+        weapons: 2209,
+        categories: 8,
+        totalVisits: data.totalVisits ?? 0,
+        uniqueVisitors: data.uniqueVisitors ?? 0,
+        weaponsGenerated: data.weaponsGenerated ?? 0,
+        grenadesGenerated: data.grenadesGenerated ?? 0,
+      });
+    }).catch(() => {
+      setStats({ parts: 5210, weapons: 2209, categories: 8, totalVisits: 0, uniqueVisitors: 0, weaponsGenerated: 0, grenadesGenerated: 0 });
+    });
   }, []);
   return stats;
 }
@@ -243,7 +258,7 @@ export default function TestAppPage() {
 
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">
-          {activeTab === "command" && <CommandCenterTab onNavigate={setActiveTab} />}
+          {activeTab === "command" && <CommandCenterTab onNavigate={setActiveTab} siteStats={stats ? { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors, weaponsGenerated: stats.weaponsGenerated, grenadesGenerated: stats.grenadesGenerated } : null} />}
           {activeTab === "gear-lab" && <GearLabTab />}
           {activeTab === "arsenal" && <ArsenalTab />}
           {activeTab === "save-ops" && <SaveOpsTab />}
@@ -256,7 +271,7 @@ export default function TestAppPage() {
 }
 
 // ── Tab: Command Center (Dashboard + Updates) ─────────────────────────────────
-function CommandCenterTab({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
+function CommandCenterTab({ onNavigate, siteStats }: { onNavigate: (tab: TabId) => void; siteStats: { totalVisits: number; uniqueVisitors: number; weaponsGenerated: number; grenadesGenerated: number } | null }) {
   const recentChanges = CHANGE_LOG.slice(0, 8);
 
   return (
@@ -296,8 +311,14 @@ function CommandCenterTab({ onNavigate }: { onNavigate: (tab: TabId) => void }) 
 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <StatCard label="Total Visits" value={siteStats?.totalVisits?.toLocaleString() ?? "—"} />
+        <StatCard label="Unique Visitors" value={siteStats?.uniqueVisitors?.toLocaleString() ?? "—"} />
+        <StatCard label="Weapons Generated" value={siteStats?.weaponsGenerated?.toLocaleString() ?? "—"} />
+        <StatCard label="Grenades Generated" value={siteStats?.grenadesGenerated?.toLocaleString() ?? "—"} />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard label="Total Parts" value="5,210" />
-        <StatCard label="Weapons" value="2,209" />
+        <StatCard label="Weapons in DB" value="2,209" />
         <StatCard label="Grenade Recipes" value="24" />
         <StatCard label="Manufacturers" value="11" />
       </div>
