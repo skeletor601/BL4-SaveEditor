@@ -2,8 +2,9 @@
  * /terra — Terra's private testing ground.
  * Top-secret features land here first before going public.
  */
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { fetchApi } from "@/lib/apiClient";
 
 export default function TerraLabPage() {
   const [unlocked, setUnlocked] = useState(false);
@@ -124,11 +125,8 @@ export default function TerraLabPage() {
           </div>
         </div>
 
-        {/* Feedback area */}
-        <div className="rounded-xl border border-dashed border-amber-500/30 p-6 text-center" style={{ backgroundColor: "rgba(18, 21, 27, 0.4)" }}>
-          <p className="text-sm text-amber-400/60">Feedback zone — tell us what works, what's broken, and what's next.</p>
-          <p className="text-[10px] text-[var(--color-text-muted)]/40 mt-2">This page is hidden from the public nav. Only accessible at /terra</p>
-        </div>
+        {/* Live Feedback System */}
+        <FeedbackPanel author="Terra" />
 
         {/* Credits */}
         <div className="text-center text-[10px] font-mono text-[var(--color-text-muted)]/30 select-none space-y-1">
@@ -175,5 +173,156 @@ function CheckItem({ label }: { label: string }) {
         {label}
       </span>
     </label>
+  );
+}
+
+// ── Feedback Panel ──────────────────────────────────────────────────────────
+interface FeedbackEntry {
+  id: string;
+  author: string;
+  type: string;
+  message: string;
+  page: string;
+  status: string;
+  reply?: string;
+  timestamp: number;
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  bug: "border-red-500/40 bg-red-500/10 text-red-400",
+  idea: "border-blue-500/40 bg-blue-500/10 text-blue-400",
+  question: "border-yellow-500/40 bg-yellow-500/10 text-yellow-400",
+  note: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]",
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  new: "border-amber-500/40 bg-amber-500/10 text-amber-400",
+  seen: "border-blue-500/40 bg-blue-500/10 text-blue-400",
+  fixed: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+  wontfix: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]",
+};
+
+function FeedbackPanel({ author }: { author: string }) {
+  const [entries, setEntries] = useState<FeedbackEntry[]>([]);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState<string>("bug");
+  const [page, setPage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+
+  const loadEntries = useCallback(async () => {
+    try {
+      const res = await fetchApi("feedback");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setEntries(data);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { loadEntries(); }, [loadEntries]);
+
+  const handleSubmit = async () => {
+    if (!message.trim()) return;
+    setSending(true);
+    setStatus(null);
+    try {
+      const res = await fetchApi("feedback", {
+        method: "POST",
+        body: JSON.stringify({ author, type, message: message.trim(), page: page.trim() }),
+      });
+      if (res.ok) {
+        setMessage("");
+        setPage("");
+        setStatus("Sent!");
+        loadEntries();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatus(data.error ?? "Failed to send.");
+      }
+    } catch {
+      setStatus("Failed — API might be down.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const timeAgo = (ts: number) => {
+    const diff = Date.now() - ts;
+    if (diff < 60000) return "just now";
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return `${Math.floor(diff / 86400000)}d ago`;
+  };
+
+  return (
+    <div className="rounded-xl border border-amber-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+      <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-amber-400">Live Feedback</h3>
+        <span className="text-[10px] font-mono text-[var(--color-text-muted)]">DrLecter sees everything here</span>
+      </div>
+
+      {/* Submit form */}
+      <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
+        <div className="flex gap-2">
+          {(["bug", "idea", "question", "note"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setType(t)}
+              className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${type === t ? TYPE_COLORS[t] : "border-transparent text-[var(--color-text-muted)]/50"}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="What's on your mind? Bug reports, ideas, questions..."
+          className="w-full h-20 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm resize-y focus:border-amber-500 focus:outline-none"
+        />
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={page}
+            onChange={(e) => setPage(e.target.value)}
+            placeholder="Which page/feature? (optional)"
+            className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-amber-500 focus:outline-none"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={sending || !message.trim()}
+            className="px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 text-sm font-medium hover:bg-amber-500/30 disabled:opacity-50 min-h-[40px]"
+          >
+            {sending ? "Sending..." : "Send"}
+          </button>
+        </div>
+        {status && <p className="text-xs text-amber-400">{status}</p>}
+      </div>
+
+      {/* Entries list */}
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-[var(--color-panel-border)]/50">
+        {entries.length === 0 ? (
+          <div className="p-4 text-center text-xs text-[var(--color-text-muted)]">No feedback yet. Be the first!</div>
+        ) : entries.map((e) => (
+          <div key={e.id} className="px-4 py-3 space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-[var(--color-text)]">{e.author}</span>
+              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${TYPE_COLORS[e.type] ?? TYPE_COLORS.note}`}>{e.type}</span>
+              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${STATUS_COLORS[e.status] ?? STATUS_COLORS.new}`}>{e.status}</span>
+              <span className="text-[10px] text-[var(--color-text-muted)]">{timeAgo(e.timestamp)}</span>
+              {e.page && <span className="text-[10px] text-[var(--color-text-muted)] font-mono">@ {e.page}</span>}
+            </div>
+            <p className="text-xs text-[var(--color-text)] leading-relaxed">{e.message}</p>
+            {e.reply && (
+              <div className="mt-1 pl-3 border-l-2 border-emerald-500/40">
+                <p className="text-[10px] text-emerald-400 font-bold">DrLecter:</p>
+                <p className="text-xs text-[var(--color-text-muted)]">{e.reply}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
