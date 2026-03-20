@@ -7,8 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const FEEDBACK_PATH = join(__dirname, "../../data/feedback.json");
+import { persistPath } from "../lib/persistPath.js";
+const FEEDBACK_PATH = persistPath("feedback.json");
 const MAX_ENTRIES = 200;
 
 export interface FeedbackEntry {

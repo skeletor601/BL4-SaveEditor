@@ -7,8 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const STATS_PATH = join(__dirname, "../../data/site_stats.json");
+import { persistPath } from "../lib/persistPath.js";
+const STATS_PATH = persistPath("site_stats.json");
 
 interface SiteStats {
   totalVisits: number;

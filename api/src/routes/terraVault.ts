@@ -7,8 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const VAULT_PATH = join(__dirname, "../../data/terra_vault.json");
+import { persistPath } from "../lib/persistPath.js";
+const VAULT_PATH = persistPath("terra_vault.json");
 const MAX_ENTRIES = 500;
 
 export interface VaultEntry {

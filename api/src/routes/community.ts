@@ -8,8 +8,8 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const RECIPES_PATH = join(__dirname, "../../data/community_recipes.json");
+import { persistPath } from "../lib/persistPath.js";
+const RECIPES_PATH = persistPath("community_recipes.json");
 
 // In-memory rate limit: max 5 submissions per IP per hour
 const RATE_LIMIT = 5;
