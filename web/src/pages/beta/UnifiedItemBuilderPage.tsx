@@ -2769,6 +2769,64 @@ export default function UnifiedItemBuilderPage() {
     [],
   );
 
+  // Shared codec reset — clears Base85/decoded output without affecting save data
+  const resetCodec = useCallback(() => {
+    setLiveBase85("");
+    setLiveDecoded("");
+    setCodecStatus(null);
+    setLastDps(null);
+    setLastWeaponTraits([]);
+    setGenerateModdedError(null);
+    setSeed(Math.floor(100 + Math.random() * 9900));
+  }, []);
+
+  // Per-builder reset functions
+  const resetWeaponBuilder = useCallback(() => {
+    setWeaponPartSelections({});
+    setExtraTokens([]);
+    setAutoFillWarning(null);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetGrenadeBuilder = useCallback(() => {
+    setGrenadePartSelections({});
+    setGrenadeExtraTokens([]);
+    setGrenadeAutoFillWarning(null);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetShieldBuilder = useCallback(() => {
+    setShieldPartSelections({});
+    setShieldExtraTokens([]);
+    setShieldAutoFillWarning(null);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetRepkitBuilder = useCallback(() => {
+    setRepkitPartSelections({});
+    setRepkitExtraTokens([]);
+    setRepkitAutoFillWarning(null);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetEnhancementBuilder = useCallback(() => {
+    setEnhancementPartSelections({});
+    setEnhancementExtraTokens([]);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetHeavyBuilder = useCallback(() => {
+    setHeavyPartSelections({});
+    setHeavyExtraTokens([]);
+    resetCodec();
+  }, [resetCodec]);
+
+  const resetClassModBuilder = useCallback(() => {
+    setClassModPartSelections({});
+    setClassModExtraTokens([]);
+    resetCodec();
+  }, [resetCodec]);
+
   const handleCopy = useCallback(async () => {
     let serial = liveBase85.split(/\r?\n/)[0]?.trim() ?? "";
     if (!serial.startsWith("@U") && liveDecoded.trim()) {
@@ -3713,6 +3771,25 @@ export default function UnifiedItemBuilderPage() {
           >
             Copy Code
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              const resetMap: Record<string, () => void> = {
+                weapon: resetWeaponBuilder,
+                grenade: resetGrenadeBuilder,
+                shield: resetShieldBuilder,
+                repkit: resetRepkitBuilder,
+                enhancement: resetEnhancementBuilder,
+                heavy: resetHeavyBuilder,
+                "class-mod": resetClassModBuilder,
+              };
+              (resetMap[category] ?? resetCodec)();
+            }}
+            className="px-4 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500/60 text-sm min-h-[44px] touch-manipulation"
+            title="Reset current builder — clears selections and codes"
+          >
+            Reset
+          </button>
           <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
             <span>Flag</span>
             <select
@@ -3927,18 +4004,7 @@ export default function UnifiedItemBuilderPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setWeaponPartSelections({});
-                    setExtraTokens([]);
-                    setLiveBase85("");
-                    setLiveDecoded("");
-                    setCodecStatus(null);
-                    setLastDps(null);
-                    setLastWeaponTraits([]);
-                    setGenerateModdedError(null);
-                    setAutoFillWarning(null);
-                    setSeed(Math.floor(100 + Math.random() * 9900));
-                  }}
+                  onClick={resetWeaponBuilder}
                   className="px-3 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500/60 text-sm min-h-[44px] touch-manipulation"
                   title="Clear all selections, codes, and reset the builder for a fresh start"
                 >
@@ -4534,6 +4600,12 @@ export default function UnifiedItemBuilderPage() {
                   >
                     Auto fill
                   </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
+                <div className="rounded-lg border border-red-500/40 px-3 py-2 min-h-[44px] flex items-center">
+                  <button type="button" onClick={resetGrenadeBuilder} className="text-red-400 hover:text-red-300 text-sm w-full text-left" title="Reset grenade builder">Reset</button>
                 </div>
               </div>
               <div>
