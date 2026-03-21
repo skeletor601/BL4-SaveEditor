@@ -45,8 +45,6 @@ export const EASTER_EGG_REGISTRY: { id: string; name: string; hint: string }[] =
   { id: "search-drlecter", name: "The Founder", hint: "Search for the creator" },
 
   // ── Hidden Pages ──
-  { id: "found-terra-lab", name: "Terra's Lab", hint: "Find the secret testing ground" },
-  { id: "found-drlecter-office", name: "DrLecter's Office", hint: "Find the command center" },
   { id: "found-test-app", name: "The Blueprint", hint: "Find the original layout mockup" },
 
   // ── UI Interactions ──
@@ -98,6 +96,9 @@ export const EASTER_EGG_REGISTRY: { id: string; name: string; hint: string }[] =
   { id: "footer-roast", name: "The Burn", hint: "Read the fine print on the dashboard" },
   { id: "konami-code", name: "Up Up Down Down", hint: "↑↑↓↓←→←→BA" },
   { id: "click-logo-10", name: "BL4 BL4 BL4", hint: "Click the BL4 logo 10 times" },
+  { id: "speed-roller", name: "Speed Roller", hint: "Generate 5 weapons in under 30 seconds" },
+  { id: "grenade-launched", name: "Houston We Have Liftoff", hint: "Generate a grenade with 5x+ knockback" },
+  { id: "one-week", name: "One Week Anniversary", hint: "Use the app 7 days after it launched" },
   { id: "all-eggs", name: "Egg Hunter Supreme", hint: "Find all 69 Easter eggs" },
 ];
 
