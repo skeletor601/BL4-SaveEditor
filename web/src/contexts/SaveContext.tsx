@@ -349,19 +349,27 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       const buf = await res.arrayBuffer();
       const blob = new Blob([buf], { type: "application/octet-stream" });
 
-      // Try direct file write (File System Access API — Chrome + Brave)
-      const handle = savFileHandleRef.current as { createWritable?: () => Promise<WritableStream> } | null;
-      if (handle && typeof handle.createWritable === "function") {
+      // Use showSaveFilePicker — remembers last directory, pre-fills filename.
+      // First save: user picks location. Every save after: defaults to same folder.
+      // Works in Chrome, Edge, Brave, Opera — all Chromium browsers.
+      const anyWindow = window as unknown as { showSaveFilePicker?: (opts: unknown) => Promise<unknown> };
+      if (typeof anyWindow.showSaveFilePicker === "function") {
         try {
-          const writable = await handle.createWritable();
-          await (writable as unknown as { write: (d: Blob) => Promise<void>; close: () => Promise<void> }).write(blob);
-          await (writable as unknown as { close: () => Promise<void> }).close();
+          const saveHandle = await anyWindow.showSaveFilePicker({
+            suggestedName: defaultName,
+            types: [{ description: "BL4 Save File", accept: { "application/octet-stream": [".sav"] } }],
+          }) as { createWritable: () => Promise<{ write: (d: Blob) => Promise<void>; close: () => Promise<void> }> };
+          const writable = await saveHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
           return true;
-        } catch {
+        } catch (err: unknown) {
+          // User cancelled the dialog
+          if (err && typeof err === "object" && (err as { name?: string }).name === "AbortError") return false;
           // Fall through to download
         }
       }
-      // Fallback: trigger download with original filename
+      // Fallback: trigger download with original filename (Firefox, Safari)
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = defaultName;
