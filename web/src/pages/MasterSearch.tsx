@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { discoverEgg } from "@/lib/easterEggs";
 import type { PartRow } from "@/data/partsData";
 import {
   getRowKey,
@@ -196,7 +197,22 @@ export default function MasterSearch() {
         { code: "{1:1}", "Part Type": "Thought Engine", Rarity: "Pearl", Manufacturer: "Anthropic", "Item Type": "Claude's Brain", category: "Easter Egg", effect: "Processes all weapon data simultaneously. Actually reads the CSV before answering. Built this entire app." },
       ],
     };
+    // Additional search Easter eggs
+    if (searchLower === "69") easterEggEntries["69"] = [{ code: "{69:69}", "Part Type": "Nice", Rarity: "Legendary", Manufacturer: "DrLecter", "Item Type": "Nice.", category: "Easter Egg", effect: "Nice." }];
+    if (searchLower === "420") easterEggEntries["420"] = [{ code: "{420:420}", "Part Type": "Seed", Rarity: "Pearl", Manufacturer: "Terra-Morpheous", "Item Type": "Terra's Seed", category: "Easter Egg", effect: "The perfect gun. Seed 420. If you know, you know." }];
+    if (searchLower === "6211") easterEggEntries["6211"] = [{ code: "{6211:6211}", "Part Type": "Signature", Rarity: "Pearl", Manufacturer: "DrLecter", "Item Type": "The Day Everything Changed", category: "Easter Egg", effect: "June 2, 2011. The day DrLecter started over. Every modded gun carries this number." }];
+    if (searchLower === "hello") easterEggEntries["hello"] = [{ code: "{0:0}", "Part Type": "Greeting", Rarity: "Common", Manufacturer: "System", "Item Type": "Hello World", category: "Easter Egg", effect: "Hello, Vault Hunter. Welcome to the BL4 AIO Save Editor." }];
+    if (searchLower === "borderlands") easterEggEntries["borderlands"] = [{ code: "{4:4}", "Part Type": "Meta", Rarity: "Legendary", Manufacturer: "Gearbox", "Item Type": "Borderlands 4", category: "Easter Egg", effect: "You're searching for the game inside the game's editor. How meta." }];
+    if (searchLower === "terra") easterEggEntries["terra"] = [{ code: "{420:1}", "Part Type": "Legend", Rarity: "Pearl", Manufacturer: "Terra-Morpheous", "Item Type": "The Ideas Guy", category: "Easter Egg", effect: "Half the features in this app exist because of Terra. Seed 420. Lab passphrase: classified." }];
+    if (searchLower === "drlecter") easterEggEntries["drlecter"] = [{ code: "{6211:1}", "Part Type": "Founder", Rarity: "Pearl", Manufacturer: "DrLecter6969", "Item Type": "The Vibe Coder", category: "Easter Egg", effect: "Built the most comprehensive BL4 save editor in existence. From a phone. With a $5 keyboard. In one week." }];
+
     const eggRows = easterEggEntries[searchLower] ?? [];
+
+    // Track search Easter egg discoveries
+    if (eggRows.length > 0) {
+      const searchEggMap: Record<string, string> = { chatgpt: "search-chatgpt", cursor: "search-cursor", claude: "search-claude", anthropic: "search-claude", "69": "search-69", "420": "search-420", "6211": "search-6211", hello: "search-hello", borderlands: "search-borderlands", terra: "search-terra", drlecter: "search-drlecter" };
+      if (searchEggMap[searchLower]) discoverEgg(searchEggMap[searchLower]);
+    }
 
     const list = data.filter((row) => {
       const raw = row as Record<string, unknown>;

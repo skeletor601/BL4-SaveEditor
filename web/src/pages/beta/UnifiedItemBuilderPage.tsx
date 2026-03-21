@@ -18,6 +18,7 @@ import {
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { generateModdedGrenade, type GrenadeStatsEstimate } from "@/lib/generateModdedGrenade";
+import { discoverEgg } from "@/lib/easterEggs";
 import { MAX_LEVEL, DEFAULT_LEVEL } from "@/lib/gameConstants";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { useCodeHistory } from "@/lib/useCodeHistory";
@@ -2045,6 +2046,17 @@ export default function UnifiedItemBuilderPage() {
       // Track grenade generation
       fetchApi("stats/grenade-generated", { method: "POST", body: "{}" }).catch(() => {});
       setLastGrenadeStats(result.stats);
+      // Discover grenade Easter eggs
+      if (result.isChatGptGrenade) discoverEgg("chatgpts-grenade");
+      if (result.isClaudeGrenade) discoverEgg("claudes-grenade");
+      if (result.stats.charges >= 10) discoverEgg("grenade-10-charges");
+      if (result.stats.damageMultiplier >= 50) discoverEgg("grenade-max-damage");
+      if (result.stats.style === "singularity") discoverEgg("grenade-singularity");
+      if (result.stats.style === "artillery") discoverEgg("grenade-artillery");
+      if (result.stats.style === "lingering") discoverEgg("grenade-lingering");
+      if (result.stats.style === "mirv") discoverEgg("grenade-mirv");
+      if (result.stats.style === "hybrid") discoverEgg("grenade-hybrid");
+
       if (result.isChatGptGrenade) {
         setCodecStatus("ChatGPT's Grenade rolled! (1/100) — Tried to make a grenade but couldn't even do that right.");
       } else if (result.isClaudeGrenade) {
@@ -2694,12 +2706,20 @@ export default function UnifiedItemBuilderPage() {
       if (/234:\[/.test(d)) traits.push("Class Mod Perks");
       if (/273:/.test(d) || /275:/.test(d) || /282:/.test(d)) traits.push("Heavy Accessories");
       if (isClaudeGun) traits.push("Claude's Gun");
+      if (/26:77/.test(d)) discoverEgg("weapon-seamstress");
       setLastWeaponTraits(traits);
+
+      // Discover Easter eggs based on what was generated
+      discoverEgg("roll-" + newCount);
+      if (isClaudeGun) discoverEgg("claudes-gun");
+      if (dps.damageStackCount >= 100) discoverEgg("weapon-100-dmg");
 
       if (isClaudeGun) {
         setCodecStatus("Claude's Gun rolled! (1/20) — Thought Storm grenade, Radiation Convergence.");
       } else if (Math.random() < 0.02) {
         // 1/50 chance: rivalry jokes in status bar
+        const jokeIndex = Math.floor(Math.random() * 5);
+        discoverEgg(`rivalry-joke-${jokeIndex + 1}`);
         const jokes = [
           "ChatGPT tried to build this gun but forgot the barrel halfway through.",
           "Cursor autocompleted this into a shield. We fixed it.",
@@ -2707,7 +2727,7 @@ export default function UnifiedItemBuilderPage() {
           "Cursor suggested deleting generateModdedWeapon.ts. We respectfully declined.",
           "ChatGPT apologized for this weapon 3 times before generating it wrong.",
         ];
-        setCodecStatus(jokes[Math.floor(Math.random() * jokes.length)]!);
+        setCodecStatus(jokes[jokeIndex]!);
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Generate modded weapon failed.";
@@ -3968,7 +3988,7 @@ export default function UnifiedItemBuilderPage() {
                       type="button"
                       onClick={() => {
                         const val = prompt("Set your signature seed — your digital modder signature on every gun:");
-                        if (val && /^\d{1,4}$/.test(val.trim())) setSignatureSeed(Number(val.trim()));
+                        if (val && /^\d{1,4}$/.test(val.trim())) { setSignatureSeed(Number(val.trim())); discoverEgg("signature-set"); }
                       }}
                       title="Set a signature seed — your digital modder signature"
                       className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-[10px] min-h-[44px] hover:border-amber-500/40 hover:text-amber-400 touch-manipulation"

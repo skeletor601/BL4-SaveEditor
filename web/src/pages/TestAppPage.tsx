@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTheme, THEMES, THEME_META } from "@/contexts/ThemeContext";
+import { getEggCount, discoverEgg } from "@/lib/easterEggs";
 import { fetchApi } from "@/lib/apiClient";
 import { CHANGE_LOG } from "@/data/changelog";
 
@@ -32,6 +33,13 @@ function useQuickStats() {
   const [stats, setStats] = useState<{ parts: number; weapons: number; categories: number; totalVisits: number; uniqueVisitors: number; weaponsGenerated: number; grenadesGenerated: number } | null>(null);
   useEffect(() => {
     // Track visit first, then fetch updated stats
+    // Time-based Easter eggs
+    const hour = new Date().getHours();
+    if (hour >= 2 && hour < 5) discoverEgg("night-owl");
+    if (hour >= 5 && hour < 7) discoverEgg("early-bird");
+    const day = new Date().getDay();
+    if (day === 0 || day === 6) discoverEgg("weekend-warrior");
+
     fetchApi("stats/visit", { method: "POST", body: "{}" })
       .catch(() => {})
       .finally(() => {
@@ -149,6 +157,15 @@ export default function TestAppPage() {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] font-mono tracking-wider text-emerald-400">SYSTEM ONLINE</span>
             </div>
+            {(() => {
+              const { found, total } = getEggCount();
+              return found > 0 ? (
+                <div className="flex items-center gap-2 px-2 py-1 rounded-lg border border-amber-500/30 bg-amber-500/5">
+                  <span className="text-[10px]">🥚</span>
+                  <span className="text-[10px] font-mono text-amber-400">{found}/{total}</span>
+                </div>
+              ) : null;
+            })()}
             <Link
               to="/settings"
               className="block text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
