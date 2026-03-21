@@ -4556,6 +4556,54 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
+      {/* Grenade Stats Estimator — above builder, matching weapon DPS placement */}
+      {lastGrenadeStats && category === "grenade" && (
+        <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] px-3 py-3">
+          {lastGrenadeStats.perkCounts["Explosive"] === 1 && Object.keys(lastGrenadeStats.perkCounts).length <= 1 && (
+            <div className="mb-2 px-3 py-2 rounded-lg border border-gray-500/40 bg-gray-500/10 text-gray-400 text-sm font-bold">
+              ChatGPT's Grenade (1/100) — "Tried to make a grenade but couldn't even do that right."
+            </div>
+          )}
+          <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">Grenade Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(from perk stacks)</span></p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div>
+              <span className="text-[var(--color-text-muted)] text-xs">Damage:</span>{" "}
+              <span className="text-orange-400 font-bold">{lastGrenadeStats.damageMultiplier > 1 ? `×${lastGrenadeStats.damageMultiplier.toFixed(1)}` : "Base"}</span>
+            </div>
+            <div>
+              <span className="text-[var(--color-text-muted)] text-xs">Radius:</span>{" "}
+              <span className="text-blue-400 font-bold">{lastGrenadeStats.radiusMultiplier > 1 ? `×${lastGrenadeStats.radiusMultiplier.toFixed(1)}` : "Base"}</span>
+            </div>
+            <div>
+              <span className="text-[var(--color-text-muted)] text-xs">Charges:</span>{" "}
+              <span className="text-green-400 font-bold">{lastGrenadeStats.charges}</span>
+            </div>
+            <div>
+              <span className="text-[var(--color-text-muted)] text-xs">Cooldown:</span>{" "}
+              <span className={`font-bold ${lastGrenadeStats.cooldownMultiplier < 1 ? "text-emerald-400" : lastGrenadeStats.cooldownMultiplier > 1 ? "text-red-400" : "text-[var(--color-text)]"}`}>
+                {lastGrenadeStats.cooldownMultiplier < 1 ? `${Math.round((1 - lastGrenadeStats.cooldownMultiplier) * 100)}% faster` : lastGrenadeStats.cooldownMultiplier > 1 ? `${Math.round((lastGrenadeStats.cooldownMultiplier - 1) * 100)}% slower` : "Normal"}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-xs text-[var(--color-text-muted)]">
+            {lastGrenadeStats.critChance > 0 && <span>Crit: {lastGrenadeStats.critChance}%</span>}
+            {lastGrenadeStats.lifesteal > 0 && <span>Lifesteal: {lastGrenadeStats.lifesteal}%</span>}
+            {lastGrenadeStats.statusChanceMultiplier > 1 && <span>Status: ×{lastGrenadeStats.statusChanceMultiplier.toFixed(1)}</span>}
+            {lastGrenadeStats.knockbackMultiplier > 1 && <span>Knockback: ×{lastGrenadeStats.knockbackMultiplier.toFixed(1)}</span>}
+            {lastGrenadeStats.style && <span className="text-[var(--color-accent)]">Style: {lastGrenadeStats.style}</span>}
+          </div>
+          {Object.keys(lastGrenadeStats.perkCounts).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {Object.entries(lastGrenadeStats.perkCounts).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([name, count]) => (
+                <span key={name} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]">
+                  {name} ×{count}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Grenade: Manufacturer + Level + Seed + Add other parts + part slot dropdowns */}
       {category === "grenade" && grenadeData && grenadeMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
@@ -4664,53 +4712,6 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
             </div>
-            {/* Grenade Stats Estimator */}
-            {lastGrenadeStats && category === "grenade" && (
-              <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]">
-                {lastGrenadeStats.perkCounts["Explosive"] === 1 && Object.keys(lastGrenadeStats.perkCounts).length <= 1 && (
-                  <div className="mb-2 px-3 py-2 rounded-lg border border-gray-500/40 bg-gray-500/10 text-gray-400 text-sm font-bold">
-                    ChatGPT's Grenade (1/100) — "Tried to make a grenade but couldn't even do that right."
-                  </div>
-                )}
-                <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">Grenade Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(from perk stacks)</span></p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                  <div>
-                    <span className="text-[var(--color-text-muted)] text-xs">Damage:</span>{" "}
-                    <span className="text-orange-400 font-bold">{lastGrenadeStats.damageMultiplier > 1 ? `×${lastGrenadeStats.damageMultiplier.toFixed(1)}` : "Base"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[var(--color-text-muted)] text-xs">Radius:</span>{" "}
-                    <span className="text-blue-400 font-bold">{lastGrenadeStats.radiusMultiplier > 1 ? `×${lastGrenadeStats.radiusMultiplier.toFixed(1)}` : "Base"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[var(--color-text-muted)] text-xs">Charges:</span>{" "}
-                    <span className="text-green-400 font-bold">{lastGrenadeStats.charges}</span>
-                  </div>
-                  <div>
-                    <span className="text-[var(--color-text-muted)] text-xs">Cooldown:</span>{" "}
-                    <span className={`font-bold ${lastGrenadeStats.cooldownMultiplier < 1 ? "text-emerald-400" : lastGrenadeStats.cooldownMultiplier > 1 ? "text-red-400" : "text-[var(--color-text)]"}`}>
-                      {lastGrenadeStats.cooldownMultiplier < 1 ? `${Math.round((1 - lastGrenadeStats.cooldownMultiplier) * 100)}% faster` : lastGrenadeStats.cooldownMultiplier > 1 ? `${Math.round((lastGrenadeStats.cooldownMultiplier - 1) * 100)}% slower` : "Normal"}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-xs text-[var(--color-text-muted)]">
-                  {lastGrenadeStats.critChance > 0 && <span>Crit: {lastGrenadeStats.critChance}%</span>}
-                  {lastGrenadeStats.lifesteal > 0 && <span>Lifesteal: {lastGrenadeStats.lifesteal}%</span>}
-                  {lastGrenadeStats.statusChanceMultiplier > 1 && <span>Status: ×{lastGrenadeStats.statusChanceMultiplier.toFixed(1)}</span>}
-                  {lastGrenadeStats.knockbackMultiplier > 1 && <span>Knockback: ×{lastGrenadeStats.knockbackMultiplier.toFixed(1)}</span>}
-                  {lastGrenadeStats.style && <span className="text-[var(--color-accent)]">Style: {lastGrenadeStats.style}</span>}
-                </div>
-                {Object.keys(lastGrenadeStats.perkCounts).length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {Object.entries(lastGrenadeStats.perkCounts).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([name, count]) => (
-                      <span key={name} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]">
-                        {name} ×{count}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
             {grenadeAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setGrenadeAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
