@@ -2811,8 +2811,6 @@ export default function UnifiedItemBuilderPage() {
     setLiveBase85("");
     setLiveDecoded("");
     setCodecStatus(null);
-    setLastDps(null);
-    setLastWeaponTraits([]);
     setGenerateModdedError(null);
     setSeed(Math.floor(100 + Math.random() * 9900));
   }, []);
@@ -2822,6 +2820,8 @@ export default function UnifiedItemBuilderPage() {
     setWeaponPartSelections({});
     setExtraTokens([]);
     setAutoFillWarning(null);
+    setLastDps(null);
+    setLastWeaponTraits([]);
     resetCodec();
   }, [resetCodec]);
 
@@ -2829,6 +2829,7 @@ export default function UnifiedItemBuilderPage() {
     setGrenadePartSelections({});
     setGrenadeExtraTokens([]);
     setGrenadeAutoFillWarning(null);
+    setLastGrenadeStats(null);
     resetCodec();
   }, [resetCodec]);
 
@@ -3864,7 +3865,7 @@ export default function UnifiedItemBuilderPage() {
             <span className="text-xs text-[var(--color-text-muted)]">Load a save (Character → Select Save) to add to backpack.</span>
           )}
         </div>
-        {lastDps && (
+        {lastDps && category === "weapon" && (
           <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]">
             {lastDps.barrelName === "Claude's Convergence" && (
               <div className="mb-2 px-3 py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 text-sm font-bold animate-pulse">
