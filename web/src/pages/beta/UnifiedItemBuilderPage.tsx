@@ -293,6 +293,7 @@ const HEAVY_PART_ORDER: { key: string; slots: number }[] = [
   { key: "Firmware", slots: 1 },
   { key: "Barrel Accessory", slots: 1 },
   { key: "Body Accessory", slots: 1 },
+  { key: "Underbarrel", slots: 1 },
 ];
 
 /** Enhancement builder data (from accessories/enhancement/builder-data). */
@@ -983,6 +984,14 @@ function buildDecodedFromHeavySelections(
   };
   pushAcc("Barrel Accessory");
   pushAcc("Body Accessory");
+
+  // Underbarrel — uses full {prefix:partId} codes since they're cross-prefix
+  (selections["Underbarrel"] ?? []).forEach((s) => {
+    const pidStr = partIdFromLabel(s.label);
+    if (!pidStr) return;
+    const qty = Math.max(1, Math.min(99, parseInt((s.qty ?? "1").trim() || "1", 10) || 1));
+    for (let i = 0; i < qty; i++) parts.push(`{${pidStr}}`);
+  });
 
   extraTokens.forEach((t) => parts.push(t));
   let decodedHeavy = `${header} ${parts.join(" ")} |`;
@@ -6918,6 +6927,45 @@ export default function UnifiedItemBuilderPage() {
                 heavyData.bodyAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
                   opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
+              } else if (heavyPartPickerPartType === "Underbarrel") {
+                // ALL underbarrels from the entire database (91 unique, filtered: no atlas/malswitch)
+                [
+                  { code: "{13:61}", name: "Shotgun" }, { code: "{13:62}", name: "Micro-Rocket POD" }, { code: "{13:63}", name: "Grenade Launcher" },
+                  { code: "{13:67}", name: "Fragcendiary Grenades" }, { code: "{13:75}", name: "Space Laser" }, { code: "{13:76}", name: "Star Helix" },
+                  { code: "{2:47}", name: "Knife Launcher" }, { code: "{2:48}", name: "Taser" }, { code: "{2:75}", name: "Demolition Charge" },
+                  { code: "{8:43}", name: "Gravity Harpoon" }, { code: "{8:45}", name: "Micro-Rocket POD" }, { code: "{8:50}", name: "Proxy Mine" },
+                  { code: "{8:56}", name: "Missilaser Alt Fire" },
+                  { code: "{20:48}", name: "Shotgun" }, { code: "{20:49}", name: "Overcharge" }, { code: "{20:79}", name: "Grenade Launcher" },
+                  { code: "{27:55}", name: "Shotgun" }, { code: "{27:56}", name: "Double Flintlocks" }, { code: "{27:57}", name: "Hand Crank" },
+                  { code: "{3:45}", name: "Knife Launcher" }, { code: "{3:46}", name: "Zip Rockets" }, { code: "{3:68}", name: "Vial Launcher" },
+                  { code: "{9:45}", name: "Spread Launcher" }, { code: "{9:46}", name: "Gravity Harpoon" }, { code: "{9:50}", name: "Knife Launcher" },
+                  { code: "{24:45}", name: "Shotgun" }, { code: "{24:46}", name: "Big Rocket" }, { code: "{24:53}", name: "Crank SMG" },
+                  { code: "{10:43}", name: "Beam Tosser" }, { code: "{10:44}", name: "Energy Disc" }, { code: "{10:49}", name: "Energy Blast" },
+                  { code: "{21:45}", name: "Railgun" }, { code: "{21:46}", name: "Energy Discharge" }, { code: "{21:53}", name: "Laser Wire" },
+                  { code: "{25:48}", name: "Shock Field" }, { code: "{25:49}", name: "Singularity" }, { code: "{25:53}", name: "Rocket Pod" },
+                  { code: "{15:42}", name: "Seeker Missiles" }, { code: "{15:43}", name: "Kill Drone" }, { code: "{15:68}", name: "Death Sphere" },
+                  { code: "{4:43}", name: "Micro-Rockets" }, { code: "{4:44}", name: "Energy Burst" }, { code: "{4:72}", name: "Gravity Well" },
+                  { code: "{26:57}", name: "Tether Snare" }, { code: "{26:58}", name: "Railgun" }, { code: "{26:62}", name: "Ordonite Spike" },
+                  { code: "{26:77}", name: "Seamstress" },
+                  { code: "{7:48}", name: "Lightning Beam" }, { code: "{7:49}", name: "Gauss Gun" }, { code: "{7:80}", name: "Fuel Rod Discharge" },
+                  { code: "{19:21}", name: "Roil Underbarrel" }, { code: "{19:46}", name: "Gas Trap" }, { code: "{19:47}", name: "Ripper Rocket" },
+                  { code: "{19:52}", name: "Shrapnel Cannon" },
+                  { code: "{23:47}", name: "Seeker Missiles" }, { code: "{23:48}", name: "Gravity Trap" }, { code: "{23:55}", name: "Target Marker" },
+                  { code: "{14:64}", name: "COMBO" }, { code: "{14:65}", name: "Shotgun" }, { code: "{14:68}", name: "Support Drone" },
+                  { code: "{5:50}", name: "Micro Shotgun" }, { code: "{5:79}", name: "Zip Rockets" }, { code: "{5:80}", name: "Attack Drone" },
+                  { code: "{11:50}", name: "Deployable Barrier" }, { code: "{11:51}", name: "Proximity Mines" }, { code: "{11:57}", name: "Digital Backup" },
+                  { code: "{11:79}", name: "Husky Auto Turret" },
+                  { code: "{17:43}", name: "MIRV Grenade" }, { code: "{17:45}", name: "Airstrike" }, { code: "{17:72}", name: "Sticky Shotgun" },
+                  { code: "{6:44}", name: "Magnum Rockets" }, { code: "{6:45}", name: "Turbine Cleaver" }, { code: "{6:75}", name: "Exhaust Blast" },
+                  { code: "{12:43}", name: "Seeker Missiles" }, { code: "{12:44}", name: "Rolling Thunder" }, { code: "{12:50}", name: "Flame Blast" },
+                  { code: "{18:48}", name: "Bipod" }, { code: "{18:49}", name: "Grenade Launcher" }, { code: "{18:69}", name: "Aegon's Dream Extra Barrel" },
+                  { code: "{18:86}", name: "Extra Barrel" }, { code: "{18:87}", name: "Shotgun" }, { code: "{18:90}", name: "Overdrive Full Auto" },
+                  { code: "{18:92}", name: "Scrap Cannon" },
+                  { code: "{22:50}", name: "Zip Rockets" }, { code: "{22:51}", name: "Taser" }, { code: "{22:52}", name: "Flamethrower" },
+                  { code: "{22:53}", name: "Extra Barrel" },
+                  { code: "{16:48}", name: "Big Rocket" }, { code: "{16:49}", name: "Extra Barrel" }, { code: "{16:50}", name: "Bipod" },
+                  { code: "{16:52}", name: "Shotgun" },
+                ].forEach((p) => opts.push({ partId: p.code.replace(/[{}]/g, ""), label: `${p.code} - ${p.name}` }));
               }
               return (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setHeavyPartPickerPartType(null)}>
