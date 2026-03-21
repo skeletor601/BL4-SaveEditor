@@ -342,6 +342,9 @@ function CommandCenterTab({ onNavigate, siteStats }: { onNavigate: (tab: TabId) 
         <StatCard label="Manufacturers" value="11" />
       </div>
 
+      {/* Top Community Code */}
+      <TopCommunityCode />
+
       {/* Recent updates */}
       <div className="rounded-xl border border-[var(--color-panel-border)] overflow-hidden"
         style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
@@ -629,6 +632,58 @@ function WorkbenchCard({ to, title, desc, badge, color }: { to: string; title: s
       </div>
       <p className="text-[10px] text-[var(--color-text-muted)]">{desc}</p>
     </Link>
+  );
+}
+
+// ── Top Community Code spotlight ─────────────────────────────────────────────
+function TopCommunityCode() {
+  const [topCode, setTopCode] = useState<{ title: string; code: string; upvotes: number; itemType: string; submittedAt: number } | null>(null);
+  useEffect(() => {
+    fetchApi("community/recipes").then((r) => r.json()).then((data) => {
+      const recipes = data?.recipes;
+      if (Array.isArray(recipes) && recipes.length > 0) {
+        // Find highest upvoted from the last 7 days
+        const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const thisWeek = recipes.filter((r: { submittedAt: number }) => r.submittedAt > weekAgo);
+        const pool = thisWeek.length > 0 ? thisWeek : recipes;
+        const top = pool.sort((a: { upvotes: number }, b: { upvotes: number }) => b.upvotes - a.upvotes)[0];
+        if (top) setTopCode({ title: top.title, code: top.code, upvotes: top.upvotes, itemType: top.itemType, submittedAt: top.submittedAt });
+      }
+    }).catch(() => {});
+  }, []);
+
+  if (!topCode) return null;
+
+  const typeColors: Record<string, string> = {
+    weapon: "border-red-500/40 text-red-400",
+    grenade: "border-orange-500/40 text-orange-400",
+    shield: "border-blue-500/40 text-blue-400",
+    "class-mod": "border-green-500/40 text-green-400",
+  };
+
+  return (
+    <div className="rounded-xl border border-amber-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+      <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-amber-400">★</span>
+          <h3 className="text-sm font-semibold text-amber-400">Top Community Code</h3>
+        </div>
+        <Link to="/community" className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">View all →</Link>
+      </div>
+      <div className="px-5 py-3 flex items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-bold text-[var(--color-text)]">{topCode.title}</span>
+            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${typeColors[topCode.itemType] ?? "border-[var(--color-panel-border)] text-[var(--color-text-muted)]"}`}>{topCode.itemType}</span>
+          </div>
+          <p className="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{topCode.code.slice(0, 60)}...</p>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10">
+          <span className="text-amber-400 text-sm">▲</span>
+          <span className="text-amber-400 font-bold text-sm">{topCode.upvotes}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 

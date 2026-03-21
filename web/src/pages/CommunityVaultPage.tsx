@@ -80,7 +80,7 @@ export default function CommunityVaultPage() {
     if (upvotedIds.has(id)) return;
     setUpvotedIds((prev) => new Set(prev).add(id));
     try {
-      const res = await fetchApi(`community/recipes/${id}/upvote`, { method: "POST" });
+      const res = await fetchApi(`community/recipes/${id}/upvote`, { method: "POST", body: "{}" });
       const data = await res.json().catch(() => ({})) as { upvotes?: number };
       if (data.upvotes != null) {
         setRecipes((prev) => prev.map((r) => r.id === id ? { ...r, upvotes: data.upvotes! } : r));
