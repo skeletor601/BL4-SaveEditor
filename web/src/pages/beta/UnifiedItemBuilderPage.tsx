@@ -4296,6 +4296,10 @@ export default function UnifiedItemBuilderPage() {
                   const applyPickerWithQty = () => {
                     const partType = weaponPartPickerPartType;
                     if (!partType) return;
+                    // Foregrip warning
+                    if (partType === "Foregrip") {
+                      if (!confirm("Warning: Selecting a foregrip will disable Daedalus ammo switching. Continue?")) return;
+                    }
                     const qty = String(Math.max(1, Math.min(99, parseInt(weaponPartPickerQty.trim(), 10) || 1)));
                     const toAdd = Array.from(weaponPartPickerChecked).map((label) => ({ label, qty }));
                     setWeaponPartSelections((prev) => ({

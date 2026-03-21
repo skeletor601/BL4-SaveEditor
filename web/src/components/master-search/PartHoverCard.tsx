@@ -73,7 +73,8 @@ export default function PartHoverCard({ data, cardTop, side = "right" }: PartHov
     ? (CATEGORY_COLORS[data.category] ?? "bg-[rgba(255,255,255,0.06)] text-[var(--color-text-muted)] border border-[var(--color-panel-border)]")
     : "";
 
-  const clampedTop = Math.min(Math.max(cardTop - 8, 72), window.innerHeight - 430);
+  // Position the card at top of viewport to avoid blocking qty selectors and other controls
+  const clampedTop = Math.min(Math.max(72, cardTop - 200), window.innerHeight - 430);
   const posClass = side === "left" ? "left-4" : "right-4";
 
   return (
