@@ -533,6 +533,8 @@ function buildDecodedFromWeaponPartSelections(
     if (!raw || !/^\d+$/.test(raw)) return 1;
     return Math.max(1, Math.min(99, Number(raw)));
   };
+  // Extra tokens FIRST — user's manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
   const rarityList = partSelections["Rarity"] ?? [];
   rarityList.forEach(({ label, qty }) => {
     const n = qtyNum(qty);
@@ -586,7 +588,6 @@ function buildDecodedFromWeaponPartSelections(
       else parts.push(`{${mfgWtId}:[${Array(n).fill(pid).join(" ")}]}`);
     });
   });
-  extraTokens.forEach((t) => parts.push(t));
   let decoded = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -616,6 +617,9 @@ function buildDecodedFromGrenadeSelections(
     if (!raw || !/^\d+$/.test(raw)) return 1;
     return Math.max(1, Math.min(99, Number(raw)));
   };
+
+  // Extra tokens FIRST — user's manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
 
   // Rarity: match by label to rarity ID; always add as {id} (no qty)
   const rarities = data.raritiesByMfg[mfgId] ?? [];
@@ -679,7 +683,6 @@ function buildDecodedFromGrenadeSelections(
     parts.push(`{${GRENADE_TYPE_ID}:[${sorted.join(" ")}]}`);
   }
 
-  extraTokens.forEach((t) => parts.push(t));
   let decodedGrenade = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -734,6 +737,8 @@ function buildDecodedFromShieldSelections(
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
+  // Extra tokens FIRST — user manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
   const qtyNum = (raw: string): number => {
     const s = String(raw ?? "").trim();
     const n = parseInt(s, 10);
@@ -809,7 +814,6 @@ function buildDecodedFromShieldSelections(
   const secondary237Token = buildTypeToken(SHIELD_ARMOR_PERK_TYPE_ID, secondary237);
   if (secondary237Token) parts.push(secondary237Token);
 
-extraTokens.forEach((t) => parts.push(t));
 let decodedShield = `${header} ${parts.join(" ")} |`;
 if (skinValue && skinValue.trim()) {
   const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -829,6 +833,8 @@ function buildDecodedFromRepkitSelections(
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
+  // Extra tokens FIRST — user manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
   const qtyNum = (raw: string): number => {
     const s = String(raw ?? "").trim();
     const n = parseInt(s, 10);
@@ -931,7 +937,6 @@ function buildDecodedFromRepkitSelections(
   const secondary243Token = buildTypeToken(REPKIT_TYPE_ID, secondary243);
   if (secondary243Token) parts.push(secondary243Token);
 
-  extraTokens.forEach((t) => parts.push(t));
   let decodedRepkit = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -951,6 +956,8 @@ function buildDecodedFromHeavySelections(
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${HEAVY_TYPE_ID}||`;
   const parts: string[] = [];
+  // Extra tokens FIRST — user manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
 
   const rarities = data.raritiesByMfg[mfgId] ?? [];
   const rarityLabel = (selections["Rarity"]?.[0]?.label ?? "").trim();
@@ -984,7 +991,6 @@ function buildDecodedFromHeavySelections(
   pushAcc("Barrel Accessory");
   pushAcc("Body Accessory");
 
-  extraTokens.forEach((t) => parts.push(t));
   let decodedHeavy = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -1007,6 +1013,8 @@ function buildDecodedFromEnhancementSelections(
 
   const header = `${mfg.code}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
+  // Extra tokens FIRST — user manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
 
   const rarityLabel = (selections["Rarity"]?.[0]?.label ?? "").trim();
   const rarityCode = mfg.rarities[rarityLabel];
@@ -1057,7 +1065,6 @@ function buildDecodedFromEnhancementSelections(
     parts.push(`{247:[${stats247.join(" ")}]}`);
   }
 
-  extraTokens.forEach((t) => parts.push(t));
   let decodedEnhancement = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
@@ -1081,6 +1088,8 @@ function buildDecodedFromClassModSelections(
   const classIdStr = String(classId);
   const header = `${classId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
+  // Extra tokens FIRST — user manually entered codes keep their position
+  extraTokens.forEach((t) => parts.push(t));
 
   const qtyNum = (raw: string): number => {
     const s = String(raw ?? "").trim();
@@ -1159,7 +1168,6 @@ function buildDecodedFromClassModSelections(
     parts.push(` {234:[${perkIds.join(" ")}]}`);
   }
 
-  extraTokens.forEach((t) => parts.push(t));
   let decodedClassMod = `${header} ${parts.join(" ")} |`;
   if (skinValue && skinValue.trim()) {
     const safe = skinValue.trim().replace(/"/g, '\\"');
