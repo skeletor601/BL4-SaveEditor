@@ -159,6 +159,10 @@ export function generateModdedGrenade(
         // Inject firmware into first token
         const fwInject = firmwareIds.join(" ");
         groupTokens[0] = groupTokens[0]!.replace("{245:[", `{245:[${fwInject} `);
+        // Append Overflow + Express to last token — more charges + faster cooldown on every grenade
+        const overflowExpress = Array(randInt(8, 16)).fill(70).concat(Array(randInt(8, 16)).fill(71));
+        const lastIdx = groupTokens.length - 1;
+        groupTokens[lastIdx] = groupTokens[lastIdx]!.replace(/\]\}$/, ` ${overflowExpress.join(" ")}]}`);
         grenadePerkBlock = groupTokens.join(" ");
       } else {
         grenadePerkBlock = buildFallbackPerkBlock(firmwareIds, modPowerMode, scaleForMode);
