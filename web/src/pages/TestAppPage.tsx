@@ -32,7 +32,7 @@ function useQuickStats() {
   const [stats, setStats] = useState<{ parts: number; weapons: number; categories: number; totalVisits: number; uniqueVisitors: number; weaponsGenerated: number; grenadesGenerated: number } | null>(null);
   useEffect(() => {
     // Track visit first, then fetch updated stats
-    fetchApi("stats/visit", { method: "POST" })
+    fetchApi("stats/visit", { method: "POST", body: "{}" })
       .catch(() => {})
       .finally(() => {
         fetchApi("stats").then((r) => r.json()).then((data) => {

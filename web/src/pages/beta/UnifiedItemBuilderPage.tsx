@@ -2042,7 +2042,7 @@ export default function UnifiedItemBuilderPage() {
       setLiveDecoded(result.code.trim());
       setLastEditedCodecSide("decoded");
       // Track grenade generation
-      fetchApi("stats/grenade-generated", { method: "POST" }).catch(() => {});
+      fetchApi("stats/grenade-generated", { method: "POST", body: "{}" }).catch(() => {});
       if (result.isClaudeGrenade) {
         setCodecStatus(`Claude's Grenade rolled! (1/20) — "Context Window" recipe`);
       } else {
@@ -2660,7 +2660,7 @@ export default function UnifiedItemBuilderPage() {
       setLiveDecoded(decoded.trim());
       setLastEditedCodecSide("decoded");
       // Track weapon generation
-      fetchApi("stats/weapon-generated", { method: "POST" }).catch(() => {});
+      fetchApi("stats/weapon-generated", { method: "POST", body: "{}" }).catch(() => {});
       // ── Roll tracker + weapon trait detection ──
       let newCount = 0;
       setRollCount((prev) => { newCount = prev + 1; return newCount; });

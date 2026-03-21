@@ -1,8 +1,8 @@
 {
-  "totalVisits": 1,
+  "totalVisits": 11,
   "uniqueVisitors": 1,
-  "weaponsGenerated": 0,
-  "grenadesGenerated": 0,
+  "weaponsGenerated": 6,
+  "grenadesGenerated": 4,
   "codesValidated": 0,
   "lastReset": "2026-03-20T00:00:00.000Z",
   "visitorIps": [
