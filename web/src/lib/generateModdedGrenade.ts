@@ -23,10 +23,35 @@ export interface GenerateModdedGrenadeOptions {
   skin?: string;
 }
 
+export interface GrenadeStatsEstimate {
+  /** Estimated damage multiplier from perk stacks */
+  damageMultiplier: number;
+  /** Estimated radius multiplier from perk stacks */
+  radiusMultiplier: number;
+  /** Total grenade charges (base 2 + Overflow stacks) */
+  charges: number;
+  /** Cooldown multiplier (1.0 = normal, lower = faster) */
+  cooldownMultiplier: number;
+  /** Critical hit chance % */
+  critChance: number;
+  /** Lifesteal % */
+  lifesteal: number;
+  /** Status effect chance multiplier */
+  statusChanceMultiplier: number;
+  /** Knockback multiplier */
+  knockbackMultiplier: number;
+  /** Style tag from recipe */
+  style: string;
+  /** Perk count breakdown */
+  perkCounts: Record<string, number>;
+}
+
 export interface GenerateModdedGrenadeResult {
   code: string;
   recipeName: string;
+  stats: GrenadeStatsEstimate;
   isClaudeGrenade?: boolean;
+  isChatGptGrenade?: boolean;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -71,15 +96,91 @@ function parseHeader(decoded: string): { prefix: number; level: number; seed: st
   return { prefix: Number(m[1]), level: Number(m[2]), seed: m[3]! };
 }
 
+/** Parse all {245:[...]} tokens from a decoded string and count perk IDs. */
+function countGrenadePerks(decoded: string): Record<number, number> {
+  const counts: Record<number, number> = {};
+  const regex = /\{245:\[([^\]]+)\]\}/g;
+  let m;
+  while ((m = regex.exec(decoded)) !== null) {
+    const ids = m[1]!.trim().split(/\s+/).map(Number).filter((n) => Number.isFinite(n));
+    for (const id of ids) {
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
+/** Calculate grenade stats from perk counts. */
+function calculateGrenadeStats(perkCounts: Record<number, number>, style: string): GrenadeStatsEstimate {
+  const c = (id: number) => perkCounts[id] ?? 0;
+
+  // Damage: 72 (+13% per), 76 (+19% per), 80 (+25% per), 39 (+15% amp per)
+  const damageMultiplier = Math.pow(1.13, c(72)) * Math.pow(1.19, c(76)) * Math.pow(1.25, c(80)) * Math.pow(1.15, c(39));
+
+  // Radius: 73 (+25% per), 76 (+38% per), 81 (+38% per), 51 (+13% per bounce)
+  const radiusMultiplier = Math.pow(1.25, c(73)) * Math.pow(1.38, c(76)) * Math.pow(1.38, c(81)) * Math.pow(1.13, c(51));
+
+  // Charges: base 2 + Overflow (70) gives +1 per stack
+  const charges = 2 + c(70);
+
+  // Cooldown: Express (71) -12% per stack, Nuke (76) +25% per stack
+  const cooldownMultiplier = Math.pow(0.88, c(71)) * Math.pow(1.25, c(76));
+
+  // Crit: 75 (15% chance per stack), 69 (30% chance for 5s per stack)
+  const critChance = Math.min(100, c(75) * 15 + c(69) * 30);
+
+  // Lifesteal: 78 (+10% per stack)
+  const lifesteal = c(78) * 10;
+
+  // Status: 66 (+300% per stack), 74 (+10% per stack)
+  const statusChanceMultiplier = 1 + (c(66) * 3) + (c(74) * 0.1);
+
+  // Knockback: 77 (+50% per stack)
+  const knockbackMultiplier = 1 + (c(77) * 0.5);
+
+  // Named perk counts for display
+  const PERK_NAMES: Record<number, string> = {
+    29: "MIRV", 30: "Divider", 31: "Spring", 32: "Artillery", 33: "Singularity",
+    34: "Lingering", 39: "Damage Amp", 40: "Tightly Packed", 42: "Micro MIRV",
+    44: "Long Division", 46: "Pulling", 55: "Missiles", 57: "Mortar",
+    59: "Gnawing", 60: "Collapsing", 63: "Pulsing", 65: "Fracture",
+    66: "Alchemic", 67: "Bouncing Blade", 69: "Penetrator", 70: "Overflow",
+    71: "Express", 72: "Explosive", 73: "Expansive", 74: "Hazardous",
+    75: "Exacting", 76: "Nuke", 77: "Concussive", 78: "Bloodthirsty",
+    79: "Merciless", 80: "Lethal", 81: "Wideload",
+  };
+  const namedCounts: Record<string, number> = {};
+  for (const [id, count] of Object.entries(perkCounts)) {
+    const name = PERK_NAMES[Number(id)];
+    if (name && count > 0) namedCounts[name] = count;
+  }
+
+  return {
+    damageMultiplier,
+    radiusMultiplier,
+    charges,
+    cooldownMultiplier,
+    critChance,
+    lifesteal,
+    statusChanceMultiplier,
+    knockbackMultiplier,
+    style,
+    perkCounts: namedCounts,
+  };
+}
+
 export function generateModdedGrenade(
   options: GenerateModdedGrenadeOptions = {},
 ): GenerateModdedGrenadeResult {
   const modPowerMode = options.modPowerMode ?? "op";
   const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 60)));
 
-  // ── Claude's Grenade Easter egg — 1/20 chance ──────────────────────────────
-  // "Context Window": Singularity pulls everything in, all 5 Lingering elements fire outward.
-  const isClaudeGrenade = Math.random() < 0.05;
+  // ── Easter eggs ──────────────────────────────────────────────────────────────
+  // Claude's Grenade (1/20): "Context Window" — all 5 Lingering + Singularity cascade
+  // ChatGPT's Grenade (1/100): absolutely terrible, no perks, apologizes
+  const eggRoll = Math.random();
+  const isClaudeGrenade = eggRoll < 0.05;
+  const isChatGptGrenade = !isClaudeGrenade && eggRoll < 0.06; // 1% chance
 
   // ── Stock base ──────────────────────────────────────────────────────────────
   let stockTokens: string[] = [];
@@ -109,7 +210,11 @@ export function generateModdedGrenade(
   let recipeName = "Terra Fallback";
   let grenadePerkBlock: string;
 
-  if (isClaudeGrenade) {
+  if (isChatGptGrenade) {
+    // ChatGPT's Grenade — absolutely awful, barely functional
+    recipeName = "ChatGPT's Grenade";
+    grenadePerkBlock = "{245:[72]}"; // Single Explosive perk. That's it. One.
+  } else if (isClaudeGrenade) {
     // "Context Window" — Singularity + all 5 Lingering elements + MIRV cascade
     recipeName = "Context Window";
     const s = (n: number) => Math.max(1, Math.round(n * scaleForMode * randFloat(0.9, 1.1)));
@@ -276,10 +381,17 @@ export function generateModdedGrenade(
     decoded = decoded.replace(/\|\s*$/, `| "c", "${safe}" |`);
   }
 
+  // Calculate grenade stats from the generated code
+  const perkCounts = countGrenadePerks(decoded);
+  const style = isClaudeGrenade ? "hybrid" : isChatGptGrenade ? "none" : (options.grenadeVisualRecipes?.find((r) => r.label === recipeName)?.style ?? "hybrid");
+  const stats = calculateGrenadeStats(perkCounts, style);
+
   return {
     code: decoded,
     recipeName,
+    stats,
     ...(isClaudeGrenade ? { isClaudeGrenade: true } : {}),
+    ...(isChatGptGrenade ? { isChatGptGrenade: true } : {}),
   };
 }
 
