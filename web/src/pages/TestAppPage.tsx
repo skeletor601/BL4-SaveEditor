@@ -170,9 +170,9 @@ export default function TestAppPage() {
               href="https://discord.gg/wNDT64Zn"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 hover:text-indigo-200 transition-colors text-xs font-medium"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border border-indigo-500/40 bg-indigo-500/15 text-indigo-200 hover:bg-indigo-500/25 hover:text-white transition-colors text-sm font-bold tracking-wide"
             >
-              <span>Join Discord</span>
+              Join Our Discord
             </a>
             <Link
               to="/settings"
