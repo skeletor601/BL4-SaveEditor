@@ -2672,7 +2672,7 @@ export default function UnifiedItemBuilderPage() {
         specialMode: moddedWeaponSpecialMode,
         forcedPrefix: autoFillPrefix ?? (weaponMfgUserSelected && weaponMfgWtId ? Number(weaponMfgWtId) : undefined),
         stockBaseDecoded,
-        skin: weaponSkinValue.trim() || undefined,
+        skin: undefined,  // Always random skin on Generate Modded — UI skin picker is for manual builds only
         skinOptions: skinOptionsForGenerate,
         visualBarrelEntries: Array.isArray(visualBarrelEntries) && visualBarrelEntries.length > 0 ? visualBarrelEntries : undefined,
         allowedBarrelEntries: Array.isArray(allowedBarrelEntries) && allowedBarrelEntries.length > 0 ? allowedBarrelEntries : undefined,

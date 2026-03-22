@@ -13,6 +13,7 @@ import BetaPage from "@/pages/BetaPage";
 import UnifiedItemBuilderPage from "@/pages/beta/UnifiedItemBuilderPage";
 import SaveComparisonPage from "@/pages/SaveComparisonPage";
 import CommunityVaultPage from "@/pages/CommunityVaultPage";
+import GodRollsPage from "@/pages/GodRollsPage";
 import TestAppPage from "@/pages/TestAppPage";
 import TerraLabPage from "@/pages/TerraLabPage";
 import DrLecterPage from "@/pages/DrLecterPage";
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/save-compare" element={<SaveComparisonPage />} />
         <Route path="/community" element={<CommunityVaultPage />} />
+        <Route path="/god-rolls" element={<GodRollsPage />} />
         <Route path="/test-app" element={<TestAppPage />} />
         <Route path="/terra" element={<TerraLabPage />} />
         <Route path="/drlecter" element={<DrLecterPage />} />

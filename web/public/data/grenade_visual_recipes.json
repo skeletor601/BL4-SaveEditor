@@ -1674,5 +1674,452 @@
       }
     ],
     "style": "hybrid"
+  },
+  {
+    "id": "gravity-crush",
+    "label": "Gravity Crush",
+    "notes": "Pure singularity: maximum pull force. Singularity (33) dominant with Collapsing (60) for rapid pull and Prolonged (58) to keep it alive. Pulling (46) on each child grenade. Utility perks for damage.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 33, "n": 50 },
+          { "id": 60, "n": 25 },
+          { "id": 58, "n": 15 },
+          { "id": 46, "n": 12 },
+          { "id": 59, "n": 10 },
+          { "id": 29, "n": 5 },
+          { "id": 40, "n": 4 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 5 },
+          { "id": 69, "n": 4 },
+          { "id": 78, "n": 3 }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "void-maw",
+    "label": "Void Maw",
+    "notes": "Collapsing-dominant singularity: extreme pull radius. Collapsing (60) at high stacks creates a massive vortex. Gnawing (59) shreds anything inside. Repulsor (61) pushes then re-pulls for damage cycling.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 60, "n": 40 },
+          { "id": 33, "n": 20 },
+          { "id": 59, "n": 18 },
+          { "id": 61, "n": 12 },
+          { "id": 58, "n": 10 },
+          { "id": 46, "n": 8 },
+          { "id": 72, "n": 25 },
+          { "id": 74, "n": 6 },
+          { "id": 39, "n": 5 },
+          { "id": 66, "n": 4 }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "tidal-pull",
+    "label": "Tidal Pull",
+    "notes": "Pulling-dominant: each child grenade spawns its own singularity. Pulling (46) stacked heavy so every MIRV child sucks enemies in. Divider + Long Division spawn many children, each with singularity.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 46, "n": 35 },
+          { "id": 33, "n": 15 },
+          { "id": 58, "n": 10 },
+          { "id": 60, "n": 10 },
+          { "id": 30, "n": 8 },
+          { "id": 44, "n": 6 },
+          { "id": 29, "n": 6 },
+          { "id": 40, "n": 5 },
+          { "id": 72, "n": 15 },
+          { "id": 39, "n": 5 },
+          { "id": 75, "n": 6 }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "missile-swarm",
+    "label": "Missile Swarm",
+    "notes": "Missiles-dominant artillery: homing micro-missiles blanket the area. Missiles (55) stacked heavy with Maglock (56) for homing. Artillery (32) base with Duration (53) extending the barrage.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 55, "n": 40 },
+          { "id": 56, "n": 20 },
+          { "id": 32, "n": 15 },
+          { "id": 53, "n": 15 },
+          { "id": 57, "n": 8 },
+          { "id": 54, "n": 6 },
+          { "id": 72, "n": 20 },
+          { "id": 73, "n": 5 },
+          { "id": 39, "n": 5 },
+          { "id": 69, "n": 4 }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "bullet-hell",
+    "label": "Bullet Hell",
+    "notes": "Artillery-dominant with Ricochet: sustained bullet streams that bounce between enemies. Artillery (32) heavy, Ricochet (54) makes every bullet chain. Duration (53) extends fire time.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 32, "n": 45 },
+          { "id": 54, "n": 25 },
+          { "id": 53, "n": 20 },
+          { "id": 56, "n": 8 },
+          { "id": 30, "n": 6 },
+          { "id": 44, "n": 5 },
+          { "id": 72, "n": 20 },
+          { "id": 75, "n": 8 },
+          { "id": 79, "n": 6 },
+          { "id": 39, "n": 5 }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "mortar-siege",
+    "label": "Mortar Siege",
+    "notes": "Mortar-dominant: top-down bombardment. Mortar (57) stacked heavy rains projectiles from above. Artillery (32) adds horizontal fire. Missiles (55) for homing cleanup.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 57, "n": 40 },
+          { "id": 32, "n": 15 },
+          { "id": 53, "n": 15 },
+          { "id": 55, "n": 10 },
+          { "id": 54, "n": 8 },
+          { "id": 29, "n": 5 },
+          { "id": 40, "n": 4 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 5 },
+          { "id": 74, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "artillery"
+  },
+  {
+    "id": "radiation-field",
+    "label": "Radiation Field",
+    "notes": "Radiation lingering variant: radiation beams (38) dominate. Duration stacked for extended field. Pulsing (63) adds radiation waves. Fracture (65) spawns radiation pillars.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 38, "n": 45 },
+          { "id": 21, "n": 15 },
+          { "id": 62, "n": 12 },
+          { "id": 63, "n": 10 },
+          { "id": 65, "n": 8 },
+          { "id": 64, "n": 6 },
+          { "id": 72, "n": 20 },
+          { "id": 74, "n": 6 },
+          { "id": 39, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "cryo-cage",
+    "label": "Cryo Cage",
+    "notes": "Cryo lingering: cryo beams (37) freeze enemies in place. Fracture (65) creates ice pillars as walls. Duration keeps the cage up. Enemies frozen inside take massive crit damage.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 37, "n": 45 },
+          { "id": 65, "n": 15 },
+          { "id": 21, "n": 12 },
+          { "id": 62, "n": 10 },
+          { "id": 63, "n": 8 },
+          { "id": 72, "n": 20 },
+          { "id": 75, "n": 10 },
+          { "id": 79, "n": 8 },
+          { "id": 69, "n": 5 },
+          { "id": 39, "n": 4 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "shock-web",
+    "label": "Shock Web",
+    "notes": "Shock lingering: shock beams (36) arc between enemies. Splat Pack (64) creates shock puddles. Pulsing (63) emits shock waves. High status chance via Alchemic (66).",
+    "groups": [
+      {
+        "entries": [
+          { "id": 36, "n": 40 },
+          { "id": 64, "n": 15 },
+          { "id": 63, "n": 12 },
+          { "id": 21, "n": 10 },
+          { "id": 62, "n": 8 },
+          { "id": 66, "n": 10 },
+          { "id": 74, "n": 8 },
+          { "id": 72, "n": 18 },
+          { "id": 39, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "acid-rain",
+    "label": "Acid Rain",
+    "notes": "Corrosive lingering: corrosive beams (35) melt armor. Splat Pack (64) dominant creates corrosive puddles everywhere. Duration extended. Status stacking with Hazardous (74) and Alchemic (66).",
+    "groups": [
+      {
+        "entries": [
+          { "id": 35, "n": 35 },
+          { "id": 64, "n": 20 },
+          { "id": 21, "n": 12 },
+          { "id": 62, "n": 10 },
+          { "id": 63, "n": 8 },
+          { "id": 65, "n": 6 },
+          { "id": 74, "n": 10 },
+          { "id": 66, "n": 8 },
+          { "id": 72, "n": 15 },
+          { "id": 39, "n": 5 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "pillar-of-flame",
+    "label": "Pillar of Flame",
+    "notes": "Fracture-dominant lingering: massive fire pillars erupt. Fracture (65) stacked heavy with fire lingering (34) base. Pulsing (63) adds fire waves between pillars.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 65, "n": 35 },
+          { "id": 34, "n": 25 },
+          { "id": 63, "n": 12 },
+          { "id": 21, "n": 10 },
+          { "id": 62, "n": 8 },
+          { "id": 29, "n": 5 },
+          { "id": 40, "n": 4 },
+          { "id": 72, "n": 20 },
+          { "id": 80, "n": 8 },
+          { "id": 39, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "cluster-bomb",
+    "label": "Cluster Bomb",
+    "notes": "MIRV-dominant: maximum grenade splitting. MIRV (29) heavy with Tightly Packed (40) for extra children. Micro MIRV (42) makes children split again. Spring (43) bounces at each point.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 29, "n": 30 },
+          { "id": 40, "n": 20 },
+          { "id": 42, "n": 15 },
+          { "id": 43, "n": 10 },
+          { "id": 41, "n": 8 },
+          { "id": 22, "n": 6 },
+          { "id": 30, "n": 6 },
+          { "id": 72, "n": 25 },
+          { "id": 73, "n": 5 },
+          { "id": 39, "n": 5 },
+          { "id": 69, "n": 4 }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "bouncing-betty",
+    "label": "Bouncing Betty",
+    "notes": "Bounce-dominant: grenade bounces endlessly, exploding at each bounce. Spring (31+48) with Tightly Coiled (49) and Apex (50). Compounding (51) increases damage with each bounce.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 31, "n": 25 },
+          { "id": 48, "n": 20 },
+          { "id": 49, "n": 15 },
+          { "id": 50, "n": 12 },
+          { "id": 51, "n": 10 },
+          { "id": 52, "n": 8 },
+          { "id": 22, "n": 6 },
+          { "id": 72, "n": 20 },
+          { "id": 80, "n": 8 },
+          { "id": 39, "n": 5 },
+          { "id": 77, "n": 6 }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "chain-reaction",
+    "label": "Chain Reaction",
+    "notes": "Micro MIRV chain: each explosion spawns children that spawn more children. Micro MIRV (42) dominant with Rubberized (41) for bouncing spread. Maximum coverage.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 42, "n": 35 },
+          { "id": 29, "n": 15 },
+          { "id": 41, "n": 12 },
+          { "id": 40, "n": 10 },
+          { "id": 43, "n": 8 },
+          { "id": 45, "n": 6 },
+          { "id": 30, "n": 5 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 5 },
+          { "id": 75, "n": 6 },
+          { "id": 74, "n": 5 }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "status-overload",
+    "label": "Status Overload",
+    "notes": "Utility-focused: maximum status effect stacking. Alchemic (66) +300% status chance stacked heavy. Hazardous (74) adds status damage. Damage Amp (39) debuffs targets. Pure damage-over-time build.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 66, "n": 35 },
+          { "id": 74, "n": 25 },
+          { "id": 39, "n": 15 },
+          { "id": 72, "n": 25 },
+          { "id": 80, "n": 10 },
+          { "id": 78, "n": 8 },
+          { "id": 69, "n": 6 },
+          { "id": 75, "n": 6 },
+          { "id": 29, "n": 5 },
+          { "id": 40, "n": 4 }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "critical-mass",
+    "label": "Critical Mass",
+    "notes": "Crit-focused utility: every hit crits. Exacting (75) for crit chance, Merciless (79) for crit damage, Penetrator (69) for guaranteed crits on impacted targets. Explosive (72) for base damage amp.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 75, "n": 35 },
+          { "id": 79, "n": 25 },
+          { "id": 69, "n": 20 },
+          { "id": 72, "n": 30 },
+          { "id": 39, "n": 10 },
+          { "id": 73, "n": 5 },
+          { "id": 29, "n": 5 },
+          { "id": 40, "n": 4 },
+          { "id": 78, "n": 6 },
+          { "id": 77, "n": 4 }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "knife-storm",
+    "label": "Knife Storm",
+    "notes": "Bouncing Blade dominant: massive knife ricochet chains. Bouncing Blade (67) stacked very heavy. Spawning (22) and Divider (30) create more knife sources. Each child grenade throws its own blade volley.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 67, "n": 50 },
+          { "id": 22, "n": 10 },
+          { "id": 30, "n": 8 },
+          { "id": 44, "n": 6 },
+          { "id": 45, "n": 5 },
+          { "id": 69, "n": 10 },
+          { "id": 75, "n": 8 },
+          { "id": 79, "n": 6 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 5 }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "suppression-field",
+    "label": "Suppression Field",
+    "notes": "Singularity + debuff: pull enemies in and suppress their damage. Suppressor (68) stacked with Singularity (33). Enemies deal 25% less damage per stack while trapped. Gnawing (59) DOT inside.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 33, "n": 30 },
+          { "id": 68, "n": 25 },
+          { "id": 60, "n": 15 },
+          { "id": 58, "n": 10 },
+          { "id": 59, "n": 12 },
+          { "id": 46, "n": 8 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 8 },
+          { "id": 74, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "singularity"
+  },
+  {
+    "id": "puddle-party",
+    "label": "Puddle Party",
+    "notes": "Splat Pack dominant lingering: elemental puddles cover the entire floor. Splat Pack (64) stacked heavy launches projectiles that each leave a puddle. Duration extends puddle lifetime. MIRV multiplies puddle sources.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 64, "n": 40 },
+          { "id": 34, "n": 15 },
+          { "id": 21, "n": 12 },
+          { "id": 62, "n": 10 },
+          { "id": 29, "n": 8 },
+          { "id": 40, "n": 6 },
+          { "id": 66, "n": 8 },
+          { "id": 74, "n": 6 },
+          { "id": 72, "n": 15 },
+          { "id": 39, "n": 5 },
+          { "id": 78, "n": 4 }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "smart-strike",
+    "label": "Smart Strike",
+    "notes": "Maglock-dominant artillery: homing grenades that fire artillery on contact. Maglock (56) stacked heavy for tracking. Artillery (32) fires on each hit. Duration (53) extends fire. Clean targeted damage.",
+    "groups": [
+      {
+        "entries": [
+          { "id": 56, "n": 35 },
+          { "id": 32, "n": 20 },
+          { "id": 53, "n": 15 },
+          { "id": 55, "n": 10 },
+          { "id": 52, "n": 8 },
+          { "id": 72, "n": 20 },
+          { "id": 39, "n": 5 },
+          { "id": 69, "n": 5 },
+          { "id": 75, "n": 6 }
+        ]
+      }
+    ],
+    "style": "artillery"
   }
 ]

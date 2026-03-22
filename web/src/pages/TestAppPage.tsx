@@ -511,10 +511,10 @@ function VaultTab() {
             <h4 className="text-sm font-bold text-[var(--color-text)] mb-1">Visual Recipes</h4>
             <p className="text-xs text-[var(--color-text-muted)]">24 curated grenade visual effects — Singularity, Artillery, Lingering, and hybrids</p>
           </div>
-          <div className="rounded-lg border border-[var(--color-panel-border)] p-4">
-            <h4 className="text-sm font-bold text-[var(--color-text)] mb-1">God Rolls</h4>
+          <Link to="/god-rolls" className="rounded-lg border border-[var(--color-panel-border)] p-4 hover:border-amber-500/40 transition-colors">
+            <h4 className="text-sm font-bold text-[var(--color-text)] mb-1">God Rolls (Non-Modded)</h4>
             <p className="text-xs text-[var(--color-text-muted)]">Pre-built optimal configurations for each item type</p>
-          </div>
+          </Link>
           <div className="rounded-lg border border-dashed border-[var(--color-panel-border)]/50 p-4">
             <h4 className="text-sm font-bold text-[var(--color-text-muted)]/50 mb-1">Named Builds</h4>
             <p className="text-xs text-[var(--color-text-muted)]/40">Paste Mobalytics URL, auto-generate full gear set (coming soon)</p>
@@ -637,7 +637,7 @@ function WorkbenchCard({ to, title, desc, badge, color }: { to: string; title: s
 
 // ── Top Community Code spotlight ─────────────────────────────────────────────
 function TopCommunityCode() {
-  const [topCode, setTopCode] = useState<{ title: string; code: string; upvotes: number; itemType: string; submittedAt: number } | null>(null);
+  const [topCode, setTopCode] = useState<{ title: string; code: string; upvotes: number; itemType: string; submittedAt: number; authorName?: string; seed?: number } | null>(null);
   useEffect(() => {
     fetchApi("community/recipes").then((r) => r.json()).then((data) => {
       const recipes = data?.recipes;
@@ -647,7 +647,7 @@ function TopCommunityCode() {
         const thisWeek = recipes.filter((r: { submittedAt: number }) => r.submittedAt > weekAgo);
         const pool = thisWeek.length > 0 ? thisWeek : recipes;
         const top = pool.sort((a: { upvotes: number }, b: { upvotes: number }) => b.upvotes - a.upvotes)[0];
-        if (top) setTopCode({ title: top.title, code: top.code, upvotes: top.upvotes, itemType: top.itemType, submittedAt: top.submittedAt });
+        if (top) setTopCode({ title: top.title, code: top.code, upvotes: top.upvotes, itemType: top.itemType, submittedAt: top.submittedAt, authorName: top.authorName, seed: top.seed });
       }
     }).catch(() => {});
   }, []);
@@ -661,26 +661,47 @@ function TopCommunityCode() {
     "class-mod": "border-green-500/40 text-green-400",
   };
 
+  // Badge gradient colors matching CommunityVaultPage
+  const BADGE_GRADIENTS = [
+    "from-purple-500 to-pink-500", "from-cyan-400 to-blue-500", "from-amber-400 to-orange-500",
+    "from-emerald-400 to-teal-500", "from-rose-400 to-red-500", "from-violet-400 to-indigo-500",
+    "from-lime-400 to-green-500", "from-fuchsia-400 to-purple-500", "from-sky-400 to-cyan-500",
+    "from-yellow-400 to-amber-500",
+  ];
+
   return (
     <div className="rounded-xl border border-amber-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
-      <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
+      <div className="px-5 py-3 border-b border-amber-500/20 flex items-center justify-between bg-gradient-to-r from-amber-500/10 via-transparent to-transparent">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400">★</span>
-          <h3 className="text-sm font-semibold text-amber-400">Top Community Code</h3>
+          <span className="text-amber-400 text-lg">★</span>
+          <h3 className="text-sm font-semibold text-amber-400">Weekly Champion</h3>
         </div>
-        <Link to="/community" className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">View all →</Link>
+        <Link to="/community" className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">View all</Link>
       </div>
-      <div className="px-5 py-3 flex items-center justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-bold text-[var(--color-text)]">{topCode.title}</span>
-            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${typeColors[topCode.itemType] ?? "border-[var(--color-panel-border)] text-[var(--color-text-muted)]"}`}>{topCode.itemType}</span>
-          </div>
-          <p className="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{topCode.code.slice(0, 60)}...</p>
+      <div className="px-5 py-4 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-bold text-[var(--color-text)]">{topCode.title}</span>
+          <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${typeColors[topCode.itemType] ?? "border-[var(--color-panel-border)] text-[var(--color-text-muted)]"}`}>{topCode.itemType}</span>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10">
-          <span className="text-amber-400 text-sm">▲</span>
-          <span className="text-amber-400 font-bold text-sm">{topCode.upvotes}</span>
+        {topCode.authorName && topCode.seed && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-amber-400/60 uppercase tracking-wide">by</span>
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider text-white bg-gradient-to-r ${BADGE_GRADIENTS[topCode.seed % BADGE_GRADIENTS.length]} shadow-md shadow-black/40 ring-1 ring-white/20`}
+              title={`Seed #${topCode.seed}`}
+            >
+              <span className="opacity-70">#</span>
+              {topCode.authorName}
+            </span>
+          </div>
+        )}
+        <p className="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{topCode.code.slice(0, 60)}...</p>
+        <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10">
+            <span className="text-amber-400 text-sm">▲</span>
+            <span className="text-amber-400 font-bold text-sm">{topCode.upvotes}</span>
+            <span className="text-amber-400/50 text-[10px] ml-1">votes</span>
+          </div>
         </div>
       </div>
     </div>

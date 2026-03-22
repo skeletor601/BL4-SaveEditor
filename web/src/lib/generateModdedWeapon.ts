@@ -6,7 +6,8 @@
  * 1. Magazine: ONLY Vladof 50-round {18:14}. No pickMagazineToken(), no COV/Order.
  * 2. Stat stacks: NEVER use code 27:75 (exclude via isExcludedStatCode).
  * 3. Exemplar: {9:[28 32 40 55 59 62...]} — two separate groups per gun, cycling those IDs. Terra confirmed great.
- * 4. Grenade 245 block: NEVER use IDs 1–20 (firmware), 70 (Overflow), 71 (Express), 87–88 (firmware).
+ * 4. Grenade 245 block: NEVER use IDs 1–20 (firmware) EXCEPT whitelisted: 4=Airstrike, 5=High Caliber,
+ *    6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'. Never 70 (Overflow), 71 (Express), 87–88.
  *    Safe perk range: 21–81 excluding 70 & 71. Enforced by GRENADE_245_FORBIDDEN set (runtime filter).
  * 5. Barrels: when allowedBarrelEntries is set, only those barrels; same for allowedUnderbarrelEntries.
  *    Terra's rule: MAX 5 unique barrel codes per gun. Slots = visual(1)+primary(1)+extra_same_prefix(0-2)+cross(0-1).
@@ -332,13 +333,24 @@ export function generateModdedWeapon(
   const isClaudeGun = Math.random() < 0.05; // 1 in 20
   // Stock base hand-built from a real auto-filled Convergence, all explicit {7:xx} format.
   const CLAUDE_GUN_STOCK_BASE = "7, 0, 1, 50| 2, 6211|| {1:13} {7:2} {7:64} {7:[66 66 66 66 66]} {7:[68 68 68 68 68]} {7:[69 69 69 69 69]} {7:[70 70 70 70 70]} {7:[71 71 71 71 71]} {7:[72 72 72 72 72]} {7:[16 16]} {7:41} {7:42} {7:43} {7:50} {7:12} {7:74} {7:75} {7:28} {7:[34 34 34 34 34]} {7:[35 35 35 35 35]} {7:[36 36 36 36 36]} {7:[48 48 48 48 48]} |";
-  /** Only use skins from the skin selector (skinOptions), excluding Christmas. No stock/default skin. */
-  const nonChristmasSkins = (options.skinOptions ?? []).filter(
+  /** Only use skins from the skin selector (skinOptions), excluding Christmas.
+   *  Shiny skins (78 of 128) are collapsed to ONE representative so they don't dominate the pool.
+   *  The "Ultimate Shiny" variant is kept separate if it exists. */
+  const allSkins = (options.skinOptions ?? []).filter(
     (s) => !/christmas/i.test(String(s.label ?? "")) && !/christmas/i.test(String(s.value ?? "")),
   );
+  const nonShinySkins = allSkins.filter((s) => !String(s.value ?? "").includes("Shiny"));
+  const ultimateSkin = allSkins.filter((s) => String(s.value ?? "").includes("Shiny_Ultimate"));
+  const shinySkins = allSkins.filter((s) => String(s.value ?? "").includes("Shiny") && !String(s.value ?? "").includes("Shiny_Ultimate"));
+  // Keep one random shiny as the representative for the whole group; Ultimate gets its own slot
+  const skinPool = [
+    ...nonShinySkins,
+    ...(shinySkins.length > 0 ? [shinySkins[Math.floor(Math.random() * shinySkins.length)]!] : []),
+    ...ultimateSkin,
+  ];
   const chosenSkin =
     skinFromOptions ||
-    (nonChristmasSkins.length > 0 ? pick(nonChristmasSkins).value : "");
+    (skinPool.length > 0 ? pick(skinPool).value : "");
 
   /**
    * Power mode rebalance (requested):
@@ -1218,10 +1230,9 @@ export function generateModdedWeapon(
   // Elemental code swaps produce entirely new visuals — only the 245 block drives the visual.
   // Falls back to hardcoded Terra pattern when no recipes are provided.
   const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
-  // Map universal element override ID (56-60) to grenade element ID (24-28)
-  // 56=Shock→28, 57=Radiation→27, 58=Corrosive→24, 59=Cryo→25, 60=Fire→26
-  const ELEMENT_TO_GRENADE: Record<number, number> = { 56: 28, 57: 27, 58: 24, 59: 25, 60: 26 };
-  const grenadeElementId = ELEMENT_TO_GRENADE[chosenElementId] ?? 24;
+  // Grenade element: random per gun, independent of weapon element.
+  // 24=Corrosive, 25=Cryo, 26=Fire, 27=Radiation, 28=Shock
+  const grenadeElementId = isClaudeGun ? 27 : pick([24, 25, 26, 27, 28]);
   // Recipe n values are the STABLE baseline. Effects are multiplicative so op/insane multiply up significantly.
   const scaleForMode = { stable: 1.0, op: 1.5, insane: 2.0 }[modPowerMode];
   // Perks that CRASH the game above a certain stack count — hard cap regardless of mode.
@@ -1232,10 +1243,10 @@ export function generateModdedWeapon(
   // 70    = Overflow  (increases grenade charge count — meaningless/harmful on a weapon).
   // 71    = Express   (reduces grenade cooldown — meaningless/harmful on a weapon).
   // 87,88 = additional grenade firmware IDs.
-  // Whitelisted firmware: 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
-  const GRENADE_245_FIRMWARE_WHITELIST = [5, 6, 10, 17, 20];
+  // Whitelisted firmware: 4=Airstrike, 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
+  const GRENADE_245_FIRMWARE_WHITELIST = [4, 5, 6, 10, 17, 20];
   const GRENADE_245_FORBIDDEN = new Set(
-    [1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,70,71,87,88],
+    [1,2,3,7,8,9,11,12,13,14,15,16,18,19,70,71,87,88],
   );
   // Pick ONE whitelisted firmware per gun, stacked 1-3× (max 3), prepended to the {245:[...]} block.
   const firmwarePerkId = isClaudeGun ? 10 : pick(GRENADE_245_FIRMWARE_WHITELIST);  // Claude's Gun: Deadeye
@@ -1326,10 +1337,10 @@ export function generateModdedWeapon(
       }
     }
     if (chosenTokens.length > 0) {
-      // Inject whitelisted firmware into the first recipe token
+      // Inject whitelisted firmware + grenade element into the first recipe token
       const firstToken = chosenTokens[0];
       const fwInject = firmwarePerkIds.join(" ");
-      chosenTokens[0] = firstToken.replace("{245:[", `{245:[${fwInject} `);
+      chosenTokens[0] = firstToken.replace("{245:[", `{245:[${fwInject} ${grenadeElementId} `);
 
       // Append style-matched complementary perks to the LAST token (preserves recipe sequence)
       // MIRV perks (29,40,41,42,43) included in ALL styles — MIRV goes with everything
@@ -1383,7 +1394,7 @@ export function generateModdedWeapon(
       ...Array(heavyStack2).fill(39),
       ...Array(heavyStack2).fill(75),
       ...[21, 22, 30, 34, 35, 36, 37, 38, 44, 45, 63, 64, 65, 69, 73, 77, 78, 79].flatMap((id) => Array(baseHeavyStack).fill(id)),
-      24, 40, 53, 62, 66, 76,
+      grenadeElementId, 40, 53, 62, 66, 76,
       77, 21,
     ].filter((id) => !GRENADE_245_FORBIDDEN.has(id));
     terraGrenadePerkBlock = `{245:[${terraPerkIds.join(" ")}]}`;
@@ -1461,9 +1472,13 @@ export function generateModdedWeapon(
   // {292:[9×10]} Tediore Enhancement "Divider" — Terra confirmed: always exactly 10 stacks on every gun.
   const dividerStacks = [groupedToken(292, Array(10).fill(9))];
 
-  // ALL 6 elements — Terra's approach: {1:[55 56 57 58 59 60]} gives the gun every element type.
-  // chosenElementId still used for grenade block element matching.
-  const extendedElementTokens = ["{1:[55 56 57 58 59 60]}"];
+  // ALL 6 elemental overrides — Terra's approach: {1:[55 56 57 58 59 60]} gives the gun every override.
+  // Primary element is a SEPARATE single element: 10=Corrosive, 11=Cryo, 12=Fire, 13=Radiation, 14=Shock.
+  // chosenElementId (56-60 range) still used for grenade block element matching.
+  const PRIMARY_ELEMENTS = [10, 11, 12, 13, 14]; // Corrosive, Cryo, Fire, Radiation, Shock
+  const chosenPrimaryElement = isClaudeGun ? 13 : pick(PRIMARY_ELEMENTS); // Claude's Gun: Radiation
+  const primaryElementToken = `{1:${chosenPrimaryElement}}`;
+  const extendedElementTokens = [primaryElementToken, "{1:[55 56 57 58 59 60]}"];
 
   // ── STOCK BASE ──────────────────────────────────────────────────────────────────────────
   // When stockBaseDecoded is provided (from auto-fill), use it as the complete stock weapon.
@@ -1512,8 +1527,6 @@ export function generateModdedWeapon(
     ...stockBaseParts,
     // Vladof 50-round stacked magazine — ammo capacity mod on top of stock mag
     magazineToken,
-    // Heavy barrel accessories on ALL guns (MIRV, Two-Shot, Triple Barrel, etc.)
-    ...heavyBarrelAccessoryTokens,
 
     // ── Modded additions ──
     ...altFireTokens,
@@ -1550,6 +1563,8 @@ export function generateModdedWeapon(
     // Underbarrel — ALWAYS added from desirable list or legacy path
     ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
     ...(underbarrelToken ? [underbarrelToken] : []),
+    // Heavy barrel accessories — placed downstream from visual barrel to avoid interference
+    ...heavyBarrelAccessoryTokens,
     // ── Effect BARRELS at END — "as far away as possible" from visual barrel (Terra's rule) ──
     // Only actual barrels here, not accessories or non-barrel tokens
     ...seamstressExtras,                                     // {13:70} + {11:75} Anarchy + {11:81} Eigenburst (only if Seamstress UB)

@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 
 import { persistPath } from "../lib/persistPath.js";
+import { lookupProfileBySeed } from "./communityProfiles.js";
 const RECIPES_PATH = persistPath("community_recipes.json");
 
 // In-memory rate limit: max 5 submissions per IP per hour
@@ -37,6 +38,8 @@ export interface CommunityRecipe {
   decoded?: string;
   submittedAt: number;
   upvotes: number;
+  seed?: number;
+  authorName?: string;
 }
 
 function loadRecipes(): CommunityRecipe[] {
@@ -57,11 +60,19 @@ export async function communityRoutes(
   _opts: FastifyPluginOptions,
 ) {
   // GET /api/community/recipes — browse all recipes (sorted by upvotes desc, newest first)
+  // Attaches authorName from community profiles based on seed
   fastify.get("/community/recipes", async (_request: FastifyRequest, reply: FastifyReply) => {
     const recipes = loadRecipes();
+    const enriched = recipes.map((r) => {
+      if (r.seed && !r.authorName) {
+        const profile = lookupProfileBySeed(r.seed);
+        if (profile) return { ...r, authorName: profile.name };
+      }
+      return r;
+    });
     return reply.send({
       success: true,
-      recipes: recipes.sort((a, b) => b.upvotes - a.upvotes || b.submittedAt - a.submittedAt),
+      recipes: enriched.sort((a, b) => b.upvotes - a.upvotes || b.submittedAt - a.submittedAt),
     });
   });
 
@@ -73,7 +84,7 @@ export async function communityRoutes(
     }
 
     const body = request.body as Record<string, unknown>;
-    const { itemType, title, description, code, decoded } = body ?? {};
+    const { itemType, title, description, code, decoded, seed } = body ?? {};
 
     if (typeof code !== "string" || !code.trim().startsWith("@U")) {
       return reply.code(400).send({ error: "code must be a Base85 serial starting with @U" });
@@ -95,6 +106,7 @@ export async function communityRoutes(
       decoded: typeof decoded === "string" ? decoded.trim().slice(0, 2000) : undefined,
       submittedAt: Date.now(),
       upvotes: 0,
+      seed: typeof seed === "number" && Number.isFinite(seed) && seed >= 1 && seed <= 9999 ? Math.trunc(seed) : undefined,
     };
 
     recipes.unshift(newRecipe);

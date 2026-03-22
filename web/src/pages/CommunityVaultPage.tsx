@@ -1,6 +1,7 @@
 /**
  * Feature 16: Community Recipe Vault
- * Browse and submit shared grenade/weapon recipes.
+ * Browse and submit shared modded grenade/weapon recipes.
+ * Includes community profile registration (seed + name) and author name badges.
  */
 import { useState, useEffect, useCallback } from "react";
 import { fetchApi } from "@/lib/apiClient";
@@ -15,6 +16,8 @@ interface CommunityRecipe {
   decoded?: string;
   submittedAt: number;
   upvotes: number;
+  seed?: number;
+  authorName?: string;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -27,6 +30,33 @@ const TYPE_COLORS: Record<string, string> = {
   enhancement: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40",
 };
 
+const BADGE_GRADIENTS = [
+  "from-purple-500 to-pink-500",
+  "from-cyan-400 to-blue-500",
+  "from-amber-400 to-orange-500",
+  "from-emerald-400 to-teal-500",
+  "from-rose-400 to-red-500",
+  "from-violet-400 to-indigo-500",
+  "from-lime-400 to-green-500",
+  "from-fuchsia-400 to-purple-500",
+  "from-sky-400 to-cyan-500",
+  "from-yellow-400 to-amber-500",
+];
+
+/** Author name badge — colorful gradient pill. Exported for use in GodRollsPage + TestAppPage. */
+export function AuthorBadge({ name, seed }: { name: string; seed: number }) {
+  const grad = BADGE_GRADIENTS[seed % BADGE_GRADIENTS.length]!;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r ${grad} shadow-sm shadow-black/30`}
+      title={`Seed #${seed}`}
+    >
+      <span className="opacity-70">#</span>
+      {name}
+    </span>
+  );
+}
+
 function timeAgo(ts: number): string {
   const d = Date.now() - ts;
   if (d < 60_000)      return "just now";
@@ -34,6 +64,9 @@ function timeAgo(ts: number): string {
   if (d < 86_400_000)  return `${Math.floor(d / 3_600_000)}h ago`;
   return `${Math.floor(d / 86_400_000)}d ago`;
 }
+
+const PROFILE_SEED_KEY = "bl4-community-seed";
+const PROFILE_NAME_KEY = "bl4-community-name";
 
 export default function CommunityVaultPage() {
   const [recipes, setRecipes] = useState<CommunityRecipe[]>([]);
@@ -49,22 +82,23 @@ export default function CommunityVaultPage() {
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const { addEntry } = useCodeHistory();
 
+  // Community profile state
+  const [profileSeed, setProfileSeed] = useState(() => localStorage.getItem(PROFILE_SEED_KEY) ?? "");
+  const [profileName, setProfileName] = useState(() => localStorage.getItem(PROFILE_NAME_KEY) ?? "");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<string | null>(null);
+  const isProfileRegistered = !!profileSeed && !!profileName;
+
   const loadRecipes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetchApi("community/recipes");
       const data = await res.json().catch(() => ({})) as { success?: boolean; recipes?: CommunityRecipe[] };
-      if (data.success && Array.isArray(data.recipes)) {
-        setRecipes(data.recipes);
-      } else {
-        setError("Failed to load recipes.");
-      }
-    } catch {
-      setError("API unavailable.");
-    } finally {
-      setLoading(false);
-    }
+      if (data.success && Array.isArray(data.recipes)) setRecipes(data.recipes);
+      else setError("Failed to load recipes.");
+    } catch { setError("API unavailable."); }
+    finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void loadRecipes(); }, [loadRecipes]);
@@ -82,139 +116,128 @@ export default function CommunityVaultPage() {
     try {
       const res = await fetchApi(`community/recipes/${id}/upvote`, { method: "POST", body: "{}" });
       const data = await res.json().catch(() => ({})) as { upvotes?: number };
-      if (data.upvotes != null) {
-        setRecipes((prev) => prev.map((r) => r.id === id ? { ...r, upvotes: data.upvotes! } : r));
-      }
-    } catch {
-      setUpvotedIds((prev) => { const s = new Set(prev); s.delete(id); return s; });
-    }
+      if (data.upvotes != null) setRecipes((prev) => prev.map((r) => r.id === id ? { ...r, upvotes: data.upvotes! } : r));
+    } catch { setUpvotedIds((prev) => { const s = new Set(prev); s.delete(id); return s; }); }
+  };
+
+  const handleSaveProfile = async () => {
+    const seedNum = Number(profileSeed);
+    if (!seedNum || seedNum < 1 || seedNum > 9999) { setProfileMsg("Seed must be 1-9999."); return; }
+    if (!profileName.trim() || profileName.trim().length > 30) { setProfileMsg("Name required (max 30 chars)."); return; }
+    setProfileSaving(true);
+    setProfileMsg(null);
+    try {
+      const res = await fetchApi("community/profiles", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seed: seedNum, name: profileName.trim() }) });
+      const data = await res.json().catch(() => ({})) as { success?: boolean; error?: string };
+      if (data.success) {
+        localStorage.setItem(PROFILE_SEED_KEY, String(seedNum));
+        localStorage.setItem(PROFILE_NAME_KEY, profileName.trim());
+        setProfileMsg("Profile saved!");
+        setTimeout(() => setProfileMsg(null), 2000);
+      } else { setProfileMsg(data.error ?? "Save failed."); }
+    } catch { setProfileMsg("API unavailable."); }
+    finally { setProfileSaving(false); }
   };
 
   const handleSubmit = async () => {
-    if (!submitForm.code.trim().startsWith("@U")) {
-      setSubmitMessage("Code must start with @U (Base85 serial).");
-      return;
-    }
-    if (!submitForm.title.trim()) {
-      setSubmitMessage("Title is required.");
-      return;
-    }
+    if (!submitForm.code.trim().startsWith("@U")) { setSubmitMessage("Code must start with @U (Base85 serial)."); return; }
+    if (!submitForm.title.trim()) { setSubmitMessage("Title is required."); return; }
     setSubmitting(true);
     setSubmitMessage(null);
     try {
-      const res = await fetchApi("community/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submitForm),
-      });
+      const seedNum = Number(profileSeed);
+      const payload = { ...submitForm, ...(seedNum >= 1 && seedNum <= 9999 ? { seed: seedNum } : {}) };
+      const res = await fetchApi("community/recipes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json().catch(() => ({})) as { success?: boolean; error?: string };
       if (data.success) {
         setSubmitMessage("Submitted! Thanks for sharing.");
         setSubmitForm({ itemType: "grenade", title: "", description: "", code: "", decoded: "" });
         void loadRecipes();
         setTimeout(() => setShowSubmit(false), 2000);
-      } else {
-        setSubmitMessage(data.error ?? "Submit failed.");
-      }
-    } catch {
-      setSubmitMessage("API unavailable.");
-    } finally {
-      setSubmitting(false);
-    }
+      } else { setSubmitMessage(data.error ?? "Submit failed."); }
+    } catch { setSubmitMessage("API unavailable."); }
+    finally { setSubmitting(false); }
   };
 
   const filtered = recipes.filter((r) => {
     if (typeFilter && r.itemType !== typeFilter) return false;
     const q = filter.trim().toLowerCase();
     if (!q) return true;
-    return [r.title, r.description ?? "", r.itemType, r.code].join(" ").toLowerCase().includes(q);
+    return [r.title, r.description ?? "", r.itemType, r.code, r.authorName ?? ""].join(" ").toLowerCase().includes(q);
   });
-
   const itemTypes = [...new Set(recipes.map((r) => r.itemType))].sort();
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold mb-1">Community Vault</h1>
-          <p className="text-sm opacity-60">Browse and share grenade/weapon recipes from the community.</p>
+          <h1 className="text-xl font-bold mb-1">Community Recipes</h1>
+          <p className="text-sm opacity-60">Browse and share modded weapon/grenade codes from the community.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowSubmit((v) => !v)}
-          className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm hover:opacity-90 min-h-[44px]"
-        >
+        <button type="button" onClick={() => setShowSubmit((v) => !v)} className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm hover:opacity-90 min-h-[44px]">
           {showSubmit ? "Cancel" : "+ Submit Recipe"}
         </button>
+      </div>
+
+      {/* Community Profile Registration */}
+      <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] p-4">
+        <div className="flex flex-wrap items-center gap-3 mb-2">
+          <h2 className="text-sm font-semibold">Your Modder Identity</h2>
+          {isProfileRegistered && <AuthorBadge name={profileName} seed={Number(profileSeed)} />}
+        </div>
+        <p className="text-xs opacity-50 mb-3">Register your seed and display name. Your name badge will appear on every code you share.</p>
+        <div className="flex flex-wrap items-end gap-3">
+          <div>
+            <label className="block text-[10px] uppercase tracking-wide opacity-40 mb-1">Seed (1-9999)</label>
+            <input type="number" min={1} max={9999} value={profileSeed} onChange={(e) => setProfileSeed(e.target.value)} placeholder="420" className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm w-24" />
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <label className="block text-[10px] uppercase tracking-wide opacity-40 mb-1">Display Name</label>
+            <input type="text" maxLength={30} value={profileName} onChange={(e) => setProfileName(e.target.value)} placeholder="Terra-Morpheous" className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
+          </div>
+          <button type="button" onClick={handleSaveProfile} disabled={profileSaving} className="px-4 py-2 rounded-lg border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium text-sm hover:bg-[var(--color-accent)]/20 disabled:opacity-50 min-h-[38px]">
+            {profileSaving ? "Saving…" : isProfileRegistered ? "Update" : "Register"}
+          </button>
+          {profileMsg && <span className="text-xs opacity-70">{profileMsg}</span>}
+        </div>
       </div>
 
       {/* Submit form */}
       {showSubmit && (
         <div className="border border-[var(--color-panel-border)] rounded-lg p-4 space-y-3 bg-[rgba(24,28,34,0.8)]">
-          <h2 className="text-sm font-medium">Submit a Recipe</h2>
+          <h2 className="text-sm font-medium">Submit a Modded Recipe</h2>
+          {isProfileRegistered && (
+            <div className="flex items-center gap-2 text-xs opacity-60">
+              <span>Posting as</span>
+              <AuthorBadge name={profileName} seed={Number(profileSeed)} />
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs opacity-60 mb-1">Item type</label>
-              <select
-                value={submitForm.itemType}
-                onChange={(e) => setSubmitForm((f) => ({ ...f, itemType: e.target.value }))}
-                className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm"
-              >
-                {["weapon","grenade","shield","class-mod","repkit","heavy","enhancement"].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
+              <select value={submitForm.itemType} onChange={(e) => setSubmitForm((f) => ({ ...f, itemType: e.target.value }))} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm">
+                {["weapon","grenade","shield","class-mod","repkit","heavy","enhancement"].map((t) => (<option key={t} value={t}>{t}</option>))}
               </select>
             </div>
             <div>
               <label className="block text-xs opacity-60 mb-1">Title *</label>
-              <input
-                type="text"
-                maxLength={100}
-                value={submitForm.title}
-                onChange={(e) => setSubmitForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="e.g. The Swarm build"
-                className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm"
-              />
+              <input type="text" maxLength={100} value={submitForm.title} onChange={(e) => setSubmitForm((f) => ({ ...f, title: e.target.value }))} placeholder="e.g. The Swarm build" className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
             </div>
           </div>
           <div>
             <label className="block text-xs opacity-60 mb-1">Description</label>
-            <input
-              type="text"
-              maxLength={500}
-              value={submitForm.description}
-              onChange={(e) => setSubmitForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="What does this do? Any tips?"
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm"
-            />
+            <input type="text" maxLength={500} value={submitForm.description} onChange={(e) => setSubmitForm((f) => ({ ...f, description: e.target.value }))} placeholder="What does this do? Any tips?" className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
           </div>
           <div>
             <label className="block text-xs opacity-60 mb-1">Base85 code * (@U...)</label>
-            <input
-              type="text"
-              value={submitForm.code}
-              onChange={(e) => setSubmitForm((f) => ({ ...f, code: e.target.value }))}
-              placeholder="@U..."
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono"
-            />
+            <input type="text" value={submitForm.code} onChange={(e) => setSubmitForm((f) => ({ ...f, code: e.target.value }))} placeholder="@U..." className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono" />
           </div>
           <div>
             <label className="block text-xs opacity-60 mb-1">Decoded string (optional)</label>
-            <input
-              type="text"
-              value={submitForm.decoded}
-              onChange={(e) => setSubmitForm((f) => ({ ...f, decoded: e.target.value }))}
-              placeholder="263, 0, 1, 50| 2, 305|| ..."
-              className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono"
-            />
+            <input type="text" value={submitForm.decoded} onChange={(e) => setSubmitForm((f) => ({ ...f, decoded: e.target.value }))} placeholder="263, 0, 1, 50| 2, 305|| ..." className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono" />
           </div>
           <div className="flex gap-2 items-center">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm hover:opacity-90 disabled:opacity-50 min-h-[44px]"
-            >
+            <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm hover:opacity-90 disabled:opacity-50 min-h-[44px]">
               {submitting ? "Submitting…" : "Submit"}
             </button>
             {submitMessage && <p className="text-xs opacity-80">{submitMessage}</p>}
@@ -224,24 +247,12 @@ export default function CommunityVaultPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center">
-        <input
-          type="text"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder="Search recipes…"
-          className="flex-1 min-w-[180px] px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm"
-        />
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm"
-        >
+        <input type="text" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search recipes…" className="flex-1 min-w-[180px] px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm">
           <option value="">All types</option>
           {itemTypes.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
-        <button type="button" onClick={loadRecipes} className="px-3 py-2 rounded border border-[var(--color-panel-border)] text-sm hover:bg-white/5">
-          Refresh
-        </button>
+        <button type="button" onClick={loadRecipes} className="px-3 py-2 rounded border border-[var(--color-panel-border)] text-sm hover:bg-white/5">Refresh</button>
       </div>
 
       {/* Recipe list */}
@@ -258,35 +269,19 @@ export default function CommunityVaultPage() {
             return (
               <div key={recipe.id} className="border border-[var(--color-panel-border)] rounded-lg p-3 bg-[rgba(24,28,34,0.6)] space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${color}`}>
-                    {recipe.itemType}
-                  </span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${color}`}>{recipe.itemType}</span>
+                  {recipe.authorName && recipe.seed && <AuthorBadge name={recipe.authorName} seed={recipe.seed} />}
                   <span className="font-medium text-sm flex-1 truncate">{recipe.title}</span>
                   <span className="text-[10px] opacity-40 shrink-0">{timeAgo(recipe.submittedAt)}</span>
                 </div>
-                {recipe.description && (
-                  <p className="text-xs opacity-70">{recipe.description}</p>
-                )}
+                {recipe.description && <p className="text-xs opacity-70">{recipe.description}</p>}
                 <div className="font-mono text-[11px] opacity-50 truncate">{recipe.code.slice(0, 60)}{recipe.code.length > 60 ? "…" : ""}</div>
                 <div className="flex gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(recipe)}
-                    className="text-xs px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors"
-                  >
-                    {copiedId === recipe.id ? "✓ Copied" : "Copy"}
+                  <button type="button" onClick={() => handleCopy(recipe)} className="text-xs px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors">
+                    {copiedId === recipe.id ? "Copied" : "Copy"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleUpvote(recipe.id)}
-                    disabled={upvotedIds.has(recipe.id)}
-                    className={`text-xs px-2.5 py-1 rounded transition-colors ${
-                      upvotedIds.has(recipe.id)
-                        ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                        : "bg-white/5 hover:bg-white/15 border border-white/10"
-                    }`}
-                  >
-                    ▲ {recipe.upvotes}
+                  <button type="button" onClick={() => void handleUpvote(recipe.id)} disabled={upvotedIds.has(recipe.id)} className={`text-xs px-2.5 py-1 rounded transition-colors ${upvotedIds.has(recipe.id) ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30" : "bg-white/5 hover:bg-white/15 border border-white/10"}`}>
+                    {recipe.upvotes}
                   </button>
                 </div>
               </div>
