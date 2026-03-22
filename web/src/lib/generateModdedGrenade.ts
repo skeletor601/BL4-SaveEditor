@@ -21,6 +21,8 @@ export interface GenerateModdedGrenadeOptions {
   grenadeVisualRecipes?: GrenadeVisualRecipe[];
   /** Skin value to apply. */
   skin?: string;
+  /** Skin options pool (from weapon-gen/data skins). */
+  skinOptions?: Array<{ label: string; value: string }>;
 }
 
 export interface GrenadeStatsEstimate {
@@ -58,12 +60,14 @@ export interface GenerateModdedGrenadeResult {
 const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
 const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const randFloat = (lo: number, hi: number) => Math.random() * (hi - lo) + lo;
-const groupedToken = (prefix: number, ids: number[]): string => `{${prefix}:[${ids.join(" ")}]}`;
+const _groupedToken = (prefix: number, ids: number[]): string => `{${prefix}:[${ids.join(" ")}]}`;
+void _groupedToken;
 
 // IDs forbidden from the {245:[...]} block for standalone grenades.
 // Overflow (70) and Express (71) are ALLOWED here — they're great on grenades (more charges, faster cooldown).
 // Only blocked in the WEAPON generator's grenade reload block.
-const GRENADE_245_FIRMWARE_WHITELIST = [5, 6, 10, 17, 20];
+// Same whitelist as weapon generator: 4=Airstrike, 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
+const GRENADE_245_FIRMWARE_WHITELIST = [4, 5, 6, 10, 17, 20];
 const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,87,88]);
 const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
 
@@ -140,8 +144,8 @@ function calculateGrenadeStats(perkCounts: Record<number, number>, style: string
 
   // Named perk counts for display
   const PERK_NAMES: Record<number, string> = {
-    29: "MIRV", 30: "Divider", 31: "Spring", 32: "Artillery", 33: "Singularity",
-    34: "Lingering", 39: "Damage Amp", 40: "Tightly Packed", 42: "Micro MIRV",
+    21: "Duration", 22: "Spawning", 23: "Spring", 29: "MIRV", 30: "Divider", 31: "Spring Payload", 32: "Artillery", 33: "Singularity",
+    34: "Lingering", 39: "Damage Amp", 40: "Tightly Packed", 41: "Rubberized", 42: "Micro MIRV", 43: "Spring Augment",
     44: "Long Division", 46: "Pulling", 55: "Missiles", 57: "Mortar",
     59: "Gnawing", 60: "Collapsing", 63: "Pulsing", 65: "Fracture",
     66: "Alchemic", 67: "Bouncing Blade", 69: "Penetrator", 70: "Overflow",
@@ -193,7 +197,9 @@ export function generateModdedGrenade(
       headerPrefix = header.prefix;
       seed = header.seed;
     }
-    stockTokens = parseStockParts(options.stockBaseDecoded);
+    stockTokens = parseStockParts(options.stockBaseDecoded)
+      // Strip ALL grenade perk/anchor tokens from stock base — our recipe controls everything
+      .filter((t) => !/\{245[:[\]]/.test(t) && !/\{298[:}]/.test(t) && !/\{291[:}]/.test(t));
   }
 
   // ── Element: always non-kinetic ─────────────────────────────────────────────
@@ -206,7 +212,8 @@ export function generateModdedGrenade(
   const firmwareIds = Array(firmwareCount).fill(firmwareId);
 
   // ── Visual recipe {245:[...]} block ─────────────────────────────────────────
-  const scaleForMode = { stable: 1.0, op: 1.5, insane: 2.0 }[modPowerMode];
+  // Visual recipe scale — higher modes = more stacks of visual perks
+  const scaleForMode = { stable: 1.0, op: 2.5, insane: 5.0 }[modPowerMode];
   let recipeName = "Terra Fallback";
   let grenadePerkBlock: string;
 
@@ -277,107 +284,86 @@ export function generateModdedGrenade(
     }
   }
 
-  // ── Cross-inserts — modded grenades accept ALL part types ─────────────────
-  // Shield, enhancement, class mod, weapon, heavy — everything stacks on grenades.
-
-  // Shield body cross-insert {246:[...]} — adds shield behaviors
-  const shieldBodyInsert = "{246:[22 22 23 23 26 26 25 25 24 24 31 39 40 45 46 58 58]}";
-
-  // Shield manufacturer cross-inserts (various shield MFGs add different defensive behaviors)
-  // Maliwan=279, Vladof=283, Tediore=287, Jakobs=306, Daedalus=312
-  const tedioreShieldCount = { stable: randInt(30, 50), op: randInt(50, 80), insane: randInt(80, 120) }[modPowerMode];
-  const tedioreShieldInsert = groupedToken(287, Array(tedioreShieldCount).fill(9));
-  const vladofShieldCount = { stable: randInt(8, 15), op: randInt(15, 25), insane: randInt(20, 35) }[modPowerMode];
-  const vladofShieldInsert = groupedToken(283, Array(vladofShieldCount).fill(pick([1, 2, 3, 5, 9])));
-
-  // Enhancement cross-inserts — Terra's pattern from all 4 manufacturers
-  const enhancementPattern = [1, 1, 9, 9, 2, 2, 3, 3];
-  const daedalusEnhInsert = groupedToken(299, enhancementPattern);
-  const jakobsEnhInsert = groupedToken(268, enhancementPattern);
-  const maliwanEnhInsert = groupedToken(271, enhancementPattern);
-  const tedioreEnhInsert = groupedToken(292, [9, 9, 2, 2, 3, 3, 9, 9, 9, 9, 9]);
-
-  // Enhancement stat perks {247:[...]} — stat boosts from enhancement system
-  const enhStatIds = [1, 2, 3, 9];
-  const enhStatCount = { stable: randInt(4, 8), op: randInt(8, 14), insane: randInt(12, 20) }[modPowerMode];
-  const enhStatInsert = groupedToken(247, Array.from({ length: enhStatCount }, () => pick(enhStatIds)));
-
-  // Class mod perk cross-insert {234:[...]} — imports skill behaviors
-  const classModPerkIds = [42, 42, 42, 42, 42, 21, 21, 21, 22, 22, 22, 23, 26, 28, 28, 28, 30, 30, 30, 31, 31, 31, 31];
-  const classModPerkCount = { stable: randInt(15, 25), op: randInt(20, 35), insane: randInt(30, 50) }[modPowerMode];
-  const classModInsert = groupedToken(234, Array.from({ length: classModPerkCount }, () => pick(classModPerkIds)));
-
-  // Tediore Enhancement Divider {292:[9×10]}
-  const dividerStacks = groupedToken(292, Array(10).fill(9));
-
-  // Heavy weapon cross-inserts — MIRV/Two-Shot behavior on the grenade
-  const heavyAccessoryInsert = groupedToken(289, [17, 16, 17]);
-
-  // Weapon barrel cross-inserts — adds projectile behavior from weapon barrels
-  // Pick a random weapon visual barrel effect to cross-insert
-  const weaponBarrelCrossInserts = [
-    "{7:64}",   // Convergence
-    "{10:62}",  // Mantra
-    "{22:68}",  // Onslaught
-    "{275:30}", // DiscJockey
-    "{273:35}", // Javelin
+  // ── Power stacking — Overflow + Express + Explosive (the holy trinity) ──────
+  // This is what makes grenades INSANE. Overflow = more charges, Express = faster cooldown,
+  // Explosive = damage amp. Learned from analyzing real 800-1600 perk grenades.
+  // Overflow + Express stay consistent (charges + cooldown don't need to scale crazy)
+  const overflowCount = randInt(80, 120);
+  const expressCount = randInt(70, 100);
+  // Explosive scales with mode — more damage stacks at higher power
+  const explosiveCount = { stable: randInt(80, 120), op: randInt(250, 400), insane: randInt(500, 800) }[modPowerMode];
+  // ── Combine recipe + power into ONE {245:[...]} block ──
+  // Order matters! Game reads left-to-right:
+  // firmware → element → VISUAL RECIPE PERKS → damage/utility → Overflow → Express → Explosive
+  // Having everything in one block (not split across two) produces better visual effects.
+  const recipeIds: number[] = [];
+  // Extract IDs from the recipe block(s)
+  const recipeMatches = grenadePerkBlock.matchAll(/\{245:\[([^\]]+)\]\}/g);
+  for (const m of recipeMatches) {
+    const ids = m[1].split(/\s+/).map(Number).filter((n) => Number.isFinite(n));
+    recipeIds.push(...ids);
+  }
+  // Build combined block: recipe visual perks FIRST, then power stacking at the END
+  const combinedIds = [
+    ...recipeIds,                          // Visual recipe (firmware + element + visual perks already ordered)
+    ...Array(explosiveCount).fill(72),     // Explosive — damage amp (after visuals)
+    ...Array(overflowCount).fill(70),      // Overflow — more charges (end)
+    ...Array(expressCount).fill(71),       // Express — faster cooldown (end)
   ];
-  const weaponBarrelInsert = pick(weaponBarrelCrossInserts);
+  const combinedPerkBlock = `{245:[${combinedIds.join(" ")}]}`;
 
-  // Ammo efficiency cross-inserts (from weapon system)
-  const freeChargerStacks = groupedToken(281, Array(randInt(12, 24)).fill(3));
-  const angelsShareStacks = groupedToken(282, Array(randInt(8, 16)).fill(14));
+  // ── Pearl rarity — every 10th grenade ──────────────────────────────────────
+  const rollCounter = Math.floor(Math.random() * 10);
+  const isPearl = rollCounter === 0;
+  const pearlToken = isPearl ? pick(["{11:82}", "{25:82}"]) : "";
 
   // ── Grenade anchors ─────────────────────────────────────────────────────────
   const torgueAnchor = "{298:11}";
   const vladofWaterfall = "{291:8}";
 
-  // ── ASSEMBLY ────────────────────────────────────────────────────────────────
+  // ── ASSEMBLY — clean: stock base + ONE combined perk block. NO cross-inserts. ──
   const allParts = [
+    // Pearl rarity (every 10th grenade)
+    ...(pearlToken ? [pearlToken] : []),
+
     // Stock base (from auto-fill — all required slots filled)
     ...stockTokens,
 
     // Element override
     elementToken,
 
-    // Grenade perk block with anchors
+    // Damage reduction so grenades don't kill the player
+    "{246:[35 35 36 36]}",
+
+    // Grenade anchors + ONE combined perk block (visual recipe + power stacking)
     torgueAnchor,
     vladofWaterfall,
-    grenadePerkBlock,
+    combinedPerkBlock,
     vladofWaterfall,
-
-    // Shield cross-inserts
-    shieldBodyInsert,
-    tedioreShieldInsert,
-    vladofShieldInsert,
-
-    // Enhancement cross-inserts (all manufacturers)
-    daedalusEnhInsert,
-    jakobsEnhInsert,
-    maliwanEnhInsert,
-    tedioreEnhInsert,
-    enhStatInsert,
-    dividerStacks,
-
-    // Class mod perks
-    classModInsert,
-
-    // Heavy weapon accessories (MIRV/Two-Shot behavior)
-    heavyAccessoryInsert,
-
-    // Weapon barrel cross-insert (projectile behavior)
-    weaponBarrelInsert,
-
-    // Ammo efficiency stacks
-    freeChargerStacks,
-    angelsShareStacks,
   ];
+
+  // ── Skin selection — random non-Christmas, shiny collapsed to 1 slot, Ultimate own slot ──
+  let chosenSkin = options.skin?.trim() || "";
+  if (!chosenSkin && options.skinOptions?.length) {
+    const allSkins = options.skinOptions.filter(
+      (s) => !/christmas/i.test(String(s.label ?? "")) && !/christmas/i.test(String(s.value ?? "")),
+    );
+    const nonShiny = allSkins.filter((s) => !String(s.value ?? "").includes("Shiny"));
+    const ultimate = allSkins.filter((s) => String(s.value ?? "").includes("Shiny_Ultimate"));
+    const shiny = allSkins.filter((s) => String(s.value ?? "").includes("Shiny") && !String(s.value ?? "").includes("Shiny_Ultimate"));
+    const skinPool = [
+      ...nonShiny,
+      ...(shiny.length > 0 ? [shiny[Math.floor(Math.random() * shiny.length)]!] : []),
+      ...ultimate,
+    ];
+    if (skinPool.length > 0) chosenSkin = pick(skinPool).value;
+  }
 
   const componentStr = allParts.join(" ").replace(/\s{2,}/g, " ").trim();
   let decoded = `${headerPrefix}, 0, 1, ${level}| 2, ${seed}|| ${componentStr} |`;
 
-  if (options.skin?.trim()) {
-    const safe = options.skin.trim().replace(/"/g, '\\"');
+  if (chosenSkin) {
+    const safe = chosenSkin.replace(/"/g, '\\"');
     decoded = decoded.replace(/\|\s*$/, `| "c", "${safe}" |`);
   }
 

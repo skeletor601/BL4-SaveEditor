@@ -92,3 +92,5 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description
 311,10,Perk,Tediore,Double tap to remotely detonate thrown grenades
 311,11,Legendary Perk,Snaboopie-pop,
 311,12,Rarity,Legendary,Urchin skin
+298,11,Legendary Perk,Countermeasure,Launches flares that distract nearby enemies (Decoy)
+298,12,Rarity,Legendary,Countermeasure skin

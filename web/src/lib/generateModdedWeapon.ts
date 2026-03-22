@@ -1300,41 +1300,33 @@ export function generateModdedWeapon(
   });
   let terraGrenadePerkBlock: string;
   // ── Claude's Gun: "Thought Storm" grenade recipe ──────────────────────────────────────
-  // Singularity core pulls enemies → Lingering radiation beams cook them → Artillery fires outward.
-  // Two 245 groups: vortex setup, then payload. Signature visual: purple radiation vortex with
-  // spinning beams and bullet streams firing from the center. Deadeye firmware (10×3) prepended.
+  // Learned from testing: Lingering (34) dominant + massive Explosive/Overflow/Express power stacking
+  // = the green sky-filling Firepot effect. Based on the user's favorite grenade ever.
   if (isClaudeGun) {
     const claudeScale = { stable: 1.0, op: 1.8, insane: 2.5 }[modPowerMode];
     const s = (n: number) => Math.max(1, Math.round(n * claudeScale * randFloat(0.9, 1.1)));
-    const group1Ids = [
-      27,                              // Radiation element anchor
-      ...Array(s(20)).fill(33),   // Singularity dominant
-      ...Array(s(12)).fill(60),   // Collapsing — maximum pull
-      ...Array(s(8)).fill(46),    // Pulling — each child gets singularity
-      ...Array(s(6)).fill(29),    // MIRV — splits into vortex children
-      ...Array(s(3)).fill(40),    // Tightly Packed — extra MIRV count
-      ...Array(s(5)).fill(59),    // Gnawing — DOT in the vortex
+    const claudeIds = [
+      ...firmwarePerkIds,              // Deadeye ×3
+      ...Array(s(6)).fill(6),     // Gadget Ahoy firmware
+      ...Array(s(3)).fill(24),    // Element anchor
+      ...Array(s(12)).fill(23),   // Spring — bounce explosions
+      ...Array(s(57)).fill(34),   // Lingering DOMINANT — the green beams
+      ...Array(s(17)).fill(24),   // More element anchors
+      ...Array(s(23)).fill(39),   // Damage Amp
+      ...Array(s(6)).fill(69),    // Penetrator — crits
+      ...Array(s(21)).fill(78),   // Bloodthirsty — lifesteal
+      ...Array(s(18)).fill(5),    // High Caliber firmware
+      ...Array(s(16)).fill(40),   // Tightly Packed — MIRV count
+      ...Array(s(20)).fill(44),   // Long Division — extra grenades
+      ...Array(s(12)).fill(46),   // Pulling — singularity on each
+      ...Array(s(13)).fill(5),    // More High Caliber
+      ...Array(s(14)).fill(57),   // Mortar — top-down fire
+      ...Array(Math.min(5, s(5))).fill(73),  // Expansive (cap 5)
+      ...Array(s(150)).fill(72),  // Explosive MASSIVE — damage amp
+      ...Array(s(120)).fill(70),  // Overflow MASSIVE — tons of charges
+      ...Array(s(100)).fill(71),  // Express MASSIVE — instant cooldown
     ];
-    const group2Ids = [
-      ...firmwarePerkIds,           // Deadeye ×3
-      ...Array(s(20)).fill(34),   // Lingering beams — radiation spin
-      ...Array(s(8)).fill(21),    // Duration — beams last longer
-      ...Array(s(5)).fill(63),    // Pulsing — elemental waves
-      ...Array(s(15)).fill(32),   // Artillery — bullets from center
-      ...Array(s(8)).fill(53),    // Artillery Duration
-      ...Array(s(4)).fill(55),    // Missiles — homing from artillery
-      ...Array(s(4)).fill(65),    // Fracture — radiation pillars
-      ...Array(s(15)).fill(72),   // Explosive — damage amp
-      ...Array(Math.min(5, s(5))).fill(73),  // Expansive (hard cap 5)
-      ...Array(s(4)).fill(69),    // Penetrator — crits on pulled targets
-      ...Array(s(4)).fill(39),    // Damage Amp
-      ...Array(s(4)).fill(74),    // Hazardous — status stacking
-      ...Array(s(3)).fill(79),    // Merciless — crit damage
-    ];
-    // Cap total to 300 IDs
-    const allClaudeIds = [...group1Ids, ...group2Ids].slice(0, 300);
-    const splitAt = group1Ids.length > 150 ? 150 : group1Ids.length;
-    terraGrenadePerkBlock = `{245:[${allClaudeIds.slice(0, splitAt).join(" ")}]} {245:[${allClaudeIds.slice(splitAt).join(" ")}]}`;
+    terraGrenadePerkBlock = `{245:[${claudeIds.join(" ")}]}`;
   } else if (recipes.length > 0) {
     // Enforce grenade recipes: keep trying until we get at least one non-empty token.
     const remaining = [...recipes];
@@ -1722,6 +1714,9 @@ export function generateModdedWeapon(
     "{281:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}",
     "{275:[23 23 23 23 23 23 23 23 23]}",
     "{26:[30 30 30]}",
+
+    // ── Tediore Enhancement Divider — splits grenade reload into more projectiles ──
+    "{292:[9 9 9 9 9 9 9 9 9 9]}",
 
     // ── Grenade reload block (mode-dependent) ──
     ...finalGrenadeParts,

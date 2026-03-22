@@ -105,9 +105,13 @@ export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<
       const type = String(part.partType ?? "").toLowerCase();
       const isRarity = type.includes("rarity");
       const isBarrel = type.includes("barrel") && !type.includes("accessory");
-      if (!isRarity && !isBarrel) continue;
+      const isLegendaryPerk = type.includes("legendary");
+      const isModel = type.includes("model");
+      const isFirmware = type.includes("firmware");
+      if (!isRarity && !isBarrel && !isLegendaryPerk && !isModel && !isFirmware) continue;
 
-      const target = isBarrel ? barrelNames : rarityNames;
+      // Barrel names always win, then legendary perks, then rarity
+      const target = isBarrel ? barrelNames : (isLegendaryPerk || isModel || isFirmware) ? barrelNames : rarityNames;
 
       // Try extracting clean name from partName first (most reliable)
       const cleanName = extractCleanName(part.partName ?? "");

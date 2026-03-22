@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useSave } from "@/contexts/SaveContext";
 import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
@@ -208,8 +209,15 @@ export default function SelectSaveView() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-[var(--color-accent)]">Select Save</h2>
-      <p className="text-sm text-[var(--color-text-muted)]">Decrypt a BL4 .sav or open JSON/YAML. Decrypt and encrypt run on the server (API must be running).</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-[var(--color-accent)]">Select Save</h2>
+          <p className="text-sm text-[var(--color-text-muted)]">Decrypt a BL4 .sav or open JSON/YAML.</p>
+        </div>
+        <div className="flex gap-2">
+          <Link to="/inventory/backpack" className="px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/60 text-sm font-medium min-h-[44px] flex items-center">Backpack</Link>
+        </div>
+      </div>
 
       <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
         <h3 className="text-[var(--color-accent)] font-medium mb-3">Open .sav (decrypt)</h3>

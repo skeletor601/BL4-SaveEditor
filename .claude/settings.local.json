@@ -52,7 +52,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:save-editor.be)",
       "WebFetch(domain:mobalytics.gg)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "WebFetch(domain:filme.imyfone.com)"
     ]
   }
 }

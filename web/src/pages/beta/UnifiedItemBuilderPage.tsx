@@ -2144,11 +2144,23 @@ export default function UnifiedItemBuilderPage() {
     } catch { /* use empty */ }
 
     try {
+      // Get skins for grenade (same pool as weapons)
+      let grenadeSkinOptions = weaponData?.skins;
+      if (!grenadeSkinOptions?.length) {
+        try {
+          const skinRes = await fetchApi("weapon-gen/data");
+          if (skinRes.ok) {
+            const skinData = (await skinRes.json()) as { skins?: { label: string; value: string }[] };
+            grenadeSkinOptions = Array.isArray(skinData?.skins) ? skinData.skins : undefined;
+          }
+        } catch { /* no skins */ }
+      }
       const result = generateModdedGrenade({
         level: grenadeLevel,
         modPowerMode: moddedWeaponPowerMode,
         stockBaseDecoded: stockBase,
         grenadeVisualRecipes,
+        skinOptions: grenadeSkinOptions,
       });
       setLiveDecoded(result.code.trim());
       setLastEditedCodecSide("decoded");
@@ -3992,6 +4004,12 @@ export default function UnifiedItemBuilderPage() {
           >
             Overwrite Save
           </button>
+          <Link
+            to="/inventory/backpack"
+            className="px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/60 text-sm min-h-[44px] touch-manipulation flex items-center"
+          >
+            Backpack
+          </Link>
           {!saveData && (
             <span className="text-xs text-[var(--color-text-muted)]">Load a save (Character → Select Save) to add to backpack.</span>
           )}
@@ -4842,13 +4860,28 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
               <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Power</label>
+                <div className="flex rounded-lg border border-[var(--color-panel-border)] overflow-hidden min-h-[44px]">
+                  {(["stable", "op", "insane"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setModdedWeaponPowerMode(mode)}
+                      className={`px-3 py-2 text-xs font-medium transition-colors ${moddedWeaponPowerMode === mode ? "bg-[var(--color-accent)] text-black" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}
+                    >
+                      {mode === "stable" ? "Stable" : mode === "op" ? "OP" : "Insane"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
                 <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
                 <div className="rounded-lg border border-purple-500/40 bg-purple-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
                   <button
                     type="button"
                     onClick={handleGenerateModdedGrenade}
                     className="text-purple-300 hover:text-purple-200 text-sm w-full text-left font-medium"
-                    title="Generate a modded grenade with cross-inserts, visual recipe, and shield/enhancement/class mod parts"
+                    title="Generate a modded grenade"
                   >
                     Generate Modded
                   </button>

@@ -61,6 +61,14 @@
           {
             "id": 57,
             "n": 1
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
           }
         ]
       }
@@ -613,75 +621,19 @@
           {
             "id": 57,
             "n": 1
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
           }
         ]
       }
     ],
     "style": "hybrid"
-  },
-  {
-    "id": "singularity-storm",
-    "label": "Singularity Storm",
-    "notes": "Singularity-focused: massive pull vortex with MIRV spawns getting sucked in. Singularity (33) dominates, Collapsing (60) strengthens pull, MIRV (29+40) adds projectile chaos inside the vortex. Gnawing (59) for DOT.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 40
-          },
-          {
-            "id": 60,
-            "n": 20
-          },
-          {
-            "id": 58,
-            "n": 15
-          },
-          {
-            "id": 59,
-            "n": 15
-          },
-          {
-            "id": 29,
-            "n": 8
-          },
-          {
-            "id": 40,
-            "n": 6
-          },
-          {
-            "id": 42,
-            "n": 4
-          },
-          {
-            "id": 46,
-            "n": 10
-          },
-          {
-            "id": 69,
-            "n": 3
-          },
-          {
-            "id": 72,
-            "n": 30
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 74,
-            "n": 8
-          },
-          {
-            "id": 66,
-            "n": 5
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
   },
   {
     "id": "artillery-barrage",
@@ -737,6 +689,18 @@
           {
             "id": 75,
             "n": 8
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -808,66 +772,6 @@
     "style": "lingering"
   },
   {
-    "id": "black-hole",
-    "label": "Black Hole",
-    "notes": "Singularity + Lingering hybrid: singularity pulls enemies into lingering beam zone. Singularity (33) opens with strong pull, then Lingering (34) beams activate inside the vortex. Gnawing (59) DOT stacks on pulled enemies. Repulsor (61) pushes then re-pulls for sustained damage cycling.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 30
-          },
-          {
-            "id": 34,
-            "n": 30
-          },
-          {
-            "id": 60,
-            "n": 15
-          },
-          {
-            "id": 59,
-            "n": 12
-          },
-          {
-            "id": 61,
-            "n": 8
-          },
-          {
-            "id": 21,
-            "n": 10
-          },
-          {
-            "id": 63,
-            "n": 8
-          },
-          {
-            "id": 46,
-            "n": 8
-          },
-          {
-            "id": 72,
-            "n": 20
-          },
-          {
-            "id": 69,
-            "n": 3
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 78,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "hybrid"
-  },
-  {
     "id": "rain-of-fire",
     "label": "Rain of Fire",
     "notes": "Artillery + MIRV hybrid: artillery grenade fires bullets while MIRV splits spawn more artillery sources. Each MIRV child also fires artillery. Mortar (57) adds top-down bombardment. Spring (31+43) makes grenades bounce in place, firing artillery at each bounce point.",
@@ -921,6 +825,18 @@
           {
             "id": 39,
             "n": 4
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -981,6 +897,22 @@
           {
             "id": 75,
             "n": 6
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
           }
         ]
       }
@@ -1117,119 +1049,23 @@
           {
             "id": 66,
             "n": 4
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
           }
         ]
       }
     ],
     "style": "hybrid"
-  },
-  {
-    "id": "blade-dancer",
-    "label": "Blade Dancer",
-    "notes": "Bouncing Blade (67) as the star — knives ricochet between enemies while Divider (30) and Long Division (44) multiply the grenade count, each spawning more blades. Penetrator (69) ensures crits on sliced targets. Splinter (45) aims child grenades at enemies.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 67,
-            "n": 30
-          },
-          {
-            "id": 30,
-            "n": 10
-          },
-          {
-            "id": 44,
-            "n": 8
-          },
-          {
-            "id": 45,
-            "n": 6
-          },
-          {
-            "id": 69,
-            "n": 8
-          },
-          {
-            "id": 22,
-            "n": 6
-          },
-          {
-            "id": 75,
-            "n": 10
-          },
-          {
-            "id": 79,
-            "n": 8
-          },
-          {
-            "id": 72,
-            "n": 15
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 56,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "mirv"
-  },
-  {
-    "id": "gravity-well",
-    "label": "Gravity Well",
-    "notes": "Pure Singularity control build. Collapsing (60) at extreme stacks for maximum pull radius. Multiple singularity sources via MIRV (29) — each child spawns its own singularity (46). Repulsor (61) creates push-pull oscillation. Gnawing (59) DOT on everything trapped.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 50
-          },
-          {
-            "id": 60,
-            "n": 30
-          },
-          {
-            "id": 46,
-            "n": 15
-          },
-          {
-            "id": 29,
-            "n": 8
-          },
-          {
-            "id": 40,
-            "n": 5
-          },
-          {
-            "id": 61,
-            "n": 10
-          },
-          {
-            "id": 59,
-            "n": 15
-          },
-          {
-            "id": 58,
-            "n": 12
-          },
-          {
-            "id": 72,
-            "n": 15
-          },
-          {
-            "id": 39,
-            "n": 5
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
   },
   {
     "id": "carpet-bomb",
@@ -1285,6 +1121,26 @@
           {
             "id": 39,
             "n": 4
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -1409,67 +1265,23 @@
           {
             "id": 66,
             "n": 4
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
           }
         ]
       }
     ],
     "style": "hybrid"
-  },
-  {
-    "id": "event-horizon",
-    "label": "Event Horizon",
-    "notes": "Singularity + MIRV: singularity at center with MIRV children orbiting and exploding. Collapsing (60) makes pull inescapable. Each MIRV child has its own singularity (46). Micro MIRV (42) creates a third generation. Gnawing (59) DOT on everything. Nuke (76) for massive final explosion.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 35
-          },
-          {
-            "id": 29,
-            "n": 12
-          },
-          {
-            "id": 42,
-            "n": 8
-          },
-          {
-            "id": 40,
-            "n": 6
-          },
-          {
-            "id": 46,
-            "n": 12
-          },
-          {
-            "id": 60,
-            "n": 15
-          },
-          {
-            "id": 59,
-            "n": 10
-          },
-          {
-            "id": 72,
-            "n": 20
-          },
-          {
-            "id": 76,
-            "n": 5
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 74,
-            "n": 5
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
   },
   {
     "id": "hailstorm",
@@ -1497,6 +1309,18 @@
           {
             "id": 22,
             "n": 5
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       },
@@ -1565,6 +1389,22 @@
           {
             "id": 40,
             "n": 4
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
           }
         ]
       },
@@ -1616,170 +1456,6 @@
     "style": "hybrid"
   },
   {
-    "id": "gravity-crush",
-    "label": "Gravity Crush",
-    "notes": "Pure singularity: maximum pull force. Singularity (33) dominant with Collapsing (60) for rapid pull and Prolonged (58) to keep it alive. Pulling (46) on each child grenade. Utility perks for damage.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 50
-          },
-          {
-            "id": 60,
-            "n": 25
-          },
-          {
-            "id": 58,
-            "n": 15
-          },
-          {
-            "id": 46,
-            "n": 12
-          },
-          {
-            "id": 59,
-            "n": 10
-          },
-          {
-            "id": 29,
-            "n": 5
-          },
-          {
-            "id": 40,
-            "n": 4
-          },
-          {
-            "id": 72,
-            "n": 20
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 69,
-            "n": 4
-          },
-          {
-            "id": 78,
-            "n": 3
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
-  },
-  {
-    "id": "void-maw",
-    "label": "Void Maw",
-    "notes": "Collapsing-dominant singularity: extreme pull radius. Collapsing (60) at high stacks creates a massive vortex. Gnawing (59) shreds anything inside. Repulsor (61) pushes then re-pulls for damage cycling.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 60,
-            "n": 40
-          },
-          {
-            "id": 33,
-            "n": 20
-          },
-          {
-            "id": 59,
-            "n": 18
-          },
-          {
-            "id": 61,
-            "n": 12
-          },
-          {
-            "id": 58,
-            "n": 10
-          },
-          {
-            "id": 46,
-            "n": 8
-          },
-          {
-            "id": 72,
-            "n": 25
-          },
-          {
-            "id": 74,
-            "n": 6
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 66,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
-  },
-  {
-    "id": "tidal-pull",
-    "label": "Tidal Pull",
-    "notes": "Pulling-dominant: each child grenade spawns its own singularity. Pulling (46) stacked heavy so every MIRV child sucks enemies in. Divider + Long Division spawn many children, each with singularity.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 46,
-            "n": 35
-          },
-          {
-            "id": 33,
-            "n": 15
-          },
-          {
-            "id": 58,
-            "n": 10
-          },
-          {
-            "id": 60,
-            "n": 10
-          },
-          {
-            "id": 30,
-            "n": 8
-          },
-          {
-            "id": 44,
-            "n": 6
-          },
-          {
-            "id": 29,
-            "n": 6
-          },
-          {
-            "id": 40,
-            "n": 5
-          },
-          {
-            "id": 72,
-            "n": 15
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 75,
-            "n": 6
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
-  },
-  {
     "id": "missile-swarm",
     "label": "Missile Swarm",
     "notes": "Missiles-dominant artillery: homing micro-missiles blanket the area. Missiles (55) stacked heavy with Maglock (56) for homing. Artillery (32) base with Duration (53) extending the barrage.",
@@ -1825,6 +1501,26 @@
           {
             "id": 69,
             "n": 4
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -1877,6 +1573,18 @@
           {
             "id": 39,
             "n": 5
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -1933,6 +1641,22 @@
           {
             "id": 78,
             "n": 4
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -2096,110 +1820,6 @@
     "style": "lingering"
   },
   {
-    "id": "acid-rain",
-    "label": "Acid Rain",
-    "notes": "Corrosive lingering: corrosive beams (35) melt armor. Splat Pack (64) dominant creates corrosive puddles everywhere. Duration extended. Status stacking with Hazardous (74) and Alchemic (66).",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 35,
-            "n": 35
-          },
-          {
-            "id": 64,
-            "n": 20
-          },
-          {
-            "id": 21,
-            "n": 12
-          },
-          {
-            "id": 62,
-            "n": 10
-          },
-          {
-            "id": 63,
-            "n": 8
-          },
-          {
-            "id": 65,
-            "n": 6
-          },
-          {
-            "id": 74,
-            "n": 10
-          },
-          {
-            "id": 66,
-            "n": 8
-          },
-          {
-            "id": 72,
-            "n": 15
-          },
-          {
-            "id": 39,
-            "n": 5
-          }
-        ]
-      }
-    ],
-    "style": "lingering"
-  },
-  {
-    "id": "status-overload",
-    "label": "Status Overload",
-    "notes": "Utility-focused: maximum status effect stacking. Alchemic (66) +300% status chance stacked heavy. Hazardous (74) adds status damage. Damage Amp (39) debuffs targets. Pure damage-over-time build.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 66,
-            "n": 35
-          },
-          {
-            "id": 74,
-            "n": 25
-          },
-          {
-            "id": 39,
-            "n": 15
-          },
-          {
-            "id": 72,
-            "n": 25
-          },
-          {
-            "id": 80,
-            "n": 10
-          },
-          {
-            "id": 78,
-            "n": 8
-          },
-          {
-            "id": 69,
-            "n": 6
-          },
-          {
-            "id": 75,
-            "n": 6
-          },
-          {
-            "id": 29,
-            "n": 5
-          },
-          {
-            "id": 40,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "hybrid"
-  },
-  {
     "id": "critical-mass",
     "label": "Critical Mass",
     "notes": "Crit-focused utility: every hit crits. Exacting (75) for crit chance, Merciless (79) for crit damage, Penetrator (69) for guaranteed crits on impacted targets. Explosive (72) for base damage amp.",
@@ -2245,26 +1865,14 @@
           {
             "id": 77,
             "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "hybrid"
-  },
-  {
-    "id": "knife-storm",
-    "label": "Knife Storm",
-    "notes": "Bouncing Blade dominant: massive knife ricochet chains. Bouncing Blade (67) stacked very heavy. Spawning (22) and Divider (30) create more knife sources. Each child grenade throws its own blade volley.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 67,
-            "n": 50
           },
           {
-            "id": 22,
+            "id": 34,
             "n": 10
+          },
+          {
+            "id": 65,
+            "n": 6
           },
           {
             "id": 30,
@@ -2272,144 +1880,12 @@
           },
           {
             "id": 44,
-            "n": 6
-          },
-          {
-            "id": 45,
-            "n": 5
-          },
-          {
-            "id": 69,
-            "n": 10
-          },
-          {
-            "id": 75,
             "n": 8
-          },
-          {
-            "id": 79,
-            "n": 6
-          },
-          {
-            "id": 72,
-            "n": 20
-          },
-          {
-            "id": 39,
-            "n": 5
           }
         ]
       }
     ],
-    "style": "mirv"
-  },
-  {
-    "id": "suppression-field",
-    "label": "Suppression Field",
-    "notes": "Singularity + debuff: pull enemies in and suppress their damage. Suppressor (68) stacked with Singularity (33). Enemies deal 25% less damage per stack while trapped. Gnawing (59) DOT inside.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 33,
-            "n": 30
-          },
-          {
-            "id": 68,
-            "n": 25
-          },
-          {
-            "id": 60,
-            "n": 15
-          },
-          {
-            "id": 58,
-            "n": 10
-          },
-          {
-            "id": 59,
-            "n": 12
-          },
-          {
-            "id": 46,
-            "n": 8
-          },
-          {
-            "id": 72,
-            "n": 20
-          },
-          {
-            "id": 39,
-            "n": 8
-          },
-          {
-            "id": 74,
-            "n": 5
-          },
-          {
-            "id": 78,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "singularity"
-  },
-  {
-    "id": "puddle-party",
-    "label": "Puddle Party",
-    "notes": "Splat Pack dominant lingering: elemental puddles cover the entire floor. Splat Pack (64) stacked heavy launches projectiles that each leave a puddle. Duration extends puddle lifetime. MIRV multiplies puddle sources.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 64,
-            "n": 40
-          },
-          {
-            "id": 34,
-            "n": 15
-          },
-          {
-            "id": 21,
-            "n": 12
-          },
-          {
-            "id": 62,
-            "n": 10
-          },
-          {
-            "id": 29,
-            "n": 8
-          },
-          {
-            "id": 40,
-            "n": 6
-          },
-          {
-            "id": 66,
-            "n": 8
-          },
-          {
-            "id": 74,
-            "n": 6
-          },
-          {
-            "id": 72,
-            "n": 15
-          },
-          {
-            "id": 39,
-            "n": 5
-          },
-          {
-            "id": 78,
-            "n": 4
-          }
-        ]
-      }
-    ],
-    "style": "lingering"
+    "style": "hybrid"
   },
   {
     "id": "smart-strike",
@@ -2453,107 +1929,31 @@
           {
             "id": 75,
             "n": 6
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
     ],
     "style": "artillery"
-  },
-  {
-    "id": "elemental-barrage",
-    "label": "Elemental Barrage",
-    "notes": "Balanced lingering+alchemic. No single dominant perk — even spread across damage, status, and area.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 34,
-            "n": 5
-          },
-          {
-            "id": 66,
-            "n": 5
-          },
-          {
-            "id": 72,
-            "n": 5
-          },
-          {
-            "id": 29,
-            "n": 3
-          },
-          {
-            "id": 40,
-            "n": 3
-          },
-          {
-            "id": 65,
-            "n": 3
-          },
-          {
-            "id": 25,
-            "n": 1
-          },
-          {
-            "id": 30,
-            "n": 1
-          }
-        ]
-      }
-    ],
-    "style": "lingering"
-  },
-  {
-    "id": "wall-of-pain",
-    "label": "Wall of Pain",
-    "notes": "7 perks at equal 25 stacks — corrosive lingering + fracture + damage amp + hazardous + crit. Massive sustained area denial.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 72,
-            "n": 46
-          },
-          {
-            "id": 35,
-            "n": 25
-          },
-          {
-            "id": 39,
-            "n": 25
-          },
-          {
-            "id": 65,
-            "n": 25
-          },
-          {
-            "id": 74,
-            "n": 25
-          },
-          {
-            "id": 75,
-            "n": 25
-          },
-          {
-            "id": 79,
-            "n": 25
-          },
-          {
-            "id": 40,
-            "n": 12
-          },
-          {
-            "id": 30,
-            "n": 5
-          },
-          {
-            "id": 76,
-            "n": 1
-          }
-        ]
-      }
-    ],
-    "style": "hybrid"
   },
   {
     "id": "plasma-burst",
@@ -2609,87 +2009,23 @@
           {
             "id": 79,
             "n": 1
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
           }
         ]
       }
     ],
     "style": "hybrid"
-  },
-  {
-    "id": "artillery-marathon",
-    "label": "Artillery Marathon",
-    "notes": "Sustained artillery fire. Duration(21)+ArtilleryDuration(53) keep it firing. Bouncer(52) for area coverage.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 21,
-            "n": 14
-          },
-          {
-            "id": 53,
-            "n": 12
-          },
-          {
-            "id": 52,
-            "n": 6
-          },
-          {
-            "id": 54,
-            "n": 3
-          },
-          {
-            "id": 55,
-            "n": 2
-          }
-        ]
-      }
-    ],
-    "style": "artillery"
-  },
-  {
-    "id": "missile-rain",
-    "label": "Missile Rain",
-    "notes": "Repeater(47) dominant at 90 stacks — continuous missile bombardment. Missiles(55) for homing. MIRV for splitting.",
-    "groups": [
-      {
-        "entries": [
-          {
-            "id": 47,
-            "n": 90
-          },
-          {
-            "id": 55,
-            "n": 25
-          },
-          {
-            "id": 29,
-            "n": 15
-          },
-          {
-            "id": 40,
-            "n": 10
-          },
-          {
-            "id": 22,
-            "n": 6
-          },
-          {
-            "id": 36,
-            "n": 4
-          },
-          {
-            "id": 79,
-            "n": 3
-          },
-          {
-            "id": 30,
-            "n": 2
-          }
-        ]
-      }
-    ],
-    "style": "artillery"
   },
   {
     "id": "pure-explosive",
@@ -2749,6 +2085,18 @@
           {
             "id": 78,
             "n": 1
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
           }
         ]
       }
@@ -2809,6 +2157,18 @@
           {
             "id": 75,
             "n": 6
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -2869,6 +2229,18 @@
           {
             "id": 69,
             "n": 4
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -2878,53 +2250,69 @@
   {
     "id": "ricochet-barrage",
     "label": "Ricochet Barrage",
-    "notes": "Ricochet dominant — every artillery bullet bounces between enemies. Artillery fires wide spread, ricochets chain through groups. Duration extended for sustained bouncing.",
+    "notes": "Ricochet dominant — artillery bullets bounce between enemies with extended duration. All stacks pumped for sustained chaos.",
     "groups": [
       {
         "entries": [
           {
             "id": 54,
-            "n": 40
+            "n": 100
           },
           {
             "id": 32,
-            "n": 30
+            "n": 75
           },
           {
             "id": 53,
-            "n": 18
+            "n": 45
           },
           {
             "id": 57,
-            "n": 10
+            "n": 25
           },
           {
             "id": 55,
-            "n": 8
+            "n": 20
           },
           {
             "id": 30,
-            "n": 6
-          },
-          {
-            "id": 44,
-            "n": 5
-          },
-          {
-            "id": 72,
             "n": 15
           },
           {
+            "id": 44,
+            "n": 13
+          },
+          {
+            "id": 72,
+            "n": 38
+          },
+          {
             "id": 39,
-            "n": 6
+            "n": 15
           },
           {
             "id": 75,
-            "n": 8
+            "n": 20
           },
           {
             "id": 79,
-            "n": 5
+            "n": 13
+          },
+          {
+            "id": 21,
+            "n": 20
+          },
+          {
+            "id": 53,
+            "n": 20
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
           }
         ]
       }
@@ -2981,6 +2369,14 @@
           {
             "id": 78,
             "n": 4
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
           }
         ]
       }
@@ -3037,6 +2433,22 @@
           {
             "id": 69,
             "n": 4
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
@@ -3093,10 +2505,2162 @@
           {
             "id": 30,
             "n": 4
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 21,
+            "n": 15
           }
         ]
       }
     ],
     "style": "artillery"
+  },
+  {
+    "id": "beam-nova",
+    "label": "Beam Nova",
+    "notes": "Lingering dominant with Pulsing heavy — rotating beams + elemental pulse waves radiating outward.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 60
+          },
+          {
+            "id": 63,
+            "n": 30
+          },
+          {
+            "id": 21,
+            "n": 20
+          },
+          {
+            "id": 62,
+            "n": 15
+          },
+          {
+            "id": 65,
+            "n": 10
+          },
+          {
+            "id": 64,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 4
+          },
+          {
+            "id": 72,
+            "n": 25
+          },
+          {
+            "id": 39,
+            "n": 6
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "radiation-storm",
+    "label": "Radiation Storm",
+    "notes": "Radiation lingering (38) dominant — green radiation beams with Fracture pillars and Pulsing waves.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 38,
+            "n": 65
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 63,
+            "n": 18
+          },
+          {
+            "id": 21,
+            "n": 18
+          },
+          {
+            "id": 62,
+            "n": 15
+          },
+          {
+            "id": 64,
+            "n": 10
+          },
+          {
+            "id": 29,
+            "n": 6
+          },
+          {
+            "id": 40,
+            "n": 4
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "cryo-storm",
+    "label": "Cryo Storm",
+    "notes": "Cryo lingering (37) dominant — ice beams freeze everything. Fracture creates ice walls.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 37,
+            "n": 65
+          },
+          {
+            "id": 65,
+            "n": 20
+          },
+          {
+            "id": 63,
+            "n": 15
+          },
+          {
+            "id": 21,
+            "n": 18
+          },
+          {
+            "id": 62,
+            "n": 12
+          },
+          {
+            "id": 64,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 22
+          },
+          {
+            "id": 75,
+            "n": 10
+          },
+          {
+            "id": 79,
+            "n": 8
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "shock-storm",
+    "label": "Shock Storm",
+    "notes": "Shock lingering (36) dominant — electric arcs chain between targets. Heavy Pulsing for shock waves.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 36,
+            "n": 60
+          },
+          {
+            "id": 63,
+            "n": 25
+          },
+          {
+            "id": 21,
+            "n": 18
+          },
+          {
+            "id": 62,
+            "n": 15
+          },
+          {
+            "id": 65,
+            "n": 12
+          },
+          {
+            "id": 66,
+            "n": 10
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 5
+          },
+          {
+            "id": 29,
+            "n": 4
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "corrosive-flood",
+    "label": "Corrosive Flood",
+    "notes": "Corrosive lingering (35) dominant — acid puddles everywhere via Splat Pack. Duration extended.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 35,
+            "n": 55
+          },
+          {
+            "id": 64,
+            "n": 25
+          },
+          {
+            "id": 63,
+            "n": 15
+          },
+          {
+            "id": 21,
+            "n": 18
+          },
+          {
+            "id": 62,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 10
+          },
+          {
+            "id": 74,
+            "n": 12
+          },
+          {
+            "id": 66,
+            "n": 8
+          },
+          {
+            "id": 72,
+            "n": 18
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "eternal-flame",
+    "label": "Eternal Flame",
+    "notes": "Fire lingering (34) with MAXIMUM duration — beams last forever. Double duration stacking.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 70
+          },
+          {
+            "id": 21,
+            "n": 35
+          },
+          {
+            "id": 62,
+            "n": 30
+          },
+          {
+            "id": 63,
+            "n": 12
+          },
+          {
+            "id": 65,
+            "n": 8
+          },
+          {
+            "id": 29,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 4
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 74,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "fracture-cascade",
+    "label": "Fracture Cascade",
+    "notes": "Fracture (65) dominant with Lingering base — massive elemental pillars erupting everywhere. MIRV multiplies pillar sources.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 65,
+            "n": 45
+          },
+          {
+            "id": 34,
+            "n": 30
+          },
+          {
+            "id": 63,
+            "n": 15
+          },
+          {
+            "id": 21,
+            "n": 15
+          },
+          {
+            "id": 62,
+            "n": 10
+          },
+          {
+            "id": 29,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 6
+          },
+          {
+            "id": 72,
+            "n": 20
+          },
+          {
+            "id": 80,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "explosive-rain",
+    "label": "Explosive Rain",
+    "notes": "Explosive dominant with Divider spawning extra grenades. Each child explodes with full force.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 30,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 10
+          },
+          {
+            "id": 34,
+            "n": 8
+          },
+          {
+            "id": 43,
+            "n": 6
+          },
+          {
+            "id": 39,
+            "n": 3
+          },
+          {
+            "id": 69,
+            "n": 2
+          },
+          {
+            "id": 78,
+            "n": 2
+          },
+          {
+            "id": 40,
+            "n": 2
+          },
+          {
+            "id": 57,
+            "n": 3
+          },
+          {
+            "id": 46,
+            "n": 2
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "nuke-drop",
+    "label": "Nuke Drop",
+    "notes": "Explosive + Nuke combo. Massive single hit with huge radius. Nuke capped at 5.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 120
+          },
+          {
+            "id": 76,
+            "n": 5
+          },
+          {
+            "id": 80,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 34,
+            "n": 6
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 75,
+            "n": 4
+          },
+          {
+            "id": 79,
+            "n": 4
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "sparkle-bomb",
+    "label": "Sparkle Bomb",
+    "notes": "Explosive dominant with all 5 Lingering elements as small sprinkles — rainbow sparkle on detonation.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 90
+          },
+          {
+            "id": 34,
+            "n": 5
+          },
+          {
+            "id": 35,
+            "n": 5
+          },
+          {
+            "id": 36,
+            "n": 5
+          },
+          {
+            "id": 37,
+            "n": 5
+          },
+          {
+            "id": 38,
+            "n": 5
+          },
+          {
+            "id": 43,
+            "n": 8
+          },
+          {
+            "id": 63,
+            "n": 6
+          },
+          {
+            "id": 65,
+            "n": 4
+          },
+          {
+            "id": 39,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 40,
+            "n": 3
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "chain-explosion",
+    "label": "Chain Explosion",
+    "notes": "Explosive dominant with MIRV splitting. Each child inherits full explosive power and splits again.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 95
+          },
+          {
+            "id": 29,
+            "n": 12
+          },
+          {
+            "id": 40,
+            "n": 8
+          },
+          {
+            "id": 42,
+            "n": 6
+          },
+          {
+            "id": 43,
+            "n": 6
+          },
+          {
+            "id": 34,
+            "n": 6
+          },
+          {
+            "id": 39,
+            "n": 4
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 44,
+            "n": 4
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "death-pulse",
+    "label": "Death Pulse",
+    "notes": "Explosive dominant with Pulsing waves. Each pulse radiates a ring of explosive damage outward.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 63,
+            "n": 20
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 21,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 43,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 4
+          },
+          {
+            "id": 74,
+            "n": 4
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 40,
+            "n": 3
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "firestarter",
+    "label": "Firestarter",
+    "notes": "Explosive + Lingering fire heavy. Explosions leave lingering fire beams that keep burning.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 80
+          },
+          {
+            "id": 34,
+            "n": 25
+          },
+          {
+            "id": 21,
+            "n": 12
+          },
+          {
+            "id": 63,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 43,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 4
+          },
+          {
+            "id": 74,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 4
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "concussion-blast",
+    "label": "Concussion Blast",
+    "notes": "Explosive + Concussive knockback. Sends enemies flying while dealing massive damage.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 77,
+            "n": 20
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 80,
+            "n": 10
+          },
+          {
+            "id": 34,
+            "n": 6
+          },
+          {
+            "id": 43,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 5
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 75,
+            "n": 4
+          },
+          {
+            "id": 65,
+            "n": 6
+          },
+          {
+            "id": 30,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "inferno-pure",
+    "label": "Inferno Pure",
+    "notes": "Maximum Lingering beams, minimal support. Pure beam intensity.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 4
+          },
+          {
+            "id": 24,
+            "n": 2
+          },
+          {
+            "id": 23,
+            "n": 6
+          },
+          {
+            "id": 34,
+            "n": 90
+          },
+          {
+            "id": 24,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 8
+          },
+          {
+            "id": 69,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 8
+          },
+          {
+            "id": 5,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 4
+          },
+          {
+            "id": 44,
+            "n": 6
+          },
+          {
+            "id": 46,
+            "n": 4
+          },
+          {
+            "id": 57,
+            "n": 4
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "inferno-artillery",
+    "label": "Inferno Artillery",
+    "notes": "Beams + heavy Mortar bombardment. Lingering fires while mortars rain.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 6
+          },
+          {
+            "id": 24,
+            "n": 3
+          },
+          {
+            "id": 23,
+            "n": 8
+          },
+          {
+            "id": 34,
+            "n": 40
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 15
+          },
+          {
+            "id": 69,
+            "n": 8
+          },
+          {
+            "id": 78,
+            "n": 12
+          },
+          {
+            "id": 5,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 10
+          },
+          {
+            "id": 44,
+            "n": 15
+          },
+          {
+            "id": 46,
+            "n": 8
+          },
+          {
+            "id": 57,
+            "n": 35
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "inferno-vampire",
+    "label": "Inferno Vampire",
+    "notes": "Heavy Bloodthirsty + Penetrator. Beams heal you while critting everything.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 6
+          },
+          {
+            "id": 24,
+            "n": 3
+          },
+          {
+            "id": 23,
+            "n": 10
+          },
+          {
+            "id": 34,
+            "n": 50
+          },
+          {
+            "id": 24,
+            "n": 12
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 20
+          },
+          {
+            "id": 78,
+            "n": 40
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 8
+          },
+          {
+            "id": 44,
+            "n": 10
+          },
+          {
+            "id": 46,
+            "n": 8
+          },
+          {
+            "id": 57,
+            "n": 8
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "inferno-swarm",
+    "label": "Inferno Swarm",
+    "notes": "Heavy MIRV + Pulling. Each child grenade gets singularity + beams. Swarm chaos.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 6
+          },
+          {
+            "id": 24,
+            "n": 3
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 34,
+            "n": 45
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 12
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 10
+          },
+          {
+            "id": 5,
+            "n": 12
+          },
+          {
+            "id": 40,
+            "n": 25
+          },
+          {
+            "id": 44,
+            "n": 25
+          },
+          {
+            "id": 46,
+            "n": 25
+          },
+          {
+            "id": 57,
+            "n": 10
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "inferno-cascade",
+    "label": "Inferno Cascade",
+    "notes": "Heavy Spring + Long Division. Bouncing beam grenades that multiply endlessly.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 6
+          },
+          {
+            "id": 24,
+            "n": 3
+          },
+          {
+            "id": 23,
+            "n": 30
+          },
+          {
+            "id": 34,
+            "n": 50
+          },
+          {
+            "id": 24,
+            "n": 12
+          },
+          {
+            "id": 39,
+            "n": 15
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 15
+          },
+          {
+            "id": 5,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 30
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 10
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "green-monster-heavy",
+    "label": "Green Monster Heavy",
+    "notes": "Explosive ultra-dominant with heavy Divider spawning. Maximum grenade multiplication.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 150
+          },
+          {
+            "id": 30,
+            "n": 50
+          },
+          {
+            "id": 44,
+            "n": 40
+          },
+          {
+            "id": 34,
+            "n": 10
+          },
+          {
+            "id": 43,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 10
+          },
+          {
+            "id": 69,
+            "n": 4
+          },
+          {
+            "id": 78,
+            "n": 4
+          },
+          {
+            "id": 40,
+            "n": 8
+          },
+          {
+            "id": 57,
+            "n": 5
+          },
+          {
+            "id": 46,
+            "n": 3
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "green-monster-beams",
+    "label": "Green Monster Beams",
+    "notes": "Explosive heavy + boosted Lingering beams. Explosions leave rotating beams behind.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 120
+          },
+          {
+            "id": 30,
+            "n": 20
+          },
+          {
+            "id": 44,
+            "n": 15
+          },
+          {
+            "id": 34,
+            "n": 50
+          },
+          {
+            "id": 43,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 8
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 6
+          },
+          {
+            "id": 57,
+            "n": 12
+          },
+          {
+            "id": 46,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "green-monster-mortar",
+    "label": "Green Monster Mortar",
+    "notes": "Explosive + heavy Mortar. Top-down bombardment mixed with ground explosions.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 130
+          },
+          {
+            "id": 30,
+            "n": 25
+          },
+          {
+            "id": 44,
+            "n": 20
+          },
+          {
+            "id": 34,
+            "n": 12
+          },
+          {
+            "id": 43,
+            "n": 15
+          },
+          {
+            "id": 39,
+            "n": 8
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 5
+          },
+          {
+            "id": 40,
+            "n": 5
+          },
+          {
+            "id": 57,
+            "n": 40
+          },
+          {
+            "id": 46,
+            "n": 5
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "green-monster-vortex",
+    "label": "Green Monster Vortex",
+    "notes": "Explosive + heavy Pulling. Explosions pull enemies in, then more explosions.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 140
+          },
+          {
+            "id": 30,
+            "n": 25
+          },
+          {
+            "id": 44,
+            "n": 20
+          },
+          {
+            "id": 34,
+            "n": 15
+          },
+          {
+            "id": 43,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 12
+          },
+          {
+            "id": 69,
+            "n": 8
+          },
+          {
+            "id": 78,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 15
+          },
+          {
+            "id": 57,
+            "n": 8
+          },
+          {
+            "id": 46,
+            "n": 30
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "green-monster-bounce",
+    "label": "Green Monster Bounce",
+    "notes": "Explosive + heavy Spring. Each bounce explodes with full force, bouncing grenades everywhere.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 72,
+            "n": 130
+          },
+          {
+            "id": 30,
+            "n": 20
+          },
+          {
+            "id": 44,
+            "n": 20
+          },
+          {
+            "id": 34,
+            "n": 12
+          },
+          {
+            "id": 43,
+            "n": 35
+          },
+          {
+            "id": 39,
+            "n": 10
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 8
+          },
+          {
+            "id": 40,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 6
+          },
+          {
+            "id": 46,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 6
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "golden-ring-pure",
+    "label": "Golden Ring Pure",
+    "notes": "Maximum Lingering for pure golden beam intensity. Duration maxed for eternal glow.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 120
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 44,
+            "n": 12
+          },
+          {
+            "id": 47,
+            "n": 12
+          },
+          {
+            "id": 21,
+            "n": 80
+          },
+          {
+            "id": 62,
+            "n": 80
+          },
+          {
+            "id": 63,
+            "n": 15
+          },
+          {
+            "id": 45,
+            "n": 8
+          },
+          {
+            "id": 65,
+            "n": 10
+          },
+          {
+            "id": 72,
+            "n": 40
+          },
+          {
+            "id": 74,
+            "n": 8
+          },
+          {
+            "id": 39,
+            "n": 8
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "golden-ring-fracture",
+    "label": "Golden Ring Fracture",
+    "notes": "Golden beams + heavy Fracture pillars erupting from the ring.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 80
+          },
+          {
+            "id": 30,
+            "n": 20
+          },
+          {
+            "id": 44,
+            "n": 15
+          },
+          {
+            "id": 47,
+            "n": 15
+          },
+          {
+            "id": 21,
+            "n": 40
+          },
+          {
+            "id": 62,
+            "n": 40
+          },
+          {
+            "id": 63,
+            "n": 30
+          },
+          {
+            "id": 45,
+            "n": 20
+          },
+          {
+            "id": 65,
+            "n": 60
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 74,
+            "n": 15
+          },
+          {
+            "id": 39,
+            "n": 15
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "golden-ring-spawn",
+    "label": "Golden Ring Spawn",
+    "notes": "Heavy Divider + Repeater. Ring spawns endless child grenades that each create their own rings.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 70
+          },
+          {
+            "id": 30,
+            "n": 60
+          },
+          {
+            "id": 44,
+            "n": 50
+          },
+          {
+            "id": 47,
+            "n": 50
+          },
+          {
+            "id": 21,
+            "n": 35
+          },
+          {
+            "id": 62,
+            "n": 35
+          },
+          {
+            "id": 63,
+            "n": 20
+          },
+          {
+            "id": 45,
+            "n": 30
+          },
+          {
+            "id": 65,
+            "n": 15
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 74,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 15
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "golden-ring-pulse",
+    "label": "Golden Ring Pulse",
+    "notes": "Heavy Pulsing waves radiating from the golden ring. Elemental pulses fill the area.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 90
+          },
+          {
+            "id": 30,
+            "n": 25
+          },
+          {
+            "id": 44,
+            "n": 20
+          },
+          {
+            "id": 47,
+            "n": 20
+          },
+          {
+            "id": 21,
+            "n": 45
+          },
+          {
+            "id": 62,
+            "n": 45
+          },
+          {
+            "id": 63,
+            "n": 70
+          },
+          {
+            "id": 45,
+            "n": 15
+          },
+          {
+            "id": 65,
+            "n": 20
+          },
+          {
+            "id": 72,
+            "n": 60
+          },
+          {
+            "id": 74,
+            "n": 20
+          },
+          {
+            "id": 39,
+            "n": 20
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "golden-ring-crit",
+    "label": "Golden Ring Crit",
+    "notes": "Golden beams with heavy Damage Amp + Hazardous. Everything in the ring takes amplified damage.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 100
+          },
+          {
+            "id": 30,
+            "n": 25
+          },
+          {
+            "id": 44,
+            "n": 20
+          },
+          {
+            "id": 47,
+            "n": 20
+          },
+          {
+            "id": 21,
+            "n": 40
+          },
+          {
+            "id": 62,
+            "n": 40
+          },
+          {
+            "id": 63,
+            "n": 25
+          },
+          {
+            "id": 45,
+            "n": 15
+          },
+          {
+            "id": 65,
+            "n": 20
+          },
+          {
+            "id": 72,
+            "n": 70
+          },
+          {
+            "id": 74,
+            "n": 40
+          },
+          {
+            "id": 39,
+            "n": 45
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "apocalypse-corrosive",
+    "label": "Apocalypse Corrosive",
+    "notes": "Corrosive Lingering dominant — green acid fills the screen. Same structure as the Insane winner.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 8
+          },
+          {
+            "id": 24,
+            "n": 4
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 35,
+            "n": 65
+          },
+          {
+            "id": 72,
+            "n": 35
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 18
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 18
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "apocalypse-shock",
+    "label": "Apocalypse Shock",
+    "notes": "Shock Lingering dominant — blue lightning fills the screen. Same structure as the Insane winner.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 8
+          },
+          {
+            "id": 24,
+            "n": 4
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 36,
+            "n": 65
+          },
+          {
+            "id": 72,
+            "n": 35
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 18
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 18
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "apocalypse-cryo",
+    "label": "Apocalypse Cryo",
+    "notes": "Cryo Lingering dominant — ice crystal fills the screen. Same structure as the Insane winner.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 8
+          },
+          {
+            "id": 24,
+            "n": 4
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 37,
+            "n": 65
+          },
+          {
+            "id": 72,
+            "n": 35
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 18
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 18
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "apocalypse-radiation",
+    "label": "Apocalypse Radiation",
+    "notes": "Radiation Lingering dominant — purple glow fills the screen. Same structure as the Insane winner.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 8
+          },
+          {
+            "id": 24,
+            "n": 4
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 38,
+            "n": 65
+          },
+          {
+            "id": 72,
+            "n": 35
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 18
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 18
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "apocalypse-fire-max",
+    "label": "Apocalypse Fire Max",
+    "notes": "Fire Max Lingering dominant — fire tornado fills the screen. Same structure as the Insane winner.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 6,
+            "n": 8
+          },
+          {
+            "id": 24,
+            "n": 4
+          },
+          {
+            "id": 23,
+            "n": 15
+          },
+          {
+            "id": 34,
+            "n": 65
+          },
+          {
+            "id": 72,
+            "n": 35
+          },
+          {
+            "id": 24,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 20
+          },
+          {
+            "id": 69,
+            "n": 6
+          },
+          {
+            "id": 78,
+            "n": 18
+          },
+          {
+            "id": 5,
+            "n": 20
+          },
+          {
+            "id": 40,
+            "n": 12
+          },
+          {
+            "id": 44,
+            "n": 18
+          },
+          {
+            "id": 46,
+            "n": 10
+          },
+          {
+            "id": 57,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 5
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
   }
 ]
