@@ -884,9 +884,10 @@ export function generateModdedWeapon(
     .map((e) => Number(e.partId))
     .filter((n) => Number.isFinite(n) && n !== 55);  // 55 = Kinetic — always excluded
   // {1:56}=Shock, {1:57}=Radiation, {1:58}=Corrosive, {1:59}=Cryo, {1:60}=Fire.
-  // Picked early so both altFireTokens and extendedElementTokens can use the same element.
+  // Picked early so both _altFireTokens and extendedElementTokens can use the same element.
   const chosenElementId = isClaudeGun ? 57 : pick([56, 57, 58, 59, 60]);  // Claude's Gun: Radiation (purple)
-  let altFireTokens: string[] = [];
+  // _altFireTokens removed from assembly — kept for legacy code paths
+  let _altFireTokens: string[] = [];
   let shouldUseUnderbarrelAlt = true;
   const bodyToken = pickToken(["body"]);
   if (!bodyToken) throw new Error("Could not build stock weapon core: missing Body.");
@@ -991,7 +992,7 @@ export function generateModdedWeapon(
       const secondPool = nonSwitchElementIds.filter((id) => id !== first);
       const second = secondPool.length ? pick(secondPool) : null;
       if (second != null) {
-        altFireTokens = [`{1:${first}}`, `{1:${second}}`];
+        _altFireTokens = [`{1:${first}}`, `{1:${second}}`];
         shouldUseUnderbarrelAlt = false;
       }
     }
@@ -1116,9 +1117,7 @@ export function generateModdedWeapon(
   const freeChargerStacks  = [groupedToken(281, Array(36).fill(3)), groupedToken(281, Array(36).fill(3))];
   const heatExchangeStacks = [groupedToken(275, Array(9).fill(23)), groupedToken(275, Array(9).fill(23))];
   const orderSrMagStacks   = [groupedToken(26,  Array(3).fill(30))];
-  // Angel's Share — Terra uses a single {282:14}. Too many stacks = gun never needs to reload.
-  // Keep it light: 1-3 stacks so the gun still reloads (important for grenade reload to trigger).
-  const angelsShareStacks  = [groupedToken(282, Array.from({ length: randInt(1, 3) }, () => 14))];
+  // Angel's Share removed — was preventing reload trigger for grenade reload builds.
   // Ventilator on ALL guns except grenade-reload (COV heat mechanic disables reload trigger).
   // Terra uses {286:[1×6]} on regular guns. Scales by mode.
   const ventilatorStacks = options.specialMode === "grenade-reload"
@@ -1196,6 +1195,7 @@ export function generateModdedWeapon(
   const daedalusEnhInsert  = [groupedToken(299, enhancementPattern)];
   const jakobsEnhInsert    = [groupedToken(268, enhancementPattern)];
   const maliwanEnhInsert   = [groupedToken(271, enhancementPattern)];
+  void maliwanEnhInsert; // Removed from assembly — Mixologist involves element
   const tedioreEnhInsert   = [groupedToken(292, tedioreEnhancementPattern)];
 
   // {246:[...]} Shield body cross-insert — Terra's exact parts from perfect gun.
@@ -1205,7 +1205,7 @@ export function generateModdedWeapon(
   // The weapon-specific elemental IDs (12, 14, 51, etc.) can resolve to wrong elements in-game.
   if (options.stockBaseDecoded) {
     // Single universal element — no weapon-specific altFire
-    altFireTokens = [];
+    _altFireTokens = [];
   } else if (nonSwitchElementIds.length > 0) {
     const wantMultiple = nonSwitchElementIds.length >= 2 && Math.random() < 0.5;
     const count = wantMultiple ? randInt(2, Math.min(nonSwitchElementIds.length, 4)) : 1;
@@ -1216,10 +1216,11 @@ export function generateModdedWeapon(
       chosen.push(pool[idx]!);
       pool.splice(idx, 1);
     }
-    altFireTokens = chosen.map((id) => `{1:${id}}`);
+    _altFireTokens = chosen.map((id) => `{1:${id}}`);
   } else {
-    altFireTokens = [`{1:${chosenElementId}}`];
+    _altFireTokens = [`{1:${chosenElementId}}`];
   }
+  void _altFireTokens; // Removed from assembly but legacy code paths still assign
 
   // ── Terra's grenade perk system ─────────────────────────────────────────────────────────────
   // Always on every gun — the {245:[...]} block drives visual effects based on which IDs are stacked.
@@ -1246,7 +1247,7 @@ export function generateModdedWeapon(
   // Whitelisted firmware: 4=Airstrike, 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
   const GRENADE_245_FIRMWARE_WHITELIST = [4, 5, 6, 10, 17, 20];
   const GRENADE_245_FORBIDDEN = new Set(
-    [1,2,3,7,8,9,11,12,13,14,15,16,18,19,70,71,87,88],
+    [1,2,3,7,8,9,11,12,13,14,15,16,18,19,87,88],
   );
   // Pick ONE whitelisted firmware per gun, stacked 1-3× (max 3), prepended to the {245:[...]} block.
   const firmwarePerkId = isClaudeGun ? 10 : pick(GRENADE_245_FIRMWARE_WHITELIST);  // Claude's Gun: Deadeye
@@ -1477,8 +1478,8 @@ export function generateModdedWeapon(
   // chosenElementId (56-60 range) still used for grenade block element matching.
   const PRIMARY_ELEMENTS = [10, 11, 12, 13, 14]; // Corrosive, Cryo, Fire, Radiation, Shock
   const chosenPrimaryElement = isClaudeGun ? 13 : pick(PRIMARY_ELEMENTS); // Claude's Gun: Radiation
-  const primaryElementToken = `{1:${chosenPrimaryElement}}`;
-  const extendedElementTokens = [primaryElementToken, "{1:[55 56 57 58 59 60]}"];
+  void chosenPrimaryElement; // Element debugging — temporarily removed from assembly
+  // Elemental overrides removed — primary element only
 
   // ── STOCK BASE ──────────────────────────────────────────────────────────────────────────
   // When stockBaseDecoded is provided (from auto-fill), use it as the complete stock weapon.
@@ -1521,17 +1522,14 @@ export function generateModdedWeapon(
     pearlRarityToken,
     // ── Visual barrel BEFORE stock base — game reads left-to-right, leftmost barrel sets the visual ──
     ...(uniqueFirstBarrelToken ? [uniqueFirstBarrelToken] : []),
-    // ── Extended elements early — Terra places these right after Pearl rarity ──
-    ...extendedElementTokens,
+    // ── Primary element — sets what element the gun shoots ──
+    `{1:${chosenPrimaryElement}}`,
     // ── Stock base (from auto-fill or hand-built) — all required slots filled ──
     ...stockBaseParts,
     // Vladof 50-round stacked magazine — ammo capacity mod on top of stock mag
     magazineToken,
 
     // ── Modded additions ──
-    ...altFireTokens,
-    homingToken,                                             // {273:1} — barrel accessory, stays here
-    scanningHomingToken,                                     // {273:29} — barrel accessory, stays here
     ...(daedalusShotgunAmmoToken ? [daedalusShotgunAmmoToken] : []),
     ...homingStacks273,
     ...damageStacks,
@@ -1541,21 +1539,20 @@ export function generateModdedWeapon(
     ...freeChargerStacks,
     ...heatExchangeStacks,
     ...orderSrMagStacks,
-    ...angelsShareStacks,
     ...ventilatorStacks,
     ...exemplarStacks,
     ...jakobsCritStacks,
     ...vladofSmgDmgStacks,
     ...vladofArBarrelStacks,
-    ...mirvInserts,                                          // Tediore MIRV cross-inserts
     ...classModCrossInsert,
     ...tedioreShieldInsert,                                  // {287:[9×N]} Tediore Shield
     ...daedalusEnhInsert,                                    // {299:[1 1 9 9 2 2 3 3]}
     ...jakobsEnhInsert,                                      // {268:[1 1 9 9 2 2 3 3]}
-    ...maliwanEnhInsert,                                     // {271:[1 1 9 9 2 2 3 3]}
+    // maliwanEnhInsert removed — Mixologist involves element, debugging element issues
     ...tedioreEnhInsert,                                     // {292:[9 9 2 2 3 3 9 9 9 9 9]}
     ...shieldBodyInsert,                                     // {246:[...]}
     ...dividerStacks,
+    ...mirvInserts,                                          // Tediore MIRV cross-inserts — right before grenade block
     // Terra grenade perk block — drives visual effects
     ...finalGrenadeParts,
     // Foregrip — only from legacy path
@@ -1563,15 +1560,16 @@ export function generateModdedWeapon(
     // Underbarrel — ALWAYS added from desirable list or legacy path
     ...(options.stockBaseDecoded ? [] : underbarrelAccessoryStack),
     ...(underbarrelToken ? [underbarrelToken] : []),
-    // Heavy barrel accessories — placed downstream from visual barrel to avoid interference
-    ...heavyBarrelAccessoryTokens,
     // ── Effect BARRELS at END — "as far away as possible" from visual barrel (Terra's rule) ──
-    // Only actual barrels here, not accessories or non-barrel tokens
     ...seamstressExtras,                                     // {13:70} + {11:75} Anarchy + {11:81} Eigenburst (only if Seamstress UB)
-    multiProjectileToken,                                    // {289:[17 16 17]} MIRV/Two-Shot barrels
     ...rowansChargeStacks,                                   // {27:[75×N]} Stalker / Rowan's Charge
     ...samePrefixBarrelParts,                                // Extra same-prefix barrels
     ...crossParts,                                           // Cross-prefix barrels
+    // ── ALL heavy parts at absolute end ──
+    homingToken,                                             // {273:1} — Reticle Homing
+    scanningHomingToken,                                     // {273:29} — Scanning
+    ...heavyBarrelAccessoryTokens,                           // {273:[29 27]} {282:18} {282:17} {289:[3 19]}
+    multiProjectileToken,                                    // {289:[17×N]} Two-Shot
     "{11:75}",                                               // Flight barrel — absolute last
 
     // stockMagToken removed — was causing COV magazines to override Vladof mag (game uses last mag token).

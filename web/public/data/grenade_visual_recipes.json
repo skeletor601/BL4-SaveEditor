@@ -2121,5 +2121,85 @@
       }
     ],
     "style": "artillery"
+  },
+  {
+    "id": "elemental-barrage",
+    "label": "Elemental Barrage",
+    "notes": "Balanced lingering+alchemic. No single dominant perk — even spread across damage, status, and area.",
+    "groups": [{ "entries": [
+      { "id": 34, "n": 5 }, { "id": 66, "n": 5 }, { "id": 72, "n": 5 },
+      { "id": 29, "n": 3 }, { "id": 40, "n": 3 }, { "id": 65, "n": 3 },
+      { "id": 25, "n": 1 }, { "id": 30, "n": 1 }
+    ]}],
+    "style": "lingering"
+  },
+  {
+    "id": "wall-of-pain",
+    "label": "Wall of Pain",
+    "notes": "7 perks at equal 25 stacks — corrosive lingering + fracture + damage amp + hazardous + crit. Massive sustained area denial.",
+    "groups": [{ "entries": [
+      { "id": 72, "n": 46 }, { "id": 35, "n": 25 }, { "id": 39, "n": 25 },
+      { "id": 65, "n": 25 }, { "id": 74, "n": 25 }, { "id": 75, "n": 25 },
+      { "id": 79, "n": 25 }, { "id": 40, "n": 12 }, { "id": 30, "n": 5 },
+      { "id": 76, "n": 1 }
+    ]}],
+    "style": "hybrid"
+  },
+  {
+    "id": "plasma-burst",
+    "label": "Plasma Burst",
+    "notes": "Plasma Coil signature recipe. Expansive(73) dominant — massive radius. Mixed style anchors from every grenade type.",
+    "groups": [{ "entries": [
+      { "id": 73, "n": 5 }, { "id": 72, "n": 9 }, { "id": 40, "n": 5 },
+      { "id": 78, "n": 5 }, { "id": 38, "n": 4 }, { "id": 29, "n": 1 },
+      { "id": 31, "n": 1 }, { "id": 32, "n": 1 }, { "id": 33, "n": 1 },
+      { "id": 34, "n": 1 }, { "id": 68, "n": 1 }, { "id": 79, "n": 1 }
+    ]}],
+    "style": "hybrid"
+  },
+  {
+    "id": "artillery-marathon",
+    "label": "Artillery Marathon",
+    "notes": "Sustained artillery fire. Duration(21)+ArtilleryDuration(53) keep it firing. Bouncer(52) for area coverage.",
+    "groups": [{ "entries": [
+      { "id": 21, "n": 14 }, { "id": 53, "n": 12 }, { "id": 52, "n": 6 },
+      { "id": 54, "n": 3 }, { "id": 55, "n": 2 }
+    ]}],
+    "style": "artillery"
+  },
+  {
+    "id": "missile-rain",
+    "label": "Missile Rain",
+    "notes": "Repeater(47) dominant at 90 stacks — continuous missile bombardment. Missiles(55) for homing. MIRV for splitting.",
+    "groups": [{ "entries": [
+      { "id": 47, "n": 90 }, { "id": 55, "n": 25 }, { "id": 29, "n": 15 },
+      { "id": 40, "n": 10 }, { "id": 22, "n": 6 }, { "id": 36, "n": 4 },
+      { "id": 79, "n": 3 }, { "id": 30, "n": 2 }
+    ]}],
+    "style": "artillery"
+  },
+  {
+    "id": "bouncer-barrage",
+    "label": "Bouncer Barrage",
+    "notes": "Bouncer(52) dominant — grenades bounce toward enemies, exploding at each bounce. Wideload(81) for huge radius.",
+    "groups": [{ "entries": [
+      { "id": 52, "n": 20 }, { "id": 40, "n": 3 }, { "id": 35, "n": 2 },
+      { "id": 81, "n": 2 }, { "id": 24, "n": 1 }, { "id": 29, "n": 1 },
+      { "id": 32, "n": 1 }
+    ]}],
+    "style": "mirv"
+  },
+  {
+    "id": "pure-explosive",
+    "label": "Pure Explosive",
+    "notes": "Explosive(72) at extreme 184 stacks with tiny anchor perks. Raw damage amplification with Overflow(70) and Express(71).",
+    "groups": [{ "entries": [
+      { "id": 72, "n": 184 }, { "id": 70, "n": 15 }, { "id": 71, "n": 10 },
+      { "id": 44, "n": 5 }, { "id": 5, "n": 2 }, { "id": 23, "n": 1 },
+      { "id": 24, "n": 1 }, { "id": 39, "n": 1 }, { "id": 40, "n": 1 },
+      { "id": 46, "n": 1 }, { "id": 57, "n": 1 }, { "id": 69, "n": 1 },
+      { "id": 78, "n": 1 }
+    ]}],
+    "style": "hybrid"
   }
 ]
