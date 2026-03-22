@@ -283,6 +283,8 @@ export interface DpsEstimate {
   fireRateStackCount: number;
   /** Estimated DPS with all stacks (3% per +Damage stack, 2% per +FR stack, 3% crit at 30% crit rate) */
   estimatedDps: number;
+  /** Underbarrel recipe name (e.g. "Space Laser", "Airstrike") */
+  underbarrelName?: string;
 }
 
 export interface GenerateModdedWeaponResult {
@@ -1716,6 +1718,11 @@ export function generateModdedWeapon(
     ...recipeCompanions,
     ...recipeExtraParts,
 
+    // ── Full-auto underbarrel (every gun) — Free Charger + Heat Exchange + Order SR Mag ──
+    "{281:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}",
+    "{275:[23 23 23 23 23 23 23 23 23]}",
+    "{26:[30 30 30]}",
+
     // ── Grenade reload block (mode-dependent) ──
     ...finalGrenadeParts,
 
@@ -1872,6 +1879,7 @@ export function generateModdedWeapon(
       critStackCount,
       fireRateStackCount: frStackCount,
       estimatedDps,
+      underbarrelName: isClaudeGun ? "Space Laser" : (chosenUbRecipe?.name ?? undefined),
     },
     ...(isClaudeGun ? { isClaudeGun: true } : {}),
   };

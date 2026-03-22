@@ -4025,6 +4025,7 @@ export default function UnifiedItemBuilderPage() {
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
               <span><span className="text-[var(--color-text-muted)] text-xs">Barrel:</span> {lastDps.barrelName || "—"}</span>
+              {lastDps.underbarrelName && <span><span className="text-[var(--color-text-muted)] text-xs">Alt-Fire:</span> <span className="text-cyan-400">{lastDps.underbarrelName}</span></span>}
               <span><span className="text-[var(--color-text-muted)] text-xs">Base DPS:</span> {lastDps.baseDps > 0 ? Math.round(lastDps.baseDps).toLocaleString() : "—"}</span>
               <span><span className="text-[var(--color-text-muted)] text-xs">Est. DPS:</span> <span className="text-green-400 font-bold">{lastDps.estimatedDps > 0 ? Math.round(lastDps.estimatedDps).toLocaleString() : "—"}</span></span>
               {lastDps.baseDps > 0 && <span className="text-[var(--color-text-muted)] text-xs">{lastDps.baseFireRate.toFixed(1)}/s × {Math.round(lastDps.baseDamagePerShot).toLocaleString()} dmg/shot</span>}
