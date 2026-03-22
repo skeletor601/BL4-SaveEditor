@@ -517,6 +517,80 @@ function rebuildFirstLine(decoded: string, partRaws: string[]): string {
   return lines.join("\n");
 }
 
+/**
+ * Incremental merge: given the current liveDecoded, a freshly-built decoded (from partSelections),
+ * and the PREVIOUS freshly-built decoded (what UI generated last time), preserve manually entered
+ * tokens in their original positions while correctly adding/removing UI-selected tokens.
+ *
+ * Algorithm:
+ * 1. Diff prevFresh vs newFresh to find added and removed UI tokens
+ * 2. Walk through liveDecoded's tokens:
+ *    - If a token matches a "removed" UI token, skip it
+ *    - Otherwise keep it in place (manual entries preserved)
+ * 3. Append "added" UI tokens to the end
+ * 4. Use the new header (updated level/seed)
+ *
+ * If prevFresh is empty (initial build), returns freshDecoded as-is.
+ */
+function mergeDecodedIncremental(liveDecoded: string, freshDecoded: string, prevFreshDecoded: string): string {
+  const liveSegment = getPartsSegmentFromFirstLine(liveDecoded);
+  const prevSegment = getPartsSegmentFromFirstLine(prevFreshDecoded);
+  // If no previous build exists (initial build), just use the fresh build
+  if (!prevSegment.trim() || !liveSegment.trim()) return freshDecoded;
+
+  const freshSegment = getPartsSegmentFromFirstLine(freshDecoded);
+  const headerTypeId = getHeaderTypeId(freshDecoded);
+
+  const liveParts = parsePartsSegment(liveSegment, getHeaderTypeId(liveDecoded));
+  const prevParts = parsePartsSegment(prevSegment, getHeaderTypeId(prevFreshDecoded));
+  const freshParts = parsePartsSegment(freshSegment, headerTypeId);
+
+  // Build bags for prev and fresh to find diff
+  const prevBag = new Map<string, number>();
+  for (const p of prevParts) prevBag.set(p.raw, (prevBag.get(p.raw) ?? 0) + 1);
+  const freshBag = new Map<string, number>();
+  for (const p of freshParts) freshBag.set(p.raw, (freshBag.get(p.raw) ?? 0) + 1);
+
+  // Tokens added: in fresh but not (or more than) in prev
+  const addedBag = new Map<string, number>();
+  for (const [raw, count] of freshBag) {
+    const prevCount = prevBag.get(raw) ?? 0;
+    if (count > prevCount) addedBag.set(raw, count - prevCount);
+  }
+
+  // Tokens removed: in prev but not (or fewer) in fresh
+  const removedBag = new Map<string, number>();
+  for (const [raw, count] of prevBag) {
+    const freshCount = freshBag.get(raw) ?? 0;
+    if (count > freshCount) removedBag.set(raw, count - freshCount);
+  }
+
+  // Walk live tokens, skip removed ones, keep everything else
+  const result: string[] = [];
+  for (const p of liveParts) {
+    const removeCount = removedBag.get(p.raw) ?? 0;
+    if (removeCount > 0) {
+      // This token was removed by UI — skip it
+      removedBag.set(p.raw, removeCount - 1);
+    } else {
+      // Keep it (UI token or manual entry — doesn't matter)
+      result.push(p.raw);
+    }
+  }
+
+  // Append newly added UI tokens at the end
+  for (const [raw, count] of addedBag) {
+    for (let i = 0; i < count; i++) result.push(raw);
+  }
+
+  // Use the fresh header (updated level/seed) + skin from fresh or live
+  const freshHeader = getFirstLineHeader(freshDecoded);
+  const skinMatch = freshSegment.match(/"c",\s*"[^"]*"/) ?? liveSegment.match(/"c",\s*"[^"]*"/);
+  const skinSuffix = skinMatch ? ` | ${skinMatch[0]} |` : " |";
+  const partsStr = result.join(" ").trim();
+  return `${freshHeader} ${partsStr}${skinSuffix}`;
+}
+
 /** Build decoded string from weapon part selections (list per type, no caps). Optional skinValue appends | "c", "skin" | to first line. */
 function buildDecodedFromWeaponPartSelections(
   data: WeaponGenData,
@@ -1268,6 +1342,17 @@ export default function UnifiedItemBuilderPage() {
   const [signatureSeed, setSignatureSeed] = usePersistedState<number | null>("uib.signatureSeed", null);
   const [liveBase85, setLiveBase85] = usePersistedState("uib.liveBase85", "");
   const [liveDecoded, setLiveDecoded] = usePersistedState("uib.liveDecoded", "");
+  // Track last UI-generated decoded so incremental merge can diff old vs new
+  const prevFreshDecodedRef = useRef("");
+  // Track current liveDecoded for merge without triggering rebuild loops
+  const liveDecodedRef = useRef(liveDecoded);
+  liveDecodedRef.current = liveDecoded;
+  // Reset the ref when switching categories so first build is a fresh (non-incremental) build
+  const prevCategoryRef = useRef(category);
+  if (prevCategoryRef.current !== category) {
+    prevCategoryRef.current = category;
+    prevFreshDecodedRef.current = "";
+  }
   const [lastEditedCodecSide, setLastEditedCodecSide] = useState<"base85" | "decoded" | null>(null);
   const [codecLoading, setCodecLoading] = useState(false);
   const [codecStatus, setCodecStatus] = useState<string>("Paste Base85 or decoded to start.");
@@ -1638,7 +1723,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildWeaponDecoded = useCallback(() => {
     if (!weaponData || !weaponMfgWtId) return;
-    const decoded = buildDecodedFromWeaponPartSelections(
+    const freshDecoded = buildDecodedFromWeaponPartSelections(
       weaponData,
       weaponMfgWtId,
       level,
@@ -1647,7 +1732,10 @@ export default function UnifiedItemBuilderPage() {
       extraTokens,
       weaponSkinValue || undefined
     );
-    setLiveDecoded(decoded);
+    // Incremental merge: preserve manually entered tokens in their positions
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Weapon build updated; encoding…");
   }, [weaponData, weaponMfgWtId, level, seed, weaponPartSelections, extraTokens, weaponSkinValue]);
@@ -1659,7 +1747,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildGrenadeDecoded = useCallback(() => {
     if (!grenadeData || grenadeMfgId == null) return;
-    const decoded = buildDecodedFromGrenadeSelections(
+    const freshDecoded = buildDecodedFromGrenadeSelections(
       grenadeData,
       grenadeMfgId,
       level,
@@ -1668,7 +1756,9 @@ export default function UnifiedItemBuilderPage() {
       grenadeExtraTokens,
       grenadeSkinValue || undefined,
     );
-    setLiveDecoded(decoded);
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Grenade build updated; encoding…");
   }, [grenadeData, grenadeMfgId, level, seed, grenadePartSelections, grenadeExtraTokens, grenadeSkinValue]);
@@ -1680,7 +1770,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildShieldDecoded = useCallback(() => {
     if (!shieldData || shieldMfgId == null) return;
-    const decoded = buildDecodedFromShieldSelections(
+    const freshDecoded = buildDecodedFromShieldSelections(
       shieldData,
       shieldMfgId,
       level,
@@ -1689,7 +1779,9 @@ export default function UnifiedItemBuilderPage() {
       shieldExtraTokens,
       shieldSkinValue || undefined,
     );
-    setLiveDecoded(decoded);
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Shield build updated; encoding…");
   }, [shieldData, shieldMfgId, level, seed, shieldPartSelections, shieldExtraTokens, shieldSkinValue]);
@@ -1716,7 +1808,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildRepkitDecoded = useCallback(() => {
     if (!repkitData || repkitMfgId == null) return;
-    const decoded = buildDecodedFromRepkitSelections(
+    const freshDecoded = buildDecodedFromRepkitSelections(
       repkitData,
       repkitMfgId,
       level,
@@ -1725,7 +1817,9 @@ export default function UnifiedItemBuilderPage() {
       repkitExtraTokens,
       repkitSkinValue || undefined,
     );
-    setLiveDecoded(decoded);
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("RepKit build updated; encoding…");
   }, [repkitData, repkitMfgId, level, seed, repkitPartSelections, repkitExtraTokens, repkitSkinValue]);
@@ -1752,7 +1846,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildHeavyDecoded = useCallback(() => {
     if (!heavyData || heavyMfgId == null) return;
-    const decoded = buildDecodedFromHeavySelections(
+    const freshDecoded = buildDecodedFromHeavySelections(
       heavyData,
       heavyMfgId,
       level,
@@ -1761,7 +1855,9 @@ export default function UnifiedItemBuilderPage() {
       heavyExtraTokens,
       heavySkinValue || undefined,
     );
-    setLiveDecoded(decoded);
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Heavy build updated; encoding…");
   }, [heavyData, heavyMfgId, level, seed, heavyPartSelections, heavyExtraTokens, heavySkinValue]);
@@ -1788,7 +1884,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildEnhancementDecoded = useCallback(() => {
     if (!enhancementData || !enhancementMfgName) return;
-    const decoded = buildDecodedFromEnhancementSelections(
+    const freshDecoded = buildDecodedFromEnhancementSelections(
       enhancementData,
       enhancementMfgName,
       level,
@@ -1797,7 +1893,9 @@ export default function UnifiedItemBuilderPage() {
       enhancementExtraTokens,
       enhancementSkinValue || undefined,
     );
-    setLiveDecoded(decoded);
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Enhancement build updated; encoding…");
   }, [enhancementData, enhancementMfgName, level, seed, enhancementPartSelections, enhancementExtraTokens, enhancementSkinValue]);
@@ -1839,7 +1937,7 @@ export default function UnifiedItemBuilderPage() {
 
   const rebuildClassModDecoded = useCallback(() => {
     if (!classModData) return;
-    const decoded = buildDecodedFromClassModSelections(
+    const freshDecoded = buildDecodedFromClassModSelections(
       classModData,
       classModClassName,
       classModRarity,
@@ -1850,8 +1948,10 @@ export default function UnifiedItemBuilderPage() {
       classModSkillPoints,
       classModSkinValue || undefined,
     );
-    if (!decoded) return;
-    setLiveDecoded(decoded);
+    if (!freshDecoded) return;
+    const merged = mergeDecodedIncremental(liveDecodedRef.current, freshDecoded, prevFreshDecodedRef.current);
+    prevFreshDecodedRef.current = freshDecoded;
+    setLiveDecoded(merged);
     setLastEditedCodecSide("decoded");
     setCodecStatus("Class Mod build updated; encoding…");
   }, [classModData, classModClassName, classModRarity, level, seed, classModSelections, classModExtraTokens, classModSkillPoints, classModSkinValue]);
@@ -2813,6 +2913,7 @@ export default function UnifiedItemBuilderPage() {
     setCodecStatus(null);
     setGenerateModdedError(null);
     setSeed(Math.floor(100 + Math.random() * 9900));
+    prevFreshDecodedRef.current = "";
   }, []);
 
   // Per-builder reset functions

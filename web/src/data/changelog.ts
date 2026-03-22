@@ -5,6 +5,18 @@ export interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    date: "2026-03-21",
+    items: [
+      "Modded Weapon Generator variety overhaul — every gun now gets a random skin (shiny skins collapsed to 1 slot, Ultimate Shiny gets its own), a random primary element (Corrosive/Cryo/Fire/Radiation/Shock), and visual barrel ordering fixed so barrel visuals actually show.",
+      "44 grenade reload recipes (was 24) — 20 new recipes across Singularity, Artillery, Lingering, MIRV, and Hybrid styles. Random grenade element per gun. Airstrike firmware added to the pool.",
+      "Community Seed Badges — register your seed + display name, get a colorful gradient name badge on every code you share. 10 badge colors, deterministic by seed.",
+      "God Rolls page (/god-rolls) — 70 built-in non-modded god rolls + community submissions. Filter by category (Weapon, Shield, Grenade, Class Mod, Repkit, Enhancement, Heavy). Upvotes and author badges.",
+      "Weekly Champion on dashboard — top community code spotlight now shows author badge and votes.",
+      "Builder architecture upgrade — manually entered codes now stay exactly where you put them. UI dropdown adds/removes no longer rearrange your codes. Works across all 7 builders.",
+      "Grenade estimate panel moved above the builder UI with proper styled container (matches weapon DPS panel).",
+    ],
+  },
+  {
     date: "2026-03-18",
     items: [
       "New app layout mockup at /test-app — sidebar nav, Gear Lab, Arsenal, Command Center, The Vault.",
