@@ -118,12 +118,33 @@ function saveDiscovered(discovered: Set<string>): void {
   } catch { /* ignore */ }
 }
 
-/** Discover an Easter egg. Returns true if it was newly discovered. */
+/** Play the fart sound on egg discovery. */
+let eggAudio: HTMLAudioElement | null = null;
+function playEggSound(): void {
+  try {
+    if (!eggAudio) eggAudio = new Audio("/audio/fart.mp3");
+    eggAudio.currentTime = 0;
+    eggAudio.play().catch(() => {});
+  } catch { /* audio not available */ }
+}
+
+/** Rick roll when all 69 eggs are found. */
+function playRickRoll(): void {
+  try {
+    window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");
+  } catch { /* blocked */ }
+}
+
+/** Discover an Easter egg. Returns true if it was newly discovered. Plays fart sound. Rick rolls at 69. */
 export function discoverEgg(id: string): boolean {
   const discovered = loadDiscovered();
   if (discovered.has(id)) return false;
   discovered.add(id);
   saveDiscovered(discovered);
+  playEggSound();
+  if (discovered.size >= TOTAL_EGGS) {
+    setTimeout(playRickRoll, 1500);
+  }
   return true;
 }
 

@@ -56,38 +56,77 @@ export function collectLookupCodesFromDecoded(decodedFull: string): string[] {
   return Array.from(out);
 }
 
+/** Extract a clean display name from a partName like "TOR_SG.comp_05_legendary_LeadBalloon" → "Lead Balloon" */
+function extractCleanName(partName: string): string | undefined {
+  if (!partName) return undefined;
+  // Try to get the name after the last underscore in legendary/pearl part names
+  // e.g. "TOR_SG.comp_05_legendary_LeadBalloon" → "LeadBalloon" → "Lead Balloon"
+  const legendaryMatch = partName.match(/(?:legendary|pearl|pearlescent)_(\w+)/i);
+  if (legendaryMatch?.[1]) {
+    // Split CamelCase into words: "LeadBalloon" → "Lead Balloon"
+    return legendaryMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
+  }
+  // Try barrel part names like "DAD_AR.part_barrel_03_onslaught" → "Onslaught"
+  const barrelMatch = partName.match(/part_barrel_\d+_(\w+)/i);
+  if (barrelMatch?.[1]) {
+    return barrelMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
+  }
+  return undefined;
+}
+
 export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<string, PartLookupItem>): string | undefined {
   if (!decodedFull) return undefined;
   const headerMatch = decodedFull.match(/^(\d+),/);
   const itemTypeId = headerMatch ? parseInt(headerMatch[1], 10) : undefined;
-  const rarityCandidates: string[] = [];
-  const barrelCandidates: string[] = [];
-  const re = /\{(\d+)(?::(\d+))?\}/g;
+  const barrelNames: string[] = [];
+  const rarityNames: string[] = [];
+  // Match simple {X:Y}, grouped {X:[Y Y Y]}, and bare {X} tokens
+  // For grouped tokens, check ALL unique IDs (rarity + barrel can be in same group)
+  const re = /\{(\d+)(?::(\d+|\[[\d\s]+\]))?\}/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(decodedFull)) !== null) {
-    const code = m[2] != null ? `{${m[1]}:${m[2]}}` : `{${m[1]}}`;
-    const part = getPartByCodeOrPrefixed(code, itemTypeId, partsByCode);
-    if (!part) continue;
-    const type = String(part.partType ?? "").toLowerCase();
-    const isRarity = type.includes("rarity");
-    const isBarrel = type.includes("barrel");
-    if (!isRarity && !isBarrel) continue;
-    const raw = String(part.effect ?? "").trim();
-    if (!raw) continue;
-    const base = raw.split(",")[0]?.split(" -")[0]?.trim() ?? "";
-    if (!base || base.length < 3 || base.length > 40 || !/[a-zA-Z]/.test(base)) continue;
-    if (GENERIC_NAME_WORDS.has(base.toLowerCase())) continue;
-    if (isRarity) rarityCandidates.push(base);
-    else barrelCandidates.push(base);
+    const prefix = m[1];
+    const inner = m[2];
+    // Build list of all IDs to check in this token
+    const idsToCheck: string[] = [];
+    if (inner == null) {
+      idsToCheck.push(`{${prefix}}`);
+    } else if (inner.startsWith("[")) {
+      // Grouped: check ALL unique IDs
+      const uniqueIds = [...new Set(inner.replace(/[\[\]]/g, "").trim().split(/\s+/).filter(Boolean))];
+      for (const id of uniqueIds) idsToCheck.push(`{${prefix}:${id}}`);
+    } else {
+      idsToCheck.push(`{${prefix}:${inner}}`);
+    }
+
+    for (const lookupCode of idsToCheck) {
+      const part = getPartByCodeOrPrefixed(lookupCode, itemTypeId, partsByCode);
+      if (!part) continue;
+      const type = String(part.partType ?? "").toLowerCase();
+      const isRarity = type.includes("rarity");
+      const isBarrel = type.includes("barrel") && !type.includes("accessory");
+      if (!isRarity && !isBarrel) continue;
+
+      const target = isBarrel ? barrelNames : rarityNames;
+
+      // Try extracting clean name from partName first (most reliable)
+      const cleanName = extractCleanName(part.partName ?? "");
+      if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
+        target.push(cleanName);
+        continue;
+      }
+
+      // Fallback: try effect/stat text
+      const raw = String(part.effect ?? part.partName ?? "").trim();
+      if (!raw) continue;
+      const base = raw.split(",")[0]?.split(" -")[0]?.trim() ?? "";
+      if (!base || base.length < 3 || base.length > 40 || !/[a-zA-Z]/.test(base)) continue;
+      if (GENERIC_NAME_WORDS.has(base.toLowerCase())) continue;
+      target.push(base);
+    }
   }
-  // Weapons: name by barrel (Hellwalker, Convergence, etc.) not rarity
-  // Everything else: name by rarity as before
-  const WEAPON_PREFIXES = new Set([2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]);
-  const isWeapon = itemTypeId != null && WEAPON_PREFIXES.has(itemTypeId);
-  if (isWeapon) {
-    return barrelCandidates[0] ?? rarityCandidates[0];
-  }
-  return rarityCandidates[0] ?? barrelCandidates[0];
+  // Always prefer barrel name over rarity name — barrel = the in-game weapon name
+  return barrelNames[0] ?? rarityNames[0];
 }
 
 export function toBackpackGroupLabel(itemType: string | undefined): string {

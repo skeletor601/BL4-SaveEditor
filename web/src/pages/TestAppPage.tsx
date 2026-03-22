@@ -166,6 +166,14 @@ export default function TestAppPage() {
                 </div>
               ) : null;
             })()}
+            <a
+              href="https://discord.gg/wNDT64Zn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 hover:text-indigo-200 transition-colors text-xs font-medium"
+            >
+              <span>Join Discord</span>
+            </a>
             <Link
               to="/settings"
               className="block text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"

@@ -3,157 +3,308 @@
     "id": "seamstress",
     "name": "Seamstress / Needles",
     "underbarrel": "{26:77}",
-    "companions": ["{13:[12 12 12 12]}", "{6:68}", "{2:70}"],
+    "companions": [
+      "{13:[12 12 12 12]}",
+      "{6:68}",
+      "{2:70}"
+    ],
     "fullAuto": true,
     "twoShot": true,
     "ventilator": true,
-    "rowans": { "charge": 5, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17 17 17 17 17 17 17]}", "{286:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]}"],
-    "extraParts": ["{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17 17 17 17 17 17 17]}",
+      "{286:[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]}"
+    ],
+    "extraParts": [
+      "{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"
+    ],
     "notes": "Kitchen sink Seamstress. Daedalus shotgun ammo + barrel acc + Tediore Enhancement massive stacking."
   },
   {
     "id": "fuel-rod",
     "name": "Fuel Rod Discharge",
     "underbarrel": "{7:80}",
-    "companions": ["{282:[18 18]}", "{7:1}"],
+    "companions": [
+      "{282:[18 18]}",
+      "{7:1}"
+    ],
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 4, "fireRate": 24 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17]}", "{282:17}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 4,
+      "fireRate": 24
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17]}",
+      "{282:17}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Vladof explosive + extreme Vladof SMG dmg stacking + heavy fire rate."
   },
   {
     "id": "space-laser",
     "name": "Space Laser",
     "underbarrel": "{13:75}",
-    "companions": ["{6:[33 33 33 33 33 33]}", "{12:58}", "{13:[12 12 12 12 12]}", "{5:[26 26 26 26]}", "{4:16}", "{13:75}"],
+    "companions": [
+      "{6:[33 33 33 33 33 33]}",
+      "{12:58}",
+      "{13:[12 12 12 12 12]}",
+      "{5:[26 26 26 26]}",
+      "{4:16}",
+      "{13:75}"
+    ],
     "fullAuto": true,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 14, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17]}", "{6:[68 16 16]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 14,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17]}",
+      "{6:[68 16 16]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Daedalus SMG + shotgun + Maliwan pistol cross-prefix. TK Wave + Space Laser combo."
   },
   {
     "id": "attack-drone",
     "name": "Attack Drone",
     "underbarrel": "{5:80}",
-    "companions": ["{4:16}"],
+    "companions": [
+      "{4:16}"
+    ],
     "fullAuto": true,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 0, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 0,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17 17 17 17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Extreme Vladof dmg stacking + Two-Shot heavy + Exemplar large."
   },
   {
     "id": "airstrike",
     "name": "Airstrike",
     "underbarrel": "{17:45}",
-    "companions": ["{17:[69 70 36 35 34 67 68]}", "{282:19}", "{275:[2 18]}", "{275:[5 7 25]}"],
+    "companions": [
+      "{17:[69 70 36 35 34 67 68]}",
+      "{282:19}",
+      "{275:[2 18]}",
+      "{275:[5 7 25]}"
+    ],
     "fullAuto": true,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 3, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17]}", "{289:[2 2 2 2 2 16 16 16 16 16 15 12]}"],
-    "extraParts": ["{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}", "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 3,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17]}",
+      "{289:[2 2 2 2 2 16 16 16 16 16 15 12]}"
+    ],
+    "extraParts": [
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}",
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Enhancement stacks + Jakobs crit heavy + Vladof dmg + mixed heavy accessories."
   },
   {
     "id": "shock-field",
     "name": "Shock Field",
     "underbarrel": "{25:48}",
-    "companions": ["{10:62}", "{16:68}", "{8:54}"],
+    "companions": [
+      "{10:62}",
+      "{16:68}",
+      "{8:54}"
+    ],
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 7, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17]}"],
-    "extraParts": ["{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"],
+    "rowans": {
+      "charge": 7,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"
+    ],
     "notes": "Stability heavy + Two-Shot + Rowans + Exemplar massive. Clean build."
   },
   {
     "id": "laser-wire",
     "name": "Laser Wire",
     "underbarrel": "{21:53}",
-    "companions": ["{18:63}", "{13:77}", "{11:[75 77]}"],
+    "companions": [
+      "{18:63}",
+      "{13:77}",
+      "{11:[75 77]}"
+    ],
     "fullAuto": true,
     "twoShot": true,
     "ventilator": true,
-    "rowans": { "charge": 5, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17 17]}", "{282:18}", "{289:[3 19]}", "{273:[1 2 3 25 29]}"],
-    "extraParts": ["{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17 17]}",
+      "{282:18}",
+      "{289:[3 19]}",
+      "{273:[1 2 3 25 29]}"
+    ],
+    "extraParts": [
+      "{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"
+    ],
     "notes": "Heavy accessories from all manufacturers + Ventilator + Tediore Enhancement massive."
   },
   {
     "id": "beam-tosser",
     "name": "Beam Tosser",
     "underbarrel": "{10:43}",
-    "companions": ["{5:67}", "{27:73}", "{4:75}", "{275:1}", "{15:16}"],
+    "companions": [
+      "{5:67}",
+      "{27:73}",
+      "{4:75}",
+      "{275:1}",
+      "{15:16}"
+    ],
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 2, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17 17 17 18]}"],
-    "extraParts": ["{6:[33 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33]}", "{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"],
+    "rowans": {
+      "charge": 2,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17 17 17 18]}"
+    ],
+    "extraParts": [
+      "{6:[33 33 33 33 33 33 33 33 33 33 33 33 33 33 33 33]}",
+      "{292:[9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9]}"
+    ],
     "notes": "Daedalus SMG heavy + double Tediore Enhancement + Two-Shot + cross-prefix barrels."
   },
   {
     "id": "gas-trap",
     "name": "Gas Trap",
     "underbarrel": "{19:46}",
-    "companions": ["{10:56}", "{4:1}", "{13:[13 77 9 9 13]}"],
+    "companions": [
+      "{10:56}",
+      "{4:1}",
+      "{13:[13 77 9 9 13]}"
+    ],
     "fullAuto": false,
     "twoShot": false,
     "ventilator": false,
-    "rowans": { "charge": 9, "fireRate": 131 },
+    "rowans": {
+      "charge": 9,
+      "fireRate": 131
+    },
     "heavyParts": [],
-    "extraParts": ["{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}", "{13:[12 12 12 12 12 12 12 12]}", "{6:[33 33 33 33 33 33 33 33 33 33]}"],
+    "extraParts": [
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}",
+      "{13:[12 12 12 12 12 12 12 12]}",
+      "{6:[33 33 33 33 33 33 33 33 33 33]}"
+    ],
     "notes": "Extreme fire rate stacking (131!) + Jakobs crit + Daedalus shotgun + SMG. No heavy parts — pure cross-prefix chaos."
   },
   {
     "id": "singularity-gl",
     "name": "Singularity Grenade Launcher",
     "underbarrel": "{25:49}",
-    "companions": ["{8:52}", "{14:76}", "{289:24}"],
+    "companions": [
+      "{8:52}",
+      "{14:76}",
+      "{289:24}"
+    ],
     "fullAuto": false,
     "twoShot": false,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 6 },
+    "rowans": {
+      "charge": 5,
+      "fireRate": 6
+    },
     "heavyParts": [],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}", "{13:[12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12]}", "{18:[31 31 31 31 31 31 31 31 31 31]}", "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}", "{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}"],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}",
+      "{13:[12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12 12]}",
+      "{18:[31 31 31 31 31 31 31 31 31 31]}",
+      "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}",
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}"
+    ],
     "notes": "Vladof dmg + Daedalus SG + Vladof AR barrel + stability + Jakobs crit. Cross-prefix stacking monster."
   },
   {
     "id": "deathsphere",
     "name": "Deathsphere",
     "underbarrel": "{15:68}",
-    "companions": ["{17:53}", "{17:55}", "{18:64}", "{312:6}", "{237:9}"],
+    "companions": [
+      "{17:53}",
+      "{17:55}",
+      "{18:64}",
+      "{312:6}",
+      "{237:9}"
+    ],
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 3, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17]}", "{278:[10 10 10 10 10 10 10 10 10 10]}"],
-    "extraParts": ["{5:[26 26 26]}"],
+    "rowans": {
+      "charge": 3,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17]}",
+      "{278:[10 10 10 10 10 10 10 10 10 10]}"
+    ],
+    "extraParts": [
+      "{5:[26 26 26]}"
+    ],
     "notes": "Ripper grenade stacking + Maliwan pistol + Shield + Armor cross-inserts. Mixed heavy + Two-Shot."
   },
   {
     "id": "big-rocket",
     "name": "Big Rocket",
-    "underbarrel": "{16:54}",
-    "companions": ["{16:68}"],
+    "underbarrel": "{16:48}",
+    "companions": [
+      "{273:1}",
+      "{273:29}"
+    ],
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 5 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17 17]}", "{282:[17 18]}", "{273:[29 27]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
-    "notes": "Two-Shot heavy + all 3 heavy manufacturers + Vladof dmg stacking."
+    "rowans": {
+      "charge": 5,
+      "fireRate": 5
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17 17]}",
+      "{282:[17 18]}",
+      "{273:[29 27]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
+    "notes": "Big Rocket underbarrel + accessory. Reticle homing + scanning homing + Two-Shot heavy + Vladof explosive.",
+    "underbarrelAccessory": "{16:54}"
   },
   {
     "id": "overdrive",
@@ -163,22 +314,39 @@
     "fullAuto": true,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 5 },
-    "heavyParts": ["{282:[17 18]}", "{289:[17 17 17 17 17 17 17 17]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72]}", "{3:[6 6 6 6 6 6 6 6 6 6]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 5
+    },
+    "heavyParts": [
+      "{282:[17 18]}",
+      "{289:[17 17 17 17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72]}",
+      "{3:[6 6 6 6 6 6 6 6 6 6]}"
+    ],
     "notes": "Vladof heavy + Two-Shot + Full-auto + Jakobs crit + Vladof dmg."
   },
   {
     "id": "mystical",
     "name": "Mystical Underbarrel",
     "underbarrel": "{8:56}",
-    "companions": ["{8:52}"],
+    "companions": [
+      "{8:52}"
+    ],
     "fullAuto": false,
     "twoShot": false,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 3 },
+    "rowans": {
+      "charge": 5,
+      "fireRate": 3
+    },
     "heavyParts": [],
-    "extraParts": ["{6:[33 33 33 33 33 33 33 33 33 33]}", "{3:[6 6 6 6 6 6 6 6 6 6 6 6]}"],
+    "extraParts": [
+      "{6:[33 33 33 33 33 33 33 33 33 33]}",
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6]}"
+    ],
     "notes": "Daedalus SMG + Jakobs crit + Rowans. Clean build, no heavy spam."
   },
   {
@@ -190,9 +358,18 @@
     "fullAuto": true,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 3 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17]}", "{282:[17 18]}"],
-    "extraParts": ["{18:[31 31 31 31 31 31 31 31 31 31]}", "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 3
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17]}",
+      "{282:[17 18]}"
+    ],
+    "extraParts": [
+      "{18:[31 31 31 31 31 31 31 31 31 31]}",
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Vladof AR barrel + Vladof dmg + heavy Two-Shot + Full-auto."
   },
   {
@@ -203,9 +380,16 @@
     "fullAuto": true,
     "twoShot": false,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 5 },
-    "heavyParts": ["{282:[17 18]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 5
+    },
+    "heavyParts": [
+      "{282:[17 18]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Vladof heavy + dmg stacking + Rowans + fire rate. Clean Vladof build."
   },
   {
@@ -216,9 +400,15 @@
     "fullAuto": false,
     "twoShot": false,
     "ventilator": false,
-    "rowans": { "charge": 8, "fireRate": 0 },
+    "rowans": {
+      "charge": 8,
+      "fireRate": 0
+    },
     "heavyParts": [],
-    "extraParts": ["{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}", "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"],
+    "extraParts": [
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6]}",
+      "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"
+    ],
     "notes": "Jakobs crit heavy + stability heavy. Clean sniper build, no heavy parts."
   },
   {
@@ -229,9 +419,17 @@
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17]}"],
-    "extraParts": ["{6:[33 33 33 33 33 33 33 33]}", "{5:[26 26 26 26]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{6:[33 33 33 33 33 33 33 33]}",
+      "{5:[26 26 26 26]}"
+    ],
     "notes": "Daedalus SMG + Maliwan pistol + Two-Shot + Rowans."
   },
   {
@@ -242,9 +440,17 @@
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17]}"],
-    "extraParts": ["{3:[6 6 6 6 6 6 6 6 6 6 6 6]}", "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{3:[6 6 6 6 6 6 6 6 6 6 6 6]}",
+      "{14:[3 3 3 3 3 3 3 3 3 3 3 3 3 3 3]}"
+    ],
     "notes": "Jakobs crit + stability + Two-Shot + Rowans."
   },
   {
@@ -255,9 +461,16 @@
     "fullAuto": false,
     "twoShot": true,
     "ventilator": false,
-    "rowans": { "charge": 5, "fireRate": 0 },
-    "heavyParts": ["{289:[17 17 17 17 17 17 17 17 17]}"],
-    "extraParts": ["{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"],
+    "rowans": {
+      "charge": 5,
+      "fireRate": 0
+    },
+    "heavyParts": [
+      "{289:[17 17 17 17 17 17 17 17 17]}"
+    ],
+    "extraParts": [
+      "{22:[72 72 72 72 72 72 72 72 72 72 72 72 72 72 72]}"
+    ],
     "notes": "Vladof dmg + Two-Shot + Rowans + Exemplar."
   }
 ]

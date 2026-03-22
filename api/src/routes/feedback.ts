@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import { persistPath } from "../lib/persistPath.js";
 const FEEDBACK_PATH = persistPath("feedback.json");
 const MAX_ENTRIES = 200;
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
 
 export interface FeedbackEntry {
   id: string;
@@ -74,6 +75,25 @@ export async function feedbackRoutes(fastify: FastifyInstance, _opts: unknown) {
     entries.unshift(entry);
     if (entries.length > MAX_ENTRIES) entries.splice(MAX_ENTRIES);
     saveFeedback(entries);
+
+    // Send Discord notification
+    if (DISCORD_WEBHOOK_URL) {
+      const emoji = { bug: "🐛", idea: "💡", question: "❓", note: "📝" }[entry.type] ?? "📬";
+      const discordPayload = JSON.stringify({
+        embeds: [{
+          title: `${emoji} New ${entry.type.toUpperCase()} from ${entry.author}`,
+          description: entry.message.slice(0, 2000),
+          color: { bug: 0xFF4444, idea: 0x44FF44, question: 0x4488FF, note: 0xFFAA00 }[entry.type] ?? 0xFFAA00,
+          footer: { text: entry.page ? `Page: ${entry.page}` : "bl4editor.com" },
+          timestamp: new Date(entry.timestamp).toISOString(),
+        }],
+      });
+      fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: discordPayload,
+      }).catch((err) => fastify.log.warn({ err }, "Discord webhook failed"));
+    }
 
     reply.code(201).send({ success: true, id: entry.id });
   });

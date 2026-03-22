@@ -5,6 +5,21 @@ export interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    date: "2026-03-22",
+    items: [
+      "COMPLETE WEAPON GENERATOR OVERHAUL — Recipe-driven system learned from 33 real modded weapons. 20 underbarrel recipes with synergistic companion parts. Every gun is truly unique — different underbarrel, different cross-inserts, different damage profile.",
+      "51 grenade reload recipes — Artillery Barrage, Missile Storm, Ricochet Barrage, Sustained Fire, Artillery Swarm, Maglock Artillery and more. Spectacular visual effects on every reload.",
+      "Shield cross-inserts fixed — no more green element override. Uses legendary shield perks (Wings of Grace, Bininu, Psychosis, etc.) + universal perks.",
+      "DPS Estimator recalibrated — additive 3% per damage stack, scans ALL barrels in the weapon. Much closer to in-game values.",
+      "Backpack naming — weapons now display the correct barrel name (Lead Balloon, Convergence, etc.) matching in-game. Scans grouped tokens and extracts clean names.",
+      "Claude's Gun v2 (1/100) — Space Laser alt-fire, Thought Storm grenade reload, Wings of Grace shield, Daedalus Accelerator, curated companion recipe.",
+      "Auto-fill fixes — never picks 'None' parts, no foregrip before underbarrel (was killing alt-fire), Tediore Reload + Jakobs Ricochet forced on manufacturer parts, Torgue Sticky/Impact blacklisted.",
+      "Header/base prefix mismatch fixed — gun type always matches its stock parts now.",
+      "Easter egg fart sound — every new discovery plays an audio cue. All 69 found = Rick Roll.",
+      "Discord server + webhook notifications for feedback.",
+    ],
+  },
+  {
     date: "2026-03-21",
     items: [
       "Modded Weapon Generator variety overhaul — every gun now gets a random skin (shiny skins collapsed to 1 slot, Ultimate Shiny gets its own), a random primary element (Corrosive/Cryo/Fire/Radiation/Shock), and visual barrel ordering fixed so barrel visuals actually show.",

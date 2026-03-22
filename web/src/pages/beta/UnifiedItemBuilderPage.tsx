@@ -2562,7 +2562,7 @@ export default function UnifiedItemBuilderPage() {
     try {
       const base = window.location.origin || "";
       const dataPath = typeof import.meta.env?.BASE_URL === "string" ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
-      const [editRes, partsRes, visualBarrelsRes, allowedBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes] = await Promise.all([
+      const [editRes, partsRes, visualBarrelsRes, allowedBarrelsRes, allowedUnderbarrelsRes, underbarrelsRes, legendaryGrenadesRes, visualRecipesRes, ubRecipesRes] = await Promise.all([
         fetchApi("weapon-edit/data"),
         fetchApi("parts/data"),
         fetch(`${base}${dataPath}/data/visual_heavy_barrels.json`).catch(() => null),
@@ -2571,6 +2571,7 @@ export default function UnifiedItemBuilderPage() {
         fetch(`${base}${dataPath}/data/desirable_underbarrels.json`).catch(() => null),
         fetch(`${base}${dataPath}/data/legendary_grenades.json`).catch(() => null),
         fetch(`${base}${dataPath}/data/grenade_visual_recipes.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/underbarrel_recipes.json`).catch(() => null),
       ]);
       const editData = (await editRes.json().catch(() => null)) as WeaponEditData | null;
       const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
@@ -2616,6 +2617,9 @@ export default function UnifiedItemBuilderPage() {
         }
         return [];
       })();
+      const underbarrelRecipes = ubRecipesRes?.ok
+        ? ((await ubRecipesRes.json().catch(() => [])) as import("@/lib/generateModdedWeapon").UnderbarrelRecipe[])
+        : [];
       let skinOptionsForGenerate = weaponData?.skins;
       if (!skinOptionsForGenerate?.length) {
         try {
@@ -2712,15 +2716,30 @@ export default function UnifiedItemBuilderPage() {
               if (best) autoFillSelections["Rarity"] = [{ label: best.stat, qty: "1" }];
             }
             // Fill ALL stock part types (skip elements — generator handles those)
+            // NEVER pick "None" — required parts must always have a real selection
             WEAPON_PART_ORDER.forEach(({ key: partType }) => {
               if (["Rarity", "Legendary Type", "Pearl Type", "Element 1", "Element 2"].includes(partType)) return;
-              let opts = partsByType[partType] ?? [];
+              // Skip underbarrel, underbarrel accessory, and foregrip from auto-fill
+              // Foregrip before underbarrel kills alt-fire — generator places it after underbarrel instead
+              if (partType === "Underbarrel" || partType === "Underbarrel Accessory" || partType === "Foregrip") return;
+              let opts = (partsByType[partType] ?? []).filter((o) => o.label && o.label !== "None" && o.label !== NONE);
               if (partType === "Magazine") {
                 opts = opts.filter((o) => !/cov/i.test(o.label) && !/heat.?gauge/i.test(o.label));
               }
-              // Skip underbarrel + underbarrel accessory from auto-fill — not required for spawn
-              // Generator adds desirable underbarrels from the curated JSON list instead
-              if (partType === "Underbarrel" || partType === "Underbarrel Accessory") return;
+              if (partType === "Manufacturer Part") {
+                // Always blacklist Torgue Sticky/Impact — they kill desirable effects
+                opts = opts.filter((o) => !/torgue.*sticky|torgue.*impact|sticky.*gyrojet|impact.*gyrojet/i.test(o.label));
+                // Always force Jakobs Ricochet on every gun + Tediore Reload on grenade guns
+                const jakobsRicochet = opts.find((o) => /jakobs\s*ricochet/i.test(o.label));
+                const tedioreReload = opts.find((o) => /\bTediore Reload\b/i.test(o.label));
+                const forced: { label: string; qty: string }[] = [];
+                if (jakobsRicochet) forced.push({ label: jakobsRicochet.label, qty: "1" });
+                if (moddedWeaponSpecialMode !== "inf-ammo" && tedioreReload) forced.push({ label: tedioreReload.label, qty: "1" });
+                if (forced.length > 0) {
+                  autoFillSelections[partType] = forced;
+                  return;
+                }
+              }
               if (opts.length) autoFillSelections[partType] = [{ label: pick(opts).label, qty: "1" }];
             });
             try {
@@ -2751,8 +2770,18 @@ export default function UnifiedItemBuilderPage() {
                   }
                   WEAPON_PART_ORDER.forEach(({ key: pt }) => {
                     if (["Rarity", "Legendary Type", "Pearl Type", "Element 1", "Element 2"].includes(pt)) return;
-                    let o = retryParts[pt] ?? [];
+                    if (pt === "Underbarrel" || pt === "Underbarrel Accessory" || pt === "Foregrip") return;
+                    let o = (retryParts[pt] ?? []).filter((x) => x.label && x.label !== "None" && x.label !== NONE);
                     if (pt === "Magazine") o = o.filter((x) => !/cov/i.test(x.label) && !/heat.?gauge/i.test(x.label));
+                    if (pt === "Manufacturer Part") {
+                      o = o.filter((x) => !/torgue.*sticky|torgue.*impact|sticky.*gyrojet|impact.*gyrojet/i.test(x.label));
+                      const jr = o.find((x) => /jakobs\s*ricochet/i.test(x.label));
+                      const tr = o.find((x) => /tediore\s*reload/i.test(x.label));
+                      const forced: { label: string; qty: string }[] = [];
+                      if (jr) forced.push({ label: jr.label, qty: "1" });
+                      if (moddedWeaponSpecialMode !== "inf-ammo" && tr) forced.push({ label: tr.label, qty: "1" });
+                      if (forced.length > 0) { retrySelections[pt] = forced; return; }
+                    }
                     if (o.length) retrySelections[pt] = [{ label: o[Math.floor(Math.random() * o.length)]!.label, qty: "1" }];
                   });
                   try {
@@ -2780,6 +2809,7 @@ export default function UnifiedItemBuilderPage() {
         desirableUnderbarrelEntries,
         legendaryGrenadeEntries: Array.isArray(legendaryGrenadeEntries) && legendaryGrenadeEntries.length > 0 ? legendaryGrenadeEntries : undefined,
         grenadeVisualRecipes: Array.isArray(grenadeVisualRecipes) && grenadeVisualRecipes.length > 0 ? grenadeVisualRecipes : undefined,
+        underbarrelRecipes: Array.isArray(underbarrelRecipes) && underbarrelRecipes.length > 0 ? underbarrelRecipes : undefined,
       });
       setLastDps(dps);
       setLiveDecoded(decoded.trim());
@@ -3966,11 +3996,22 @@ export default function UnifiedItemBuilderPage() {
             <span className="text-xs text-[var(--color-text-muted)]">Load a save (Character → Select Save) to add to backpack.</span>
           )}
         </div>
+        <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]/30 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] text-[var(--color-text-muted)]/60">On mobile? Can't edit saves directly —</span>
+          <a
+            href="https://discord.gg/wNDT64Zn"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 text-[10px] font-medium transition-colors"
+          >
+            Join our Discord for item drops
+          </a>
+        </div>
         {lastDps && category === "weapon" && (
           <div className="mt-3 pt-3 border-t border-[var(--color-panel-border)]">
             {lastDps.barrelName === "Claude's Convergence" && (
               <div className="mb-2 px-3 py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-300 text-sm font-bold animate-pulse">
-                Claude's Gun (1/20) — "Thought Storm" Radiation Convergence
+                Claude's Gun (1/100) — "Thought Storm" Radiation Convergence
               </div>
             )}
             {rollMilestone && (
@@ -3979,7 +4020,7 @@ export default function UnifiedItemBuilderPage() {
               </div>
             )}
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">DPS Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(9% dmg · 5% FR · multiplicative)</span></p>
+              <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">DPS Estimate <span className="normal-case text-[var(--color-text-muted)]/60">(~3% per +Dmg stack · est.)</span></p>
               {rollCount > 0 && <span className="text-[10px] font-mono text-[var(--color-text-muted)]/50">Roll #{rollCount}</span>}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
@@ -4165,7 +4206,7 @@ export default function UnifiedItemBuilderPage() {
                   {/* Special mode — mutually exclusive pill toggles */}
                   {(["grenade-reload", "inf-ammo"] as const).map((mode) => {
                     const active = moddedWeaponSpecialMode === mode;
-                    const label = mode === "grenade-reload" ? "Grenade Reload" : "Inf Ammo";
+                    const label = mode === "grenade-reload" ? "Grenade Reload" : "Inf Alt Fire";
                     const tip = mode === "grenade-reload"
                       ? "Add grenade reload block (grenade item + perk stacks) to every generated gun. Disables Rowan's Charge stacks."
                       : "Add 7× Rowan's Charge {27:75} stacks for infinite ammo on every generated gun. Disables grenade reload block.";
