@@ -10,7 +10,7 @@ const branches = [
   { path: "parts-translator", label: "Parts Translator" },
   { path: "backpack", label: "Backpack" },
   { path: "code-spawn", label: "Code spawn" },
-  { path: "validator", label: "Validator" },
+  { path: "validator", label: "Code Inspector" },
 ];
 
 export default function InventoryPage() {

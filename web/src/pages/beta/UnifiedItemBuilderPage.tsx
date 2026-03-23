@@ -18,6 +18,7 @@ import {
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { generateModdedGrenade, type GrenadeStatsEstimate } from "@/lib/generateModdedGrenade";
+import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
 import { discoverEgg } from "@/lib/easterEggs";
 import { MAX_LEVEL, DEFAULT_LEVEL } from "@/lib/gameConstants";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -1503,6 +1504,13 @@ export default function UnifiedItemBuilderPage() {
   const [showShieldGodRollModal, setShowShieldGodRollModal] = useState(false);
   const [shieldAutoFillWarning, setShieldAutoFillWarning] = useState<string | null>(null);
 
+  // Shield generator state
+  const [lastShieldStats, setLastShieldStats] = useState<ShieldStatsEstimate | null>(null);
+  const [shieldModAmmoRegen, setShieldModAmmoRegen] = useState(false);
+  const [shieldModMovementSpeed, setShieldModMovementSpeed] = useState(false);
+  const [shieldModFireworks, setShieldModFireworks] = useState(false);
+  const [shieldModImmortality, setShieldModImmortality] = useState(false);
+
   const [showShieldLegendaryModal, setShowShieldLegendaryModal] = useState(false);
   const [shieldLegendarySearch, setShieldLegendarySearch] = useState("");
   const [shieldLegendarySelectedIds, setShieldLegendarySelectedIds] = useState<Set<string>>(new Set());
@@ -2240,6 +2248,56 @@ export default function UnifiedItemBuilderPage() {
       setCodecStatus(e instanceof Error ? e.message : "Modded grenade generation failed.");
     }
   }, [grenadeData, level, moddedWeaponPowerMode]);
+
+  const handleGenerateModdedShield = useCallback(async () => {
+    if (!shieldData?.mfgs?.length) return;
+    const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+    const mfg = pickR(shieldData.mfgs);
+    const shieldLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
+
+    // Auto-fill stock base
+    const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
+    const rarities = shieldData.raritiesByMfg[mfg.id] ?? [];
+    const legendaryRarity = rarities.find((r) => /legendary/i.test(r.label));
+    if (legendaryRarity) autoFillSelections["Rarity"] = [{ label: legendaryRarity.label, qty: "1" }];
+
+    const models = shieldData.modelsByMfg?.[mfg.id] ?? [];
+    if (models.length) autoFillSelections["Model"] = [{ label: pickR(models).label, qty: "1" }];
+
+    let stockBase: string | undefined;
+    try {
+      const candidate = buildDecodedFromShieldSelections(shieldData, mfg.id, shieldLevel, Math.floor(Math.random() * 9000) + 1000, autoFillSelections, []);
+      if (candidate) stockBase = candidate;
+    } catch { /* fall through */ }
+
+    // Get skins
+    let skinOptions = weaponData?.skins;
+    if (!skinOptions?.length) {
+      try {
+        const skinRes = await fetchApi("weapon-gen/data");
+        if (skinRes.ok) {
+          const skinData = (await skinRes.json()) as { skins?: { label: string; value: string }[] };
+          skinOptions = Array.isArray(skinData?.skins) ? skinData.skins : undefined;
+        }
+      } catch { /* no skins */ }
+    }
+
+    const result = generateModdedShield({
+      level: shieldLevel,
+      modPowerMode: moddedWeaponPowerMode,
+      stockBaseDecoded: stockBase,
+      skinOptions,
+      ammoRegen: shieldModAmmoRegen,
+      movementSpeed: shieldModMovementSpeed,
+      fireworks: shieldModFireworks,
+      immortality: shieldModImmortality,
+    });
+
+    setLastShieldStats(result.stats);
+    setLiveDecoded(result.code.trim());
+    setLastEditedCodecSide("decoded");
+    setCodecStatus(`Modded shield generated — ${result.recipeName}`);
+  }, [shieldData, level, moddedWeaponPowerMode, shieldModAmmoRegen, shieldModMovementSpeed, shieldModFireworks, shieldModImmortality, weaponData?.skins]);
 
   const handleGrenadeAutoFill = useCallback(() => {
     setGrenadeAutoFillWarning(null);
@@ -5374,8 +5432,76 @@ export default function UnifiedItemBuilderPage() {
                 >
                   Auto fill
                 </button>
+                <div>
+                  <label className="block text-xs text-[var(--color-accent)] mb-1">Power</label>
+                  <div className="flex rounded-lg border border-[var(--color-panel-border)] overflow-hidden min-h-[44px]">
+                    {(["stable", "op", "insane"] as const).map((mode) => (
+                      <button key={mode} type="button" onClick={() => setModdedWeaponPowerMode(mode)}
+                        className={`px-3 py-2 text-xs font-medium transition-colors ${moddedWeaponPowerMode === mode ? "bg-[var(--color-accent)] text-black" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}`}>
+                        {mode === "stable" ? "Stable" : mode === "op" ? "OP" : "Insane"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-[var(--color-accent)] mb-1">Toggles</label>
+                  <div className="flex gap-2 min-h-[44px] items-center">
+                    {([["ammoRegen", "Ammo Regen", shieldModAmmoRegen, setShieldModAmmoRegen],
+                       ["moveSpeed", "Move Speed", shieldModMovementSpeed, setShieldModMovementSpeed],
+                       ["fireworks", "Missiles", shieldModFireworks, setShieldModFireworks],
+                       ["immortal", "Immortality", shieldModImmortality, setShieldModImmortality]] as const).map(([key, label, val, setter]) => (
+                      <button key={key} type="button" onClick={() => (setter as (v: boolean) => void)(!val)}
+                        className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${val ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/40"}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
+                  <div className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
+                    <button type="button" onClick={handleGenerateModdedShield}
+                      className="text-blue-300 hover:text-blue-200 text-sm w-full text-left font-medium"
+                      title="Generate a modded shield with legendary perks + universal + energy + armor stacking">
+                      Generate Modded
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+            {/* Shield Stats Estimator */}
+            {lastShieldStats && category === "shield" && (
+              <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] px-3 py-3 mt-3">
+                <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">Shield Estimate</p>
+                <div className="grid grid-cols-3 gap-3 text-sm mb-2">
+                  <div>
+                    <span className="text-[var(--color-text-muted)] text-xs">Health:</span>{" "}
+                    <span className="text-green-400 font-bold">{lastShieldStats.healthMultiplier > 1 ? `x${lastShieldStats.healthMultiplier.toFixed(1)}` : "Base"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--color-text-muted)] text-xs">Capacity:</span>{" "}
+                    <span className="text-blue-400 font-bold">{lastShieldStats.capacityMultiplier > 1 ? `x${lastShieldStats.capacityMultiplier.toFixed(1)}` : "Base"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--color-text-muted)] text-xs">Recharge:</span>{" "}
+                    <span className="text-cyan-400 font-bold">{lastShieldStats.rechargeMultiplier > 1 ? `x${lastShieldStats.rechargeMultiplier.toFixed(1)}` : "Base"}</span>
+                  </div>
+                </div>
+                {lastShieldStats.legendaryPerks.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {lastShieldStats.legendaryPerks.map((perk) => (
+                      <span key={perk} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-blue-500/40 bg-blue-500/10 text-blue-300">
+                        {perk}
+                      </span>
+                    ))}
+                    {shieldModAmmoRegen && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/10 text-emerald-300">AMMO REGEN</span>}
+                    {shieldModMovementSpeed && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-amber-500/40 bg-amber-500/10 text-amber-300">MOVE SPEED</span>}
+                    {shieldModFireworks && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-red-500/40 bg-red-500/10 text-red-300">MISSILES</span>}
+                    {shieldModImmortality && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-purple-500/40 bg-purple-500/10 text-purple-300">IMMORTALITY</span>}
+                  </div>
+                )}
+              </div>
+            )}
 
             {shieldAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShieldAutoFillWarning(null)}>
