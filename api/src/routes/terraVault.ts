@@ -100,4 +100,62 @@ export async function terraVaultRoutes(fastify: FastifyInstance, _opts: unknown)
     saveVault(entries);
     reply.send({ success: true });
   });
+
+  // ── Terra's Grenade Codes — separate persistent store for grenade recipe discovery ──
+  const GRENADE_CODES_PATH = persistPath("terra_grenade_codes.json");
+
+  interface GrenadeCode {
+    id: string;
+    name: string;
+    code: string;
+    rating: "banger" | "good" | "mid" | "dud";
+    notes: string;
+    timestamp: number;
+  }
+
+  function loadGrenadeCodes(): GrenadeCode[] {
+    try {
+      if (!existsSync(GRENADE_CODES_PATH)) return [];
+      return JSON.parse(readFileSync(GRENADE_CODES_PATH, "utf-8"));
+    } catch { return []; }
+  }
+  function saveGrenadeCodes(codes: GrenadeCode[]): void {
+    writeFileSync(GRENADE_CODES_PATH, JSON.stringify(codes, null, 2), "utf-8");
+  }
+
+  fastify.get("/terra-grenade-codes", async (_request, reply) => {
+    reply.send(loadGrenadeCodes());
+  });
+
+  fastify.post("/terra-grenade-codes", async (request, reply) => {
+    const body = request.body as Record<string, unknown>;
+    const name = String(body.name ?? "").trim();
+    const code = String(body.code ?? "").trim();
+    const rating = String(body.rating ?? "mid").trim();
+    const notes = String(body.notes ?? "").trim();
+    if (!code) return reply.code(400).send({ error: "Code is required." });
+    const entry: GrenadeCode = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      name: name || "Unnamed Grenade",
+      code,
+      rating: (["banger","good","mid","dud"].includes(rating) ? rating : "mid") as GrenadeCode["rating"],
+      notes,
+      timestamp: Date.now(),
+    };
+    const codes = loadGrenadeCodes();
+    codes.unshift(entry);
+    if (codes.length > 200) codes.splice(200);
+    saveGrenadeCodes(codes);
+    reply.code(201).send({ success: true, id: entry.id });
+  });
+
+  fastify.delete("/terra-grenade-codes/:id", async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const codes = loadGrenadeCodes();
+    const idx = codes.findIndex((c) => c.id === id);
+    if (idx === -1) return reply.code(404).send({ error: "Not found." });
+    codes.splice(idx, 1);
+    saveGrenadeCodes(codes);
+    reply.send({ success: true });
+  });
 }

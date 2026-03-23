@@ -125,6 +125,9 @@ export default function TerraLabPage() {
           </div>
         </div>
 
+        {/* Terra's Grenade Codes — for grenade recipe discovery */}
+        <TerraGrenadeCodes />
+
         {/* Terra's Code Vault */}
         <TerraVault />
 
@@ -203,6 +206,107 @@ const ITEM_TYPE_COLORS: Record<string, string> = {
   heavy: "border-pink-500/40 bg-pink-500/10 text-pink-400",
   other: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]",
 };
+
+// ── Terra's Grenade Codes ────────────────────────────────────────────────────
+function TerraGrenadeCodes() {
+  const [codes, setCodes] = useState<Array<{ id: string; name: string; code: string; rating: string; notes: string; timestamp: number }>>([]);
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+  const [rating, setRating] = useState<string>("mid");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetchApi("terra-grenade-codes");
+      const data = await res.json();
+      if (Array.isArray(data)) setCodes(data);
+    } catch { /* offline */ }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
+
+  const handleSubmit = async () => {
+    if (!code.trim()) { setMsg("Code is required"); return; }
+    setSubmitting(true);
+    setMsg(null);
+    try {
+      const res = await fetchApi("terra-grenade-codes", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, code, rating, notes }),
+      });
+      const data = await res.json() as { success?: boolean };
+      if (data.success) {
+        setMsg("Saved!");
+        setName(""); setCode(""); setNotes(""); setRating("mid");
+        void load();
+        setTimeout(() => setMsg(null), 2000);
+      }
+    } catch { setMsg("Failed"); }
+    finally { setSubmitting(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    await fetchApi(`terra-grenade-codes/${id}`, { method: "DELETE" }).catch(() => {});
+    void load();
+  };
+
+  const ratingColors: Record<string, string> = {
+    banger: "border-green-500/50 bg-green-500/20 text-green-300",
+    good: "border-cyan-500/50 bg-cyan-500/20 text-cyan-300",
+    mid: "border-yellow-500/50 bg-yellow-500/20 text-yellow-300",
+    dud: "border-red-500/50 bg-red-500/20 text-red-300",
+  };
+
+  return (
+    <div className="rounded-xl border border-orange-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+      <div className="px-5 py-3 border-b border-orange-500/20 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent">
+        <h3 className="text-sm font-semibold text-orange-400">Grenade Codes</h3>
+        <p className="text-[10px] text-[var(--color-text-muted)]">Post grenade codes here — DrLecter uses these to create new recipes for the generator.</p>
+      </div>
+
+      {/* Submit form */}
+      <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Grenade name (optional)" maxLength={60} className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
+          <select value={rating} onChange={(e) => setRating(e.target.value)} className="px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm">
+            <option value="banger">Banger</option>
+            <option value="good">Good</option>
+            <option value="mid">Mid</option>
+            <option value="dud">Dud</option>
+          </select>
+        </div>
+        <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste decoded grenade code here..." rows={3} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono" />
+        <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes — what makes this one special?" maxLength={200} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
+        <div className="flex gap-2 items-center">
+          <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/40 font-medium text-sm hover:bg-orange-500/30 disabled:opacity-50">
+            {submitting ? "Saving…" : "Save Code"}
+          </button>
+          {msg && <span className="text-xs opacity-70">{msg}</span>}
+        </div>
+      </div>
+
+      {/* Saved codes */}
+      <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto">
+        {codes.length === 0 ? (
+          <p className="text-xs text-[var(--color-text-muted)] text-center py-4">No grenade codes yet. Be the first!</p>
+        ) : codes.map((c) => (
+          <div key={c.id} className="border border-[var(--color-panel-border)] rounded-lg p-3 bg-[rgba(24,28,34,0.4)] space-y-1">
+            <div className="flex items-center gap-2">
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${ratingColors[c.rating] ?? ratingColors.mid}`}>
+                {c.rating.toUpperCase()}
+              </span>
+              <span className="text-sm font-medium flex-1 truncate">{c.name || "Unnamed"}</span>
+              <button type="button" onClick={() => void handleDelete(c.id)} className="text-[10px] text-red-400/50 hover:text-red-400">delete</button>
+            </div>
+            {c.notes && <p className="text-xs text-[var(--color-text-muted)]">{c.notes}</p>}
+            <div className="font-mono text-[10px] text-[var(--color-text-muted)]/60 truncate">{c.code.slice(0, 100)}...</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function TerraVault() {
   const [entries, setEntries] = useState<VaultEntry[]>([]);
