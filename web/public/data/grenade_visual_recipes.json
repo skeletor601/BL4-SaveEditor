@@ -4662,5 +4662,825 @@
       }
     ],
     "style": "lingering"
+  },
+  {
+    "id": "terra-explosive-fracture",
+    "label": "Terra Explosive Fracture",
+    "notes": "Multi-block artillery+bouncer. Fracture pillars + massive explosive.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 38,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 1
+          },
+          {
+            "id": 75,
+            "n": 12
+          },
+          {
+            "id": 73,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 130
+          },
+          {
+            "id": 71,
+            "n": 50
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 77,
+            "n": 3
+          },
+          {
+            "id": 78,
+            "n": 3
+          },
+          {
+            "id": 80,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 3
+          },
+          {
+            "id": 21,
+            "n": 3
+          },
+          {
+            "id": 62,
+            "n": 3
+          },
+          {
+            "id": 44,
+            "n": 3
+          },
+          {
+            "id": 63,
+            "n": 7
+          },
+          {
+            "id": 47,
+            "n": 3
+          },
+          {
+            "id": 65,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 13
+          },
+          {
+            "id": 41,
+            "n": 5
+          },
+          {
+            "id": 32,
+            "n": 15
+          },
+          {
+            "id": 53,
+            "n": 15
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-status-bomb",
+    "label": "Terra Status Bomb",
+    "notes": "Heavy Alchemic + Hazardous status stacking.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 34,
+            "n": 5
+          },
+          {
+            "id": 66,
+            "n": 25
+          },
+          {
+            "id": 65,
+            "n": 5
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 69,
+            "n": 5
+          },
+          {
+            "id": 63,
+            "n": 10
+          },
+          {
+            "id": 64,
+            "n": 10
+          },
+          {
+            "id": 45,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 5
+          },
+          {
+            "id": 78,
+            "n": 10
+          },
+          {
+            "id": 75,
+            "n": 15
+          },
+          {
+            "id": 72,
+            "n": 25
+          },
+          {
+            "id": 73,
+            "n": 10
+          },
+          {
+            "id": 71,
+            "n": 50
+          },
+          {
+            "id": 74,
+            "n": 15
+          },
+          {
+            "id": 79,
+            "n": 15
+          },
+          {
+            "id": 70,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-radius-monster",
+    "label": "Terra Radius Monster",
+    "notes": "Expansive x50 + Wideload x25. Damage Amp x100 + Merciless x50.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 73,
+            "n": 50
+          },
+          {
+            "id": 76,
+            "n": 5
+          },
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 75,
+            "n": 10
+          },
+          {
+            "id": 71,
+            "n": 60
+          },
+          {
+            "id": 70,
+            "n": 60
+          },
+          {
+            "id": 81,
+            "n": 25
+          },
+          {
+            "id": 79,
+            "n": 50
+          },
+          {
+            "id": 66,
+            "n": 10
+          },
+          {
+            "id": 40,
+            "n": 15
+          },
+          {
+            "id": 39,
+            "n": 100
+          },
+          {
+            "id": 29,
+            "n": 15
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-balanced-power",
+    "label": "Terra Balanced Power",
+    "notes": "Balanced 25x across 6 perks + trailing lingering.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 40,
+            "n": 9
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-mirv-balanced",
+    "label": "Terra MIRV Balanced",
+    "notes": "Balanced 25x + Tightly Packed x50. MIRV chaos with even damage.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 35,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 40,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-mirv-army",
+    "label": "Terra MIRV Army",
+    "notes": "MIRV x150 + Tightly Packed x100 + Micro MIRV x50. Exponential multiplication.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 21,
+            "n": 5
+          },
+          {
+            "id": 22,
+            "n": 5
+          },
+          {
+            "id": 29,
+            "n": 150
+          },
+          {
+            "id": 30,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 100
+          },
+          {
+            "id": 42,
+            "n": 50
+          },
+          {
+            "id": 44,
+            "n": 5
+          },
+          {
+            "id": 63,
+            "n": 10
+          },
+          {
+            "id": 64,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 50
+          },
+          {
+            "id": 66,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 25
+          },
+          {
+            "id": 71,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 26
+          },
+          {
+            "id": 73,
+            "n": 10
+          }
+        ]
+      }
+    ],
+    "style": "mirv"
+  },
+  {
+    "id": "terra-balanced-fire",
+    "label": "Terra Balanced Fire",
+    "notes": "Balanced + Fire Lingering (34).",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 34,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 40,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "terra-balanced-shock",
+    "label": "Terra Balanced Shock",
+    "notes": "Balanced + Shock Lingering (36).",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 36,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 40,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "terra-balanced-radiation",
+    "label": "Terra Balanced Radiation",
+    "notes": "Balanced + Radiation Lingering (38).",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 38,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 40,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "terra-balanced-cryo",
+    "label": "Terra Balanced Cryo",
+    "notes": "Balanced + Cryo Lingering (37).",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 37,
+            "n": 25
+          },
+          {
+            "id": 30,
+            "n": 5
+          },
+          {
+            "id": 39,
+            "n": 25
+          },
+          {
+            "id": 40,
+            "n": 50
+          },
+          {
+            "id": 65,
+            "n": 25
+          },
+          {
+            "id": 72,
+            "n": 50
+          },
+          {
+            "id": 73,
+            "n": 25
+          },
+          {
+            "id": 74,
+            "n": 25
+          },
+          {
+            "id": 75,
+            "n": 25
+          },
+          {
+            "id": 76,
+            "n": 3
+          },
+          {
+            "id": 79,
+            "n": 25
+          },
+          {
+            "id": 70,
+            "n": 50
+          },
+          {
+            "id": 71,
+            "n": 50
+          }
+        ]
+      }
+    ],
+    "style": "lingering"
+  },
+  {
+    "id": "terra-radius-corrosive",
+    "label": "Terra Radius Corrosive",
+    "notes": "Radius Monster + Corrosive Lingering.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 35,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 50
+          },
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 81,
+            "n": 25
+          },
+          {
+            "id": 79,
+            "n": 50
+          },
+          {
+            "id": 75,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 100
+          },
+          {
+            "id": 29,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 15
+          },
+          {
+            "id": 66,
+            "n": 10
+          },
+          {
+            "id": 71,
+            "n": 60
+          },
+          {
+            "id": 70,
+            "n": 60
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
+  },
+  {
+    "id": "terra-radius-shock",
+    "label": "Terra Radius Shock",
+    "notes": "Radius Monster + Shock Lingering.",
+    "groups": [
+      {
+        "entries": [
+          {
+            "id": 36,
+            "n": 15
+          },
+          {
+            "id": 73,
+            "n": 50
+          },
+          {
+            "id": 72,
+            "n": 100
+          },
+          {
+            "id": 81,
+            "n": 25
+          },
+          {
+            "id": 79,
+            "n": 50
+          },
+          {
+            "id": 75,
+            "n": 10
+          },
+          {
+            "id": 39,
+            "n": 100
+          },
+          {
+            "id": 29,
+            "n": 15
+          },
+          {
+            "id": 40,
+            "n": 15
+          },
+          {
+            "id": 66,
+            "n": 10
+          },
+          {
+            "id": 71,
+            "n": 60
+          },
+          {
+            "id": 70,
+            "n": 60
+          }
+        ]
+      }
+    ],
+    "style": "hybrid"
   }
 ]

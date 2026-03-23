@@ -69,7 +69,8 @@ void _groupedToken;
 // Same whitelist as weapon generator: 4=Airstrike, 5=High Caliber, 6=Gadget Ahoy, 10=Deadeye, 17=Get Throwin', 20=Daed-dy O'
 const GRENADE_245_FIRMWARE_WHITELIST = [4, 5, 6, 10, 17, 20];
 const GRENADE_245_FORBIDDEN = new Set([1,2,3,4,7,8,9,11,12,13,14,15,16,18,19,87,88]);
-const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 5, 76: 5 };
+// Standalone grenades can handle higher Expansive stacks than weapon reloads (Terra uses 50)
+const GRENADE_PERK_HARD_CAP: Record<number, number> = { 73: 50, 76: 5 };
 
 // Non-kinetic element IDs for {245:XX} element codes
 const GRENADE_ELEMENTS = [24, 25, 26, 27, 28]; // Corrosive, Cryo, Fire, Radiation, Shock
@@ -334,6 +335,12 @@ export function generateModdedGrenade(
 
     // Damage reduction so grenades don't kill the player
     "{246:[35 35 36 36]}",
+
+    // ── Terra's secret sauce (occasional cross-inserts) ──
+    // 30% chance: class mod cross-insert for extra skill behaviors
+    ...(Math.random() < 0.3 ? ["{255:21}"] : []),
+    // 30% chance: Vladof Covering Fire legendary cross
+    ...(Math.random() < 0.3 ? ["{291:6}"] : []),
 
     // Grenade anchors + ONE combined perk block (visual recipe + power stacking)
     torgueAnchor,
