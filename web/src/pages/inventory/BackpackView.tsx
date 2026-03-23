@@ -655,6 +655,30 @@ export default function BackpackView() {
                                   setSelectedFlagValue(item.stateFlags || 1);
                                 }
                               }}
+                              onDoubleClick={() => {
+                                // Detect item type from prefix and navigate to the appropriate builder
+                                const pfxMatch = item.decodedFull?.match(/^(\d+),/);
+                                const pfx = pfxMatch ? Number(pfxMatch[1]) : 0;
+                                let cat = "weapon";
+                                if (pfx >= 2 && pfx <= 27) cat = "weapon";
+                                else if ([234,254,255,256,257,258,259].includes(pfx)) cat = "class-mod";
+                                else if ([237,246,248,279,283,287,293,300,306,312,321].includes(pfx)) cat = "shield";
+                                else if ([263,267,270,272,278,291,298,311].includes(pfx)) cat = "grenade";
+                                else if ([243,261,265,266,269,274,277,285,290].includes(pfx)) cat = "repkit";
+                                else if ([247,264,268,271,281,284,286,292,296,299,303,310].includes(pfx)) cat = "enhancement";
+                                else if ([244,273,275,282,289].includes(pfx)) cat = "heavy";
+                                navigate("/beta/unified-item-builder", {
+                                  state: {
+                                    editFromBackpack: true,
+                                    decoded: item.decodedFull,
+                                    serial: item.serial,
+                                    category: cat,
+                                    slotKey: item.slotKey,
+                                    container: item.container,
+                                    path: item.path,
+                                  },
+                                });
+                              }}
                               onContextMenu={(e) => {
                                 e.preventDefault();
                                 setContextItem(item);

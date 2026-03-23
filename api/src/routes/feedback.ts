@@ -10,7 +10,7 @@ import { fileURLToPath } from "url";
 import { persistPath } from "../lib/persistPath.js";
 const FEEDBACK_PATH = persistPath("feedback.json");
 const MAX_ENTRIES = 200;
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "https://discordapp.com/api/webhooks/1485316729692487921/DK6P5j8XNX611j96PGKvrsWGnVhXG8kJ1yMW0BUhb8Av16CMZkg3QOMSJjxp_P3UGxEk";
 
 export interface FeedbackEntry {
   id: string;

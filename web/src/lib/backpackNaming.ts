@@ -10,10 +10,11 @@ export interface PartLookupItem {
   rarity?: string;
 }
 
-const GENERIC_NAME_WORDS = new Set([
+const _GENERIC_NAME_WORDS = new Set([
   "rarity", "common", "uncommon", "rare", "epic", "legendary",
   "barrel", "body", "element", "firmware", "model", "skin", "part",
 ]);
+void _GENERIC_NAME_WORDS;
 
 function getPartByCodeOrPrefixed(
   code: string,
@@ -61,18 +62,54 @@ function extractCleanName(partName: string): string | undefined {
   if (!partName) return undefined;
   // Try to get the name after the last underscore in legendary/pearl part names
   // e.g. "TOR_SG.comp_05_legendary_LeadBalloon" → "LeadBalloon" → "Lead Balloon"
+  // Skip generic names like "legendary_perk" or "legendary_Perk"
   const legendaryMatch = partName.match(/(?:legendary|pearl|pearlescent)_(\w+)/i);
-  if (legendaryMatch?.[1]) {
+  if (legendaryMatch?.[1] && !/^perk$/i.test(legendaryMatch[1])) {
     // Split CamelCase into words: "LeadBalloon" → "Lead Balloon"
     return legendaryMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
   }
-  // Try barrel part names like "DAD_AR.part_barrel_03_onslaught" → "Onslaught"
-  const barrelMatch = partName.match(/part_barrel_\d+_(\w+)/i);
+  // Try barrel part names:
+  // "DAD_AR.part_barrel_03_onslaught" → "Onslaught"
+  // "BOR_SG.part_unique_barrel_02_convergence" → "Convergence"
+  const barrelMatch = partName.match(/part_(?:unique_)?barrel_\d+_(\w+)/i);
   if (barrelMatch?.[1]) {
     return barrelMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
   }
   return undefined;
 }
+
+/** Known grenade names by {prefix:partId} — uses the in-game SKIN name (what the game displays).
+ * Maps both the perk code AND the rarity/skin code to the same name.
+ * IMPORTANT: Only match when the prefix matches the grenade's header prefix! */
+const GRENADE_LEGENDARY_NAMES: Record<string, string> = {
+  // Maliwan — skip Gold (generic)
+  "{263:9}": "Destructive Disco", "{263:10}": "Destructive Disco",
+  "{263:11}": "Recursive", "{263:12}": "Recursive",
+  // Jakobs
+  "{267:9}": "Spinning Blade", "{267:10}": "Spinning Blade",
+  "{267:11}": "Sho Kunai", "{267:12}": "Sho Kunai",
+  // Daedalus
+  "{270:7}": "Buzz Axe", "{270:8}": "Fuse", "{270:9}": "Fuse",
+  // Order
+  "{272:7}": "Swarm", "{272:8}": "Swarm",
+  "{272:9}": "Chaumurky", "{272:10}": "Chaumurky",
+  "{272:11}": "Skully", "{272:12}": "Skully",
+  // Ripper
+  "{278:9}": "Jelly", "{278:10}": "Jelly",
+  "{278:11}": "Buoy", "{278:12}": "Buoy",
+  // Vladof
+  "{291:6}": "Blockbuster", "{291:7}": "Blockbuster",
+  "{291:8}": "Waterfall", "{291:9}": "Waterfall",
+  // Torgue
+  "{298:6}": "Firepot", "{298:7}": "Firepot",
+  "{298:8}": "Slippy", "{298:9}": "Slippy",
+  "{298:11}": "Countermeasure", "{298:12}": "Countermeasure",
+  // Tediore
+  "{311:6}": "Faulty Detonator", "{311:7}": "Faulty Detonator",
+  "{311:8}": "UAV", "{311:9}": "UAV",
+  "{311:11}": "Urchin", "{311:12}": "Urchin",
+};
+const GRENADE_PREFIXES = new Set([263,267,270,272,278,291,298,311]);
 
 export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<string, PartLookupItem>): string | undefined {
   if (!decodedFull) return undefined;
@@ -100,33 +137,50 @@ export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<
     }
 
     for (const lookupCode of idsToCheck) {
+      // Extract prefix from the lookup code — simple tokens {X} use the header prefix
+      const codeMatch = lookupCode.match(/\{(\d+):(\d+)\}/);
+      const simpleMatch = !codeMatch ? lookupCode.match(/\{(\d+)\}/) : null;
+      const codePfx = codeMatch ? Number(codeMatch[1]) : (simpleMatch ? itemTypeId : null);
+      const partId = codeMatch ? Number(codeMatch[2]) : (simpleMatch ? Number(simpleMatch[1]) : null);
+
+      const isWeapon = itemTypeId != null && itemTypeId >= 2 && itemTypeId <= 27;
+      const isGrenade = itemTypeId != null && GRENADE_PREFIXES.has(itemTypeId);
+      const isSamePrefix = codePfx === itemTypeId;
+
+      // GRENADES: only match same-prefix legendary names (prevents anchors from being named)
+      if (isGrenade && isSamePrefix && itemTypeId != null && partId != null) {
+        const prefixedCode = `{${itemTypeId}:${partId}}`;
+        const grenadeName = GRENADE_LEGENDARY_NAMES[prefixedCode] ?? GRENADE_LEGENDARY_NAMES[lookupCode];
+        if (grenadeName) {
+          barrelNames.push(grenadeName);
+          continue;
+        }
+      }
+
+      // Skip cross-prefix parts for naming (they're just cross-inserts, not the item's name)
+      if (codePfx != null && !isSamePrefix && !isWeapon) continue;
+
       const part = getPartByCodeOrPrefixed(lookupCode, itemTypeId, partsByCode);
       if (!part) continue;
       const type = String(part.partType ?? "").toLowerCase();
-      const isRarity = type.includes("rarity");
-      const isBarrel = type.includes("barrel") && !type.includes("accessory");
-      const isLegendaryPerk = type.includes("legendary");
-      const isModel = type.includes("model");
-      const isFirmware = type.includes("firmware");
-      if (!isRarity && !isBarrel && !isLegendaryPerk && !isModel && !isFirmware) continue;
 
-      // Barrel names always win, then legendary perks, then rarity
-      const target = isBarrel ? barrelNames : (isLegendaryPerk || isModel || isFirmware) ? barrelNames : rarityNames;
-
-      // Try extracting clean name from partName first (most reliable)
-      const cleanName = extractCleanName(part.partName ?? "");
-      if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
-        target.push(cleanName);
-        continue;
+      if (isWeapon) {
+        // WEAPONS: only barrel names (first barrel = weapon name)
+        const isBarrel = type.includes("barrel") && !type.includes("accessory");
+        if (!isBarrel) continue;
+        const cleanName = extractCleanName(part.partName ?? "");
+        if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
+          barrelNames.push(cleanName);
+        }
+      } else {
+        // NON-WEAPONS: rarity skin name (same prefix only)
+        const isRarity = type.includes("rarity");
+        if (!isRarity) continue;
+        const cleanName = extractCleanName(part.partName ?? "");
+        if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
+          rarityNames.push(cleanName);
+        }
       }
-
-      // Fallback: try effect/stat text
-      const raw = String(part.effect ?? part.partName ?? "").trim();
-      if (!raw) continue;
-      const base = raw.split(",")[0]?.split(" -")[0]?.trim() ?? "";
-      if (!base || base.length < 3 || base.length > 40 || !/[a-zA-Z]/.test(base)) continue;
-      if (GENERIC_NAME_WORDS.has(base.toLowerCase())) continue;
-      target.push(base);
     }
   }
   // Always prefer barrel name over rarity name — barrel = the in-game weapon name

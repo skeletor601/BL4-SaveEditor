@@ -7,7 +7,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { parse as yamlParse } from "yaml";
 import { useSave } from "@/contexts/SaveContext";
 import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
@@ -1335,8 +1335,59 @@ function slotRarityStyle(rarity: string | undefined): { border: string; bg: stri
 }
 
 export default function UnifiedItemBuilderPage() {
+  const location = useLocation();
   const { addEntry: addHistoryEntry } = useCodeHistory();
   const [category, setCategory] = usePersistedState<ItemCategory>("uib.category", "weapon");
+
+  // ── Edit from Backpack — receive item via navigation state ──
+  const [editingFromBackpack, setEditingFromBackpack] = useState<{
+    serial: string;
+    slotKey: string;
+    container: string;
+    path: string[];
+  } | null>(null);
+
+  useEffect(() => {
+    const state = location.state as {
+      editFromBackpack?: boolean;
+      decoded?: string;
+      serial?: string;
+      category?: string;
+      slotKey?: string;
+      container?: string;
+      path?: string[];
+    } | null;
+    if (state?.editFromBackpack && (state.decoded || state.serial)) {
+      // Set the category
+      if (state.category) setCategory(state.category as ItemCategory);
+      // Reset prevFreshDecodedRef so rebuild effects don't overwrite our loaded code
+      prevFreshDecodedRef.current = "";
+      // Use setTimeout to set codes AFTER rebuild effects have fired from category change
+      setTimeout(() => {
+        if (state.decoded) {
+          setLiveDecoded(state.decoded);
+          setLastEditedCodecSide("decoded");
+        }
+        if (state.serial) {
+          setLiveBase85(state.serial);
+          if (!state.decoded) setLastEditedCodecSide("base85");
+        }
+        // Set prevFreshDecodedRef to the loaded code so merges work from here
+        if (state.decoded) prevFreshDecodedRef.current = state.decoded;
+      }, 100);
+      // Track the backpack item for "Update Item" button
+      if (state.serial && state.slotKey && state.container && state.path) {
+        setEditingFromBackpack({
+          serial: state.serial,
+          slotKey: state.slotKey,
+          container: state.container,
+          path: state.path,
+        });
+      }
+      // Clear the navigation state so refresh doesn't re-trigger
+      window.history.replaceState({}, "");
+    }
+  }, [location.state]);
   const [level, setLevel] = usePersistedState("uib.level", DEFAULT_LEVEL);
   const [seed, setSeed] = usePersistedState("uib.seed", 1);
   const [signatureSeed, setSignatureSeed] = usePersistedState<number | null>("uib.signatureSeed", null);
@@ -3991,6 +4042,49 @@ export default function UnifiedItemBuilderPage() {
           >
             {addToBackpackLoading ? "Adding…" : "Add to Backpack"}
           </button>
+          {editingFromBackpack && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (!saveData || !editingFromBackpack) return;
+                setCodecStatus("Updating item...");
+                try {
+                  // Encode the current decoded to get new serial
+                  const encRes = await fetchApi("save/encode-serial", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ decoded_string: liveDecoded.split("\n")[0]?.trim() }),
+                  });
+                  const encData = await encRes.json() as { serial?: string };
+                  if (!encData.serial) { setCodecStatus("Encode failed"); return; }
+                  // Walk the path to find and update the item in saveData
+                  let target: Record<string, unknown> = saveData as Record<string, unknown>;
+                  const path = editingFromBackpack.path;
+                  for (let i = 0; i < path.length - 1; i++) {
+                    const key = path[i]!;
+                    target = (target[key] ?? (target as unknown as unknown[])[Number(key)]) as Record<string, unknown>;
+                  }
+                  const lastKey = path[path.length - 1]!;
+                  const slot = (target[lastKey] ?? (target as unknown as unknown[])[Number(lastKey)]) as Record<string, unknown>;
+                  if (slot) {
+                    slot.serial = encData.serial;
+                    updateSaveData({ ...saveData });
+                    setCodecStatus("Item updated in backpack!");
+                    setEditingFromBackpack(null);
+                  } else {
+                    setCodecStatus("Could not find item in save data");
+                  }
+                } catch {
+                  setCodecStatus("Update failed");
+                }
+              }}
+              disabled={!saveData}
+              className="px-4 py-2 rounded-lg bg-orange-500/80 text-black font-medium hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm min-h-[44px] touch-manipulation"
+              title="Overwrite the original backpack item with your edits"
+            >
+              Update Item
+            </button>
+          )}
           <button
             type="button"
             onClick={async () => {
