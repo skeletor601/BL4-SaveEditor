@@ -349,9 +349,20 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       const buf = await res.arrayBuffer();
       const blob = new Blob([buf], { type: "application/octet-stream" });
 
-      // Use showSaveFilePicker — remembers last directory, pre-fills filename.
-      // First save: user picks location. Every save after: defaults to same folder.
-      // Works in Chrome, Edge, Brave, Opera — all Chromium browsers.
+      // Priority 1: Use the stored file handle from showOpenFilePicker (true one-click overwrite)
+      const handle = savFileHandleRef.current as { createWritable?: () => Promise<{ write: (d: Blob) => Promise<void>; close: () => Promise<void> }> } | null;
+      if (handle && typeof handle.createWritable === "function") {
+        try {
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          return true;
+        } catch (err) {
+          console.warn("Writing via original file handle failed, falling back:", err);
+        }
+      }
+
+      // Priority 2: showSaveFilePicker — user picks location (Chrome/Edge/Brave)
       const anyWindow = window as unknown as { showSaveFilePicker?: (opts: unknown) => Promise<unknown> };
       if (typeof anyWindow.showSaveFilePicker === "function") {
         try {
@@ -362,14 +373,15 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
           const writable = await saveHandle.createWritable();
           await writable.write(blob);
           await writable.close();
+          // Store this handle for future one-click overwrites
+          setSavFileHandle(saveHandle);
           return true;
         } catch (err: unknown) {
-          // User cancelled the dialog
           if (err && typeof err === "object" && (err as { name?: string }).name === "AbortError") return false;
-          // Fall through to download
         }
       }
-      // Fallback: trigger download with original filename (Firefox, Safari)
+
+      // Priority 3: Fallback download (Firefox, Safari)
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = defaultName;
@@ -380,7 +392,7 @@ export function SaveProvider({ children }: { children: React.ReactNode }) {
       setLoadError(e instanceof Error ? e.message : "Encrypt failed. Is the API running?");
       return false;
     }
-  }, [saveData, saveUserId, savePlatform, saveFileName, rawYamlUtf8, rawBytesBase64]);
+  }, [saveData, saveUserId, savePlatform, saveFileName, rawYamlUtf8, rawBytesBase64, setSavFileHandle]);
 
   const exportAsJson = useCallback(
     (filename?: string) => {
