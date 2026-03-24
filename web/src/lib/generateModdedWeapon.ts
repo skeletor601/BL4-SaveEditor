@@ -1483,6 +1483,7 @@ export function generateModdedWeapon(
     "{18:64}": "{18:65}",  // Wombo Combo
     "{18:99}": "{18:63}",  // Bubbles
     "{19:17}": "{19:1}",   // Prince Harming
+    "{20:60}": "{20:65}",  // Luty Madlad
     "{19:20}": "{19:19}",  // Hellfire
     "{21:59}": "{21:60}",  // Ohm I Got
     "{21:62}": "{21:63}",  // Plasma Coil

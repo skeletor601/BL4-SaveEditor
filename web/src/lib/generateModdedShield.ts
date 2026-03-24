@@ -1,7 +1,21 @@
 /**
- * Modded Shield Generator — builds a shield from a stock auto-fill base,
- * then layers legendary perks, universal perks, and power stacking.
+ * Modded Shield Generator — recipe-driven shield assembly.
+ * Picks a random recipe from shield_recipes.json, then layers
+ * toggle overrides (ammo regen, movement speed, fireworks, immortality).
  */
+
+import shieldRecipesJson from "../../public/data/shield_recipes.json";
+
+export interface ShieldRecipe {
+  id: string;
+  label: string;
+  notes: string;
+  legendaries: string[];
+  universal: string;
+  armor: string;
+  energy: string;
+  extras: string[];
+}
 
 export interface GenerateModdedShieldOptions {
   level?: number;
@@ -31,35 +45,23 @@ export interface GenerateModdedShieldResult {
 }
 
 const SHIELD_MFGS = [279, 283, 287, 293, 300, 306, 312, 321];
-// Maliwan, Vladof, Tediore, Order, Ripper, Jakobs, Daedalus, Torgue
 
 const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
 const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-/** Shield legendary perks — each has unique behavior */
-const SHIELD_LEGENDARIES = [
-  { code: "{279:1}", name: "Nucleosynthesis", mfg: 279 },
-  { code: "{279:8}", name: "Psychosis", mfg: 279 },
-  { code: "{283:6}", name: "Refreshments", mfg: 283 },
-  { code: "{283:8}", name: "Bareknuckle", mfg: 283 },
-  { code: "{283:11}", name: "Exoskeleton", mfg: 283 },
-  { code: "{287:6}", name: "Shield Boi", mfg: 287 },
-  { code: "{287:9}", name: "Bininu", mfg: 287 },
-  { code: "{293:1}", name: "Glass", mfg: 293 },
-  { code: "{293:2}", name: "Direct Current", mfg: 293 },
-  { code: "{300:6}", name: "Short Circuit", mfg: 300 },
-  { code: "{300:8}", name: "Overshield Eater", mfg: 300 },
-  { code: "{300:11}", name: "Backdoor", mfg: 300 },
-  { code: "{306:7}", name: "Vintage", mfg: 306 },
-  { code: "{306:8}", name: "Shallot Shell", mfg: 306 },
-  { code: "{312:6}", name: "Wings of Grace", mfg: 312 },
-  { code: "{312:8}", name: "Power Play", mfg: 312 },
-  { code: "{321:6}", name: "Bundled", mfg: 321 },
-  { code: "{321:9}", name: "Sisyphusian", mfg: 321 },
-];
+/** Map perk code → human name for badge display */
+const PERK_NAMES: Record<string, string> = {
+  "279:1": "Nucleosynthesis", "279:8": "Psychosis",
+  "283:6": "Refreshments", "283:8": "Bareknuckle", "283:11": "Exoskeleton",
+  "287:6": "Shield Boi", "287:9": "Bininu",
+  "293:1": "Glass", "293:2": "Direct Current",
+  "300:6": "Short Circuit", "300:8": "Overshield Eater", "300:11": "Backdoor",
+  "306:7": "Vintage", "306:8": "Shallot Shell",
+  "312:6": "Wings of Grace", "312:8": "Power Play",
+  "321:6": "Bundled", "321:9": "Sisyphusian",
+};
 
-/** Universal shield perks (type 246) — IDs 27-58 */
-const SHIELD_UNIVERSAL_IDS = [27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58];
+const SHIELD_RECIPES: ShieldRecipe[] = shieldRecipesJson as ShieldRecipe[];
 
 function parseHeader(decoded: string): { prefix: number; level: number; seed: string } | null {
   const m = decoded.match(/^(\d+)\s*,\s*0\s*,\s*1\s*,\s*(\d+)\s*\|\s*2\s*,\s*(\d+)\s*\|\|/);
@@ -79,11 +81,69 @@ function parseStockParts(decoded: string): string[] {
   return tokens;
 }
 
+/** Extract unique legendary perk names from legendary token strings */
+function extractLegendaryNames(legendaryTokens: string[]): string[] {
+  const names = new Set<string>();
+  for (const token of legendaryTokens) {
+    // Match {MFG:PERK} or {MFG:[PERK PERK ...]}
+    const singleMatch = token.match(/\{(\d+):(\d+)\}/);
+    if (singleMatch) {
+      const key = `${singleMatch[1]}:${singleMatch[2]}`;
+      if (PERK_NAMES[key]) names.add(PERK_NAMES[key]);
+      continue;
+    }
+    const arrayMatch = token.match(/\{(\d+):\[([^\]]+)\]\}/);
+    if (arrayMatch) {
+      const mfg = arrayMatch[1];
+      const ids = [...new Set(arrayMatch[2].split(/\s+/).map((s) => s.trim()).filter(Boolean))];
+      for (const id of ids) {
+        const key = `${mfg}:${id}`;
+        if (PERK_NAMES[key]) names.add(PERK_NAMES[key]);
+      }
+    }
+  }
+  return [...names];
+}
+
+/** Count total IDs in a {type:[...]} token for stats estimation */
+function countIdsInToken(token: string): number {
+  if (!token) return 0;
+  const m = token.match(/\[([^\]]+)\]/);
+  if (!m) return token.match(/\{\d+:\d+\}/) ? 1 : 0;
+  return m[1].split(/\s+/).filter(Boolean).length;
+}
+
+/** Scale a recipe's tokens by power mode multiplier */
+function scaleToken(token: string, scale: number): string {
+  if (!token) return "";
+  // For {type:[id id id ...]} tokens, multiply the count
+  const m = token.match(/^\{(\d+):\[([^\]]+)\]\}$/);
+  if (m) {
+    const type = m[1];
+    const ids = m[2].split(/\s+/).filter(Boolean);
+    // Get unique IDs and their counts
+    const idCounts = new Map<string, number>();
+    for (const id of ids) {
+      idCounts.set(id, (idCounts.get(id) || 0) + 1);
+    }
+    const scaled: string[] = [];
+    for (const [id, count] of idCounts) {
+      const newCount = Math.max(1, Math.round(count * scale));
+      for (let i = 0; i < newCount; i++) scaled.push(id);
+    }
+    return `{${type}:[${scaled.join(" ")}]}`;
+  }
+  return token;
+}
+
 export function generateModdedShield(
   options: GenerateModdedShieldOptions = {},
 ): GenerateModdedShieldResult {
   const modPowerMode = options.modPowerMode ?? "op";
   const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 60)));
+
+  // ── Power mode scale factors (recipes are written at ~OP level) ──
+  const modeScale = { stable: 0.4, op: 1.0, insane: 2.5 }[modPowerMode];
 
   // ── Stock base ──
   let stockTokens: string[] = [];
@@ -99,62 +159,23 @@ export function generateModdedShield(
     stockTokens = parseStockParts(options.stockBaseDecoded);
   }
 
-  // ── Pick 2-4 random legendary perks (from different manufacturers) ──
-  const shuffledLegs = [...SHIELD_LEGENDARIES].sort(() => Math.random() - 0.5);
-  const legCount = randInt(2, 4);
-  const chosenLegs: typeof SHIELD_LEGENDARIES = [];
-  const usedMfgs = new Set<number>();
-  for (const leg of shuffledLegs) {
-    if (chosenLegs.length >= legCount) break;
-    if (!usedMfgs.has(leg.mfg)) {
-      chosenLegs.push(leg);
-      usedMfgs.add(leg.mfg);
-    }
-  }
-  const legendaryTokens = chosenLegs.map((l) => l.code);
-  const legendaryNames = chosenLegs.map((l) => l.name);
+  // ── Pick a random recipe ──
+  const recipe = pick(SHIELD_RECIPES);
 
-  // ── Stack chosen legendaries for power ──
-  const legStackCount = { stable: randInt(5, 10), op: randInt(15, 30), insane: randInt(40, 80) }[modPowerMode];
-  const legendaryStacks = chosenLegs.map((l) => {
-    const m = l.code.match(/\{(\d+):(\d+)\}/);
-    if (!m) return l.code;
-    return `{${m[1]}:[${Array(legStackCount).fill(m[2]).join(" ")}]}`;
+  // ── Scale legendary tokens by power mode ──
+  const legendaryTokens = recipe.legendaries.map((t) => scaleToken(t, modeScale));
+  const legendaryNames = extractLegendaryNames(recipe.legendaries);
+
+  // ── Scale universal/armor/energy tokens ──
+  const universalToken = scaleToken(recipe.universal, modeScale);
+  const armorToken = scaleToken(recipe.armor, modeScale);
+  const energyToken = scaleToken(recipe.energy, modeScale);
+
+  // ── Scale extras (but keep single-value tokens like {234:42} as-is) ──
+  const extraTokens = recipe.extras.map((t) => {
+    if (t.includes("[")) return scaleToken(t, modeScale);
+    return t;
   });
-
-  // ── Universal shield perks (type 246) — random selection ──
-  const universalCount = { stable: randInt(6, 10), op: randInt(10, 16), insane: randInt(16, 24) }[modPowerMode];
-  const shuffledUniversal = [...SHIELD_UNIVERSAL_IDS].sort(() => Math.random() - 0.5);
-  const chosenUniversals = shuffledUniversal.slice(0, universalCount);
-  // Stack each universal perk
-  const universalStackCount = { stable: randInt(3, 6), op: randInt(8, 15), insane: randInt(15, 30) }[modPowerMode];
-  const universalIds: number[] = [];
-  for (const id of chosenUniversals) {
-    for (let i = 0; i < universalStackCount; i++) universalIds.push(id);
-  }
-  const universalToken = universalIds.length > 0 ? `{246:[${universalIds.join(" ")}]}` : "";
-
-  // ── Energy perks (type 248) ──
-  const energyIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const energyCount = randInt(3, 6);
-  const chosenEnergy = [...energyIds].sort(() => Math.random() - 0.5).slice(0, energyCount);
-  const energyStackCount = { stable: randInt(3, 5), op: randInt(8, 12), insane: randInt(15, 25) }[modPowerMode];
-  const energyPerkIds: number[] = [];
-  for (const id of chosenEnergy) {
-    for (let i = 0; i < energyStackCount; i++) energyPerkIds.push(id);
-  }
-  const energyToken = energyPerkIds.length > 0 ? `{248:[${energyPerkIds.join(" ")}]}` : "";
-
-  // ── Armor perks (type 237) ──
-  const armorIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
-  const armorCount = randInt(3, 6);
-  const chosenArmor = [...armorIds].sort(() => Math.random() - 0.5).slice(0, armorCount);
-  const armorStackCount = { stable: randInt(3, 5), op: randInt(8, 15), insane: randInt(15, 30) }[modPowerMode];
-  const armorPerkIds: number[] = [];
-  for (const id of chosenArmor) {
-    for (let i = 0; i < armorStackCount; i++) armorPerkIds.push(id);
-  }
-  const armorToken = armorPerkIds.length > 0 ? `{237:[${armorPerkIds.join(" ")}]}` : "";
 
   // ── Toggle: Ammo Regen — {22:[68x15]} Vladof SMG barrel acc ──
   const ammoRegenToken = options.ammoRegen ? "{22:[68 68 68 68 68 68 68 68 68 68 68 68 68 68 68]}" : "";
@@ -199,10 +220,10 @@ export function generateModdedShield(
     ...(pearlToken ? [pearlToken] : []),
     ...stockTokens,
     ...legendaryTokens,
-    ...legendaryStacks,
     ...(universalToken ? [universalToken] : []),
     ...(energyToken ? [energyToken] : []),
     ...(armorToken ? [armorToken] : []),
+    ...extraTokens,
     ...(ammoRegenToken ? [ammoRegenToken] : []),
     ...movementSpeedTokens,
     ...fireworksTokens,
@@ -218,11 +239,14 @@ export function generateModdedShield(
   }
 
   // ── Stats estimate ──
-  const capacityMult = 1 + (universalCount * universalStackCount * 0.02);
-  const rechargeMult = 1 + (energyCount * energyStackCount * 0.015);
-  const healthMult = 1 + (armorCount * armorStackCount * 0.01) + (legStackCount * chosenLegs.length * 0.005);
+  const universalCount = countIdsInToken(universalToken);
+  const armorCount = countIdsInToken(armorToken);
+  const energyCount = countIdsInToken(energyToken);
+  const legCount = legendaryTokens.reduce((sum, t) => sum + countIdsInToken(t), 0);
 
-  const recipeName = chosenLegs.length > 0 ? chosenLegs.map((l) => l.name).join(" + ") : "Standard Shield";
+  const capacityMult = 1 + (universalCount * 0.015);
+  const rechargeMult = 1 + (energyCount * 0.02);
+  const healthMult = 1 + (armorCount * 0.01) + (legCount * 0.005);
 
   return {
     code: decoded,
@@ -231,8 +255,8 @@ export function generateModdedShield(
       capacityMultiplier: capacityMult,
       rechargeMultiplier: rechargeMult,
       legendaryPerks: legendaryNames,
-      style: chosenLegs.length >= 3 ? "multi-legendary" : chosenLegs.length >= 2 ? "dual-legendary" : "focused",
+      style: legendaryNames.length >= 4 ? "mega-legendary" : legendaryNames.length >= 3 ? "multi-legendary" : legendaryNames.length >= 2 ? "dual-legendary" : "focused",
     },
-    recipeName,
+    recipeName: recipe.label,
   };
 }

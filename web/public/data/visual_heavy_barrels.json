@@ -118,7 +118,7 @@
   { "name": "Roil", "code": "{19:57}" },
   { "name": "GCX", "code": "{20:7}" },
   { "name": "Painter", "code": "{20:8}" },
-  { "name": "Luty Madlad", "code": "{20:60}" },
+  { "name": "Luty Madlad", "code": "{20:60}", "visual": true },
   { "name": "Darkbeast", "code": "{20:64}" },
   { "name": "Ephemeris", "code": "{21:7}" },
   { "name": "Synastry", "code": "{21:8}" },
