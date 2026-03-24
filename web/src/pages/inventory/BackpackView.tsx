@@ -126,6 +126,8 @@ export default function BackpackView() {
   const [gearLevelDialog, setGearLevelDialog] = useState<{ level: number } | null>(null);
   const [gearLevelLoading, setGearLevelLoading] = useState(false);
   const [clearBackpackLoading, setClearBackpackLoading] = useState(false);
+  const [dupeAllDialog, setDupeAllDialog] = useState<{ qty: string } | null>(null);
+  const [dupeAllLoading, setDupeAllLoading] = useState(false);
   const [showClearBackpackConfirm, setShowClearBackpackConfirm] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [compareItemA, setCompareItemA] = useState<TreeItem | null>(null);
@@ -399,6 +401,63 @@ export default function BackpackView() {
     [saveData, getYamlText, updateSaveData]
   );
 
+  const handleDupeAll = useCallback(
+    async (qty: number) => {
+      if (!saveData || qty < 1) return;
+      setDupeAllDialog(null);
+      setDupeAllLoading(true);
+      setAddMessage(null);
+      const yamlContent = getYamlText();
+      if (!yamlContent?.trim()) {
+        setAddMessage("No save YAML loaded.");
+        setDupeAllLoading(false);
+        return;
+      }
+      const num = Math.min(99, Math.max(1, qty));
+      // Collect all backpack item serials
+      const backpackSerials = slots.backpack
+        .map((s) => ({ serial: s.serial?.trim(), flags: String(s.stateFlags ?? s.flags ?? 1) }))
+        .filter((s) => s.serial && s.serial.startsWith("@U"));
+      if (backpackSerials.length === 0) {
+        setAddMessage("No items in backpack to duplicate.");
+        setDupeAllLoading(false);
+        return;
+      }
+      try {
+        let currentYaml = yamlContent;
+        let totalAdded = 0;
+        for (let round = 0; round < num; round++) {
+          for (const { serial, flags } of backpackSerials) {
+            const res = await fetchApi("save/add-item", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                yaml_content: currentYaml,
+                serial,
+                flag: flags,
+              }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
+              setAddMessage(data?.error ?? `Failed at item ${totalAdded + 1}.`);
+              setDupeAllLoading(false);
+              return;
+            }
+            currentYaml = data.yaml_content;
+            totalAdded++;
+          }
+        }
+        const parsed = yamlParse(currentYaml) as Record<string, unknown>;
+        updateSaveData(parsed);
+        setAddMessage(`Duplicated ${backpackSerials.length} items x${num} (${totalAdded} copies added).`);
+      } catch {
+        setAddMessage(getApiUnavailableError());
+      }
+      setDupeAllLoading(false);
+    },
+    [saveData, getYamlText, updateSaveData, slots.backpack]
+  );
+
   const handleSetGearLevel = useCallback(async () => {
     if (!gearLevelDialog || !saveData) return;
     const yamlContent = getYamlText();
@@ -553,6 +612,15 @@ export default function BackpackView() {
           disabled={!itemSerial.trim() || isAdding}
         >
           {isAdding ? "Adding…" : "Add to Backpack"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setDupeAllDialog({ qty: "1" })}
+          disabled={dupeAllLoading}
+          className="px-4 py-2 rounded-lg border border-purple-500/60 text-purple-300 text-sm hover:bg-purple-500/10 disabled:opacity-50 min-h-[44px]"
+          title="Duplicate all backpack items"
+        >
+          {dupeAllLoading ? "Duping…" : "Dupe All"}
         </button>
         <button
           type="button"
@@ -921,6 +989,54 @@ export default function BackpackView() {
                 onClick={() => !gearLevelLoading && setGearLevelDialog(null)}
                 disabled={gearLevelLoading}
                 className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] disabled:opacity-50 min-h-[44px]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dupe All dialog */}
+      {dupeAllDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => !dupeAllLoading && setDupeAllDialog(null)}
+        >
+          <div
+            className="rounded-lg border border-purple-500/40 bg-[var(--color-panel)] p-4 max-w-sm w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-purple-300 font-medium mb-2">Dupe All Backpack Items</h3>
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              How many times to duplicate all {slots.backpack.filter((s) => s.serial?.trim().startsWith("@U")).length} items?
+            </p>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={dupeAllDialog.qty}
+              onChange={(e) => setDupeAllDialog((d) => d ? { ...d, qty: e.target.value } : null)}
+              className="w-20 px-3 py-2 rounded-lg border border-purple-500/40 bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center font-mono"
+              autoFocus
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                disabled={dupeAllLoading}
+                onClick={() => {
+                  const n = parseInt(dupeAllDialog.qty, 10);
+                  if (Number.isFinite(n) && n >= 1) handleDupeAll(n);
+                }}
+                className="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-500 disabled:opacity-50"
+              >
+                {dupeAllLoading ? "Duping…" : "Dupe"}
+              </button>
+              <button
+                type="button"
+                disabled={dupeAllLoading}
+                onClick={() => setDupeAllDialog(null)}
+                className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)]"
               >
                 Cancel
               </button>
