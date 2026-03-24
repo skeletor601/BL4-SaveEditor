@@ -3058,6 +3058,12 @@ export default function UnifiedItemBuilderPage() {
     setShieldPartSelections({});
     setShieldExtraTokens([]);
     setShieldAutoFillWarning(null);
+    setLastShieldStats(null);
+    setShieldModAmmoRegen(false);
+    setShieldModMovementSpeed(false);
+    setShieldModFireworks(false);
+    setShieldModImmortality(false);
+    setShieldSkinValue("");
     resetCodec();
   }, [resetCodec]);
 
