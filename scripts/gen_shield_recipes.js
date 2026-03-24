@@ -68,7 +68,23 @@ const energyBlocks = (idCounts) => {
 const CORE_UNIVERSAL = { 30: 120, 50: 120, 54: 120 }; // Divider, Healthy, Capacity — always on every shield
 const CORE_UNIVERSAL_LIGHT = { 30: 60, 50: 60, 54: 60 };
 const CORE_UNIVERSAL_HEAVY = { 30: 200, 50: 200, 54: 200 };
-const BININU_CORE = { 30: 200, 50: 250, 54: 120 }; // Bininu: extra Healthy + Divider
+// Bininu universals: NO Capacity (54) — kills health regen. Healthy + elements + light extras.
+const BININU_UNI = (healthy = 25) => universalBlocks({
+  22: 10, 23: 10, 24: 10, 25: 10, 26: 10, // elements
+  50: healthy, // Healthy — moderate
+  32: 25, 35: 15, 36: 15, 37: 10, 38: 10, 55: 10, 56: 10, // medium+light
+});
+// Bininu singles — random activators (Terra's pattern: lots of singles)
+const BININU_SINGLES = "{246:5} {246:27} {246:28} {246:43} {246:44} {246:45} {246:46} {246:47} {246:48} {246:51} {246:52} {246:57} {246:58}";
+// Bininu energy defense — mostly singles (Terra's pattern)
+const BININU_ENERGY = "{248:1} {248:12} {248:13} {248:27} {248:6} {248:[7 7 7 7 7 7 7 7 7 7]} {248:8} {248:9}";
+// Class mod perk stacking (Terra uses 349x perk 41 + 99x perk 61)
+const BININU_CLASS_PERKS = (p41 = 250, p61 = 99) => [
+  block(234, Array(p41).fill(41)),
+  block(234, Array(p61).fill(61)),
+];
+// Daedalus Repkit cross-insert
+const DAEDALUS_CROSS = block(277, Array(50).fill(1));
 
 const AMMO_REGEN_21 = block(22, Array(21).fill(68));
 const AMMO_REGEN_15 = block(22, Array(15).fill(68));
@@ -627,98 +643,105 @@ const energyRecipes = [
 ];
 
 // ═══════════════════════════════════════
-// 10 BININU VARIANTS (Armor, health-focused)
+// 10 BININU VARIANTS — Terra's format:
+// - Bininu x100 primary (heavy self-stacking IS the shield)
+// - NO Capacity (54) — kills health regen
+// - Mix Armor + Energy legendaries freely as supports
+// - Light energy perks {248} (mostly singles)
+// - Heavy class mod perks {234:[41x250+]}
+// - Daedalus cross-insert {277:[1x50]}
+// - NO armor perks {237}
 // ═══════════════════════════════════════
 const bininuRecipes = [
   {
-    id: "bininu-health-gate",
-    label: "Bininu Health Gate",
-    notes: "Bininu: Massive Healthy + Divider stacking. Pure health gate.",
-    legendaries: [legStack(287, 9, 20), legStack(283, 11, 15)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 15, 56: 12 }),
-    defense: armorBlocks({ 8: 15, 9: 15, 20: 12, 21: 12 }),
-    extras: [AMMO_REGEN_15]
+    id: "bininu-terra",
+    label: "Bininu Terra",
+    notes: "Bininu: Terra's reference build. Bininu x100 + Psychosis + Refreshments + Glass + Overshield Eater + Wings of Grace + Power Play. NO Capacity.",
+    legendaries: [legStack(287, 9, 100), legStack(279, 8, 25), legStack(283, 6, 5), legStack(293, 1, 10), legStack(300, 8, 15), legStack(312, 6, 10)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES + " {246:[39 39]} {246:[40 40]}",
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(250, 99), DAEDALUS_CROSS, AMMO_REGEN_21]
   },
   {
-    id: "bininu-immortal",
-    label: "Bininu Immortal",
-    notes: "Bininu: Extreme Healthy + Divider + Capacity. Near-immortality.",
-    legendaries: [legStack(287, 9, 25), legStack(283, 6, 15)],
-    universal: universalBlocks({ 30: 250, 50: 300, 54: 150, 55: 20, 56: 15 }),
-    defense: armorBlocks({ 8: 20, 9: 20, 31: 15 }),
-    extras: [AMMO_REGEN_21, ...MOVE_SPEED]
+    id: "bininu-mega",
+    label: "Bininu Mega",
+    notes: "Bininu: x120 massive stacking + Glass + Power Play + Backdoor. Max health regen.",
+    legendaries: [legStack(287, 9, 120), legStack(293, 1, 15), legStack(312, 8, 10), legStack(300, 11, 10)],
+    universal: BININU_UNI(30) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(200, 80), DAEDALUS_CROSS, AMMO_REGEN_21]
   },
   {
-    id: "bininu-tank",
-    label: "Bininu Tank",
-    notes: "Bininu + Shield Boi + Exoskeleton. Tediore + Vladof tank.",
-    legendaries: [legStack(287, 9, 18), legStack(287, 6, 15), legStack(283, 11, 12)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 12 }),
-    defense: armorBlocks({ 8: 18, 9: 18, 20: 12, 21: 12, 4: 8, 5: 8 }),
-    extras: [AMMO_REGEN_15]
+    id: "bininu-psychosis",
+    label: "Bininu Psychosis",
+    notes: "Bininu: x80 + Psychosis x30. Low shield = max health regen + damage. Mixed types.",
+    legendaries: [legStack(287, 9, 80), legStack(279, 8, 30), legStack(300, 8, 10), legStack(283, 6, 5)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(180, 70), DAEDALUS_CROSS, AMMO_REGEN_15]
   },
   {
-    id: "bininu-regen",
-    label: "Bininu Regen",
-    notes: "Bininu + Refreshments. Health regen + sustain combo.",
-    legendaries: [legStack(287, 9, 20), legStack(283, 6, 20)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 15, 57: 10 }),
-    defense: armorBlocks({ 8: 12, 9: 12, 1: 10, 2: 10 }),
-    extras: [AMMO_REGEN_21]
+    id: "bininu-wings",
+    label: "Bininu Wings",
+    notes: "Bininu: x80 + Wings of Grace x20 + Power Play x10. Health + flight.",
+    legendaries: [legStack(287, 9, 80), legStack(312, 6, 20), legStack(312, 8, 10), legStack(293, 2, 8)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES + " {246:[39 39]} {246:[40 40]}",
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(200, 90), DAEDALUS_CROSS, AMMO_REGEN_21, ...MOVE_SPEED]
   },
   {
-    id: "bininu-fortress",
-    label: "Bininu Fortress",
-    notes: "Bininu + Shallot Shell + Sisyphusian. Health gate + defense wall.",
-    legendaries: [legStack(287, 9, 18), legStack(306, 8, 15), legStack(321, 9, 12)],
-    universal: universalBlocks({ ...BININU_CORE, 56: 12, 55: 10 }),
-    defense: armorBlocks({ 8: 18, 9: 18, 31: 15, 20: 10 }),
-    extras: [AMMO_REGEN_15, ...MOVE_SPEED]
+    id: "bininu-glass",
+    label: "Bininu Glass",
+    notes: "Bininu: x90 + Glass x15 + Short Circuit x10. Health gate + Order synergy.",
+    legendaries: [legStack(287, 9, 90), legStack(293, 1, 15), legStack(300, 6, 10), legStack(279, 1, 8)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(220, 85), DAEDALUS_CROSS, AMMO_REGEN_15]
   },
   {
-    id: "bininu-balanced",
-    label: "Bininu Balanced",
-    notes: "Bininu + Bundled + Refreshments. Health + explosions + sustain.",
-    legendaries: [legStack(287, 9, 15), legStack(321, 6, 15), legStack(283, 6, 12)],
-    universal: universalBlocks({ ...BININU_CORE, 35: 10, 36: 10, 55: 8 }),
-    defense: armorBlocks({ 8: 12, 9: 12, 4: 8, 5: 8 }),
-    extras: [AMMO_REGEN_15, ...MOVE_SPEED]
+    id: "bininu-overshield",
+    label: "Bininu Overshield",
+    notes: "Bininu: x80 + Overshield Eater x20 + Direct Current x10. Health + overshield aggression.",
+    legendaries: [legStack(287, 9, 80), legStack(300, 8, 20), legStack(293, 2, 10), legStack(283, 8, 5)],
+    universal: BININU_UNI(20) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(200, 80), DAEDALUS_CROSS, AMMO_REGEN_21, ...MOVE_SPEED]
   },
   {
-    id: "bininu-mega-health",
-    label: "Bininu Mega Health",
-    notes: "Bininu x30 solo. Maximum health perk stacking.",
-    legendaries: [legStack(287, 9, 30)],
-    universal: universalBlocks({ 30: 300, 50: 350, 54: 180, 55: 20 }),
-    defense: armorBlocks({ 8: 20, 9: 20, 20: 15, 21: 15 }),
-    extras: [AMMO_REGEN_21]
+    id: "bininu-pure",
+    label: "Bininu Pure",
+    notes: "Bininu: x100 solo focus. Minimal supports, maximum Bininu stacking.",
+    legendaries: [legStack(287, 9, 100), legStack(279, 8, 10), legStack(293, 1, 5)],
+    universal: BININU_UNI(30) + " " + BININU_SINGLES + " {246:[39 39]} {246:[40 40]}",
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(300, 99), DAEDALUS_CROSS, AMMO_REGEN_21]
   },
   {
-    id: "bininu-speed-heal",
-    label: "Bininu Speed Heal",
-    notes: "Bininu + Shield Boi. Health focus + movement speed.",
-    legendaries: [legStack(287, 9, 20), legStack(287, 6, 18)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 12, 56: 8 }),
-    defense: armorBlocks({ 4: 8, 5: 8 }),
-    extras: [block(22, Array(30).fill(68)), ...MOVE_SPEED]
+    id: "bininu-backdoor",
+    label: "Bininu Backdoor",
+    notes: "Bininu: x80 + Backdoor x15 + Nucleosynthesis x10. Health regen + breach.",
+    legendaries: [legStack(287, 9, 80), legStack(300, 11, 15), legStack(279, 1, 10), legStack(312, 6, 8)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(180, 75), DAEDALUS_CROSS, AMMO_REGEN_15, ...MOVE_SPEED]
   },
   {
-    id: "bininu-vladof-duo",
-    label: "Bininu-Vladof Duo",
-    notes: "Bininu + all 3 Vladof legendaries. Health + full Vladof suite.",
-    legendaries: [legStack(287, 9, 15), legStack(283, 6, 12), legStack(283, 8, 10), legStack(283, 11, 10)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 10, 57: 8 }),
-    defense: armorBlocks({ 8: 15, 9: 15, 20: 10, 21: 10 }),
-    extras: [AMMO_REGEN_15]
+    id: "bininu-speed",
+    label: "Bininu Speed",
+    notes: "Bininu: x80 + Wings x15. Maximum movement speed + health regen.",
+    legendaries: [legStack(287, 9, 80), legStack(312, 6, 15), legStack(283, 6, 5), legStack(300, 6, 8)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES,
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(200, 90), DAEDALUS_CROSS, block(22, Array(30).fill(68)), ...MOVE_SPEED]
   },
   {
-    id: "bininu-all-armor",
-    label: "Bininu All-Armor",
-    notes: "Bininu + one from each Armor mfg. Health gate + full coverage.",
-    legendaries: [legStack(287, 9, 15), legStack(283, 6, 12), legStack(306, 8, 10), legStack(321, 6, 10)],
-    universal: universalBlocks({ ...BININU_CORE, 55: 10, 56: 8, 58: 8 }),
-    defense: armorBlocks({ 8: 12, 9: 12, 20: 10, 21: 10, 31: 8 }),
-    extras: [AMMO_REGEN_15, ...MOVE_SPEED]
+    id: "bininu-all-star",
+    label: "Bininu All-Star",
+    notes: "Bininu: x80 + 5 support legendaries from 5 different mfgs. Maximum diversity.",
+    legendaries: [legStack(287, 9, 80), legStack(279, 8, 15), legStack(293, 1, 10), legStack(300, 8, 10), legStack(312, 6, 10), legStack(283, 6, 5)],
+    universal: BININU_UNI(25) + " " + BININU_SINGLES + " {246:[39 39]} {246:[40 40]}",
+    defense: BININU_ENERGY,
+    extras: ["{234:62}", "{234:42}", ...BININU_CLASS_PERKS(250, 99), DAEDALUS_CROSS, AMMO_REGEN_21, ...MOVE_SPEED]
   },
 ];
 
