@@ -5447,7 +5447,14 @@ export default function UnifiedItemBuilderPage() {
             {/* Shield Stats Estimator */}
             {lastShieldStats && category === "shield" && (
               <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] px-3 py-3 mt-3">
-                <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">Shield Estimate</p>
+                <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
+                  Shield Estimate
+                  {(lastShieldStats as any).shieldType && (
+                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${(lastShieldStats as any).shieldType === "Armor" ? "border border-orange-500/40 bg-orange-500/10 text-orange-300" : "border border-sky-500/40 bg-sky-500/10 text-sky-300"}`}>
+                      {(lastShieldStats as any).shieldType}
+                    </span>
+                  )}
+                </p>
                 <div className="grid grid-cols-3 gap-3 text-sm mb-2">
                   <div>
                     <span className="text-[var(--color-text-muted)] text-xs">Health:</span>{" "}
