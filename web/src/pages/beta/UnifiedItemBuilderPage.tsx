@@ -5421,15 +5421,25 @@ export default function UnifiedItemBuilderPage() {
                 <div>
                   <label className="block text-xs text-[var(--color-accent)] mb-1">Toggles</label>
                   <div className="flex gap-2 min-h-[44px] items-center">
-                    {([["ammoRegen", "Ammo Regen", shieldModAmmoRegen, setShieldModAmmoRegen],
-                       ["moveSpeed", "Move Speed", shieldModMovementSpeed, setShieldModMovementSpeed],
-                       ["fireworks", "Missiles", shieldModFireworks, setShieldModFireworks],
-                       ["immortal", "Immortality", shieldModImmortality, setShieldModImmortality]] as const).map(([key, label, val, setter]) => (
-                      <button key={key} type="button" onClick={() => (setter as (v: boolean) => void)(!val)}
-                        className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${val ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/40"}`}>
-                        {label}
-                      </button>
-                    ))}
+                    {([["ammoRegen", "Ammo Regen", shieldModAmmoRegen, setShieldModAmmoRegen, "emerald"],
+                       ["moveSpeed", "Move Speed", shieldModMovementSpeed, setShieldModMovementSpeed, "amber"],
+                       ["fireworks", "Missiles", shieldModFireworks, setShieldModFireworks, "red"],
+                       ["immortal", "Immortality", shieldModImmortality, setShieldModImmortality, "purple"]] as const).map(([key, label, val, setter, color]) => {
+                      const activeColors: Record<string, string> = {
+                        emerald: "border-emerald-400 bg-emerald-500/25 text-emerald-300 shadow-emerald-500/30",
+                        amber: "border-amber-400 bg-amber-500/25 text-amber-300 shadow-amber-500/30",
+                        red: "border-red-400 bg-red-500/25 text-red-300 shadow-red-500/30",
+                        purple: "border-purple-400 bg-purple-500/25 text-purple-300 shadow-purple-500/30",
+                      };
+                      return (
+                        <button key={key} type="button" onClick={() => (setter as (v: boolean) => void)(!val)}
+                          className={`rounded font-bold border transition-all duration-150 ${val
+                            ? `px-3 py-1.5 text-xs ${activeColors[color]} shadow-[0_0_10px_rgba(0,0,0,0.3)] scale-105`
+                            : "px-2 py-1 text-[10px] border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/40 opacity-60"}`}>
+                          {val ? `\u2713 ${label}` : label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
                 <div>
