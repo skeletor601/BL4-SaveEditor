@@ -2249,44 +2249,13 @@ export default function UnifiedItemBuilderPage() {
     }
   }, [grenadeData, level, moddedWeaponPowerMode]);
 
-  const handleGenerateModdedShield = useCallback(async () => {
+  const handleGenerateModdedShield = useCallback(() => {
     if (!shieldData?.mfgs?.length) return;
-    const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
-    const mfg = pickR(shieldData.mfgs);
     const shieldLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
-
-    // Auto-fill stock base
-    const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
-    const rarities = shieldData.raritiesByMfg[mfg.id] ?? [];
-    const legendaryRarity = rarities.find((r) => /legendary/i.test(r.label));
-    if (legendaryRarity) autoFillSelections["Rarity"] = [{ label: legendaryRarity.label, qty: "1" }];
-
-    const models = shieldData.modelsByMfg?.[mfg.id] ?? [];
-    if (models.length) autoFillSelections["Model"] = [{ label: pickR(models).label, qty: "1" }];
-
-    let stockBase: string | undefined;
-    try {
-      const candidate = buildDecodedFromShieldSelections(shieldData, mfg.id, shieldLevel, Math.floor(Math.random() * 9000) + 1000, autoFillSelections, []);
-      if (candidate) stockBase = candidate;
-    } catch { /* fall through */ }
-
-    // Get skins
-    let skinOptions = weaponData?.skins;
-    if (!skinOptions?.length) {
-      try {
-        const skinRes = await fetchApi("weapon-gen/data");
-        if (skinRes.ok) {
-          const skinData = (await skinRes.json()) as { skins?: { label: string; value: string }[] };
-          skinOptions = Array.isArray(skinData?.skins) ? skinData.skins : undefined;
-        }
-      } catch { /* no skins */ }
-    }
 
     const result = generateModdedShield({
       level: shieldLevel,
       modPowerMode: moddedWeaponPowerMode,
-      stockBaseDecoded: stockBase,
-      skinOptions,
       ammoRegen: shieldModAmmoRegen,
       movementSpeed: shieldModMovementSpeed,
       fireworks: shieldModFireworks,
@@ -2297,7 +2266,7 @@ export default function UnifiedItemBuilderPage() {
     setLiveDecoded(result.code.trim());
     setLastEditedCodecSide("decoded");
     setCodecStatus(`Modded shield generated — ${result.recipeName}`);
-  }, [shieldData, level, moddedWeaponPowerMode, shieldModAmmoRegen, shieldModMovementSpeed, shieldModFireworks, shieldModImmortality, weaponData?.skins]);
+  }, [shieldData, level, moddedWeaponPowerMode, shieldModAmmoRegen, shieldModMovementSpeed, shieldModFireworks, shieldModImmortality]);
 
   const handleGrenadeAutoFill = useCallback(() => {
     setGrenadeAutoFillWarning(null);
