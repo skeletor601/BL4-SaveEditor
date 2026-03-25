@@ -87,16 +87,19 @@ export default function SettingsPage() {
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
         <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-3 pl-1">◈ About / Credits</h2>
         <p className="text-sm text-[var(--color-text-muted)]">
-          BL4 AIO Save Editor – Web version. All credit goes to original creator <strong>Superexboom</strong>.
+          BL4 AIO Save Editor – Web version.
+        </p>
+        <p className="text-sm text-[var(--color-text-muted)] mt-3">
+          <strong className="text-yellow-300">Terra</strong> - CEO, Idea Generator, Head of Quality Assurance, Shield Scientist, and the reason this editor is what it is today. None of this happens without Terra.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
           <strong>YNOT</strong> - for all the help with codes and the DB, plus answering all my other million questions.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
-          <strong>Terra</strong> - for all the great ideas, plus testing and giving feedback.
+          <strong>Mattmab</strong> - for the Borderlands Item Editor reference HTML that taught us how items are built, the "Show All Parts" concept, class mod research, and being first to match strings to part numbers. The foundation this editor was built on.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
-          <strong>Spliff and Shaggy</strong> - testing and spreading the word.
+          <strong>Spliff, Shaggy, Hydra, Shadow</strong> - the front line. Bug hunting, stress testing, and getting the word out so others can enjoy it too.
         </p>
         <p className="text-sm mt-3">
           <a href="https://BL4Editor.com" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline font-mono">
