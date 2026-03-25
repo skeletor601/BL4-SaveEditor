@@ -2,7 +2,7 @@
 """
 Reads JSON from stdin: {"serials": ["@U...", ...]}
 Outputs JSON to stdout: {"items": [{"serial", "decodedFull", "itemId", "level", "manufacturer", "itemType", "name"} | {"serial", "error": "..."}, ...]}
-decodedFull = full deserialized/formatted string (header||parts). Uses decoder_logic and lookup from repo root.
+decodedFull = full deserialized/formatted string (header||parts). Uses serial_codec and item_registry from repo root.
 """
 import json
 import sys
@@ -13,8 +13,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 try:
-    import decoder_logic
-    import lookup
+    import serial_codec
+    import item_registry
 except ImportError as e:
     sys.stderr.write(f"Import error: {e}\n")
     sys.exit(1)
@@ -25,7 +25,7 @@ def decode_one(serial_b85: str) -> dict:
     if not serial_b85 or not isinstance(serial_b85, str) or not serial_b85.strip().startswith("@U"):
         out["error"] = "Invalid serial (must start with @U)"
         return out
-    formatted_str, _, err = decoder_logic.decode_serial_to_string(serial_b85.strip())
+    formatted_str, _, err = serial_codec.decode_serial_to_string(serial_b85.strip())
     if err:
         out["error"] = str(err)
         return out
@@ -44,7 +44,7 @@ def decode_one(serial_b85: str) -> dict:
     except (ValueError, IndexError) as e:
         out["error"] = str(e)
         return out
-    manufacturer, item_type, found = lookup.get_kind_enums(item_id)
+    manufacturer, item_type, found = item_registry.get_kind_enums(item_id)
     if not found:
         manufacturer, item_type = "Unknown", "Unknown"
     out["itemId"] = item_id

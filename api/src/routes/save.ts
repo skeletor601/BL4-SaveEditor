@@ -10,7 +10,7 @@ const DECODE_SCRIPT = join(REPO_ROOT, "scripts", "decode_serials.py");
 const SAVE_MUTATE_SCRIPT = join(REPO_ROOT, "scripts", "save_mutate.py");
 const ENCODE_SCRIPT = join(REPO_ROOT, "scripts", "encode_serial.py");
 
-/** Max time for save_mutate.py so one stuck request doesn't tie up the server (e.g. on free-tier Render). */
+/** Max time for save mutation so one stuck request doesn't tie up the server. */
 const SAVE_MUTATE_TIMEOUT_MS = 90_000;
 
 type SaveMutatePayload = {

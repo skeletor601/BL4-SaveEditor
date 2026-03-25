@@ -183,7 +183,53 @@ export interface GenerateModdedWeaponOptions {
    * produces a valid weapon. Format: "prefix, 0, 1, level| 2, seed|| {parts...} |"
    */
   stockBaseDecoded?: string;
+  customMode?: boolean;
+  forcedVisualBarrel?: string;
+  forcedRarityToken?: string;
 }
+
+/**
+ * Named weapon barrel → matching rarity code map.
+ * Exported so the UI can build the "Named Weapon" dropdown for custom modded generation.
+ */
+export const NAMED_WEAPON_BARRELS: { name: string; barrelCode: string; rarityCode: string }[] = [
+  { name: "Zipper",            barrelCode: "{2:1}",   rarityCode: "{2:54}" },
+  { name: "Roach",             barrelCode: "{6:54}",  rarityCode: "{6:1}" },
+  { name: "Convergence",       barrelCode: "{7:64}",  rarityCode: "{7:100}" },
+  { name: "Bod",               barrelCode: "{8:52}",  rarityCode: "{8:53}" },
+  { name: "Acey May",          barrelCode: "{8:54}",  rarityCode: "{8:55}" },
+  { name: "Missilaser",        barrelCode: "{8:57}",  rarityCode: "{8:58}" },
+  { name: "Hellwalker",        barrelCode: "{9:82}",  rarityCode: "{9:83}" },
+  { name: "Rainbow Vomit",     barrelCode: "{9:86}",  rarityCode: "{9:85}" },
+  { name: "TKs Wave",          barrelCode: "{9:90}",  rarityCode: "{9:80}" },
+  { name: "Kaleidosplode",     barrelCode: "{10:56}", rarityCode: "{10:1}" },
+  { name: "Sweet Embrace",     barrelCode: "{10:58}", rarityCode: "{10:57}" },
+  { name: "Mantra",            barrelCode: "{10:62}", rarityCode: "{10:80}" },
+  { name: "Forsaken Chaos",    barrelCode: "{11:77}", rarityCode: "{11:78}" },
+  { name: "Eigenburst",        barrelCode: "{11:81}", rarityCode: "{11:82}" },
+  { name: "Lead Balloon",      barrelCode: "{12:56}", rarityCode: "{12:57}" },
+  { name: "Lumberjack",        barrelCode: "{13:57}", rarityCode: "{13:72}" },
+  { name: "Star Helix",        barrelCode: "{13:77}", rarityCode: "{13:73}" },
+  { name: "LaserDisc",         barrelCode: "{14:78}", rarityCode: "{14:35}" },
+  { name: "Midnight Defiance", barrelCode: "{16:68}", rarityCode: "{16:69}" },
+  { name: "Wombo Combo",       barrelCode: "{18:64}", rarityCode: "{18:65}" },
+  { name: "Bubbles",           barrelCode: "{18:99}", rarityCode: "{18:63}" },
+  { name: "Prince Harming",    barrelCode: "{19:17}", rarityCode: "{19:1}" },
+  { name: "Luty Madlad",       barrelCode: "{20:60}", rarityCode: "{20:65}" },
+  { name: "Hellfire",          barrelCode: "{19:20}", rarityCode: "{19:19}" },
+  { name: "Ohm I Got",         barrelCode: "{21:59}", rarityCode: "{21:60}" },
+  { name: "Plasma Coil",       barrelCode: "{21:62}", rarityCode: "{21:63}" },
+  { name: "Songbird",          barrelCode: "{21:80}", rarityCode: "{21:60}" },
+  { name: "Kaoson",            barrelCode: "{22:66}", rarityCode: "{22:67}" },
+  { name: "Onslaught",         barrelCode: "{22:68}", rarityCode: "{22:1}" },
+  { name: "Birts Bees",        barrelCode: "{22:87}", rarityCode: "{22:88}" },
+  { name: "Mercury",           barrelCode: "{22:91}", rarityCode: "{22:1}" },
+  { name: "Stray",             barrelCode: "{23:20}", rarityCode: "{23:19}" },
+  { name: "Complex Root",      barrelCode: "{25:20}", rarityCode: "{25:59}" },
+  { name: "Katagawas Revenge", barrelCode: "{25:60}", rarityCode: "{25:61}" },
+  { name: "Conflux",           barrelCode: "{25:81}", rarityCode: "{25:82}" },
+  { name: "Bonnie and Clyde",  barrelCode: "{27:73}", rarityCode: "{27:1}" },
+];
 
 type ParsedComponent =
   | string
@@ -764,10 +810,15 @@ export function generateModdedWeapon(
   ];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
   const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
-  const chosenVisualBarrel = isClaudeGun ? "{7:64}" : pick(visualBarrelPool).code.trim();  // Claude's Gun: Convergence
+  const chosenVisualBarrel = isClaudeGun
+    ? "{7:64}"
+    : options.customMode
+      ? "" // Custom mode: no visual barrel injection — user's auto-filled barrel is the only barrel
+      : pick(visualBarrelPool).code.trim();
   // Stack the visual barrel 2-4× (Terra stacks Bod 3×) to reinforce the visual identity.
   const visualBarrelStackCount = isClaudeGun ? 4 : { stable: randInt(2, 3), op: 3, insane: randInt(3, 4) }[modPowerMode];
-  const uniqueFirstBarrelToken = (() => {
+  const uniqueFirstBarrelToken = options.customMode ? "" : (() => {
+    if (!chosenVisualBarrel) return "";
     // If the code is a simple {prefix:part}, stack as a grouped token.
     const m = chosenVisualBarrel.match(/^\{(\d+):(\d+)\}$/);
     if (m) return groupedToken(Number(m[1]), Array(visualBarrelStackCount).fill(Number(m[2])));
@@ -1498,7 +1549,9 @@ export function generateModdedWeapon(
     "{25:81}": "{25:82}",  // Conflux
     "{27:73}": "{27:1}",   // Bonnie and Clyde
   };
-  const pearlRarityToken = VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]);
+  const pearlRarityToken = options.customMode && options.forcedRarityToken
+    ? options.forcedRarityToken
+    : VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]);
 
   // Removed: extreme same-prefix stacking and body ×10 repeats (bloat without synergy).
 

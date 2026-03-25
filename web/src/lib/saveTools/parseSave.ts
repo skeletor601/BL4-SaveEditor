@@ -1,6 +1,6 @@
 /**
  * Stub: BL4 save file parser.
- * TODO: Port decoder logic from bl4_decoder_py / decoder_logic.py.
+ * TODO: Native TS save parser for .sav binary format.
  * Parse .sav binary or exported format; return structured data for UI.
  */
 

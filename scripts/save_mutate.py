@@ -3,7 +3,7 @@
 Reads JSON from stdin: {"yaml_content": "...", "action": "sync_levels"|"add_item"|"apply_preset"|"update_item", "params": {...}}
 Outputs JSON to stdout: {"success": true, "yaml_content": "..."} or {"success": false, "error": "..."}
 For sync_levels also returns success_count, fail_count, info (list of failure messages).
-Uses bl4_functions and unlock_logic from repo root.
+Uses save_ops and progression from repo root.
 """
 import json
 import sys
@@ -15,8 +15,8 @@ sys.path.insert(0, str(REPO_ROOT))
 try:
     import yaml
     from yaml.nodes import MappingNode, SequenceNode, ScalarNode
-    import bl4_functions as bl4f
-    import unlock_logic
+    import save_ops as bl4f
+    import progression
 except ImportError as e:
     sys.stderr.write(f"Import error: {e}\n")
     sys.exit(1)
@@ -49,53 +49,53 @@ def apply_preset(data: dict, preset_name: str, params: dict):
     params = params or {}
     try:
         if preset_name == "clear_map_fog":
-            unlock_logic.clear_map_fog(data)
+            progression.clear_map_fog(data)
         elif preset_name == "discover_all_locations":
-            unlock_logic.discover_all_locations(data)
+            progression.discover_all_locations(data)
         elif preset_name == "complete_all_safehouse_missions":
-            unlock_logic.complete_all_safehouse_missions(data)
+            progression.complete_all_safehouse_missions(data)
         elif preset_name == "complete_all_collectibles":
-            unlock_logic.complete_all_collectibles(data)
+            progression.complete_all_collectibles(data)
         elif preset_name == "complete_all_challenges":
-            unlock_logic.complete_all_challenges(data)
+            progression.complete_all_challenges(data)
         elif preset_name == "complete_all_achievements":
-            unlock_logic.complete_all_achievements(data)
+            progression.complete_all_achievements(data)
         elif preset_name == "complete_all_story_missions":
-            unlock_logic.complete_all_story_missions(data)
+            progression.complete_all_story_missions(data)
         elif preset_name == "complete_all_missions":
-            unlock_logic.complete_all_missions(data)
+            progression.complete_all_missions(data)
         elif preset_name == "set_character_class":
             class_key = params.get("class_key")
             if not class_key:
                 return False, "set_character_class requires params.class_key"
-            unlock_logic.set_character_class(data, class_key)
+            progression.set_character_class(data, class_key)
         elif preset_name == "set_character_to_max_level":
-            unlock_logic.set_character_to_max_level(data)
+            progression.set_character_to_max_level(data)
         elif preset_name == "set_max_sdu":
-            unlock_logic.set_max_sdu(data)
+            progression.set_max_sdu(data)
         elif preset_name == "unlock_vault_powers":
-            unlock_logic.unlock_vault_powers(data)
+            progression.unlock_vault_powers(data)
         elif preset_name == "unlock_all_hover_drives":
-            unlock_logic.unlock_all_hover_drives(data)
+            progression.unlock_all_hover_drives(data)
         elif preset_name == "unlock_all_specialization":
-            unlock_logic.unlock_all_specialization(data)
+            progression.unlock_all_specialization(data)
         elif preset_name == "unlock_postgame":
-            unlock_logic.unlock_postgame(data)
+            progression.unlock_postgame(data)
         elif preset_name == "unlock_max_everything":
-            unlock_logic.max_ammo(data)
-            unlock_logic.max_currency(data)
-            unlock_logic.clear_map_fog(data)
-            unlock_logic.discover_all_locations(data)
-            unlock_logic.complete_all_collectibles(data)
-            unlock_logic.complete_all_achievements(data)
-            unlock_logic.complete_all_missions(data)
-            unlock_logic.set_max_sdu(data)
-            unlock_logic.unlock_vault_powers(data)
-            unlock_logic.unlock_postgame(data)
-            unlock_logic.unlock_all_hover_drives(data)
-            unlock_logic.unlock_all_specialization(data)
-            unlock_logic.complete_all_challenges(data)
-            unlock_logic.set_character_to_max_level(data)
+            progression.max_ammo(data)
+            progression.max_currency(data)
+            progression.clear_map_fog(data)
+            progression.discover_all_locations(data)
+            progression.complete_all_collectibles(data)
+            progression.complete_all_achievements(data)
+            progression.complete_all_missions(data)
+            progression.set_max_sdu(data)
+            progression.unlock_vault_powers(data)
+            progression.unlock_postgame(data)
+            progression.unlock_all_hover_drives(data)
+            progression.unlock_all_specialization(data)
+            progression.complete_all_challenges(data)
+            progression.set_character_to_max_level(data)
         else:
             return False, f"Unknown preset: {preset_name}"
         return True, None

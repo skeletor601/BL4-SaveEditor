@@ -2,7 +2,7 @@
 """
 Reads JSON from stdin: {"decoded_string": "..."}
 Outputs JSON to stdout: {"success": true, "serial": "..."} or {"success": false, "error": "..."}
-Uses b_encoder.encode_to_base85 from repo root.
+Uses serial_encoder.encode_to_base85 from repo root.
 """
 import json
 import sys
@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 try:
-    import b_encoder
+    import serial_encoder
 except ImportError as e:
     sys.stderr.write(f"Import error: {e}\n")
     sys.exit(1)
@@ -46,7 +46,7 @@ def main() -> None:
         except (TypeError, ValueError):
             pass
 
-    serial, err = b_encoder.encode_to_base85(decoded, new_level=level_int)
+    serial, err = serial_encoder.encode_to_base85(decoded, new_level=level_int)
     if err:
         print(json.dumps({"success": False, "error": err}))
         sys.exit(0)

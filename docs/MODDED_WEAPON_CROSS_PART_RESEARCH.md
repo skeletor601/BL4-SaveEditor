@@ -1,5 +1,5 @@
 # Modded Weapon Cross-Part Research
-Source: save-editor.be/GZO/Codes.html — analyzed 2026-03-15
+Source: community modded weapon codes — analyzed 2026-03-15
 
 ## The Core Technique
 Top modded weapons cross-insert **legendary rarity tokens from other weapons** to import those weapons' unique effects into the host gun. The game reads all rarity/barrel tokens and activates their behaviors.

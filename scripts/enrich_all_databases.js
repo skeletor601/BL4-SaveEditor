@@ -2,7 +2,7 @@
 /**
  * enrich_all_databases.js
  * Enriches api/data/parts.json and master_search/db/universal_parts_db.json
- * using scripts/big_editor_parts_flat.json as the source of rich field data.
+ * using scripts/big_editor_parts_flat.json as the source of enrichment data.
  *
  * Rules:
  * - NEVER overwrite fields that already have real data

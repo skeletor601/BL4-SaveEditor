@@ -52,7 +52,6 @@ python -m tools.merge_codes_for_db "C:\Users\picas\Desktop\codes for db.txt"
 | Command | Purpose |
 |--------|---------|
 | `python -m tools.check_skin_coverage` | Check that all named weapon skins from the “codes for db” file are present in `master_search/db/weapon_skins.json`. |
-| `python -m tools.merge_item_editor_html_into_db` | Load Item Editor HTML, extract parts, merge into universal_parts_db.json. |
 | `python -m tools.merge_part_lookup_into_db` | Load Part-Lookup HTML CSV and merge into universal_parts_db.json. |
 | `python -m tools.reset_and_rescrape_db` | Reset and rescrape the parts DB (see script for details). |
 

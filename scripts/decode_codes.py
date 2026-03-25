@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from decoder_logic import decode_serial_to_string
+from serial_codec import decode_serial_to_string
 
 codes = [
     # Batch 1 (message 1)

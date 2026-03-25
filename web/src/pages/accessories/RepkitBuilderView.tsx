@@ -74,6 +74,7 @@ export default function RepkitBuilderView() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"data" | "encode" | "add" | null>(null);
 
+
   useEffect(() => {
     let cancelled = false;
     setLoading("data");

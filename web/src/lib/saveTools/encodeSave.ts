@@ -1,6 +1,6 @@
 /**
  * Stub: BL4 save file encoder.
- * TODO: Port b_encoder.py logic for serialization / Base85.
+ * TODO: Native TS serialization / Base85 encoding.
  * Encode edited data back to .sav format for download.
  */
 

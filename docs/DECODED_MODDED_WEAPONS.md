@@ -1,6 +1,6 @@
 # Decoded Modded Weapon Codes — Recipe Analysis
 
-All codes decoded from community builds (bl4editor.com) and save-editor.be.
+All codes decoded from community builds.
 Purpose: analyze part combinations to build "micro recipes" for the random generator.
 
 ## Community Builds (bl4editor.com)
@@ -103,7 +103,7 @@ Purpose: analyze part combinations to build "micro recipes" for the random gener
 - **Key parts**: {64}x75 — 75 copies of body part 64! {65}x10, {66}x16 — massive single-part stacking
 - **Notable**: Extreme stacking of individual parts. Brute force approach — one part repeated 75 times.
 
-## Save-Editor.be Codes
+## Community Codes (Set 2)
 
 ### 9. Debauched Breathless Kaleidosplode cryo/rad (Daedalus SMG, seed 3006)
 (Code from community — need to decode separately)

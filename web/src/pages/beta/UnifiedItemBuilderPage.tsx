@@ -13,12 +13,14 @@ import { useSave } from "@/contexts/SaveContext";
 import { apiUrl, fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 import {
   generateModdedWeapon,
+  NAMED_WEAPON_BARRELS,
   type WeaponEditData,
   type UniversalDbPartCode,
   type DpsEstimate,
 } from "@/lib/generateModdedWeapon";
 import { generateModdedGrenade, type GrenadeStatsEstimate } from "@/lib/generateModdedGrenade";
 import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
+import { generateModdedRepkit, type RepkitStatEstimate, type RepkitBuilderData as GenRepkitBuilderData } from "@/lib/generateModdedRepkit";
 import { discoverEgg } from "@/lib/easterEggs";
 import { MAX_LEVEL, DEFAULT_LEVEL } from "@/lib/gameConstants";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -1271,18 +1273,18 @@ function dedupeByPartId<T extends { partId: string | number }>(opts: T[]): T[] {
  * Descriptive IDs ON  → ID badge · stat/name · extra description · part-type tag
  * Descriptive IDs OFF → compact "ID  stat" single line
  */
-function PickerOptionContent({
+function PartLabel({
   partId,
   label,
   description,
   pickerPartType,
-  descriptive,
+  detailed,
 }: {
   partId: string;
   label: string;
   description?: string;
   pickerPartType?: string | null;
-  descriptive: boolean;
+  detailed: boolean;
 }) {
   // Strip leading numeric ID prefix from label: "13 - +Accuracy" → "+Accuracy"
   const stat = label.replace(/^\d+\s*[-–]\s*/, "").trim() || label;
@@ -1290,7 +1292,7 @@ function PickerOptionContent({
   // Only show extra description when it adds new info
   const extraDesc = desc && desc !== stat && desc !== label ? desc : "";
 
-  if (!descriptive) {
+  if (!detailed) {
     return (
       <span className="min-w-0">
         <span className="block text-sm text-[var(--color-text)]">
@@ -1414,8 +1416,8 @@ export default function UnifiedItemBuilderPage() {
   const { saveData, getYamlText, updateSaveData, canOverwriteInPlace, overwriteSaveInPlace, savePlatform, saveUserId } = useSave();
   const navigate = useNavigate();
   const [flagValue, setFlagValue] = usePersistedState("unified-item-builder.flagValue", 1);
-  const [masterUnlockGuidelines, setMasterUnlockGuidelines] = usePersistedState("unified-item-builder.masterUnlock", false);
-  const [descriptiveIdsGuidelines, setDescriptiveIdsGuidelines] = usePersistedState("unified-item-builder.descriptiveIds", true);
+  const [crossMfgExpand, setCrossMfgExpand] = usePersistedState("bl4.builder.crossMfg", false);
+  const [richDetailView, setRichDetailView] = usePersistedState("bl4.builder.detailView", true);
 
   // Add other parts (universal DB)
   const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
@@ -1467,6 +1469,12 @@ export default function UnifiedItemBuilderPage() {
   const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
   const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
   const [lastDps, setLastDps] = useState<DpsEstimate | null>(null);
+  const [showWeaponGenModeModal, setShowWeaponGenModeModal] = useState(false);
+  const [customWepMfg, setCustomWepMfg] = useState("");
+  const [customWepType, setCustomWepType] = useState("");
+  const [customWepRarity, setCustomWepRarity] = useState("");
+  const [customWepLegPearl, setCustomWepLegPearl] = useState("");
+  const [customWepLevel, setCustomWepLevel] = useState("50");
   const [rollCount, setRollCount] = useState(0);
   const [rollMilestone, setRollMilestone] = useState<string | null>(null);
   const [lastWeaponTraits, setLastWeaponTraits] = useState<string[]>([]);
@@ -1562,6 +1570,14 @@ export default function UnifiedItemBuilderPage() {
   const [repkitResistanceSearch, setRepkitResistanceSearch] = useState("");
   const [repkitResistanceSelectedIds, setRepkitResistanceSelectedIds] = useState<Set<number>>(new Set());
   const [repkitResistanceApplyQty, setRepkitResistanceApplyQty] = useState("1");
+  // Modded repkit generator
+  const [moddedRepkitPowerMode, setModdedRepkitPowerMode] = useState<"stable" | "op" | "insane">("op");
+  const [moddedRepkitLoading, setModdedRepkitLoading] = useState(false);
+  const [moddedRepkitError, setModdedRepkitError] = useState<string | null>(null);
+  const [moddedRepkitStats, setModdedRepkitStats] = useState<RepkitStatEstimate | null>(null);
+  const [repkitToggle1, setRepkitToggle1] = useState(false);
+  const [repkitToggle2, setRepkitToggle2] = useState(false);
+  const [repkitToggle3, setRepkitToggle3] = useState(false);
 
   // Heavy (when category === "heavy")
   const [heavyData, setHeavyData] = useState<HeavyBuilderData | null>(null);
@@ -2646,7 +2662,49 @@ export default function UnifiedItemBuilderPage() {
     setRepkitPartSelections(selections);
   }, [repkitData, repkitMfgId, repkitPartSelections]);
 
-  const handleGenerateModdedWeapon = useCallback(async () => {
+  const handleGenerateModdedRepkit = useCallback(async () => {
+    if (!repkitData) { setModdedRepkitError("Repkit data not loaded."); return; }
+    setModdedRepkitLoading(true);
+    setModdedRepkitError(null);
+    setModdedRepkitStats(null);
+    try {
+      const genData: GenRepkitBuilderData = {
+        mfgs: repkitData.mfgs,
+        raritiesByMfg: repkitData.raritiesByMfg,
+        prefix: repkitData.prefix,
+        firmware: repkitData.firmware,
+        resistance: repkitData.resistance,
+        universalPerks: repkitData.universalPerks,
+        legendaryPerks: repkitData.legendaryPerks,
+        modelsByMfg: repkitData.modelsByMfg,
+      };
+      const { code, stats } = generateModdedRepkit(genData, {
+        level,
+        modPowerMode: moddedRepkitPowerMode,
+      });
+      setModdedRepkitStats(stats);
+      setLiveDecoded(code.trim());
+      setLiveBase85("");
+      setCodecStatus("Modded repkit generated; encoding…");
+      try {
+        const encRes = await fetchApi("save/encode-serial", {
+          method: "POST",
+          body: JSON.stringify({ decoded_string: code.trim() }),
+        });
+        const encData = await encRes.json().catch(() => ({}));
+        if (encRes.ok && encData?.serial) {
+          setLiveBase85(encData.serial);
+          setCodecStatus("Modded repkit encoded.");
+        }
+      } catch { /* best-effort encode */ }
+    } catch (e) {
+      setModdedRepkitError(e instanceof Error ? e.message : "Generate modded repkit failed.");
+    } finally {
+      setModdedRepkitLoading(false);
+    }
+  }, [repkitData, level, moddedRepkitPowerMode]);
+
+  const handleGenerateModdedWeapon = useCallback(async (customOpts?: { customMfgWtId?: string; customRarity?: string; customLegPearl?: string; customLevel?: string }) => {
     setGenerateModdedError(null);
     setGenerateModdedLoading(true);
     try {
@@ -2765,7 +2823,8 @@ export default function UnifiedItemBuilderPage() {
         setGenerateModdedError("Parts data failed to load. Try again.");
         return;
       }
-      const weaponLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
+      const isCustom = !!customOpts;
+      const weaponLevel = isCustom && customOpts.customLevel ? (Number(customOpts.customLevel) || 50) : (/^\d+$/.test(String(level)) ? Number(level) : 50);
       // ── Build stock base via auto-fill (guarantees all slots → 100% spawn) ──
       // Ensure weaponData is loaded — if not, fetch it now
       let wd = weaponData;
@@ -2783,16 +2842,25 @@ export default function UnifiedItemBuilderPage() {
       if (wd) {
         const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
         const allMfgWtIds = wd.mfgWtIdList.map((m) => m.mfgWtId);
-        const mfgId = weaponMfgUserSelected && weaponMfgWtId ? weaponMfgWtId : (allMfgWtIds.length ? pick(allMfgWtIds) : null);
+        const mfgId = isCustom && customOpts.customMfgWtId
+          ? customOpts.customMfgWtId
+          : weaponMfgUserSelected && weaponMfgWtId ? weaponMfgWtId : (allMfgWtIds.length ? pick(allMfgWtIds) : null);
         if (mfgId) {
           autoFillPrefix = Number(mfgId);
           const partsByType = wd.partsByMfgTypeId[mfgId];
           if (partsByType) {
             const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
-            // Pick rarity — always Legendary or Pearl
+            // Pick rarity — custom uses user's choice, random picks Legendary/Pearl
             const legendaryTypes = wd.legendaryByMfgTypeId[mfgId] ?? [];
             const pearlTypes = wd.pearlByMfgTypeId[mfgId] ?? [];
-            if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
+            if (isCustom && customOpts.customRarity) {
+              autoFillSelections["Rarity"] = [{ label: customOpts.customRarity, qty: "1" }];
+              if (customOpts.customRarity === "Legendary" && customOpts.customLegPearl) {
+                autoFillSelections["Legendary Type"] = [{ label: customOpts.customLegPearl, qty: "1" }];
+              } else if (customOpts.customRarity === "Pearl" && customOpts.customLegPearl) {
+                autoFillSelections["Pearl Type"] = [{ label: customOpts.customLegPearl, qty: "1" }];
+              }
+            } else if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
               autoFillSelections["Rarity"] = [{ label: "Pearl", qty: "1" }];
               const pt = pick(pearlTypes);
               autoFillSelections["Pearl Type"] = [{ label: `${pt.partId} - ${pt.description}`, qty: "1" }];
@@ -2805,6 +2873,18 @@ export default function UnifiedItemBuilderPage() {
               const best = rarities.find((r) => /epic/i.test(r.stat)) ?? rarities.find((r) => /rare/i.test(r.stat)) ?? (rarities.length ? pick(rarities) : null);
               if (best) autoFillSelections["Rarity"] = [{ label: best.stat, qty: "1" }];
             }
+            // Custom mode: force barrel matching the legendary/pearl weapon name
+            if (isCustom && customOpts.customLegPearl) {
+              // Extract weapon name from "82 - Hellwalker" format
+              const namePart = customOpts.customLegPearl.replace(/^\d+\s*[-–]\s*/, "").trim();
+              if (namePart) {
+                const barrelOpts = (partsByType["Barrel"] ?? []).filter((o) => o.label && o.label !== "None" && o.label !== NONE);
+                const matchedBarrel = barrelOpts.find((o) => o.label.toLowerCase().includes(namePart.toLowerCase()));
+                if (matchedBarrel) {
+                  autoFillSelections["Barrel"] = [{ label: matchedBarrel.label, qty: "1" }];
+                }
+              }
+            }
             // Fill ALL stock part types (skip elements — generator handles those)
             // NEVER pick "None" — required parts must always have a real selection
             WEAPON_PART_ORDER.forEach(({ key: partType }) => {
@@ -2812,6 +2892,8 @@ export default function UnifiedItemBuilderPage() {
               // Skip underbarrel, underbarrel accessory, and foregrip from auto-fill
               // Foregrip before underbarrel kills alt-fire — generator places it after underbarrel instead
               if (partType === "Underbarrel" || partType === "Underbarrel Accessory" || partType === "Foregrip") return;
+              // Skip barrel if already set by custom legendary/pearl matching above
+              if (isCustom && partType === "Barrel" && autoFillSelections["Barrel"]?.length) return;
               let opts = (partsByType[partType] ?? []).filter((o) => o.label && o.label !== "None" && o.label !== NONE);
               if (partType === "Magazine") {
                 opts = opts.filter((o) => !/cov/i.test(o.label) && !/heat.?gauge/i.test(o.label));
@@ -2900,6 +2982,7 @@ export default function UnifiedItemBuilderPage() {
         legendaryGrenadeEntries: Array.isArray(legendaryGrenadeEntries) && legendaryGrenadeEntries.length > 0 ? legendaryGrenadeEntries : undefined,
         grenadeVisualRecipes: Array.isArray(grenadeVisualRecipes) && grenadeVisualRecipes.length > 0 ? grenadeVisualRecipes : undefined,
         underbarrelRecipes: Array.isArray(underbarrelRecipes) && underbarrelRecipes.length > 0 ? underbarrelRecipes : undefined,
+        ...(isCustom ? { customMode: true } : {}),
       });
       setLastDps(dps);
       setLiveDecoded(decoded.trim());
@@ -3967,14 +4050,14 @@ export default function UnifiedItemBuilderPage() {
         {/* Display toggles */}
         <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-[var(--color-panel-border)]/50 flex-wrap">
           <span className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mr-0.5">Display</span>
-          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${descriptiveIdsGuidelines ? "bg-[var(--color-accent)]/20 border-[var(--color-accent)] text-[var(--color-accent)]" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"}`}>
-            <input type="checkbox" checked={descriptiveIdsGuidelines} onChange={(e) => setDescriptiveIdsGuidelines(e.target.checked)} className="sr-only" />
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${descriptiveIdsGuidelines ? "bg-[var(--color-accent)]" : "bg-[var(--color-text-muted)]"}`} />
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${richDetailView ? "bg-[var(--color-accent)]/20 border-[var(--color-accent)] text-[var(--color-accent)]" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"}`}>
+            <input type="checkbox" checked={richDetailView} onChange={(e) => setRichDetailView(e.target.checked)} className="sr-only" />
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${richDetailView ? "bg-[var(--color-accent)]" : "bg-[var(--color-text-muted)]"}`} />
             Show Info
           </label>
-          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${masterUnlockGuidelines ? "bg-amber-400/20 border-amber-400/80 text-amber-300" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-amber-400/40 hover:text-[var(--color-text)]"}`}>
-            <input type="checkbox" checked={masterUnlockGuidelines} onChange={(e) => setMasterUnlockGuidelines(e.target.checked)} className="sr-only" />
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${masterUnlockGuidelines ? "bg-amber-400" : "bg-[var(--color-text-muted)]"}`} />
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer text-xs font-medium select-none transition-colors ${crossMfgExpand ? "bg-amber-400/20 border-amber-400/80 text-amber-300" : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-amber-400/40 hover:text-[var(--color-text)]"}`}>
+            <input type="checkbox" checked={crossMfgExpand} onChange={(e) => setCrossMfgExpand(e.target.checked)} className="sr-only" />
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${crossMfgExpand ? "bg-amber-400" : "bg-[var(--color-text-muted)]"}`} />
             All Parts
           </label>
         </div>
@@ -4374,10 +4457,10 @@ export default function UnifiedItemBuilderPage() {
                   })}
                   <button
                     type="button"
-                    onClick={() => void handleGenerateModdedWeapon()}
+                    onClick={() => setShowWeaponGenModeModal(true)}
                     disabled={generateModdedLoading}
                     className="px-3 py-2 rounded-lg border border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 disabled:opacity-60 text-sm min-h-[44px] touch-manipulation"
-                    title="Generate a random modded weapon in-place (underbarrel, multi-projectile, needle homing when applicable). Result appears in Current build parts."
+                    title="Generate a modded weapon — Random or Custom (pick a named weapon)"
                   >
                     {generateModdedLoading ? "Generating…" : "Generate modded weapon"}
                   </button>
@@ -4387,6 +4470,98 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
             </div>
+            {/* Random / Custom weapon gen modal */}
+            {showWeaponGenModeModal && (() => {
+              const wd = weaponData;
+              const customMfgWtId = wd?.mfgWtIdList.find((e) => e.manufacturer === customWepMfg && e.weaponType === customWepType)?.mfgWtId ?? "";
+              const customMfgTypes = wd?.mfgWtIdList.filter((e) => e.manufacturer === customWepMfg) ?? [];
+              const customRarities = customMfgWtId ? (wd?.rarityByMfgTypeId[customMfgWtId] ?? []) : [];
+              const customRarityStats = [...new Set(customRarities.map((r) => r.stat).filter(Boolean))].sort();
+              const hasLeg = customMfgWtId ? (wd?.legendaryByMfgTypeId[customMfgWtId]?.length ?? 0) > 0 : false;
+              const hasPearl = customMfgWtId ? (wd?.pearlByMfgTypeId[customMfgWtId]?.length ?? 0) > 0 : false;
+              const rarityOpts = [...customRarityStats.filter((s) => s !== "Legendary" && s !== "Pearl" && s !== "Pearlescent"), ...(hasLeg ? ["Legendary"] : []), ...(hasPearl ? ["Pearl"] : [])];
+              const legPearlOpts = customWepRarity === "Legendary"
+                ? (wd?.legendaryByMfgTypeId[customMfgWtId] ?? []).map((r) => `${r.partId} - ${r.description}`)
+                : customWepRarity === "Pearl"
+                  ? (wd?.pearlByMfgTypeId[customMfgWtId] ?? []).map((r) => `${r.partId} - ${r.description}`)
+                  : [];
+              const canGenerate = !!customMfgWtId && !!customWepRarity && (customWepRarity !== "Legendary" && customWepRarity !== "Pearl" || !!customWepLegPearl);
+              const selClass = "w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3";
+              return (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowWeaponGenModeModal(false)}>
+                  <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-[var(--color-accent)] font-medium text-sm">Generate Modded Weapon</h3>
+                      <button type="button" onClick={() => { setCustomWepMfg(""); setCustomWepType(""); setCustomWepRarity(""); setCustomWepLegPearl(""); setCustomWepLevel("50"); }}
+                        className="px-2 py-1 rounded text-[10px] font-medium text-red-400/70 border border-red-500/30 hover:bg-red-500/10 hover:text-red-400">
+                        Reset
+                      </button>
+                    </div>
+
+                    <button type="button" onClick={() => { setShowWeaponGenModeModal(false); void handleGenerateModdedWeapon(); }}
+                      className="w-full px-4 py-3 rounded-lg bg-[var(--color-accent)] text-black font-medium min-h-[44px] hover:opacity-90 mb-4">
+                      Random
+                    </button>
+
+                    <div className="border-t border-[var(--color-panel-border)] pt-3">
+                      <p className="text-[var(--color-accent)] font-medium text-sm mb-1">Custom</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-3">Pick manufacturer, type, rarity — auto-fill builds the base, mods added on top. No extra barrels.</p>
+
+                      <label className="block text-xs text-[var(--color-text-muted)] mb-1">Manufacturer</label>
+                      <select value={customWepMfg} onChange={(e) => { setCustomWepMfg(e.target.value); setCustomWepType(""); setCustomWepRarity(""); setCustomWepLegPearl(""); }} className={selClass}>
+                        <option value="">Select...</option>
+                        {[...new Set(wd?.mfgWtIdList.map((e) => e.manufacturer) ?? [])].sort().map((m) => <option key={m} value={m}>{m}</option>)}
+                      </select>
+
+                      {customWepMfg && (
+                        <>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Weapon Type</label>
+                          <select value={customWepType} onChange={(e) => { setCustomWepType(e.target.value); setCustomWepRarity(""); setCustomWepLegPearl(""); }} className={selClass}>
+                            <option value="">Select...</option>
+                            {customMfgTypes.map((e) => <option key={e.weaponType} value={e.weaponType}>{e.weaponType}</option>)}
+                          </select>
+                        </>
+                      )}
+
+                      {customMfgWtId && (
+                        <>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                          <input type="number" min={1} max={60} value={customWepLevel} onChange={(e) => setCustomWepLevel(e.target.value)}
+                            className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3" />
+
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Rarity</label>
+                          <select value={customWepRarity} onChange={(e) => { setCustomWepRarity(e.target.value); setCustomWepLegPearl(""); }} className={selClass}>
+                            <option value="">Select...</option>
+                            {rarityOpts.map((r) => <option key={r} value={r}>{r}</option>)}
+                          </select>
+                        </>
+                      )}
+
+                      {(customWepRarity === "Legendary" || customWepRarity === "Pearl") && legPearlOpts.length > 0 && (
+                        <>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">{customWepRarity} Type</label>
+                          <select value={customWepLegPearl} onChange={(e) => setCustomWepLegPearl(e.target.value)} className={selClass}>
+                            <option value="">Select...</option>
+                            {legPearlOpts.map((o) => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </>
+                      )}
+
+                      <button type="button" disabled={!canGenerate}
+                        onClick={() => { setShowWeaponGenModeModal(false); void handleGenerateModdedWeapon({ customMfgWtId, customRarity: customWepRarity, customLegPearl: customWepLegPearl, customLevel: customWepLevel }); }}
+                        className="w-full px-4 py-3 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] font-medium min-h-[44px] hover:bg-[var(--color-accent)] hover:text-black disabled:opacity-40 disabled:cursor-not-allowed">
+                        Generate Custom
+                      </button>
+                    </div>
+
+                    <button type="button" onClick={() => setShowWeaponGenModeModal(false)}
+                      className="w-full mt-3 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm min-h-[44px]">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
             {autoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
@@ -4485,8 +4660,8 @@ export default function UnifiedItemBuilderPage() {
             {weaponMfgWtId && (
               <div className="parts-container max-h-[55vh] overflow-y-auto pr-2 space-y-2">
                 {(() => {
-                  const unlocked = masterUnlockGuidelines;
-                  const mfgWtIds = unlocked && weaponData?.partsByMfgTypeId
+                  const showAllMfgs = crossMfgExpand;
+                  const mfgWtIds = showAllMfgs && weaponData?.partsByMfgTypeId
                     ? Object.keys(weaponData.partsByMfgTypeId)
                     : [weaponMfgWtId];
                   const rarityStats = new Set<string>();
@@ -4517,7 +4692,7 @@ export default function UnifiedItemBuilderPage() {
                     return `${label} (${mfg})`;
                   };
                   type PartOpt = { partId: string; label: string; description?: string; isStock: boolean };
-                  const legendaryOptions: PartOpt[] = unlocked
+                  const legendaryOptions: PartOpt[] = showAllMfgs
                     ? (() => {
                         const stock: PartOpt[] = [], extra: PartOpt[] = [];
                         mfgWtIds.forEach((id) => {
@@ -4533,7 +4708,7 @@ export default function UnifiedItemBuilderPage() {
                     : (weaponData.legendaryByMfgTypeId[weaponMfgWtId] ?? []).map((r) => ({
                         partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, weaponManufacturer), isStock: true,
                       }));
-                  const pearlOptions: PartOpt[] = unlocked
+                  const pearlOptions: PartOpt[] = showAllMfgs
                     ? (() => {
                         const stock: PartOpt[] = [], extra: PartOpt[] = [];
                         mfgWtIds.forEach((id) => {
@@ -4555,7 +4730,7 @@ export default function UnifiedItemBuilderPage() {
                     if (partType === "Legendary Type") return legendaryOptions;
                     if (partType === "Pearl Type") return pearlOptions;
                     if (partType === "Element 1" || partType === "Element 2") return elementalOptions;
-                    if (unlocked && weaponData.partsByMfgTypeId) {
+                    if (showAllMfgs && weaponData.partsByMfgTypeId) {
                       const stock: PartOpt[] = [], extra: PartOpt[] = [];
                       mfgWtIds.forEach((id) => {
                         const mfg = getMfgName(id);
@@ -4685,7 +4860,7 @@ export default function UnifiedItemBuilderPage() {
                             <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
                               <div>
                                 <h3 className="text-[var(--color-accent)] font-medium text-sm">Select {weaponPartPickerPartType}</h3>
-                                {unlocked && (
+                                {showAllMfgs && (
                                   <p className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono text-[var(--color-text-muted)]">
                                     <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-amber-300 bg-amber-400/15 border border-amber-400/30 leading-none">X-MFG</span>
                                     = cross-manufacturer part
@@ -4710,7 +4885,7 @@ export default function UnifiedItemBuilderPage() {
                                 {getOpts(weaponPartPickerPartType).map((o) => (
                                   <label
                                     key={o.partId + o.label}
-                                    className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30 ${unlocked && !o.isStock ? "bg-amber-400/[0.03]" : ""}`}
+                                    className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10 border-[var(--color-panel-border)]/30 ${showAllMfgs && !o.isStock ? "bg-amber-400/[0.03]" : ""}`}
                                     onMouseEnter={(e) => startHover(hoverDataByLabel(o.label, o.description, weaponPartPickerPartType || undefined), e.currentTarget.getBoundingClientRect().top)}
                                     onMouseLeave={endHover}
                                   >
@@ -4728,10 +4903,10 @@ export default function UnifiedItemBuilderPage() {
                                       className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                     />
                                     <span className="flex-1 min-w-0">
-                                      {unlocked && !o.isStock && (
+                                      {showAllMfgs && !o.isStock && (
                                         <span className="inline-flex items-center mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-amber-300 bg-amber-400/15 border border-amber-400/30 leading-none align-middle">X-MFG</span>
                                       )}
-                                      <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={weaponPartPickerPartType} descriptive={descriptiveIdsGuidelines} />
+                                      <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={weaponPartPickerPartType} detailed={richDetailView} />
                                     </span>
                                   </label>
                                 ))}
@@ -5240,7 +5415,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={grenadePartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={grenadePartPickerPartType || undefined} detailed={richDetailView} />
                               </label>
                             ))}
                           </div>
@@ -5730,7 +5905,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={shieldPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={shieldPartPickerPartType || undefined} detailed={richDetailView} />
                               </label>
                             ))}
                           </div>
@@ -6668,6 +6843,71 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
+      {/* RepKit Stats Estimator — above builder, matching weapon DPS placement */}
+      {category === "repkit" && moddedRepkitStats && (
+        <section className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden px-4 py-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">Repkit Estimate</p>
+          </div>
+          {/* Archetype name + description */}
+          <div>
+            <span className="text-sm font-bold text-[var(--color-accent)]">{moddedRepkitStats.archetypeName}</span>
+            <span className="text-xs text-[var(--color-text-muted)] ml-2">{moddedRepkitStats.archetypeDesc}</span>
+          </div>
+          {/* Header badges */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">{moddedRepkitStats.mfgName}</span>
+            <span className="px-2.5 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">{moddedRepkitStats.legendaryName}</span>
+            <span className="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">{moddedRepkitStats.prefixName}</span>
+            <span className="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">{moddedRepkitStats.firmwareName}</span>
+          </div>
+          {/* Legendary effect */}
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <span className="text-purple-300 font-medium">{moddedRepkitStats.legendaryName}:</span> {moddedRepkitStats.legendaryEffect}
+          </p>
+          {/* Cross-manufacturer legendary badges */}
+          {moddedRepkitStats.crossMfgLegendaries.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {moddedRepkitStats.crossMfgLegendaries.map((name) => (
+                <span key={name} className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/15 text-orange-300 border border-orange-500/30">{name}</span>
+              ))}
+            </div>
+          )}
+          {/* Key stat line */}
+          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-sm">
+            <span><span className="text-emerald-400 font-medium">Healing:</span> <span className="text-[var(--color-text)] font-bold">{moddedRepkitStats.healingStacks}</span></span>
+            <span><span className="text-yellow-400 font-medium">Amp:</span> <span className="text-[var(--color-text)]">{moddedRepkitStats.ampStacks}</span></span>
+            <span><span className="text-cyan-400 font-medium">Cooldown:</span> <span className="text-[var(--color-text)]">{moddedRepkitStats.cooldownStacks}</span></span>
+            <span><span className="text-red-400 font-medium">Leech:</span> <span className="text-[var(--color-text)]">{moddedRepkitStats.leechStacks}</span></span>
+            <span><span className="text-amber-400 font-medium">Tank:</span> <span className="text-[var(--color-text)]">{moddedRepkitStats.tankStacks}</span></span>
+            <span><span className="text-green-400 font-medium">Overdose:</span> <span className="text-[var(--color-text)]">{moddedRepkitStats.overdoseStacks}</span></span>
+          </div>
+          {/* All perk badges */}
+          <div className="flex flex-wrap gap-1.5">
+            {moddedRepkitStats.allPerks.map((p, i) => (
+              <span key={`${p.name}-${i}`} title={p.description}
+                className="px-2 py-0.5 rounded text-[10px] font-bold border bg-[rgba(255,255,255,0.05)] text-[var(--color-text-muted)] border-[var(--color-panel-border)]"
+              >
+                {p.name} ×{p.stacks}
+              </span>
+            ))}
+          </div>
+          {/* Class mod perk badges */}
+          {moddedRepkitStats.classModPerks?.length > 0 && (
+            <div>
+              <span className="text-[10px] uppercase tracking-wider text-violet-400/70 mr-2">Class Mod Perks</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {moddedRepkitStats.classModPerks.map((cm, i) => (
+                  <span key={`cm-${i}`} className="px-2 py-0.5 rounded text-[10px] font-bold border bg-violet-500/10 text-violet-300 border-violet-500/25">
+                    {cm.name} ×{cm.stacks}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* RepKit: Manufacturer + Level + Seed + Add other parts + part groups (weapon-style) */}
       {category === "repkit" && repkitData && repkitMfgId != null && (
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
@@ -6746,6 +6986,47 @@ export default function UnifiedItemBuilderPage() {
                 >
                   Auto fill
                 </button>
+                <span className="self-center text-[var(--color-text-muted)] text-xs mx-1">|</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[var(--color-text-muted)] text-sm">Generate modded:</span>
+                  <select
+                    value={moddedRepkitPowerMode}
+                    onChange={(e) => setModdedRepkitPowerMode(e.target.value as "stable" | "op" | "insane")}
+                    className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                  >
+                    <option value="stable">Stable</option>
+                    <option value="op">OP</option>
+                    <option value="insane">Insane</option>
+                  </select>
+                  {/* Temp toggles — placeholders */}
+                  {([
+                    { label: "Temp 1", active: repkitToggle1, set: setRepkitToggle1 },
+                    { label: "Temp 2", active: repkitToggle2, set: setRepkitToggle2 },
+                    { label: "Temp 3", active: repkitToggle3, set: setRepkitToggle3 },
+                  ] as const).map((t) => (
+                    <button
+                      key={t.label}
+                      type="button"
+                      onClick={() => t.set(!t.active)}
+                      className={`px-3 py-2 rounded-lg border text-sm min-h-[44px] touch-manipulation transition-colors ${
+                        t.active
+                          ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
+                          : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                      }`}
+                    >
+                      {t.active ? "✓ " : ""}{t.label}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => void handleGenerateModdedRepkit()}
+                    disabled={moddedRepkitLoading}
+                    className="px-3 py-2 rounded-lg border border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 disabled:opacity-60 text-sm min-h-[44px] touch-manipulation"
+                  >
+                    {moddedRepkitLoading ? "Generating…" : "Generate modded repkit"}
+                  </button>
+                  {moddedRepkitError && <span className="text-red-400 text-xs">{moddedRepkitError}</span>}
+                </div>
               </div>
             </div>
 
@@ -6997,7 +7278,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={repkitPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={repkitPartPickerPartType || undefined} detailed={richDetailView} />
                               </label>
                             ))}
                           </div>
@@ -7388,7 +7669,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={heavyPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
+                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={heavyPartPickerPartType || undefined} detailed={richDetailView} />
                           </label>
                         ))}
                       </div>
@@ -7934,7 +8215,7 @@ export default function UnifiedItemBuilderPage() {
                                     }}
                                     className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                   />
-                                  <PickerOptionContent partId={o.id} label={o.label} description={undefined} pickerPartType={classModPartPickerKey || undefined} descriptive={descriptiveIdsGuidelines} />
+                                  <PartLabel partId={o.id} label={o.label} description={undefined} pickerPartType={classModPartPickerKey || undefined} detailed={richDetailView} />
                                 </label>
                               ))}
                             </div>
@@ -8945,7 +9226,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <PickerOptionContent partId={o.partId} label={o.label} description={o.description} pickerPartType={enhancementPartPickerPartType || undefined} descriptive={descriptiveIdsGuidelines} />
+                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={enhancementPartPickerPartType || undefined} detailed={richDetailView} />
                           </label>
                         ))}
                       </div>
@@ -9105,7 +9386,7 @@ export default function UnifiedItemBuilderPage() {
                           : null,
                       );
 
-                      if (!descriptiveIdsGuidelines) {
+                      if (!richDetailView) {
                         return (
                           <div className="text-sm text-[var(--color-text)] break-words">
                             {rawLabel}
@@ -9392,7 +9673,7 @@ export default function UnifiedItemBuilderPage() {
                       <span className="font-mono text-[11px] text-[var(--color-text-muted)]">{p.code}</span>
                       <span className="text-sm text-[var(--color-text)] truncate">{p.label}</span>
                     </div>
-                    {descriptiveIdsGuidelines && (
+                    {richDetailView && (
                       <>
                         {(p.manufacturer || p.rarity || p.partType) && (
                           <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
