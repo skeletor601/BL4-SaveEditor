@@ -7842,6 +7842,19 @@ export default function UnifiedItemBuilderPage() {
                 >
                   Add other parts
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const classIdStr = String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255);
+                    const skills = classModData?.skillsByClass[classIdStr] ?? [];
+                    const next: Record<string, number> = { ...classModSkillPoints };
+                    skills.forEach((s) => { next[s.skillNameEN] = 5; });
+                    setClassModSkillPoints(next);
+                  }}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-sm min-h-[44px] touch-manipulation"
+                >
+                  Max All Skills
+                </button>
               </div>
             </div>
 
@@ -7941,19 +7954,6 @@ export default function UnifiedItemBuilderPage() {
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                       <span className="text-sm font-medium text-[var(--color-accent)]">Skills</span>
                       <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const next: Record<string, number> = { ...classModSkillPoints };
-                            skills.forEach((s) => {
-                              next[s.skillNameEN] = 5;
-                            });
-                            setClassModSkillPoints(next);
-                          }}
-                          className="px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-[11px] min-h-[32px]"
-                        >
-                          Max All
-                        </button>
                         <input
                           type="text"
                           placeholder="Search…"

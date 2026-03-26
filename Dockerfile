@@ -21,9 +21,9 @@ COPY shield shield
 COPY heavy heavy
 COPY class_mods class_mods
 COPY enhancement enhancement
-COPY bl4_functions.py bl4_decoder_py b_encoder.py decoder_logic.py lookup.py resource_loader.py unlock_logic.py unlock_data.py ./
+COPY save_ops.py serial_codec.py serial_encoder.py item_registry.py progression.py progression_data.py asset_loader.py ./
 COPY ui_localization*.json item_localization_zh-CN.json ./
-COPY bl4_decoder_py bl4_decoder_py
+COPY codec codec
 
 # Build API (need devDependencies for tsc)
 WORKDIR /app/api

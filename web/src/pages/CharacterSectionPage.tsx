@@ -7,6 +7,7 @@ const subTabs = [
   { path: "select-save", label: "Select Save" },
   { path: "edit", label: "Character" },
   { path: "yaml", label: "YAML" },
+  { path: "/inventory/backpack", label: "Backpack", external: true },
 ];
 
 export default function CharacterSectionPage() {
@@ -19,9 +20,9 @@ export default function CharacterSectionPage() {
       <div className="rounded-lg border-2 border-[var(--color-panel-border)] px-4 py-3 bg-[rgba(48,52,60,0.85)] backdrop-blur-sm">
         <h1 className="text-xl font-semibold text-[var(--color-text)]">Character</h1>
         <nav className="flex flex-wrap gap-2 pt-2 border-t border-[var(--color-panel-border)]/50 mt-2">
-          {subTabs.map(({ path, label }) => {
-            const to = `${base}/${path}`;
-            const isActive = subPath === path;
+          {subTabs.map(({ path, label, external }) => {
+            const to = external ? path : `${base}/${path}`;
+            const isActive = !external && subPath === path;
             return (
               <Link
                 key={path}

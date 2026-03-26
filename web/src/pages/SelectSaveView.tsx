@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+
 import { useSave } from "@/contexts/SaveContext";
-import { fetchApi, getApiUnavailableError, isLikelyUnavailable } from "@/lib/apiClient";
 
 const USER_ID_STORAGE_KEY = "bl4-save-user-id";
 const OVERWRITE_TIP_STORAGE_KEY = "bl4-save-hide-overwrite-tip";
@@ -43,7 +42,7 @@ export default function SelectSaveView() {
     clearSave,
     exportAsYaml,
     downloadAsSav,
-    getYamlText,
+    overwriteSaveInPlace,
   } = useSave();
 
   const onFileChange = useCallback(
@@ -133,64 +132,9 @@ export default function SelectSaveView() {
   }, [decryptSav, userIdInput]);
 
   const overwriteSaveSmart = useCallback(async () => {
-    if (!saveData || !savePlatform || !saveUserId) {
-      alert("Decrypt a .sav first (with User ID and platform) before overwriting.");
-      return;
-    }
-
-    const defaultName =
-      saveFileName?.replace(/\.(json|yaml|yml|txt)$/i, ".sav") ?? "bl4-save.sav";
-
-    const body: Record<string, unknown> = {
-      user_id: saveUserId,
-      platform: savePlatform,
-      filename: defaultName,
-      yaml_content: getYamlText(),
-    };
-
-    try {
-      const res = await fetchApi("save/encrypt", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const msg =
-          isLikelyUnavailable(res)
-            ? getApiUnavailableError()
-            : (typeof (data as any).error === "string" ? (data as any).error : "Encrypt failed.");
-        alert(msg);
-        return;
-      }
-
-      const buf = await res.arrayBuffer();
-      const blob = new Blob([buf], { type: "application/octet-stream" });
-
-      const handle: any = savFileHandleRef.current;
-      if (handle && typeof handle.createWritable === "function") {
-        try {
-          const writable = await handle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          alert("Save file encrypted and overwritten successfully.");
-          return;
-        } catch (err) {
-          console.warn("Writing via original file handle failed, falling back to download:", err);
-        }
-      }
-
-      // Fallback: regular download
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = defaultName;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : getApiUnavailableError();
-      alert(msg);
-    }
-  }, [saveData, savePlatform, saveUserId, saveFileName, getYamlText]);
+    const ok = await overwriteSaveInPlace();
+    if (ok) alert("Save file encrypted and overwritten successfully.");
+  }, [overwriteSaveInPlace]);
 
   const saveUserIdToStorage = useCallback(() => {
     const v = userIdInput.trim();
@@ -209,14 +153,9 @@ export default function SelectSaveView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-[var(--color-accent)]">Select Save</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">Decrypt a BL4 .sav or open JSON/YAML.</p>
-        </div>
-        <div className="flex gap-2">
-          <Link to="/inventory/backpack" className="px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/60 text-sm font-medium min-h-[44px] flex items-center">Backpack</Link>
-        </div>
+      <div>
+        <h2 className="text-lg font-semibold text-[var(--color-accent)]">Select Save</h2>
+        <p className="text-sm text-[var(--color-text-muted)]">Decrypt a BL4 .sav or open JSON/YAML.</p>
       </div>
 
       <div className="rounded-lg border-2 border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(48,52,60,0.45)] backdrop-blur-sm">
