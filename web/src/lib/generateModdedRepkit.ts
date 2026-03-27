@@ -422,7 +422,7 @@ export function generateModdedRepkit(
   _bd: RepkitBuilderData,
   opts: GenerateModdedRepkitOptions = {},
 ): GenerateModdedRepkitResult {
-  const level = opts.level ?? 50;
+  const level = opts.level ?? 60;
   const mode = opts.modPowerMode ?? "op";
   const seed = ri(1000, 9999);
   const sc = { stable: 1.0, op: 1.5, insane: 2.25 }[mode];

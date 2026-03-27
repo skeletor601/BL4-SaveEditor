@@ -21,7 +21,7 @@ const WORLD_PRESETS: { label: string; preset_name: string }[] = [
 ];
 
 const CHARACTER_PRESETS: { label: string; preset_name: string }[] = [
-  { label: "Max Level (Level 50)", preset_name: "set_character_to_max_level" },
+  { label: "Max Level (Level 60)", preset_name: "set_character_to_max_level" },
   { label: "Max SDU", preset_name: "set_max_sdu" },
   { label: "Unlock All Vault Gates", preset_name: "unlock_vault_powers" },
   { label: "Unlock All Hover Drives", preset_name: "unlock_all_hover_drives" },

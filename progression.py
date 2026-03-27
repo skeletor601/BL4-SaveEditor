@@ -392,9 +392,11 @@ def set_character_level(data, level):
     # But wait, `set_character_to_max_level` is what is used.
     
     xp = 0 # Placeholder. If I had the logic I would put it here.
-    
-    # Hardcode XP for level 50 based on user feedback
-    if level == 50:
+
+    # Hardcode XP for known level caps
+    if level == 60:
+        xp = 8000000
+    elif level == 50:
         xp = 3430227
 
     idx = -1
@@ -537,16 +539,16 @@ def complete_character_challenges(data):
     counters = {
         'siren_death_tiered': 1000, 'siren_death_single': 1,
         'siren_demonology_tiered': 1000, 'siren_demonology_single': 1,
-        'siren_duplicate_tiered': 1000, 'siren_duplicate_single': 1, 'siren_levelup': 50,
+        'siren_duplicate_tiered': 1000, 'siren_duplicate_single': 1, 'siren_levelup': 60,
         'exo_autolock_tiered': 1000, 'exo_autolock_single': 1,
         'exo_buster_tiered': 1000, 'exo_buster_single': 1,
-        'exo_heavyarms_tiered': 1000, 'exo_heavyarms_single': 1, 'exo_levelup': 50,
+        'exo_heavyarms_tiered': 1000, 'exo_heavyarms_single': 1, 'exo_levelup': 60,
         'gravitar_terminal_tiered': 1000, 'gravitar_terminal_single': 1,
         'gravitar_stasis_tiered': 1000, 'gravitar_stasis_single': 1,
-        'gravitar_exodus_tiered': 1000, 'gravitar_exodus_single': 1, 'gravitar_levelup': 50,
+        'gravitar_exodus_tiered': 1000, 'gravitar_exodus_single': 1, 'gravitar_levelup': 60,
         'paladin_cybernetics_tiered': 1000, 'paladin_cybernetics_single': 1,
         'paladin_vengeance_tiered': 1000, 'paladin_vengeance_single': 1,
-        'paladin_weaponmaster_tiered': 1000, 'paladin_weaponmaster_single': 1, 'paladin_levelup': 50,
+        'paladin_weaponmaster_tiered': 1000, 'paladin_weaponmaster_single': 1, 'paladin_levelup': 60,
     }
     update_stats_counters(data, counters)
 

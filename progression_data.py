@@ -68,7 +68,7 @@ CHARACTER_CLASSES = {
   },
 }
 
-MAX_LEVEL = 50
+MAX_LEVEL = 60
 
 # --- Constants from exploration.js ---
 

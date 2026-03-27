@@ -1528,6 +1528,11 @@ export default function UnifiedItemBuilderPage() {
   const [showGrenadeGenModeModal, setShowGrenadeGenModeModal] = useState(false);
   const [customGrenadeMfg, setCustomGrenadeMfg] = useState<number | null>(null);
   const [customGrenadeLeg, setCustomGrenadeLeg] = useState("");
+  const [customGrenadeLevel, setCustomGrenadeLevel] = useState("60");
+  const [showShieldGenLevelModal, setShowShieldGenLevelModal] = useState(false);
+  const [customShieldLevel, setCustomShieldLevel] = useState("60");
+  const [showRepkitGenLevelModal, setShowRepkitGenLevelModal] = useState(false);
+  const [customRepkitLevel, setCustomRepkitLevel] = useState("60");
 
   // Shield (when category === "shield")
   const [shieldData, setShieldData] = useState<ShieldBuilderData | null>(null);
@@ -2861,7 +2866,7 @@ export default function UnifiedItemBuilderPage() {
         return;
       }
       const isCustom = !!customOpts;
-      const weaponLevel = isCustom && customOpts.customLevel ? (Number(customOpts.customLevel) || 50) : (/^\d+$/.test(String(level)) ? Number(level) : 50);
+      const weaponLevel = isCustom && customOpts.customLevel ? (Number(customOpts.customLevel) || 60) : (/^\d+$/.test(String(level)) ? Number(level) : 60);
       // ── Build stock base via auto-fill (guarantees all slots → 100% spawn) ──
       // Ensure weaponData is loaded — if not, fetch it now
       let wd = weaponData;
@@ -3092,7 +3097,7 @@ export default function UnifiedItemBuilderPage() {
       setAutoFillWarning("Please select manufacturer and weapon type first.");
       return;
     }
-    const hasLevel = /^\d+$/.test(String(level)) && Number(level) >= 1 && Number(level) <= 50;
+    const hasLevel = /^\d+$/.test(String(level)) && Number(level) >= 1 && Number(level) <= 60;
     if (!hasLevel) {
       setAutoFillWarning(`Please set a valid level (1–${MAX_LEVEL}) first.`);
       return;
@@ -4377,7 +4382,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -5138,7 +5143,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -5248,7 +5253,11 @@ export default function UnifiedItemBuilderPage() {
                       </button>
                     </div>
 
-                    <button type="button" onClick={() => { setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade(); }}
+                    <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                    <input type="number" min={1} max={60} value={customGrenadeLevel} onChange={(e) => setCustomGrenadeLevel(e.target.value)}
+                      className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3" />
+
+                    <button type="button" onClick={() => { setLevel(Number(customGrenadeLevel) || 60); setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade(); }}
                       className="w-full px-4 py-3 rounded-lg bg-purple-500 text-black font-medium min-h-[44px] hover:opacity-90 mb-4">
                       Random
                     </button>
@@ -5274,7 +5283,7 @@ export default function UnifiedItemBuilderPage() {
                       )}
 
                       <button type="button" disabled={customGrenadeMfg == null}
-                        onClick={() => { setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade({ customMfgId: customGrenadeMfg ?? undefined, customLegLabel: customGrenadeLeg || undefined }); }}
+                        onClick={() => { setLevel(Number(customGrenadeLevel) || 60); setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade({ customMfgId: customGrenadeMfg ?? undefined, customLegLabel: customGrenadeLeg || undefined }); }}
                         className="w-full px-4 py-3 rounded-lg border border-purple-500 text-purple-400 font-medium min-h-[44px] hover:bg-purple-500 hover:text-black disabled:opacity-40 disabled:cursor-not-allowed">
                         Generate Custom
                       </button>
@@ -5633,7 +5642,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -5718,7 +5727,7 @@ export default function UnifiedItemBuilderPage() {
                 <div>
                   <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
                   <div className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
-                    <button type="button" onClick={handleGenerateModdedShield}
+                    <button type="button" onClick={() => setShowShieldGenLevelModal(true)}
                       className="text-blue-300 hover:text-blue-200 text-sm w-full text-left font-medium"
                       title="Generate a modded shield with legendary perks + universal + energy + armor stacking">
                       Generate Modded
@@ -5768,6 +5777,20 @@ export default function UnifiedItemBuilderPage() {
               </div>
             )}
 
+            {showShieldGenLevelModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowShieldGenLevelModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-blue-400 font-medium text-sm mb-3">Generate Modded Shield</h3>
+                  <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                  <input type="number" min={1} max={60} value={customShieldLevel} onChange={(e) => setCustomShieldLevel(e.target.value)}
+                    className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-4" autoFocus />
+                  <button type="button" onClick={() => { setLevel(Number(customShieldLevel) || 60); setShowShieldGenLevelModal(false); handleGenerateModdedShield(); }}
+                    className="w-full px-4 py-3 rounded-lg bg-blue-500 text-black font-medium min-h-[44px] hover:opacity-90 mb-2">Generate</button>
+                  <button type="button" onClick={() => setShowShieldGenLevelModal(false)}
+                    className="w-full px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm min-h-[44px]">Cancel</button>
+                </div>
+              </div>
+            )}
             {shieldAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setShieldAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
@@ -6100,7 +6123,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -7037,7 +7060,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -7117,7 +7140,7 @@ export default function UnifiedItemBuilderPage() {
                   ))}
                   <button
                     type="button"
-                    onClick={() => void handleGenerateModdedRepkit()}
+                    onClick={() => setShowRepkitGenLevelModal(true)}
                     disabled={moddedRepkitLoading}
                     className="px-3 py-2 rounded-lg border border-[var(--color-accent)]/60 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 disabled:opacity-60 text-sm min-h-[44px] touch-manipulation"
                   >
@@ -7128,6 +7151,20 @@ export default function UnifiedItemBuilderPage() {
               </div>
             </div>
 
+            {showRepkitGenLevelModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowRepkitGenLevelModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-[var(--color-accent)] font-medium text-sm mb-3">Generate Modded Repkit</h3>
+                  <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                  <input type="number" min={1} max={60} value={customRepkitLevel} onChange={(e) => setCustomRepkitLevel(e.target.value)}
+                    className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-4" autoFocus />
+                  <button type="button" onClick={() => { setLevel(Number(customRepkitLevel) || 60); setShowRepkitGenLevelModal(false); void handleGenerateModdedRepkit(); }}
+                    className="w-full px-4 py-3 rounded-lg bg-[var(--color-accent)] text-black font-medium min-h-[44px] hover:opacity-90 mb-2">Generate</button>
+                  <button type="button" onClick={() => setShowRepkitGenLevelModal(false)}
+                    className="w-full px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm min-h-[44px]">Cancel</button>
+                </div>
+              </div>
+            )}
             {repkitAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setRepkitAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
@@ -7494,7 +7531,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -7917,7 +7954,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -8468,7 +8505,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>
@@ -8527,6 +8564,20 @@ export default function UnifiedItemBuilderPage() {
               </div>
             </div>
 
+            {showRepkitGenLevelModal && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowRepkitGenLevelModal(false)}>
+                <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-[var(--color-accent)] font-medium text-sm mb-3">Generate Modded Repkit</h3>
+                  <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                  <input type="number" min={1} max={60} value={customRepkitLevel} onChange={(e) => setCustomRepkitLevel(e.target.value)}
+                    className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-4" autoFocus />
+                  <button type="button" onClick={() => { setLevel(Number(customRepkitLevel) || 60); setShowRepkitGenLevelModal(false); void handleGenerateModdedRepkit(); }}
+                    className="w-full px-4 py-3 rounded-lg bg-[var(--color-accent)] text-black font-medium min-h-[44px] hover:opacity-90 mb-2">Generate</button>
+                  <button type="button" onClick={() => setShowRepkitGenLevelModal(false)}
+                    className="w-full px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm min-h-[44px]">Cancel</button>
+                </div>
+              </div>
+            )}
             {repkitAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setRepkitAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
@@ -9093,7 +9144,7 @@ export default function UnifiedItemBuilderPage() {
                   min={1}
                   max={MAX_LEVEL}
                   value={level}
-                  onChange={(e) => setLevel(Number(e.target.value) || 50)}
+                  onChange={(e) => setLevel(Number(e.target.value) || 60)}
                   className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] w-20"
                 />
               </div>

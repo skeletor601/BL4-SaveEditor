@@ -92,7 +92,7 @@ export function generateModdedShield(
   options: GenerateModdedShieldOptions = {},
 ): GenerateModdedShieldResult {
   const modPowerMode = options.modPowerMode ?? "op";
-  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 50)));
+  const level = Math.max(1, Math.min(255, Math.trunc(options.level ?? 60)));
 
   // ── Step 1: Pick manufacturer + determine type ──
   const headerPrefix = pick([...SHIELD_MFGS]);
