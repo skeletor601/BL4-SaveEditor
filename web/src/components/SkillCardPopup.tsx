@@ -14,7 +14,7 @@ function getSkillIconFilename(skillNameEN: string, className: string): string {
     .replace(/['']/g, "")
     .replace(/\s+/g, "_");
   const safeName = norm.replace(/[^a-zA-Z0-9_!]/g, "").toLowerCase();
-  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4" };
+  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4", C4SH: "_5" };
   const suffix = suffixMap[className] ?? "";
   return `${safeName}${suffix}.png`;
 }

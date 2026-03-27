@@ -64,7 +64,7 @@ export async function accessoriesRoutes(
   });
 
   // Serve class mod skill icons (same layout as desktop: class_mods/Amon|Harlowe|Rafa|Vex/*.png)
-  const allowedClasses = ["Amon", "Harlowe", "Rafa", "Vex"];
+  const allowedClasses = ["Amon", "Harlowe", "Rafa", "Vex", "C4SH"];
   const safeFilename = /^[a-zA-Z0-9_!]+\.png$/;
   const __dirnameRoutes = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(__dirnameRoutes, "..", "..", "..");

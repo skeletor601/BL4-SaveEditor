@@ -48,3 +48,5 @@ tools/export_embedded_parts_to_csv.py
 tools/merge_bl4_master_database_into_db.py
 tools/merge_embedded_parts_into_databases.py
 tools/merge_reference_save_editor_into_db.py
+ncs_control_pre_dlc/
+dlc_diff/

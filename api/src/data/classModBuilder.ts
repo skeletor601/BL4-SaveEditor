@@ -25,9 +25,10 @@ export const CLASS_IDS: Record<string, number> = {
   Harlowe: 259,
   Rafa: 256,
   Vex: 254,
+  C4SH: 404,
 };
 
-export const CLASS_NAMES = ["Amon", "Harlowe", "Rafa", "Vex"] as const;
+export const CLASS_NAMES = ["Amon", "Harlowe", "Rafa", "Vex", "C4SH"] as const;
 
 /** Per-class rarity part IDs for non-legendary (Common/Uncommon/Rare/Epic). */
 const PER_CLASS_RARITIES: Record<string, Record<string, number>> = {
@@ -35,6 +36,7 @@ const PER_CLASS_RARITIES: Record<string, Record<string, number>> = {
   Rafa: { Common: 66, Uncommon: 67, Rare: 68, Epic: 69 },
   Harlowe: { Common: 224, Uncommon: 223, Rare: 222, Epic: 221 },
   Amon: { Common: 70, Uncommon: 69, Rare: 68, Epic: 67 },
+  C4SH: { Common: 52, Uncommon: 53, Rare: 54, Epic: 55 },
 };
 
 export interface ClassModNameOption {

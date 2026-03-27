@@ -249,6 +249,7 @@ const CLASS_MOD_CLASS_IDS: Record<string, number> = {
   Harlowe: 259,
   Rafa: 256,
   Vex: 254,
+  C4SH: 404,
 };
 
 // Per-class rarity part IDs for non-legendary (Common/Uncommon/Rare/Epic), mirrored from api/src/data/classModBuilder.ts
@@ -257,6 +258,7 @@ const CLASS_MOD_PER_CLASS_RARITIES: Record<string, Record<string, number>> = {
   Rafa: { Common: 66, Uncommon: 67, Rare: 68, Epic: 69 },
   Harlowe: { Common: 224, Uncommon: 223, Rare: 222, Epic: 221 },
   Amon: { Common: 70, Uncommon: 69, Rare: 68, Epic: 67 },
+  C4SH: { Common: 52, Uncommon: 53, Rare: 54, Epic: 55 },
 };
 
 const GRENADE_PART_ORDER: { key: string; slots: number }[] = [
@@ -346,9 +348,40 @@ function getClassModSkillIconFilename(skillNameEN: string, className: string): s
     .replace(/['']/g, "")
     .replace(/\s+/g, "_");
   const safeName = norm.replace(/[^a-zA-Z0-9_!]/g, "").toLowerCase();
-  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4" };
+  const suffixMap: Record<string, string> = { Vex: "_1", Rafa: "_2", Harlowe: "_3", Amon: "_4", C4SH: "_5" };
   const suffix = suffixMap[className] ?? "";
   return `${safeName}${suffix}.png`;
+}
+
+const C4SH_BLUE_SKILLS = new Set([
+  "Fast Hands","Insurance","Ante","Splash the Pot","Alchemy","Go for Broke","Sounds of Rain",
+  "Trick-Taker","Late Scratch","Double-Down","Wretched Shadows","High Roller","Take the Pot",
+  "Stack the Deck","Legerdemain","Vigorish","Dealer's Bluff","Ace in the Hole","Around the Corner",
+  "House Edge","C4SH Game","No Limit","Ante Up","Kill Button","Payout","Boom or Bust",
+  "Tender Hearts","Card Sharp","Hot Streak","Read the Signs","The Turn","Risky Business",
+  "Heart of the Cards","Running Luck",
+]);
+const C4SH_RED_SKILLS = new Set([
+  "Unleashed","Your Huckleberry","The Determinator","Hard-Boiled","Shootist","Stand and Bleed",
+  "Hot Hand","Trick Shot","Ride to Ruin","A Blur of Fingers and Brass","Brimstone","Fast C4SH",
+  "Firestorm","Burn the House Down","High Noon","Bloodstained Moon","Lawless","Truck Full of Nitro",
+  "War Wagon","Pale Rider","Nothing Beats Lead","Forsaken","Broken Arrow","Maverick","Cottonmouth",
+  "Bad Men Must Bleed","The Wind","Rattlesnake",
+]);
+const C4SH_GREEN_SKILLS = new Set([
+  "Luck Be a Robot","Sweet Roll","Charm Bracelet","O Fortuna","Red Moon Rising","Ready to Roll",
+  "Riding High","Bonemeal Ticket","Before She Knows You're Dead","Luckless","Double Time",
+  "Can't Stop Winning","Turn of Fate","High Stakes","Fortune's Favor","Let it Ride","The Wilds",
+  "Potent Posse","Restless Remains","Sorcerer","Tooth and Nail","Serendipity","Sidekick's Revenge",
+  "The Glorious Dead","Accursed Bones","Tormented","Loaded Dice","Shadow's Embrace","Graveyard Shift",
+  "Snake Eyes","Call","Cursed Call","Witching Hour",
+]);
+
+function getC4SHSkillColor(skillName: string): string {
+  if (C4SH_BLUE_SKILLS.has(skillName)) return "text-blue-400";
+  if (C4SH_RED_SKILLS.has(skillName)) return "text-red-400";
+  if (C4SH_GREEN_SKILLS.has(skillName)) return "text-green-400";
+  return "text-[var(--color-text)]";
 }
 
 function partIdFromLabel(label: string): string | null {
@@ -7994,7 +8027,7 @@ export default function UnifiedItemBuilderPage() {
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                               />
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm text-[var(--color-text)] truncate">{skill.skillNameEN}</div>
+                                <div className={`text-sm truncate ${classModClassName === "C4SH" ? getC4SHSkillColor(skill.skillNameEN) : "text-[var(--color-text)]"}`}>{skill.skillNameEN}</div>
                                 <div className="text-[10px] text-[var(--color-text-muted)]">
                                   {`{${skill.skillIds.join(", ")}}`}
                                 </div>

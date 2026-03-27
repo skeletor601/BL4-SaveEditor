@@ -7,12 +7,14 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 13,Daedalus,Assault Rifle,73,Rarity,Legendary,Star Helix
 13,Daedalus,Assault Rifle,85,Rarity,Legendary,First Impression
 13,Daedalus,Assault Rifle,100,Rarity,Legendary,Oscar Mike
+13,Daedalus,Assault Rifle,83,Rarity,Legendary,Mercredi
 2,Daedalus,Pistol,95,Rarity,Common,
 2,Daedalus,Pistol,96,Rarity,Uncommon,
 2,Daedalus,Pistol,97,Rarity,Rare,
 2,Daedalus,Pistol,98,Rarity,Epic,
 2,Daedalus,Pistol,54,Rarity,Legendary,Zipper
 2,Daedalus,Pistol,59,Rarity,Legendary,Rangefinder
+2,Daedalus,Pistol,80,Rarity,Pearl,Soul Survivor
 8,Daedalus,Shotgun,95,Rarity,Common,
 8,Daedalus,Shotgun,96,Rarity,Uncommon,
 8,Daedalus,Shotgun,97,Rarity,Rare,
@@ -25,6 +27,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 20,Daedalus,SMG,97,Rarity,Rare,
 20,Daedalus,SMG,98,Rarity,Epic,
 20,Daedalus,SMG,63,Rarity,Legendary,Darkbeast
+20,Daedalus,SMG,2,Rarity,Legendary,Prowler
+20,Daedalus,SMG,65,Rarity,Legendary,Luty Madlad
 27,Jakobs,Assault Rifle,95,Rarity,Common,
 27,Jakobs,Assault Rifle,96,Rarity,Uncommon,
 27,Jakobs,Assault Rifle,97,Rarity,Rare,
@@ -40,6 +44,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 3,Jakobs,Pistol,78,Rarity,Legendary,Phantom Flame
 3,Jakobs,Pistol,79,Rarity,Legendary,San Saba Songbird
 3,Jakobs,Pistol,81,Rarity,Legendary,Seventh Sense
+3,Jakobs,Pistol,83,Rarity,Legendary,Shalashaska
 9,Jakobs,Shotgun,95,Rarity,Common,
 9,Jakobs,Shotgun,96,Rarity,Uncommon,
 9,Jakobs,Shotgun,97,Rarity,Rare,
@@ -48,6 +53,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 9,Jakobs,Shotgun,83,Rarity,Legendary,Hellwalker
 9,Jakobs,Shotgun,85,Rarity,Legendary,Rainbow Vomit
 9,Jakobs,Shotgun,91,Rarity,Legendary,T.K's Wave
+9,Jakobs,Shotgun,100,Rarity,Legendary,Doeshot
 24,Jakobs,Sniper,95,Rarity,Common,
 24,Jakobs,Sniper,96,Rarity,Uncommon,
 24,Jakobs,Sniper,97,Rarity,Rare,
@@ -55,6 +61,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 24,Jakobs,Sniper,1,Rarity,Legendary,Boomslang
 24,Jakobs,Sniper,73,Rarity,Legendary,Borstel Ballista
 24,Jakobs,Sniper,76,Rarity,Legendary,Truck
+24,Jakobs,Sniper,78,Rarity,Legendary,Fearstalker
 10,Maliwan,Shotgun,95,Rarity,Common,
 10,Maliwan,Shotgun,96,Rarity,Uncommon,
 10,Maliwan,Shotgun,97,Rarity,Rare,
@@ -63,6 +70,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 10,Maliwan,Shotgun,57,Rarity,Legendary,Sweet Embrace
 10,Maliwan,Shotgun,80,Rarity,Legendary,Mantra
 10,Maliwan,Shotgun,100,Rarity,Legendary,Kickballer
+10,Maliwan,Shotgun,61,Rarity,Legendary,Reminisce
 21,Maliwan,SMG,58,Rarity,Common,
 21,Maliwan,SMG,96,Rarity,Uncommon,
 21,Maliwan,SMG,97,Rarity,Rare,
@@ -70,6 +78,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 21,Maliwan,SMG,60,Rarity,Legendary,Ohm I Got
 21,Maliwan,SMG,63,Rarity,Legendary,Plasma Coil
 21,Maliwan,SMG,83,Rarity,Legendary,Matador's Match
+21,Maliwan,SMG,81,Rarity,Legendary,Broken Wings
+21,Maliwan,SMG,85,Rarity,Legendary,Flash Cyclone
 25,Maliwan,Sniper,95,Rarity,Common,
 25,Maliwan,Sniper,96,Rarity,Uncommon,
 25,Maliwan,Sniper,97,Rarity,Rare,
@@ -84,6 +94,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 15,Order,Assault Rifle,98,Rarity,Epic,
 15,Order,Assault Rifle,75,Rarity,Legendary,G.M.R.
 15,Order,Assault Rifle,76,Rarity,Legendary,Goalkeeper
+15,Order,Assault Rifle,77,Rarity,Pearl,Crow-Sourced
 4,Order,Pistol,95,Rarity,Common,
 4,Order,Pistol,96,Rarity,Uncommon,
 4,Order,Pistol,97,Rarity,Rare,
@@ -91,6 +102,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 4,Order,Pistol,53,Rarity,Legendary,Lucky Clover
 4,Order,Pistol,76,Rarity,Legendary,Bully
 4,Order,Pistol,80,Rarity,Legendary,Noisy Cricket
+4,Order,Pistol,83,Rarity,Legendary,Sunspot
+4,Order,Pistol,85,Rarity,Legendary,Roulette
 26,Order,Sniper,95,Rarity,Common,
 26,Order,Sniper,96,Rarity,Uncommon,
 26,Order,Sniper,97,Rarity,Rare,
@@ -105,6 +118,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 7,Ripper,Shotgun,19,Rarity,Legendary,Golden God
 7,Ripper,Shotgun,20,Rarity,Legendary,Goremaster
 7,Ripper,Shotgun,100,Rarity,Legendary,Convergence
+7,Ripper,Shotgun,54,Rarity,Pearl,Crazed Earl
+7,Ripper,Shotgun,56,Rarity,Legendary,Hair Trigger
 19,Ripper,SMG,95,Rarity,Common,
 19,Ripper,SMG,96,Rarity,Uncommon,
 19,Ripper,SMG,97,Rarity,Rare,
@@ -112,6 +127,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 19,Ripper,SMG,1,Rarity,Legendary,Prince Harming
 19,Ripper,SMG,19,Rarity,Legendary,Hellfire
 19,Ripper,SMG,56,Rarity,Legendary,Roil
+19,Ripper,SMG,59,Rarity,Legendary,Falke
 23,Ripper,Sniper,95,Rarity,Common,
 23,Ripper,Sniper,96,Rarity,Uncommon,
 23,Ripper,Sniper,97,Rarity,Rare,
@@ -119,6 +135,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 23,Ripper,Sniper,19,Rarity,Legendary,Stray
 23,Ripper,Sniper,1,Rarity,Legendary,Vamoose
 23,Ripper,Sniper,57,Rarity,Legendary,Rainmaker
+23,Ripper,Sniper,56,Rarity,Legendary,Tankbuster
 14,Tediore,Assault Rifle,89,Rarity,Common,
 14,Tediore,Assault Rifle,90,Rarity,Uncommon,
 14,Tediore,Assault Rifle,91,Rarity,Rare,
@@ -126,6 +143,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 14,Tediore,Assault Rifle,35,Rarity,Legendary,Chuck
 14,Tediore,Assault Rifle,36,Rarity,Legendary,Divided Focus
 14,Tediore,Assault Rifle,77,Rarity,Legendary,Murmur
+14,Tediore,Assault Rifle,79,Rarity,Legendary,Laser Disker
 5,Tediore,Pistol,95,Rarity,Common,
 5,Tediore,Pistol,96,Rarity,Uncommon,
 5,Tediore,Pistol,97,Rarity,Rare,
@@ -141,6 +159,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 11,Tediore,Shotgun,76,Rarity,Legendary,Anarchy
 11,Tediore,Shotgun,78,Rarity,Legendary,Forsaken Chaos
 11,Tediore,Shotgun,80,Rarity,Legendary,Husky Friend
+11,Tediore,Shotgun,78,Rarity,Legendary,CommBD
 11,Tediore,Shotgun,82,Rarity,Pearl,Eigenburst
 17,Torgue,Assault Rifle,95,Rarity,Common,
 17,Torgue,Assault Rifle,96,Rarity,Uncommon,
@@ -149,12 +168,14 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 17,Torgue,Assault Rifle,1,Rarity,Legendary,Bugbear
 17,Torgue,Assault Rifle,56,Rarity,Legendary,Cold Shoulder
 17,Torgue,Assault Rifle,78,Rarity,Legendary,Potato Thrower IV
+17,Torgue,Assault Rifle,83,Rarity,Legendary,Fleabag
 6,Torgue,Pistol,95,Rarity,Common,
 6,Torgue,Pistol,96,Rarity,Uncommon,
 6,Torgue,Pistol,97,Rarity,Rare,
 6,Torgue,Pistol,98,Rarity,Epic,
 6,Torgue,Pistol,1,Rarity,Legendary,Roach
 6,Torgue,Pistol,53,Rarity,Legendary,Queen's Rest
+6,Torgue,Pistol,57,Rarity,Legendary,Scoot'n'Shoot
 6,Torgue,Pistol,59,Rarity,Legendary,Hardpoint
 6,Torgue,Pistol,78,Rarity,Pearl,Handcannon
 12,Torgue,Shotgun,95,Rarity,Common,
@@ -163,6 +184,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 12,Torgue,Shotgun,98,Rarity,Epic,
 12,Torgue,Shotgun,1,Rarity,Legendary,Linebacker
 12,Torgue,Shotgun,57,Rarity,Legendary,Lead Balloon
+12,Torgue,Shotgun,77,Rarity,Legendary,Unstable Kor
+12,Torgue,Shotgun,79,Rarity,Legendary,Arctic
 18,Vladof,Assault Rifle,95,Rarity,Common,
 18,Vladof,Assault Rifle,96,Rarity,Uncommon,
 18,Vladof,Assault Rifle,97,Rarity,Rare,
@@ -171,6 +194,8 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 18,Vladof,Assault Rifle,65,Rarity,Legendary,Wombo Combo
 18,Vladof,Assault Rifle,88,Rarity,Legendary,Aegon's Dream
 18,Vladof,Assault Rifle,93,Rarity,Legendary,Whiskey Foxtrot
+18,Vladof,Assault Rifle,100,Rarity,Legendary,Bubbles
+18,Vladof,Assault Rifle,103,Rarity,Legendary,Laser-Cutter
 22,Vladof,SMG,95,Rarity,Common,
 22,Vladof,SMG,96,Rarity,Uncommon,
 22,Vladof,SMG,97,Rarity,Rare,
@@ -178,6 +203,7 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 22,Vladof,SMG,1,Rarity,Legendary,Onslaught
 22,Vladof,SMG,67,Rarity,Legendary,Kaoson
 22,Vladof,SMG,88,Rarity,Legendary,Birt's Bees
+22,Vladof,SMG,92,Rarity,Legendary,Mercurious
 16,Vladof,Sniper,95,Rarity,Common,
 16,Vladof,Sniper,96,Rarity,Uncommon,
 16,Vladof,Sniper,97,Rarity,Rare,
@@ -185,3 +211,4 @@ Manufacturer & Weapon Type ID,Manufacturer,Weapon Type,Part ID,Part Type,Stat,De
 16,Vladof,Sniper,66,Rarity,Legendary,Finnity XXX-L
 16,Vladof,Sniper,67,Rarity,Legendary,Stop Gap
 16,Vladof,Sniper,69,Rarity,Legendary,Midnight Defiance
+16,Vladof,Sniper,88,Rarity,Legendary,Hemorrhage

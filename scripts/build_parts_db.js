@@ -297,7 +297,7 @@ for (const r of readCsv("enhancement/Enhancement_perk.csv")) {
 // --- Class Mods ---
 console.log("Processing class mod data ...");
 
-const CLASS_IDS_MAP = { "255": "Amon", "259": "Harlowe", "256": "Rafa", "254": "Vex" };
+const CLASS_IDS_MAP = { "255": "Amon", "259": "Harlowe", "256": "Rafa", "254": "Vex", "404": "C4SH" };
 
 for (const r of readCsv("class_mods/Class_rarity_name.csv")) {
   const classId = r["class_ID"], className = r["class_name"] || CLASS_IDS_MAP[r["class_ID"]] || r["class_ID"];
@@ -349,7 +349,46 @@ for (const r of readCsv("heavy/heavy_manufacturer_perk_EN.csv")) {
   }
 }
 
-// ── PHASE 2: Weapon parts from embedded_parts_export.csv ────────────────────
+// ── PHASE 2: Weapon parts from all_weapon_part_EN.csv + elemental.csv ────────
+
+console.log("Processing weapon parts data ...");
+
+for (const r of readCsv("weapon_edit/all_weapon_part_EN.csv")) {
+  const typeId = r["Manufacturer & Weapon Type ID"], partId = r["Part ID"];
+  const mfg = r["Manufacturer"], weaponType = r["Weapon Type"];
+  const partType = r["Part Type"], string = r["String"], stat = r["Stat"], desc = r["Description"];
+  if (!typeId || !partId) continue;
+  const displayName = stat || string || `${mfg} ${weaponType} ${partType} ${partId}`;
+  const effect = desc || stat || "";
+  const rarity = partType === "Rarity" ? (stat || "").split(" ")[0] || undefined : undefined;
+  addPart({
+    code: `{${typeId}:${partId}}`,
+    partName: string || `${mfg}_${weaponType}.part_${partId}`,
+    itemType: displayName,
+    manufacturer: mfg || undefined,
+    weaponType: weaponType || undefined,
+    partType: partType || undefined,
+    effect: effect || undefined,
+    rarity: rarity || undefined,
+    category: "Weapon",
+  });
+}
+
+console.log("Processing elemental data ...");
+
+for (const r of readCsv("weapon_edit/elemental.csv")) {
+  const typeId = r["Elemental_ID"], partId = r["Part_ID"], stat = r["Stat"];
+  if (!typeId || !partId) continue;
+  addPart({
+    code: `{${typeId}:${partId}}`,
+    partName: `Element.part_${partId}`,
+    itemType: stat || `Element ${partId}`,
+    partType: "Element",
+    category: "Element",
+  });
+}
+
+// ── PHASE 2b: Legacy embedded_parts_export.csv (if present) ─────────────────
 
 console.log("Processing embedded_parts_export.csv ...");
 

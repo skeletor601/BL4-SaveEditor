@@ -18,6 +18,7 @@ import { communityProfileRoutes } from "./routes/communityProfiles.js";
 import { communityGodrollRoutes } from "./routes/communityGodrolls.js";
 import { feedbackRoutes } from "./routes/feedback.js";
 import { terraVaultRoutes } from "./routes/terraVault.js";
+import { greenVaultRoutes } from "./routes/greenVault.js";
 import { statsRoutes } from "./routes/stats.js";
 import { getAllParts } from "./data/parts.js";
 
@@ -85,6 +86,7 @@ await fastify.register(communityProfileRoutes, { prefix: "/api" });
 await fastify.register(communityGodrollRoutes, { prefix: "/api" });
 await fastify.register(feedbackRoutes, { prefix: "/api" });
 await fastify.register(terraVaultRoutes, { prefix: "/api" });
+await fastify.register(greenVaultRoutes, { prefix: "/api" });
 await fastify.register(statsRoutes, { prefix: "/api" });
 
 // Optional: serve web app from same process (for Render single-service deploy)

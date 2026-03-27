@@ -13,7 +13,11 @@
       "Bash(gh api:*)",
       "Bash(grep:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:mobalytics.gg)"
+      "WebFetch(domain:mobalytics.gg)",
+      "Bash(python:*)",
+      "Bash(NCS=\"/c/Users/picas/Desktop/Borderlands-4.NcsParser-220-1-0-0-1768940952/Borderlands-4.NcsParser/output/json/pakchunk4-Windows_12_P-Nexus-Data-inv4.json\" grep -n \"comp_05_legendary_Hoarder\" \"$NCS\")",
+      "Bash(NCS=\"/c/Users/picas/Desktop/Borderlands-4.NcsParser-220-1-0-0-1768940952/Borderlands-4.NcsParser/output/json/pakchunk4-Windows_12_P-Nexus-Data-inv4.json\" __NEW_LINE_1dfe19d95dfd9c5b__ grep -n \"Root\" \"$NCS\")",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }

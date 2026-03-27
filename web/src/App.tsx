@@ -16,6 +16,7 @@ import CommunityVaultPage from "@/pages/CommunityVaultPage";
 import GodRollsPage from "@/pages/GodRollsPage";
 import TestAppPage from "@/pages/TestAppPage";
 import TerraLabPage from "@/pages/TerraLabPage";
+import GreenLabPage from "@/pages/GreenLabPage";
 import DrLecterPage from "@/pages/DrLecterPage";
 
 function AppRoutes() {
@@ -81,6 +82,7 @@ function AppRoutes() {
         <Route path="/god-rolls" element={<GodRollsPage />} />
         <Route path="/test-app" element={<TestAppPage />} />
         <Route path="/terra" element={<TerraLabPage />} />
+        <Route path="/green" element={<GreenLabPage />} />
         <Route path="/drlecter" element={<DrLecterPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />

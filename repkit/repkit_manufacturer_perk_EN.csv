@@ -22,6 +22,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 266,5,Rarity,Legendary,Blood Analyzer Skin,Blood Analyzer,mal_repair_kit.comp_05_legendary_BloodAnalyzer
 266,6,Legendary Perk,Immunity Shot,"On use, grants immunity to the last received Elemental Damage type for 7 seconds",Immunity Shot,
 266,7,Model,Refresher,"2900, 1562 8s, 20s CD",,
+266,8,Rarity,Legendary,Geiger-Roid Skin,Geiger-Roid,mal_repair_kit.comp_05_legendary_geigerroid
 285,1,Legendary Perk,Heart Pump,"This Repkit has 3 Charges, and a 30% chance to refill 1 Charge on enemy kill",Heart Pump,
 285,2,Model,Recorporator,"2082, 2082 8s, 24s CD",,
 285,3,Rarity,Common,,,ord_repair_kit.comp_01_common
@@ -29,6 +30,8 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 285,5,Rarity,Rare,,,ord_repair_kit.comp_03_rare
 285,6,Rarity,Epic,,,ord_repair_kit.comp_04_epic
 285,7,Rarity,Legendary,Triple Bypass Skin,Triple Bypass,ord_repair_kit.comp_05_legendary_TripleBypass
+285,8,Legendary Perk,Blood Moon,DLC Legendary Repkit,Paleblood,ord_repair_kit.part_augment_unique_paleblood
+285,9,Rarity,Legendary,Blood Moon Skin,Paleblood,ord_repair_kit.comp_05_legendary_paleblood
 274,1,Legendary Perk,Time Dialation,"Repkit Duration increased by +100%, and Cooldown reduced by -50%",Time Dialation,
 274,2,Model,Scabber,", 5949 10s, 20s CD",,
 274,3,Rarity,Common,,,
