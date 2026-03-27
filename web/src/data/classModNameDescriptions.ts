@@ -42,9 +42,26 @@ export const CLASS_MOD_NAME_DESCRIPTIONS: Record<string, ClassModNameInfo> = {
   "teen witch":        { character: "Vex", description: "When at max HP, Lifesteal partially applies to shields. When at max Shield, Lifesteal partially grants Overshield." },
   "undead eye":        { character: "Vex", description: "Killing enemies with Sniper Rifles triggers Blood Shot. Critically hitting has a 33% chance to trigger Blood Shot as well." },
 
-  // ── C4SH (The Rogue) ─────────────────────────────────────────────────────
-  // Class mod names TBD — will be populated when the update drops.
-  // Placeholder entries for the action skill augment names (may also appear as class mod names):
+  // ── C4SH (The Rogue) — Normal ─────────────────────────────────────────────
+  "pistoleer":     { character: "C4SH", description: "C4SH standard class mod." },
+  "bane":          { character: "C4SH", description: "C4SH standard class mod." },
+  "gambler":       { character: "C4SH", description: "C4SH standard class mod." },
+  "puppeteer":     { character: "C4SH", description: "C4SH standard class mod." },
+  "swindler":      { character: "C4SH", description: "C4SH standard class mod." },
+  "antagonist":    { character: "C4SH", description: "C4SH standard class mod." },
+  "powderbot":     { character: "C4SH", description: "C4SH standard class mod." },
+  "triggerbot":    { character: "C4SH", description: "C4SH standard class mod." },
+  "crack shot":    { character: "C4SH", description: "C4SH standard class mod." },
+  "pack leader":   { character: "C4SH", description: "C4SH standard class mod." },
+  // ── C4SH (The Rogue) — Legendary ────────────────────────────────────────
+  "rounder":       { character: "C4SH", description: "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains Charges and resets his Action Skill Duration. Red Text: And for my next trick..." },
+  "ludopath":      { character: "C4SH", description: "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains Fire Rate and Movement Speed for every Ludopath Stack. Red Text: They see me rollin'" },
+  "hotshot":       { character: "C4SH", description: "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals Fire Damage. If Windfall is active, these Beams always Critically Hit. Red Text: Spin to win" },
+  "cooler":        { character: "C4SH", description: "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains Ordnance Cooldown Rate. Red Text: Do do that voodoo that you do so well." },
+  "whale":         { character: "C4SH", description: "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. When Windfall activates, fully restore Action Skill Cooldown. Red Text: I have not yet begun to defile myself." },
+  "windrider":     { character: "C4SH", description: "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his Fortune Stacks, otherwise killing an enemy with a Gun drains Fortune Stacks. Red Text: Play to win. Never play to not lose." },
+  "gamer":         { character: "C4SH", description: "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critical Hit, he gains bonus damage. Red Text: Luck is what happens when preparation meets opportunity." },
+  "hooligan":      { character: "C4SH", description: "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal Bonus Fire Damage based on the number of Stacks. Red Text: Here we go, here we go, here we go!" },
 };
 
 const CHARACTER_COLORS: Record<string, string> = {
