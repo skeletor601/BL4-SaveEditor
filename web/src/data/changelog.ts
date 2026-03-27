@@ -5,6 +5,26 @@ export interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    date: "2026-03-27",
+    items: [
+      "DLC COWBELL UPDATE — New playable character C4SH (Rogue) fully integrated into the class mod builder. 100 skills across 3 trees (Sleight of Hand, Crossfire, Cleromancy) with all 5-tier skill IDs, descriptions, and color-tinted icons.",
+      "34 new DLC legendary weapons added — Mantra, Shalashaska, Roulette, Eigenburst, Flash Cyclone, Inscriber, Jetsetter, Doeshot, Mercredi, Fleabag, Handcannon, Bubbles, Mercurious, Conflux, and more across all manufacturers.",
+      "6 Pearlescent rarity weapons identified and properly tagged — Conflux, Eigenburst, Handcannon, Crazed Earl, Crow-Sourced, Soul Survivor. Pearl option now shows in rarity dropdown for those weapon types.",
+      "New legendary shields — Honey Badger (Daedalus), Elpis Star (Maliwan), Hopscotch (Tediore), Undershield (Vladof).",
+      "New legendary grenades — Barb'ara (Vladof), Bismuth-Tipped Dagger (Jakobs), Sho Kunai (Jakobs), Skully (Order), Urchin (Tediore), Slippy (Torgue), Flare (Torgue).",
+      "New legendary repkits — Healthraiser (Daedalus), Blood Moon (Order), Geiger-Roid (Maliwan).",
+      "New firmware — Skillcraft (Raid DLC).",
+      "Custom Modded Grenade Generator — same as custom weapon generator. Pick manufacturer and legendary, mods added on top. Random or custom mode via modal.",
+      "Max All Skills button moved to top row in class mod builder next to Add Other Parts.",
+      "Weapon parts now included in universal parts database — Master Search covers all 5,680 parts including weapons, elementals, shields, grenades, repkits, enhancements, class mods, and heavies.",
+      "Build script updated to pull from weapon_edit CSVs + elemental.csv. All parts flow into parts.json and universal_parts_db.json.",
+      "Backpack button moved into Character Studio top tab bar (alongside Select Save, Character, YAML).",
+      "Overwrite Save in Character Studio now writes to game folder instead of Downloads (uses same file handle system as unified builder).",
+      "Dockerfile fixed for renamed Python files (codec/, save_ops.py, etc.).",
+      "New DLC class mods for existing characters — Lamplighter (Amon), Trooper (Harlowe), Overdriver (Rafa), Misericorde (Vex).",
+    ],
+  },
+  {
     date: "2026-03-22",
     items: [
       "COMPLETE WEAPON GENERATOR OVERHAUL — Recipe-driven system learned from 33 real modded weapons. 20 underbarrel recipes with synergistic companion parts. Every gun is truly unique — different underbarrel, different cross-inserts, different damage profile.",

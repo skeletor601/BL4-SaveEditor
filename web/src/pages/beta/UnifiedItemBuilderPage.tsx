@@ -1525,6 +1525,9 @@ export default function UnifiedItemBuilderPage() {
   const [grenadeExtraTokens, setGrenadeExtraTokens] = usePersistedState<string[]>("uib.grenade.extraTokens", []);
   const [showGrenadeGodRollModal, setShowGrenadeGodRollModal] = useState(false);
   const [grenadeAutoFillWarning, setGrenadeAutoFillWarning] = useState<string | null>(null);
+  const [showGrenadeGenModeModal, setShowGrenadeGenModeModal] = useState(false);
+  const [customGrenadeMfg, setCustomGrenadeMfg] = useState<number | null>(null);
+  const [customGrenadeLeg, setCustomGrenadeLeg] = useState("");
 
   // Shield (when category === "shield")
   const [shieldData, setShieldData] = useState<ShieldBuilderData | null>(null);
@@ -2195,14 +2198,13 @@ export default function UnifiedItemBuilderPage() {
     setGrenadePartSelections(selections);
   }, [grenadeData]);
 
-  const handleGenerateModdedGrenade = useCallback(async () => {
+  const handleGenerateModdedGrenade = useCallback(async (opts?: { customMfgId?: number; customLegLabel?: string }) => {
     if (!grenadeData?.mfgs?.length) return;
     const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
     const grenadeLevel = /^\d+$/.test(String(level)) ? Number(level) : 50;
 
     // Build stock base via auto-fill
-    const mfg = pickR(grenadeData.mfgs);
-    const mfgId = mfg.id;
+    const mfgId = opts?.customMfgId ?? pickR(grenadeData.mfgs).id;
     const grenadeSeed = Math.floor(1000 + Math.random() * 9000);
     const autoFillSelections: Record<string, { label: string; qty: string }[]> = {};
     // Always Legendary — modded grenades should never be Common/Rare/etc.
@@ -2211,7 +2213,9 @@ export default function UnifiedItemBuilderPage() {
     autoFillSelections["Rarity"] = [{ label: legendaryRarity?.label ?? (rarities.length ? rarities[rarities.length - 1]!.label : "Legendary"), qty: "1" }];
     const legendaryForMfg = grenadeData.legendaryPerks.filter((l) => l.mfgId === mfgId);
     const legs = legendaryForMfg.length ? legendaryForMfg : grenadeData.legendaryPerks;
-    if (legs.length) {
+    if (opts?.customLegLabel) {
+      autoFillSelections["Legendary"] = [{ label: opts.customLegLabel, qty: "1" }];
+    } else if (legs.length) {
       const leg = pickR(legs);
       autoFillSelections["Legendary"] = [{ label: `${leg.mfgId}:${leg.partId}`, qty: "1" }];
     }
@@ -5214,15 +5218,72 @@ export default function UnifiedItemBuilderPage() {
                 <div className="rounded-lg border border-purple-500/40 bg-purple-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
                   <button
                     type="button"
-                    onClick={handleGenerateModdedGrenade}
+                    onClick={() => setShowGrenadeGenModeModal(true)}
                     className="text-purple-300 hover:text-purple-200 text-sm w-full text-left font-medium"
-                    title="Generate a modded grenade"
+                    title="Generate a modded grenade — Random or Custom"
                   >
                     Generate Modded
                   </button>
                 </div>
               </div>
             </div>
+            {showGrenadeGenModeModal && (() => {
+              const gd = grenadeData;
+              const mfgs = gd?.mfgs ?? [];
+              const selectedMfg = mfgs.find((m) => m.id === customGrenadeMfg);
+              const legsForMfg = customGrenadeMfg != null ? (gd?.legendaryPerks.filter((l) => l.mfgId === customGrenadeMfg) ?? []) : [];
+              const selClass = "w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3";
+              return (
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4" onClick={() => setShowGrenadeGenModeModal(false)}>
+                  <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-purple-400 font-medium text-sm">Generate Modded Grenade</h3>
+                      <button type="button" onClick={() => { setCustomGrenadeMfg(null); setCustomGrenadeLeg(""); }}
+                        className="px-2 py-1 rounded text-[10px] font-medium text-red-400/70 border border-red-500/30 hover:bg-red-500/10 hover:text-red-400">
+                        Reset
+                      </button>
+                    </div>
+
+                    <button type="button" onClick={() => { setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade(); }}
+                      className="w-full px-4 py-3 rounded-lg bg-purple-500 text-black font-medium min-h-[44px] hover:opacity-90 mb-4">
+                      Random
+                    </button>
+
+                    <div className="border-t border-[var(--color-panel-border)] pt-3">
+                      <p className="text-purple-400 font-medium text-sm mb-1">Custom</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-3">Pick manufacturer and legendary — mods added on top of the base build.</p>
+
+                      <label className="block text-xs text-[var(--color-text-muted)] mb-1">Manufacturer</label>
+                      <select value={customGrenadeMfg ?? ""} onChange={(e) => { setCustomGrenadeMfg(e.target.value ? Number(e.target.value) : null); setCustomGrenadeLeg(""); }} className={selClass}>
+                        <option value="">Select...</option>
+                        {mfgs.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                      </select>
+
+                      {selectedMfg && legsForMfg.length > 0 && (
+                        <>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Legendary</label>
+                          <select value={customGrenadeLeg} onChange={(e) => setCustomGrenadeLeg(e.target.value)} className={selClass}>
+                            <option value="">Random legendary...</option>
+                            {legsForMfg.map((l) => <option key={`${l.mfgId}:${l.partId}`} value={`${l.mfgId}:${l.partId}`}>{l.stat || `${l.mfgName} #${l.partId}`}</option>)}
+                          </select>
+                        </>
+                      )}
+
+                      <button type="button" disabled={customGrenadeMfg == null}
+                        onClick={() => { setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade({ customMfgId: customGrenadeMfg ?? undefined, customLegLabel: customGrenadeLeg || undefined }); }}
+                        className="w-full px-4 py-3 rounded-lg border border-purple-500 text-purple-400 font-medium min-h-[44px] hover:bg-purple-500 hover:text-black disabled:opacity-40 disabled:cursor-not-allowed">
+                        Generate Custom
+                      </button>
+                    </div>
+
+                    <button type="button" onClick={() => setShowGrenadeGenModeModal(false)}
+                      className="w-full mt-3 px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm min-h-[44px]">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
             {grenadeAutoFillWarning && (
               <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setGrenadeAutoFillWarning(null)}>
                 <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>
