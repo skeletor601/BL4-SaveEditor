@@ -68,6 +68,7 @@ export async function greenVaultRoutes(fastify: FastifyInstance, _opts: unknown)
     const entry = entries.find((e) => e.id === id);
     if (!entry) return reply.code(404).send({ error: "Not found." });
     if (typeof body.label === "string") entry.label = body.label.trim();
+    if (typeof body.code === "string") entry.code = body.code.trim();
     if (typeof body.notes === "string") entry.notes = body.notes.trim();
     if (Array.isArray(body.tags)) entry.tags = (body.tags as string[]).map((t) => String(t).trim()).filter(Boolean);
     if (typeof body.type === "string") entry.type = body.type.trim();

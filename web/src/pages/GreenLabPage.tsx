@@ -260,6 +260,27 @@ function GreenVault() {
   const [status, setStatus] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editCode, setEditCode] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [editTags, setEditTags] = useState("");
+  const [editType, setEditType] = useState("weapon");
+  const [editSaving, setEditSaving] = useState(false);
+
+  const startEdit = (e: { id: string; label: string; code: string; notes: string; tags: string[]; type: string }) => {
+    setEditingId(e.id); setEditLabel(e.label); setEditCode(e.code); setEditNotes(e.notes); setEditTags(e.tags.join(", ")); setEditType(e.type);
+  };
+  const cancelEdit = () => setEditingId(null);
+  const saveEdit = async () => {
+    if (!editingId) return;
+    setEditSaving(true);
+    try {
+      const res = await fetchApi(`green-vault/${editingId}`, { method: "PATCH", body: JSON.stringify({ label: editLabel.trim(), code: editCode.trim(), notes: editNotes.trim(), tags: editTags.split(",").map((t) => t.trim()).filter(Boolean), type: editType }) });
+      if (res.ok) { setEditingId(null); loadEntries(); }
+    } catch { /* ignore */ }
+    finally { setEditSaving(false); }
+  };
 
   const loadEntries = useCallback(async () => {
     try {
@@ -326,16 +347,45 @@ function GreenVault() {
           <div className="p-6 text-center text-xs text-[var(--color-text-muted)]">No codes yet. Save your best builds here!</div>
         ) : filtered.map((e) => (
           <div key={e.id} className="px-4 py-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <button onClick={() => toggleExpand(e.id)} className="text-xs font-bold text-[var(--color-text)] hover:text-emerald-400">{e.label}</button>
-              <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${ITEM_TYPE_COLORS[e.type] ?? ITEM_TYPE_COLORS.other}`}>{e.type}</span>
-              {e.tags.map((t) => <span key={t} className="px-1.5 py-0.5 rounded text-[8px] bg-white/5 text-[var(--color-text-muted)] border border-[var(--color-panel-border)]">{t}</span>)}
-              <span className="text-[10px] text-[var(--color-text-muted)]">{timeAgo(e.timestamp)}</span>
-              <button onClick={() => handleCopy(e.code)} className="text-[10px] text-[var(--color-text-muted)] hover:text-emerald-400">Copy</button>
-              <button onClick={() => handleDelete(e.id)} className="text-[10px] text-[var(--color-text-muted)] hover:text-red-400">Delete</button>
-            </div>
-            {e.notes && <p className="text-[10px] text-[var(--color-text-muted)] mt-1 italic">{e.notes}</p>}
-            {expanded.has(e.id) && (<pre className="mt-2 p-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[10px] text-[var(--color-text)] font-mono whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto">{e.code}</pre>)}
+            {editingId === e.id ? (
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {ITEM_TYPES.map((t) => (
+                    <button key={t} onClick={() => setEditType(t)}
+                      className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${editType === t ? ITEM_TYPE_COLORS[t] : "border-transparent text-[var(--color-text-muted)]/50"}`}
+                    >{t}</button>
+                  ))}
+                </div>
+                <input value={editLabel} onChange={(ev) => setEditLabel(ev.target.value)} placeholder="Name"
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                <textarea value={editCode} onChange={(ev) => setEditCode(ev.target.value)} rows={3}
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-[10px] font-mono resize-y focus:border-emerald-500 focus:outline-none" />
+                <input value={editTags} onChange={(ev) => setEditTags(ev.target.value)} placeholder="Tags (comma separated)"
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                <input value={editNotes} onChange={(ev) => setEditNotes(ev.target.value)} placeholder="Notes"
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                <div className="flex gap-2">
+                  <button onClick={saveEdit} disabled={editSaving}
+                    className="px-3 py-1.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-medium hover:bg-emerald-500/30 disabled:opacity-50">{editSaving ? "Saving..." : "Save"}</button>
+                  <button onClick={cancelEdit}
+                    className="px-3 py-1.5 rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-[10px]">Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button onClick={() => toggleExpand(e.id)} className="text-xs font-bold text-[var(--color-text)] hover:text-emerald-400">{e.label}</button>
+                  <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${ITEM_TYPE_COLORS[e.type] ?? ITEM_TYPE_COLORS.other}`}>{e.type}</span>
+                  {e.tags.map((t) => <span key={t} className="px-1.5 py-0.5 rounded text-[8px] bg-white/5 text-[var(--color-text-muted)] border border-[var(--color-panel-border)]">{t}</span>)}
+                  <span className="text-[10px] text-[var(--color-text-muted)]">{timeAgo(e.timestamp)}</span>
+                  <button onClick={() => startEdit(e)} className="text-[10px] text-[var(--color-text-muted)] hover:text-emerald-400">Edit</button>
+                  <button onClick={() => handleCopy(e.code)} className="text-[10px] text-[var(--color-text-muted)] hover:text-emerald-400">Copy</button>
+                  <button onClick={() => handleDelete(e.id)} className="text-[10px] text-[var(--color-text-muted)] hover:text-red-400">Delete</button>
+                </div>
+                {e.notes && <p className="text-[10px] text-[var(--color-text-muted)] mt-1 italic">{e.notes}</p>}
+                {expanded.has(e.id) && (<pre className="mt-2 p-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[10px] text-[var(--color-text)] font-mono whitespace-pre-wrap break-all max-h-[200px] overflow-y-auto">{e.code}</pre>)}
+              </>
+            )}
           </div>
         ))}
       </div>
