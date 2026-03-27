@@ -17,15 +17,17 @@ export default function GreenLabPage() {
           <div className="text-6xl opacity-20 select-none">🧪</div>
           <h1 className="text-xl font-bold text-[var(--color-text)]">Green's Lab</h1>
           <p className="text-sm text-[var(--color-text-muted)]">This area is restricted. Enter the passphrase.</p>
-          <form onSubmit={(e) => { e.preventDefault(); if (input.trim() === "9989") setUnlocked(true); }}>
+          <form onSubmit={(e) => { e.preventDefault(); if (input.trim() === "9989") setUnlocked(true); }} className="space-y-3">
             <input
               type="text"
+              inputMode="numeric"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => { setInput(e.target.value); if (e.target.value.trim() === "9989") setUnlocked(true); }}
               placeholder="Passphrase"
               className="w-full px-4 py-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center text-lg tracking-wider focus:border-emerald-500 focus:outline-none"
               autoFocus
             />
+            <button type="submit" className="w-full px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold tracking-wider transition-colors">Enter</button>
           </form>
           <p className="text-[10px] text-[var(--color-text-muted)]/30 select-none">If you know, you know.</p>
         </div>

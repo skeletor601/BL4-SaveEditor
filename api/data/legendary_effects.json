@@ -1,0 +1,1096 @@
+{
+  "weapons": {
+    "Anarchy": {
+      "item": "Anarchy",
+      "perk": "Mutualism",
+      "desc": "On Auto-Reload or kill, grants Damage and Accuracy for a Maximum of stacks, which reset on manual Reload",
+      "redText": "Cause I WANNA be!"
+    },
+    "Asher's Rise": {
+      "item": "Asher's Rise",
+      "perk": "Slow Burn",
+      "desc": "Critical Hits apply Status Effects instead of increased impact Damage",
+      "redText": "How can we possibly have the slightest idea what to expect?"
+    },
+    "Bod": {
+      "item": "Bod",
+      "perk": "All-Arounder",
+      "desc": "Counts as a Shotgun, an Assault Rifle, a Sniper Rifle, a Pistol, and an SMG",
+      "redText": "Do you believe in this thing, or not?"
+    },
+    "Bonnie and Clyde": {
+      "item": "Bonnie and Clyde",
+      "perk": "Pair of Thieves",
+      "desc": "On kill, grants Damage for the Gun's other Mode and refills its Magazine",
+      "redText": "From a schoolboy to a rattlesnake."
+    },
+    "Boomslang": {
+      "item": "Boomslang",
+      "perk": "Bullet Pollinator",
+      "desc": "After Reloading, the first Critical Hit Ricochets a Sticky Projectile to nearby enemies",
+      "redText": "Everything is blooming most recklessly."
+    },
+    "Broken Wings": {
+      "item": "Broken Wings",
+      "perk": "Fledgling",
+      "desc": "",
+      "redText": "It's a sprint, not a marathon."
+    },
+    "Bubbles": {
+      "item": "Bubbles",
+      "perk": "Squeaky Clean",
+      "desc": "",
+      "redText": "So sassy."
+    },
+    "Budget Deity": {
+      "item": "Budget Deity",
+      "perk": "Color Spray",
+      "desc": "Shoots Corrosive, Cryo, and Incendiary droplets (element combo varies)",
+      "redText": ""
+    },
+    "Bugbear": {
+      "item": "Bugbear",
+      "perk": "Rotary Gun",
+      "desc": "Scales up to max Damage and Damage Radius based on the emptiness of the Magazine",
+      "redText": "So, in conclusion... *large explosion*"
+    },
+    "Bully": {
+      "item": "Bully",
+      "perk": "Defense Protocol",
+      "desc": "When Gun Shields are activated, launches an Attack Drone periodically",
+      "redText": "Keep Summer safe."
+    },
+    "Birt's Bees": {
+      "item": "Birt's Bees",
+      "perk": "Hivemind",
+      "desc": "",
+      "redText": "Fill your life with laughter and bees."
+    },
+    "Borstel Ballista": {
+      "item": "Borstel Ballista",
+      "perk": "Propagation",
+      "desc": "",
+      "redText": "Go now and speed well!"
+    },
+    "Bloody Lumberjack": {
+      "item": "Bloody Lumberjack",
+      "perk": "Timber",
+      "desc": "",
+      "redText": "You're more lost than you realize."
+    },
+    "Cold Shoulder": {
+      "item": "Cold Shoulder",
+      "perk": "Iced Out",
+      "desc": "",
+      "redText": "You've been smooching with everybody"
+    },
+    "Complex Root": {
+      "item": "Complex Root",
+      "perk": "Sierpinski",
+      "desc": "Spawns additional diverging Projectiles along its path",
+      "redText": "It's the nucleus of every man-made invention of today."
+    },
+    "Conflux": {
+      "item": "Conflux",
+      "perk": "Sinew",
+      "desc": "Deals bonus Damage per Status Effect on the target",
+      "redText": "It's self-indulgent, I admit."
+    },
+    "Convergence": {
+      "item": "Convergence",
+      "perk": "Asymptotic",
+      "desc": "",
+      "redText": "Steel chambers, late the pyres; Of her salamandrine fires"
+    },
+    "Crazed Earl": {
+      "item": "Crazed Earl",
+      "perk": "BOGO",
+      "desc": "Fires Shards that stick into enemies. Meleeing enemies with Shards will explode the Shards and send them toward other nearby enemies.",
+      "redText": ""
+    },
+    "Darkbeast": {
+      "item": "Darkbeast",
+      "perk": "Parley",
+      "desc": "Bullets pierce enemies, and have a chance when hitting an enemy to cause an explosion",
+      "redText": "K, awesome!"
+    },
+    "Divided Focus": {
+      "item": "Divided Focus",
+      "perk": "Conquerer",
+      "desc": "Fires bouncing Projectiles that pierce enemies",
+      "redText": "That's whatever you were talking about for ya."
+    },
+    "Doeshot": {
+      "item": "Doeshot",
+      "perk": "Doer",
+      "desc": "",
+      "redText": "So La Ti Buck"
+    },
+    "Eigenburst": {
+      "item": "Eigenburst",
+      "perk": "Determined",
+      "desc": "Damage increases as loaded ammo decreases",
+      "redText": "An affinity for disobedience."
+    },
+    "Falke": {
+      "item": "Falke",
+      "perk": "Resonance",
+      "desc": "",
+      "redText": "Let us become whole again."
+    },
+    "Fearstalker": {
+      "item": "Fearstalker",
+      "perk": "Improbable",
+      "desc": "Critical Hits grant a Stack of Deduction that increases the next Non-Critical Hit Damage per Stack. Non-Critical Hits grant a Stack of Observation that increases the next Critical Hit Damage per Stack.",
+      "redText": "Quite right...mauled to death it seems."
+    },
+    "Finnity XXX-L": {
+      "item": "Finnity XXX-L",
+      "perk": "Pipin' Hot Barrels",
+      "desc": "Does not consume Ammo while Overheating",
+      "redText": "As seen on Monday Night Rehabilitation."
+    },
+    "First Impression": {
+      "item": "First Impression",
+      "perk": "Firm Handshake",
+      "desc": "Chance to Critically Hit based on the target's health percentage.",
+      "redText": "Hello there!"
+    },
+    "Fisheye": {
+      "item": "Fisheye",
+      "perk": "Ultima Ratio Regum",
+      "desc": "Fires wide, penetrating triple Railgun shots with bonus Critical Damage",
+      "redText": "See, I told you they'd listen to Reason."
+    },
+    "Flash Cyclone": {
+      "item": "Flash Cyclone",
+      "perk": "Flash Freeze",
+      "desc": "Chance on Hit to Explode and Spawn additional projectiles",
+      "redText": "What cyclone? Its a couple of flakes!"
+    },
+    "Fleabag": {
+      "item": "Fleabag",
+      "perk": "Ringleader",
+      "desc": "Sticky Projectiles move to the most recently hit target",
+      "redText": "Can't you see the fleas?"
+    },
+    "Forsaken Chaos": {
+      "item": "Forsaken Chaos",
+      "perk": "Wide Net",
+      "desc": "",
+      "redText": "The people have spoken."
+    },
+    "G.M.R.": {
+      "item": "G.M.R.",
+      "perk": "Big Name Hunter",
+      "desc": "When Zoomed In, Damage increases, Shot Cost increases, and Fire Rate decreases",
+      "redText": "O, inheritor of grace!"
+    },
+    "Goalkeeper": {
+      "item": "Goalkeeper",
+      "perk": "Amper Camper",
+      "desc": "When Gun Shield is depleted, grants bonus Damage for a duration",
+      "redText": "I'm not camping! I'm guarding the flag."
+    },
+    "Golden God": {
+      "item": "Golden God",
+      "perk": "Rage",
+      "desc": "When Overheating, the Bulletforge does not break, but instead continually consumes greater amounts of Ammo",
+      "redText": ""
+    },
+    "Goremaster": {
+      "item": "Goremaster",
+      "perk": "Chief Execution Officer",
+      "desc": "Deals bonus Damage to enemies below a Health threshold",
+      "redText": ""
+    },
+    "Hair Trigger": {
+      "item": "Hair Trigger",
+      "perk": "Timed Charge",
+      "desc": "Projectiles explode when releasing the trigger",
+      "redText": "You're going to regret this the rest of your life..."
+    },
+    "Handcannon": {
+      "item": "Handcannon",
+      "perk": "Click Boom Boom",
+      "desc": "Sticky Projectiles deal Damage while attached to targets",
+      "redText": "Dangerous toys are fun, but you could get hurt."
+    },
+    "Hardpoint": {
+      "item": "Hardpoint",
+      "perk": "Breach",
+      "desc": "",
+      "redText": "Hope your core's armored."
+    },
+    "Hellwalker": {
+      "item": "Hellwalker",
+      "perk": "Soothslayer",
+      "desc": "",
+      "redText": "A piece of the moon hung in the sky like a polished bone."
+    },
+    "Hemorrhage": {
+      "item": "Hemorrhage",
+      "perk": "Black Death",
+      "desc": "Deals increased Damage the farther away the target is",
+      "redText": "Stay back, I have powers."
+    },
+    "Hot Slugger": {
+      "item": "Hot Slugger",
+      "perk": "Blazing Barrel",
+      "desc": "On kill, deal bonus Damage for a duration, Maximum 3 Stacks",
+      "redText": "The madder I am, the thicker my accent gets!"
+    },
+    "Inkling": {
+      "item": "Inkling",
+      "perk": "Inkling",
+      "desc": "Fires bouncing Projectiles that leave an Elemental Splat on bounce",
+      "redText": "Gonna paint your wagon, gonna paint it fine."
+    },
+    "Inscriber": {
+      "item": "Inscriber",
+      "perk": "Effigy",
+      "desc": "Hitting enemies spawns 4 projectiles behind them",
+      "redText": "For those who come after."
+    },
+    "Kaleidosplode": {
+      "item": "Kaleidosplode",
+      "perk": "Colorful Mess",
+      "desc": "",
+      "redText": "Trying to paint the prettiest picture I can with the colors I have."
+    },
+    "Kaoson": {
+      "item": "Kaoson",
+      "perk": "Granted",
+      "desc": "",
+      "redText": "Twice the power!"
+    },
+    "Katagawa's Revenge": {
+      "item": "Katagawa's Revenge",
+      "perk": "Stormcloud",
+      "desc": "",
+      "redText": "You might hurt someone, and that's MY @#%in' job."
+    },
+    "Kickballer": {
+      "item": "Kickballer",
+      "perk": "Force Bunt",
+      "desc": "",
+      "redText": "Let's go, Diamond Ponies!"
+    },
+    "King's Gambit": {
+      "item": "King's Gambit",
+      "perk": "Holy Hell",
+      "desc": "When shot, thrown Gun Ricochets Projectiles to nearby enemies",
+      "redText": "The refutation of any gambit begins with accepting it."
+    },
+    "Laser-Cutter": {
+      "item": "Laser-Cutter",
+      "perk": "Bone Saw",
+      "desc": "",
+      "redText": "Isaac's bestie."
+    },
+    "Laser Disker": {
+      "item": "Laser Disker",
+      "perk": "Shazbot",
+      "desc": "Deals bonus Damage to airborne enemies",
+      "redText": "A U.F.O. is just an I.F.O. you haven't met."
+    },
+    "Lead Balloon": {
+      "item": "Lead Balloon",
+      "perk": "Lightweight",
+      "desc": "Projectiles float upward and spawn child Projectiles upon exploding",
+      "redText": "For a brick, he flew pretty good."
+    },
+    "Linebacker": {
+      "item": "Linebacker",
+      "perk": "Full Coverage",
+      "desc": "Bouncing Projectiles increase Damage and Damage Radius per bounce",
+      "redText": "Put me in!"
+    },
+    "Lucian's Flank": {
+      "item": "Lucian's Flank",
+      "perk": "Trample",
+      "desc": "Critical Hits refill Ammo to the Gun's Magazine",
+      "redText": "How dare you!?"
+    },
+    "Lucky Clover": {
+      "item": "Lucky Clover",
+      "perk": "Kismet",
+      "desc": "On Reload, fires 2 Homing Rockets that deal Damage each",
+      "redText": "Such devastation... This was my intention."
+    },
+    "Luty Madlad": {
+      "item": "Luty Madlad",
+      "perk": "Homemade Ingenuity",
+      "desc": "Overheats quickly, but also Cools down quickly",
+      "redText": "I've got a Luty."
+    },
+    "Mantra": {
+      "item": "Mantra",
+      "perk": "Chakra",
+      "desc": "Deals Melee damage",
+      "redText": "Punch your way to self-actualization"
+    },
+    "Matador's Match": {
+      "item": "Matador's Match",
+      "perk": "Sparkler",
+      "desc": "",
+      "redText": "You've been officially labeled a 'Disturber of the Peace.'"
+    },
+    "Mercredi": {
+      "item": "Mercredi",
+      "perk": "Cyclical",
+      "desc": "Cycles between different firing styles on Reload. While Target-locked, gain a stacking buff that grants bonus Damage per stack.",
+      "redText": "Lord Tuesday wishes to speak of burgers."
+    },
+    "Mercurious": {
+      "item": "Mercurious",
+      "perk": "Fleet Footed",
+      "desc": "Bullet Damage scales with Movement Speed",
+      "redText": "The mighty giant-killer, stood there, spellbound."
+    },
+    "Midnight Defiance": {
+      "item": "Midnight Defiance",
+      "perk": "Crowd Sourced",
+      "desc": "On hit, additional Projectiles spawn from nearby enemies",
+      "redText": "The creators have spoken."
+    },
+    "Missilaser": {
+      "item": "Missilaser",
+      "perk": "Misstical",
+      "desc": "Underbarrel fires Sticky Rockets that are detonated by the Gun's laser",
+      "redText": ""
+    },
+    "Murmur": {
+      "item": "Murmur",
+      "perk": "Executor",
+      "desc": "Deals Critical Damage to enemies under 35% health.",
+      "redText": "Did you hear something?"
+    },
+    "Noisy Cricket": {
+      "item": "Noisy Cricket",
+      "perk": "Silence",
+      "desc": "",
+      "redText": "Feel like I'm gonna break this damn thing!"
+    },
+    "Ohm I Got": {
+      "item": "Ohm I Got",
+      "perk": "Energy Transfer",
+      "desc": "When Energy Shield is active, grants Damage by consuming the Shield's energy instead of Ammo. When Overshield is also active, Energy Shield will not deplete.",
+      "redText": "Back off, man. I'm a scientist."
+    },
+    "Onslaught": {
+      "item": "Onslaught",
+      "perk": "Keep It Coming",
+      "desc": "Chance for every bullet fired to deal extra Damage and not consume Ammo",
+      "redText": "Are ya spinning, son?"
+    },
+    "Oscar Mike": {
+      "item": "Oscar Mike",
+      "perk": "Tactical Rounds",
+      "desc": "The first half of your Magazine deals +50% Bonus Damage",
+      "redText": "Duty called, I answered, we hung out. Duty's awesome!"
+    },
+    "Phantom Flame": {
+      "item": "Phantom Flame",
+      "perk": "Midday",
+      "desc": "Zooming In acquires Lock On targets over time, and firing while Zoomed In shoots the entire Magazine",
+      "redText": "Fan the flames."
+    },
+    "Plasma Coil": {
+      "item": "Plasma Coil",
+      "perk": "Superheated",
+      "desc": "",
+      "redText": "Harness the 4th state of matter."
+    },
+    "Potato Thrower IV": {
+      "item": "Potato Thrower IV",
+      "perk": "Spud Gun",
+      "desc": "",
+      "redText": ""
+    },
+    "Prince Harming": {
+      "item": "Prince Harming",
+      "perk": "Pamplemousse",
+      "desc": "Hitting enemies deals Damage to you, and grants a Stack of Cruelty - which, on kill, restores Overshield per Stack of Cruelty",
+      "redText": "Have you the wing?"
+    },
+    "Prowler": {
+      "item": "Prowler",
+      "perk": "Pounce",
+      "desc": "Bullets slowly home in on targets. Reloading accelerates them toward their targets.",
+      "redText": ""
+    },
+    "Queen's Rest": {
+      "item": "Queen's Rest",
+      "perk": "Royal Armory",
+      "desc": "Fires high-speed rounds, and damaging enemies has a chance to spawn a Homing Sticky Projectile",
+      "redText": "I could set this world on fire and call it rain."
+    },
+    "Rainmaker": {
+      "item": "Rainmaker",
+      "perk": "Irrigation",
+      "desc": "",
+      "redText": ""
+    },
+    "Rangefinder": {
+      "item": "Rangefinder",
+      "perk": "Precision",
+      "desc": "",
+      "redText": "Something's gotta hit."
+    },
+    "Ravenfire": {
+      "item": "Ravenfire",
+      "perk": "621",
+      "desc": "Explosions radiate outward from the point of impact",
+      "redText": "Bok bok!"
+    },
+    "Reminisce": {
+      "item": "Reminisce",
+      "perk": "Remnant",
+      "desc": "Does not reload, and instead refills Ammo when the projectiles return",
+      "redText": "What goes around..."
+    },
+    "Roach": {
+      "item": "Roach",
+      "perk": "Flesh Eaters",
+      "desc": "Shoots eggs that hatch flying roaches when attached to flesh, living or dead",
+      "redText": "He was the raddest roach."
+    },
+    "Roil": {
+      "item": "Roil",
+      "perk": "Hydropower",
+      "desc": "Overheating prevents firing, and switching modes will reduce heat",
+      "redText": "Sleep down in the soil."
+    },
+    "Rooker": {
+      "item": "Rooker",
+      "perk": "Callous",
+      "desc": "[Alt-Fire] Fires 2 Needles that continuously home in on enemies that are being aimed at.",
+      "redText": ""
+    },
+    "Roulette": {
+      "item": "Roulette",
+      "perk": "Lord Luck",
+      "desc": "On Reload, gain random buffs",
+      "redText": "Papa needs a new pair of class mods!"
+    },
+    "Rowan's Charge": {
+      "item": "Rowan's Charge",
+      "perk": "Stalker",
+      "desc": "Grants a chance for shots to be a Critical Hit, and refunds Ammo on Critical Hit",
+      "redText": "I dream of darkness."
+    },
+    "Rowdy Rider": {
+      "item": "Rowdy Rider",
+      "perk": "Overwhelming",
+      "desc": "Ricochet Projectiles on Critical Hits",
+      "redText": "Plink, headshot."
+    },
+    "Ruby's Grasp": {
+      "item": "Ruby's Grasp",
+      "perk": "Grasp",
+      "desc": "Reloading the Gun fires Homing copies",
+      "redText": "Coming for all of us."
+    },
+    "San Saba Songbird": {
+      "item": "San Saba Songbird",
+      "perk": "Dueling Pistol",
+      "desc": "Deals bonus Damage after swapping Guns",
+      "redText": "Let me tell you, buddy - there's a faster gun..."
+    },
+    "Scoot'n'Shoot": {
+      "item": "Scoot'n'Shoot",
+      "perk": "Rollin' Deep",
+      "desc": "Phantom Guns fire from the locations of your previous shots. Phantom Guns reset on reload.",
+      "redText": "Move it or lose it!"
+    },
+    "Shalashaska": {
+      "item": "Shalashaska",
+      "perk": "Aweful Lot",
+      "desc": "On Auto-Reload, grants a Stack of Exhiliration. Each Stack increases the number of possible Ricochets by 1. Resets on manual Reload.",
+      "redText": "I love to reload during a battle."
+    },
+    "Sideshow": {
+      "item": "Sideshow",
+      "perk": "Juggler",
+      "desc": "Shoot as many targets as possible before they hit the ground, and refill up to 2 Ammo per target hit",
+      "redText": "My record is 24."
+    },
+    "Soul Survivor": {
+      "item": "Soul Survivor",
+      "perk": "Adrenaline",
+      "desc": "Deals increased Damage for each ally in Fight For Your Life",
+      "redText": "At first I was afraid..."
+    },
+    "Star Helix": {
+      "item": "Star Helix",
+      "perk": "Constellation",
+      "desc": "Projectiles can be fired vertically or horizontally",
+      "redText": "They see the stars, and they think, \"Mine.\""
+    },
+    "Stop Gap": {
+      "item": "Stop Gap",
+      "perk": "Reconfigure",
+      "desc": "When firing, Fire Rate decreases, but Damage increases",
+      "redText": "Do better. Try harder."
+    },
+    "Stray": {
+      "item": "Stray",
+      "perk": "Stray",
+      "desc": "Fires 2 secondary bullets that home in on nearby target(s)",
+      "redText": "Don't catch-a-straaaay!"
+    },
+    "Sunspot": {
+      "item": "Sunspot",
+      "perk": "Eclipse",
+      "desc": "Damage scales based on the emptiness of the Magazine",
+      "redText": "Sun Spot! Sun Spot run! Run Spot run!"
+    },
+    "Sweet Embrace": {
+      "item": "Sweet Embrace",
+      "perk": "Adoration",
+      "desc": "",
+      "redText": "Absence makes the heart grow fonder."
+    },
+    "Symmetry": {
+      "item": "Symmetry",
+      "perk": "Bilateral",
+      "desc": "Fires from reserve Ammo while charging",
+      "redText": "We all lined up to see the syzygy, but only the guy in front saw anything."
+    },
+    "T.K's Wave": {
+      "item": "T.K's Wave",
+      "perk": "Heirloom",
+      "desc": "",
+      "redText": ""
+    },
+    "Tankbuster": {
+      "item": "Tankbuster",
+      "perk": "Funnel",
+      "desc": "Heals nearby enemies to deal additional Damage per enemy healed",
+      "redText": "What you feel makes part of what they'll feel"
+    },
+    "Truck": {
+      "item": "Truck",
+      "perk": "Fixer-Upper",
+      "desc": "",
+      "redText": "To truly be old-school: build it yourself."
+    },
+    "Unstable Kor": {
+      "item": "Unstable Kor",
+      "perk": "Full Belly",
+      "desc": "Detonating Stickies triggers a Nova. Nova Damage scales with the number of attached Stickies.",
+      "redText": "It's building up, building up, building deep inside."
+    },
+    "Vamoose": {
+      "item": "Vamoose",
+      "perk": "Scarce",
+      "desc": "",
+      "redText": "Faster than a knife fight in a phone booth."
+    },
+    "Whiskey Foxtrot": {
+      "item": "Whiskey Foxtrot",
+      "perk": "Overdrive / Scrap Cannon",
+      "desc": "Overdrive: Switches to a secondary Magazine that can be fired on Full Auto. Scrap Cannon: Fires a spread of shrapnel from the Underbarrel and increases target's Damage Taken for 8s",
+      "redText": ""
+    },
+    "Wombo Combo": {
+      "item": "Wombo Combo",
+      "perk": "Rip Rockets",
+      "desc": "Rockets automatically fire from the Underbarrel",
+      "redText": "Where you at? Where you at? Where you at?"
+    },
+    "Zipper": {
+      "item": "Zipper",
+      "perk": "Prison Rules",
+      "desc": "Grants Critical Damage and bonus Damage when hitting a target in the back",
+      "redText": "Who's the shot caller now?"
+    },
+    "Aegon's Dream": {
+      "item": "Aegon's Dream",
+      "perk": "Prophetic",
+      "desc": "",
+      "redText": "Finish the song!"
+    },
+    "ARC-TAN": {
+      "item": "ARC-TAN",
+      "perk": "KA-BOOM",
+      "desc": "",
+      "redText": "Not to go off on a tangent..."
+    },
+    "Anchor": {
+      "item": "Anchor",
+      "perk": "Anchor",
+      "desc": "",
+      "redText": "Across the big lough we were going, But sadly a great gale was blowing. We stopped on the shore, Built a fire and did more, But that was the end of the rowing."
+    },
+    "Crow-Sourced": {
+      "item": "Crow-Sourced",
+      "perk": "Left of the Murder",
+      "desc": "Fires random objects",
+      "redText": "And we had to share the rock!"
+    }
+  },
+  "shields": {
+    "Cindershelly": {
+      "item": "Cindershelly",
+      "perk": "Glass",
+      "desc": "When damaged, grants a Stack of Resolve that reduces Damage Taken per Stack. When the Energy Shield breaks, releases a Nova that deals Damage, with each Stack of Resolve increasing the Damage.",
+      "redText": "Skip to the end."
+    },
+    "Compleation": {
+      "item": "Compleation",
+      "perk": "Sisyphusian",
+      "desc": "When Armor Shield is full, it instantly loses an Armor Segment",
+      "redText": ""
+    },
+    "Elpis Star": {
+      "item": "Elpis Star",
+      "perk": "Moonfall",
+      "desc": "When dealing Melee Damage, spawn a Meteor Cluster to fall on the damaged enemy.",
+      "redText": "Make a wish."
+    },
+    "Extra Medium": {
+      "item": "Extra Medium",
+      "perk": "Nucleosynthesis",
+      "desc": "When Energy Shield breaks or fills, it triggers a Nova that deals Damage",
+      "redText": "Never above five on the call sheet of life."
+    },
+    "Firebreak": {
+      "item": "Firebreak",
+      "perk": "Backdoor",
+      "desc": "When Energy Shield breaks, triggers a Nova on 3 enemies that deals Damage",
+      "redText": "Anyway, here goes your firewall."
+    },
+    "Firewerks": {
+      "item": "Firewerks",
+      "perk": "Bundled",
+      "desc": "On kill, spawns Missiles that home in on nearby enemies and deal Damage each",
+      "redText": "...Maybe one more."
+    },
+    "Guardian Angel": {
+      "item": "Guardian Angel",
+      "perk": "Wings of Grace",
+      "desc": "When equipped, grants faster revival from Fight for Your Life. When FFYL expires, grants 1 free Second Wind periodically",
+      "redText": "I... am here to help..."
+    },
+    "Heavyweight": {
+      "item": "Heavyweight",
+      "perk": "Bareknuckle",
+      "desc": "On Melee Hit, consumes an Armor Segment to grant Melee Damage. When Armor Shield is empty, grants Melee Damage",
+      "redText": ""
+    },
+    "Hoarder": {
+      "item": "Hoarder",
+      "perk": "Refreshments",
+      "desc": "On kill, chance to spawn an Ammo Booster that instantly refills your Gun",
+      "redText": "BYO bullets!"
+    },
+    "Honey Badger": {
+      "item": "Honey Badger",
+      "perk": "Ferocity",
+      "desc": "Reduces self-Damage Dealt while Shield is active",
+      "redText": "You're saying it in your head, so I don't have to type it."
+    },
+    "Hopscotch": {
+      "item": "Hopscotch",
+      "perk": "Shook",
+      "desc": "Spawns a Singularity when an Armor Segment breaks",
+      "redText": "I kept you hopping didn't I?"
+    },
+    "Oak-Aged Cask": {
+      "item": "Oak-Aged Cask",
+      "perk": "Vintage",
+      "desc": "",
+      "redText": ""
+    },
+    "Onion": {
+      "item": "Onion",
+      "perk": "Shallot Shell",
+      "desc": "On Armor Segment break, grants Immunity to Damage for a duration",
+      "redText": "You don't have to cry about it."
+    },
+    "Pandoran Memento": {
+      "item": "Pandoran Memento",
+      "perk": "Psychosis",
+      "desc": "When damaged, grants Elemental Resistance and Resistance to the last Damage Type received",
+      "redText": "I hate this planet."
+    },
+    "Principal": {
+      "item": "Principal",
+      "perk": "Shield Boi",
+      "desc": "Spawns a Shield Boi when the last Armor Segment breaks",
+      "redText": "Protect me, squire!"
+    },
+    "Protean Cell": {
+      "item": "Protean Cell",
+      "perk": "Direct Current",
+      "desc": "Ground Slam to toggle this effect. While enabled, drains Shield over time to grant Bonus Shock Damage, and Damage Taken passes through the Shield",
+      "redText": "Electrical resistance is futile."
+    },
+    "Super Soldier": {
+      "item": "Super Soldier",
+      "perk": "Power Play",
+      "desc": "When Energy Shield fills, grants an Overshield. When Energy Shield is full, grants Fire Rate, Movement Speed, and regens Ammo/s",
+      "redText": "I'll never forget the adventures we had."
+    },
+    "Timekeeper's New Shield": {
+      "item": "Timekeeper's New Shield",
+      "perk": "Bininu",
+      "desc": "When equipped, grants Maximum Health, Health Regeneration/s, and reduces Damage Taken",
+      "redText": "It's all coming together."
+    },
+    "Undershield": {
+      "item": "Undershield",
+      "perk": "Exoskeleton",
+      "desc": "On Armor Segment break, grants Overshield",
+      "redText": "Anything worth doing is worth doing in excess."
+    },
+    "Watts 4 Dinner": {
+      "item": "Watts 4 Dinner",
+      "perk": "Overshield Eater",
+      "desc": "When Energy Shield is active, enemies have a chance to drop an Overshield when hit. When Overshield is also active, grants Shock Damage",
+      "redText": "Watt was yours is now mine."
+    },
+    "Short Circuit": {
+      "item": "Short Circuit",
+      "perk": "Short Circuit",
+      "desc": "While Energy Shield is not full, it periodically Shocks nearby enemies",
+      "redText": ""
+    }
+  },
+  "grenades": {
+    "Barb'ara": {
+      "item": "Barb'ara",
+      "perk": "Tentacles",
+      "desc": "",
+      "redText": ""
+    },
+    "Blockbuster": {
+      "item": "Blockbuster",
+      "perk": "Got You Covered",
+      "desc": "",
+      "redText": ""
+    },
+    "Budget Deity (Grenade)": {
+      "item": "Budget Deity",
+      "perk": "D.O.P.E. Buoys",
+      "desc": "Throws 2 Combo Orbs, which place the Atlas Target Lock on enemies damaged by the Combo Orbs",
+      "redText": ""
+    },
+    "Buoy": {
+      "item": "Buoy",
+      "perk": "Buoyant",
+      "desc": "",
+      "redText": "No wake zone..."
+    },
+    "Buzz Axe": {
+      "item": "Buzz Axe",
+      "perk": "Makeshift",
+      "desc": "",
+      "redText": ""
+    },
+    "Chaumurky": {
+      "item": "Chaumurky",
+      "perk": "Incessant",
+      "desc": "Continuously homes in on a target",
+      "redText": ""
+    },
+    "Chuck": {
+      "item": "Chuck",
+      "perk": "Pitcher",
+      "desc": "",
+      "redText": "What a tosser."
+    },
+    "Countermeasure": {
+      "item": "Countermeasure",
+      "perk": "Decoy",
+      "desc": "Launches flares that distract nearby enemies",
+      "redText": "Separate the wheat from the chaff."
+    },
+    "Destructo Disco": {
+      "item": "Destructo Disco",
+      "perk": "Groove",
+      "desc": "",
+      "redText": "I don't even think the worms are awake yet..."
+    },
+    "Faulty Detonator": {
+      "item": "Faulty Detonator",
+      "perk": "Sticky Trigger",
+      "desc": "Grenade spawns Combo Orbs upon detonation",
+      "redText": ""
+    },
+    "Firepot": {
+      "item": "Firepot",
+      "perk": "Spicy",
+      "desc": "Spawns homing Torgue Stickies over time",
+      "redText": "Sticky booooy, come to toooown!"
+    },
+    "Fuse": {
+      "item": "Fuse",
+      "perk": "Fortified Position",
+      "desc": "",
+      "redText": ""
+    },
+    "Jelly": {
+      "item": "Jelly",
+      "perk": "Self-Replicating",
+      "desc": "",
+      "redText": "Short for 'Jellifer'."
+    },
+    "Recursive": {
+      "item": "Recursive",
+      "perk": "Looping",
+      "desc": "",
+      "redText": "Let's do this, one last time..."
+    },
+    "Sho Kunai": {
+      "item": "Sho Kunai",
+      "perk": "Ninja Speed",
+      "desc": "Grants Movement Speed for a short Duration with each consecutive hit",
+      "redText": ""
+    },
+    "Skully": {
+      "item": "Skully",
+      "perk": "Accursed",
+      "desc": "",
+      "redText": ""
+    },
+    "Slippy": {
+      "item": "Slippy",
+      "perk": "Swordfish",
+      "desc": "Deals Melee Damage on detonation",
+      "redText": "Woaahooahhhhwoahwoaaahhhh!!!"
+    },
+    "Spinning Blade": {
+      "item": "Spinning Blade",
+      "perk": "Juggler",
+      "desc": "Catch the rebound to refund 1 Grenade Charge",
+      "redText": "I'll take that..."
+    },
+    "Swarm": {
+      "item": "Swarm",
+      "perk": "Swoosh",
+      "desc": "",
+      "redText": ""
+    },
+    "Transmitter": {
+      "item": "Transmitter",
+      "perk": "Message from the Void",
+      "desc": "",
+      "redText": "Do you read me?"
+    },
+    "UAV": {
+      "item": "UAV",
+      "perk": "Death From Above",
+      "desc": "",
+      "redText": ""
+    },
+    "Urchin": {
+      "item": "Urchin",
+      "perk": "Snaboopie-pop",
+      "desc": "",
+      "redText": "Benthic boogie."
+    },
+    "Waterfall": {
+      "item": "Waterfall",
+      "perk": "Waterfall",
+      "desc": "Causes additional explosions when damaging targets",
+      "redText": "I'm only going to ask this once. Who. Is. JASON?!"
+    }
+  },
+  "repkits": {
+    "Blood Rush": {
+      "item": "Blood Rush",
+      "perk": "Blood Rush",
+      "desc": "Automatically restores Health on Second Wind",
+      "redText": ""
+    },
+    "Blood Siphon": {
+      "item": "Blood Siphon",
+      "perk": "Blood Siphon",
+      "desc": "On kill, converts excess Damage into Healing Orbs that seek out nearby allies",
+      "redText": ""
+    },
+    "Broken Vial": {
+      "item": "Broken Vial",
+      "perk": "Broken Vial",
+      "desc": "Heals for the last instances of Damage taken within the last few seconds",
+      "redText": ""
+    },
+    "Cardiac Shock": {
+      "item": "Cardiac Shock",
+      "perk": "Cardiac Shock",
+      "desc": "When Health goes below a threshold, there is a chance to replenish a Repkit Charge",
+      "redText": ""
+    },
+    "Chrome": {
+      "item": "Chrome",
+      "perk": "Chrome",
+      "desc": "On use, grants Fire Rate and Movement Speed, and reduces Repkit Cooldown each time Damage is taken",
+      "redText": ""
+    },
+    "Healthraiser": {
+      "item": "Healthraiser",
+      "perk": "Soothing",
+      "desc": "Spawns Health Boosters at the start and end of the Repkit's duration.",
+      "redText": ""
+    },
+    "Heart Pump": {
+      "item": "Heart Pump",
+      "perk": "Heart Pump",
+      "desc": "This Repkit has 3 Charges, and has a chance to replenish a Charge on kill",
+      "redText": ""
+    },
+    "Immunity Shot": {
+      "item": "Immunity Shot",
+      "perk": "Immunity Shot",
+      "desc": "On use, grants Immunity to the last Elemental Damage Taken for a duration",
+      "redText": ""
+    },
+    "Pulsometer": {
+      "item": "Pulsometer",
+      "perk": "Pulsometer",
+      "desc": "Passively regenerates Health over time, increasing in Rate when your Health is low",
+      "redText": ""
+    },
+    "Roid Rage (Corrosive)": {
+      "item": "Roid Rage (Corrosive)",
+      "perk": "Roid Rage",
+      "desc": "On Use applies stacks of Roid-Rage that decay over time. Each time a stack expires spawn a Corrosive Nova.",
+      "redText": ""
+    },
+    "Roid Rage (Cryo)": {
+      "item": "Roid Rage (Cryo)",
+      "perk": "Roid Rage",
+      "desc": "On Use applies stacks of Roid-Rage that decay over time. Each time a stack expires spawn a Cryo Nova.",
+      "redText": ""
+    },
+    "Roid Rage (Fire)": {
+      "item": "Roid Rage (Fire)",
+      "perk": "Roid Rage",
+      "desc": "On Use applies stacks of Roid-Rage that decay over time. Each time a stack expires spawn a Fire Nova.",
+      "redText": ""
+    },
+    "Roid Rage (Radiation)": {
+      "item": "Roid Rage (Radiation)",
+      "perk": "Roid Rage",
+      "desc": "On Use applies stacks of Roid-Rage that decay over time. Each time a stack expires spawn a Radiation Nova.",
+      "redText": ""
+    },
+    "Roid Rage (Shock)": {
+      "item": "Roid Rage (Shock)",
+      "perk": "Roid Rage",
+      "desc": "On Use applies stacks of Roid-Rage that decay over time. Each time a stack expires spawn a Shock Nova.",
+      "redText": ""
+    },
+    "Time Dilation": {
+      "item": "Time Dilation",
+      "perk": "Time Dilation",
+      "desc": "The Repkit's Duration is increased, and its Cooldown Duration is decreased",
+      "redText": ""
+    }
+  },
+  "heavyWeapons": {
+    "Atling Gun": {
+      "item": "Atling Gun",
+      "perk": "Whistler",
+      "desc": "",
+      "redText": "Move in silence..."
+    },
+    "Bottled Lightning": {
+      "item": "Bottled Lightning",
+      "perk": "Strike Twice",
+      "desc": "",
+      "redText": ""
+    },
+    "Disc Jockey": {
+      "item": "Disc Jockey",
+      "perk": "Bouncing Biscuits",
+      "desc": "Energy disc Projectiles bounce up to max times, and gain Damage per bounce",
+      "redText": ""
+    },
+    "Gamma Void": {
+      "item": "Gamma Void",
+      "perk": "Radiation Exposure",
+      "desc": "Creates a Singularity in which enemies take Radiation Damage over time",
+      "redText": ""
+    },
+    "Heimdahl": {
+      "item": "Heimdahl",
+      "perk": "Rig",
+      "desc": "Fires Dahl soldier heads that attack nearby enemies",
+      "redText": "In his eternal service."
+    },
+    "Ichor": {
+      "item": "Ichor",
+      "perk": "Deihazard",
+      "desc": "Deals Incendiary and Corrosive Damage",
+      "redText": ""
+    },
+    "Jetsetter": {
+      "item": "Jetsetter",
+      "perk": "Frequent Flyer",
+      "desc": "",
+      "redText": ""
+    },
+    "Sidewinder": {
+      "item": "Sidewinder",
+      "perk": "Sidewinder",
+      "desc": "",
+      "redText": "Next comes the Winding Side."
+    },
+    "Sprezzatura": {
+      "item": "Sprezzatura",
+      "perk": "Gungnir",
+      "desc": "",
+      "redText": "Effortless grace."
+    },
+    "Streamer": {
+      "item": "Streamer",
+      "perk": "Delegation",
+      "desc": "Launches stationary Projectiles that each fire a Beam forward",
+      "redText": ""
+    }
+  },
+  "terminalMods": {
+    "Bullet Amp": {
+      "item": "Bullet Amp",
+      "perk": "Bullet Amp",
+      "desc": "Shooting through the barrier amplifies gun damage",
+      "redText": ""
+    },
+    "Ironskin": {
+      "item": "Ironskin",
+      "perk": "Ironskin",
+      "desc": "Take reduced damage while in the terminal, damage reduction decreases over time",
+      "redText": ""
+    },
+    "On the Go": {
+      "item": "On the Go",
+      "perk": "On the Go",
+      "desc": "Activating the terminal will teleport it to the player's current position",
+      "redText": "For the healer... on the gooooooo!"
+    }
+  },
+  "underbarrelMods": {
+    "Atlas Dart Underbarrel": {
+      "item": "Atlas Dart Underbarrel",
+      "perk": "Atlas-Licensed Underbarrel",
+      "desc": "Fires Tracker Darts, tagging enemies that your Projectiles will home in on",
+      "redText": ""
+    },
+    "Atlas Grenade Underbarrel": {
+      "item": "Atlas Grenade Underbarrel",
+      "perk": "Atlas-Licensed Underbarrel",
+      "desc": "Fires Tracker Grenades, tagging enemies that your Projectiles will home in on",
+      "redText": ""
+    },
+    "Husky Auto Turret": {
+      "item": "Husky Auto Turret",
+      "perk": "Husky Auto Turret",
+      "desc": "",
+      "redText": ""
+    }
+  }
+}
