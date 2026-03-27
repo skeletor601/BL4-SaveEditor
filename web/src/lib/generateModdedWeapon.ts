@@ -175,7 +175,7 @@ export interface GenerateModdedWeaponOptions {
    * - "inf-ammo": always add 7× Rowan's Charge (27:75) stacks; skip the grenade block entirely.
    * - undefined/null: default probabilistic behaviour (tediore check + 35% chance).
    */
-  specialMode?: "grenade-reload" | "inf-ammo" | null;
+  specialMode?: "grenade-reload" | "inf-ammo" | "both" | null;
   /**
    * Pre-built stock weapon decoded string from auto-fill.
    * When provided, the generator uses this as the base (all stock slots filled) and
@@ -716,10 +716,12 @@ export function generateModdedWeapon(
   const rowansChargeCount = { stable: randInt(3, 7), op: randInt(5, 11), insane: randInt(6, 14) }[modPowerMode];
   // Fire rate capped lower — {27:15} on top of the full-auto string drains ammo in seconds for fast weapon types.
   const rowansFireRateCount = { stable: randInt(2, 4), op: randInt(3, 5), insane: randInt(3, 5) }[modPowerMode];
+  const wantsInfAmmo = options.specialMode === "inf-ammo" || options.specialMode === "both";
+  const wantsGrenadeReload = options.specialMode === "grenade-reload" || options.specialMode === "both";
   const rowansChargeStacks =
-    options.specialMode === "inf-ammo"
+    wantsInfAmmo
       ? [groupedToken(27, Array(9).fill(75)), groupedToken(27, Array(7).fill(15))]
-      : options.specialMode === "grenade-reload"
+      : wantsGrenadeReload
         ? []
         : tedioreReloadCode == null || Math.random() < 0.35
           ? [groupedToken(27, Array(rowansChargeCount).fill(75)), groupedToken(27, Array(rowansFireRateCount).fill(15))]
@@ -1210,7 +1212,7 @@ export function generateModdedWeapon(
   // Angel's Share removed — was preventing reload trigger for grenade reload builds.
   // Ventilator on ALL guns except grenade-reload (COV heat mechanic disables reload trigger).
   // Terra uses {286:[1×6]} on regular guns. Scales by mode.
-  const ventilatorStacks = options.specialMode === "grenade-reload"
+  const ventilatorStacks = wantsGrenadeReload
     ? []
     : [groupedToken(286, Array.from({ length: { stable: randInt(3, 5), op: randInt(5, 7), insane: randInt(6, 8) }[modPowerMode] }, () => 1))];
   // {273:29} Scanning — rockets home toward nearby targets; complements {273:1} Reticle Homing.
@@ -1490,9 +1492,11 @@ export function generateModdedWeapon(
   // Grenade system: {298:11} Torgue anchor + {291:8} Vladof waterfall wrap the {245:[...]} perk block.
   // No extra legendary grenade wrapper — Torgue + Vladof anchors are sufficient.
   const grenadeParts: string[] =
-    options.specialMode === "inf-ammo"
-      ? []
-      : [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor];
+    wantsGrenadeReload
+      ? [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor]
+      : options.specialMode === "inf-ammo"
+        ? []
+        : [torgueGrenadeAnchor, vladofGrenadeAnchor, terraGrenadePerkBlock, vladofGrenadeAnchor];
 
   const finalGrenadeParts = grenadeParts;
 
@@ -1706,11 +1710,11 @@ export function generateModdedWeapon(
 
   // ── Rowan's Charge from recipe (inf-ammo overrides to 9 charge + 7 fire rate) ──
   const recipeRowansChargeStacks: string[] = [];
-  if (options.specialMode === "inf-ammo") {
+  if (wantsInfAmmo) {
     // Inf-ammo: always max Rowan's for infinite underbarrel ammo
     recipeRowansChargeStacks.push(groupedToken(27, Array(9).fill(75)));
     recipeRowansChargeStacks.push(groupedToken(27, Array(7).fill(15)));
-  } else if (options.specialMode !== "grenade-reload" && recipeRowansCharge > 0) {
+  } else if (!wantsGrenadeReload && recipeRowansCharge > 0) {
     recipeRowansChargeStacks.push(groupedToken(27, Array(recipeRowansCharge).fill(75)));
     if (recipeRowansFireRate > 0) {
       recipeRowansChargeStacks.push(groupedToken(27, Array(Math.min(recipeRowansFireRate, 20)).fill(15)));
