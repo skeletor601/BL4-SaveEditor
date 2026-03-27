@@ -66,10 +66,37 @@ export default function GreenLabPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LabCard title="Unified Item Builder" status="live" desc="Build weapons, grenades, shields, class mods, repkits, heavies, enhancements. All in one page with live codec." link="/beta/unified-item-builder" />
-          <LabCard title="C4SH Class Mod Builder" status="new" desc="New DLC character C4SH (Rogue) fully integrated — 100 skills across 3 trees with color-coded icons." link="/beta/unified-item-builder" />
-          <LabCard title="Master Search" status="live" desc="Search 5,600+ parts by name, manufacturer, rarity, or type. All weapons now included." link="/master-search" />
-          <LabCard title="DLC Legendary Weapons" status="new" desc="34 new legendary weapons added — Mantra, Roulette, Shalashaska, Eigenburst, Flash Cyclone, and more. 6 Pearlescent rarity weapons." />
+          <LabCard title="DLC Cowbell — C4SH Character" status="new" desc="New character C4SH (Rogue) fully integrated. Class mod builder has all 100 skills across 3 trees (blue/red/green) with color-tinted icons, descriptions, and 5-tier skill IDs. Test building C4SH class mods." link="/beta/unified-item-builder" />
+          <LabCard title="34 New DLC Legendary Weapons" status="new" desc="Mantra, Shalashaska, Roulette, Eigenburst, Flash Cyclone, Inscriber, Jetsetter, Doeshot, Mercredi, and more. All with enriched perk descriptions and red text. 6 Pearlescent weapons. Check weapon builder dropdowns." link="/beta/unified-item-builder" />
+          <LabCard title="Custom Modded Grenade Generator" status="new" desc="Pick manufacturer + legendary grenade, then mods are stacked on top. Same as custom weapon generator. Hit 'Generate Modded' in grenade tab for Random/Custom modal." link="/beta/unified-item-builder" />
+          <LabCard title="Grenade Reload + Inf Alt Fire Combo" status="new" desc="Both modes can now be selected together in the weapon generator. Get grenade reload AND infinite ammo Rowan's Charge on the same gun." link="/beta/unified-item-builder" />
+          <LabCard title="New DLC Shields, Grenades, Repkits" status="new" desc="Honey Badger, Elpis Star, Hopscotch, Undershield (shields). Barb'ara, Bismuth-Tipped Dagger, Urchin, Slippy (grenades). Healthraiser, Blood Moon, Geiger-Roid (repkits). All with full descriptions." link="/beta/unified-item-builder" />
+          <LabCard title="Pearl Rarity — 33%" status="testing" desc="Pearl rarity chance changed to 33% for both weapon and grenade generators. Was 100% weapons / 10% grenades. Test that non-pearl weapons still generate correctly." link="/beta/unified-item-builder" />
+          <LabCard title="5,680 Parts in Universal DB" status="live" desc="All weapon parts now in Master Search. Search for any weapon by name, barrel, or code." link="/master-search" />
+          <LabCard title="Modded Repkit Generator" status="testing" desc="60 recipe archetypes (Tank, DPS, Healer, Speed, Elemental, Brawler, Support, Terra Specials). Class mod perks matched per archetype. Random elemental perks." link="/beta/unified-item-builder" />
+        </div>
+
+        {/* Testing checklist */}
+        <div className="rounded-xl border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+          <div className="px-5 py-3 border-b border-[var(--color-panel-border)]">
+            <h3 className="text-sm font-semibold text-emerald-400">Testing Checklist</h3>
+          </div>
+          <div className="p-5 space-y-2 text-sm">
+            <CheckItem label="Select C4SH in class mod builder — do all 100 skills show with colored icons?" />
+            <CheckItem label="Click a C4SH skill — does the popup show name + description?" />
+            <CheckItem label="Max All Skills button works for C4SH?" />
+            <CheckItem label="Build a C4SH legendary class mod — does the code generate correctly?" />
+            <CheckItem label="New DLC weapons show in weapon builder rarity dropdown (Shalashaska, Roulette, etc.)?" />
+            <CheckItem label="Pearl weapons show 'Pearl' in rarity dropdown (Eigenburst, Handcannon, Conflux)?" />
+            <CheckItem label="Custom modded grenade generator — pick manufacturer + legendary, does it generate?" />
+            <CheckItem label="Grenade Reload + Inf Alt Fire both selected — does the weapon get both?" />
+            <CheckItem label="Generate 10+ weapons — ~33% should be Pearl rarity?" />
+            <CheckItem label="New shields in shield builder (Honey Badger, Hopscotch, Undershield, Elpis Star)?" />
+            <CheckItem label="New grenades in grenade builder (Urchin, Slippy, Barb'ara, Bismuth)?" />
+            <CheckItem label="New repkits in repkit builder (Healthraiser, Blood Moon, Geiger-Roid)?" />
+            <CheckItem label="Master Search — search 'Mantra' or 'Shalashaska' — do new weapons appear?" />
+            <CheckItem label="Modded repkit generator — test all 8 categories (Tank, DPS, Healer, etc.)?" />
+          </div>
         </div>
 
         <GreenGrenadeCodes />
@@ -104,6 +131,17 @@ function LabCard({ title, status, desc, link }: { title: string; status: "new" |
     </div>
   );
   return link ? <Link to={link}>{content}</Link> : content;
+}
+
+function CheckItem({ label }: { label: string }) {
+  const [checked, setChecked] = useState(false);
+  return (
+    <label className="flex items-center gap-3 cursor-pointer group">
+      <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)}
+        className="w-4 h-4 rounded border-2 border-[var(--color-panel-border)] bg-transparent checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer" />
+      <span className={`${checked ? "line-through text-[var(--color-text-muted)]/50" : "text-[var(--color-text)]"} group-hover:text-emerald-400 transition-colors`}>{label}</span>
+    </label>
+  );
 }
 
 // ── Green's Grenade Codes ────────────────────────────────────────────────────

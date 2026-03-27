@@ -73,36 +73,52 @@ export default function TerraLabPage() {
         {/* Feature cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <LabCard
-            title="Modded Weapon Generator v2"
-            status="testing"
-            desc="Auto-fill stock base, heavy barrel accessories on all guns, visual barrel stacking, 24 grenade recipes, firmware whitelist. Generate and report back."
+            title="DLC Cowbell — C4SH Character"
+            status="new"
+            desc="New character C4SH (Rogue) fully integrated. Class mod builder has all 100 skills across 3 trees (blue/red/green) with color-tinted icons, descriptions, and 5-tier skill IDs. Test building C4SH class mods."
             link="/beta/unified-item-builder"
           />
           <LabCard
-            title="Modded Grenade Generator"
+            title="34 New DLC Legendary Weapons"
             status="new"
-            desc="Full grenade modding — auto-fill Legendary base, cross-category parts (shield, enhancement, class mod, heavy). Hit 'Generate Modded' in grenade builder."
+            desc="Mantra, Shalashaska, Roulette, Eigenburst, Flash Cyclone, Inscriber, Jetsetter, Doeshot, Mercredi, and more. All with enriched perk descriptions and red text. 6 Pearlescent weapons. Check weapon builder dropdowns."
             link="/beta/unified-item-builder"
           />
           <LabCard
-            title="24 Grenade Visual Recipes"
-            status="testing"
-            desc="Singularity Storm, Artillery Barrage, Lingering Inferno, Black Hole, MIRV Madness, Neutron Star, and more. Style-tagged with complementary perk injection."
-          />
-          <LabCard
-            title="Barrel DPS Calculator Fix"
+            title="Custom Modded Grenade Generator"
             status="new"
-            desc="Parser now handles DMG format (Torgue/Vladof) + Reload fire rate. 138/149 barrels now have damage data. 11 heavy legendaries still need lootlemon lookup."
+            desc="Pick manufacturer + legendary grenade, then mods are stacked on top. Same as custom weapon generator. Hit 'Generate Modded' in grenade tab for Random/Custom modal."
+            link="/beta/unified-item-builder"
           />
           <LabCard
-            title="Claude's Gun (1/20)"
-            status="easter-egg"
-            desc="Thought Storm grenade recipe, Radiation Convergence barrel ×4, Deadeye firmware ×3, Maliwan heavy accessories. Purple pulsing banner when rolled."
+            title="Grenade Reload + Inf Alt Fire Combo"
+            status="new"
+            desc="Both modes can now be selected together in the weapon generator. Get grenade reload AND infinite ammo Rowan's Charge on the same gun."
+            link="/beta/unified-item-builder"
           />
           <LabCard
-            title="New App Layout"
+            title="New DLC Shields, Grenades, Repkits"
+            status="new"
+            desc="Honey Badger, Elpis Star, Hopscotch, Undershield (shields). Barb'ara, Bismuth-Tipped Dagger, Urchin, Slippy (grenades). Healthraiser, Blood Moon, Geiger-Roid (repkits). All with full descriptions."
+            link="/beta/unified-item-builder"
+          />
+          <LabCard
+            title="Pearl Rarity — 33%"
+            status="testing"
+            desc="Pearl rarity chance changed to 33% for both weapon and grenade generators. Was 100% weapons / 10% grenades. Test that non-pearl weapons still generate correctly."
+            link="/beta/unified-item-builder"
+          />
+          <LabCard
+            title="5,680 Parts in Universal DB"
             status="live"
-            desc="Sidebar nav with Command Center, Gear Lab, Arsenal, Save Ops, The Vault, Workbench. Now the official homepage."
+            desc="All weapon parts now in Master Search. Build script pulls from weapon CSV + elemental CSV. Search for any weapon by name, barrel, or code."
+            link="/master-search"
+          />
+          <LabCard
+            title="Modded Repkit Generator"
+            status="testing"
+            desc="60 recipe archetypes (Tank, DPS, Healer, Speed, Elemental, Brawler, Support, Terra Specials). Class mod perks matched per archetype. Random elemental perks."
+            link="/beta/unified-item-builder"
           />
         </div>
 
@@ -112,16 +128,20 @@ export default function TerraLabPage() {
             <h3 className="text-sm font-semibold text-amber-400">Testing Checklist</h3>
           </div>
           <div className="p-5 space-y-2 text-sm">
-            <CheckItem label="Generate 10+ weapons — do they all spawn?" />
-            <CheckItem label="Every weapon has a non-kinetic element?" />
-            <CheckItem label="Visual barrels look correct (stacked 2-4×)?" />
-            <CheckItem label="Heavy barrel accessories show up on non-heavy weapons?" />
-            <CheckItem label="Grenade generator produces valid grenades?" />
-            <CheckItem label="Grenade recipes create distinct visuals?" />
-            <CheckItem label="DPS panel shows trait badges + roll counter?" />
-            <CheckItem label="Roll 20+ times — did Claude's Gun appear?" />
-            <CheckItem label="New homepage layout works on mobile?" />
-            <CheckItem label="Search 'chatgpt' in Master Search — see the Easter egg?" />
+            <CheckItem label="Select C4SH in class mod builder — do all 100 skills show with colored icons?" />
+            <CheckItem label="Click a C4SH skill — does the popup show name + description?" />
+            <CheckItem label="Max All Skills button works for C4SH?" />
+            <CheckItem label="Build a C4SH legendary class mod — does the code generate correctly?" />
+            <CheckItem label="New DLC weapons show in weapon builder rarity dropdown (Shalashaska, Roulette, etc.)?" />
+            <CheckItem label="Pearl weapons show 'Pearl' in rarity dropdown (Eigenburst, Handcannon, Conflux)?" />
+            <CheckItem label="Custom modded grenade generator — pick manufacturer + legendary, does it generate?" />
+            <CheckItem label="Grenade Reload + Inf Alt Fire both selected — does the weapon get both?" />
+            <CheckItem label="Generate 10+ weapons — ~33% should be Pearl rarity?" />
+            <CheckItem label="New shields in shield builder (Honey Badger, Hopscotch, Undershield, Elpis Star)?" />
+            <CheckItem label="New grenades in grenade builder (Urchin, Slippy, Barb'ara, Bismuth)?" />
+            <CheckItem label="New repkits in repkit builder (Healthraiser, Blood Moon, Geiger-Roid)?" />
+            <CheckItem label="Master Search — search 'Mantra' or 'Shalashaska' — do new weapons appear?" />
+            <CheckItem label="Modded repkit generator — test all 8 categories (Tank, DPS, Healer, etc.)?" />
           </div>
         </div>
 
