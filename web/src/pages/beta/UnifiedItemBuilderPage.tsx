@@ -1498,7 +1498,7 @@ export default function UnifiedItemBuilderPage() {
   const [enhancementSkinValue, setEnhancementSkinValue] = usePersistedState("uib.enhancement.skin", "");
   const [classModSkinValue, setClassModSkinValue] = usePersistedState("uib.classMod.skin", "");
   const [moddedWeaponPowerMode, setModdedWeaponPowerMode] = useState<"stable" | "op" | "insane">("op");
-  const [moddedWeaponSpecialModess, setModdedWeaponSpecialModes] = useState<Set<"grenade-reload" | "inf-ammo">>(new Set());
+  const [moddedWeaponSpecialModes, setModdedWeaponSpecialModes] = useState<Set<"grenade-reload" | "inf-ammo">>(new Set());
   const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
   const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
   const [lastDps, setLastDps] = useState<DpsEstimate | null>(null);
@@ -2948,7 +2948,7 @@ export default function UnifiedItemBuilderPage() {
                 const tedioreReload = opts.find((o) => /\bTediore Reload\b/i.test(o.label));
                 const forced: { label: string; qty: string }[] = [];
                 if (jakobsRicochet) forced.push({ label: jakobsRicochet.label, qty: "1" });
-                if (!moddedWeaponSpecialModess.has("inf-ammo") && tedioreReload) forced.push({ label: tedioreReload.label, qty: "1" });
+                if (!moddedWeaponSpecialModes.has("inf-ammo") && tedioreReload) forced.push({ label: tedioreReload.label, qty: "1" });
                 if (forced.length > 0) {
                   autoFillSelections[partType] = forced;
                   return;
@@ -2993,7 +2993,7 @@ export default function UnifiedItemBuilderPage() {
                       const tr = o.find((x) => /tediore\s*reload/i.test(x.label));
                       const forced: { label: string; qty: string }[] = [];
                       if (jr) forced.push({ label: jr.label, qty: "1" });
-                      if (!moddedWeaponSpecialModess.has("inf-ammo") && tr) forced.push({ label: tr.label, qty: "1" });
+                      if (!moddedWeaponSpecialModes.has("inf-ammo") && tr) forced.push({ label: tr.label, qty: "1" });
                       if (forced.length > 0) { retrySelections[pt] = forced; return; }
                     }
                     if (o.length) retrySelections[pt] = [{ label: o[Math.floor(Math.random() * o.length)]!.label, qty: "1" }];
@@ -3012,7 +3012,7 @@ export default function UnifiedItemBuilderPage() {
       const { code: decoded, dps, isClaudeGun } = generateModdedWeapon(editData, universalPartCodes, {
         level: weaponLevel,
         modPowerMode: moddedWeaponPowerMode,
-        specialMode: moddedWeaponSpecialModess.has("grenade-reload") && moddedWeaponSpecialModess.has("inf-ammo") ? "both" : moddedWeaponSpecialModess.has("grenade-reload") ? "grenade-reload" : moddedWeaponSpecialModess.has("inf-ammo") ? "inf-ammo" : null,
+        specialMode: moddedWeaponSpecialModes.has("grenade-reload") && moddedWeaponSpecialModes.has("inf-ammo") ? "both" : moddedWeaponSpecialModes.has("grenade-reload") ? "grenade-reload" : moddedWeaponSpecialModes.has("inf-ammo") ? "inf-ammo" : null,
         forcedPrefix: autoFillPrefix ?? (weaponMfgUserSelected && weaponMfgWtId ? Number(weaponMfgWtId) : undefined),
         stockBaseDecoded,
         skin: undefined,  // Always random skin on Generate Modded — UI skin picker is for manual builds only
@@ -4476,7 +4476,7 @@ export default function UnifiedItemBuilderPage() {
                   </select>
                   {/* Special mode — can select both */}
                   {(["grenade-reload", "inf-ammo"] as const).map((mode) => {
-                    const active = moddedWeaponSpecialModess.has(mode);
+                    const active = moddedWeaponSpecialModes.has(mode);
                     const label = mode === "grenade-reload" ? "Grenade Reload" : "Inf Alt Fire";
                     const tip = mode === "grenade-reload"
                       ? "Add grenade reload block (grenade item + perk stacks) to every generated gun."
