@@ -326,17 +326,61 @@ Same pattern as weapons. Search for the manufacturer root entry and its sub-entr
 
 ---
 
-## Extracting Skill Names and Descriptions
+## Extracting Skill Names, Descriptions, and Icon Mappings
 
-### Skill names from skilltrees_data4.json
+### CRITICAL: Icon-to-Skill Mapping (skilltrees_data4.json)
 
-Search for the character's tree entries. Each node has:
-- Position (`"Trunk - Row 1 - 1"`)
-- Tooltip reference (`"tooltip_robo_passive_01_TableFLip"`)
-- Icon path (`"/Game/DLC/Cowbell/uiresources/skill_icons/passives/c4sh_passive_blue_01"`)
-- Node type (passive, augment, capstone)
+**DO NOT guess which icon file goes with which skill by position order.** The game mixes icon colors across trees. For example, `c4sh_passive_blue_06` is actually "Luck Be a Robot" which belongs to the GREEN tree, and `c4sh_passive_red_23` is actually "Fast Hands" from the BLUE tree.
 
-### Skill descriptions from uitooltipdata4.json
+The ONLY reliable mapping is in `skilltrees_data4.json`. Each skill node has BOTH an `icon` field and a `tooltip` field side by side:
+
+```json
+{
+  "name": { "value": "Trunk - Row 1 - 1" },
+  "icon": { "value": "Asset'/Game/DLC/Cowbell/uiresources/skill_icons/passives/c4sh_passive_blue_01.c4sh_passive_blue_01'" },
+  "tooltip": { "value": "uitooltipdata'tooltip_robo_passive_14_TakeThePot'" }
+}
+```
+
+This tells you: icon file `c4sh_passive_blue_01` = skill "TakeThePot" (Passive_14 = "Take the Pot").
+
+**Extract the full mapping with this script:**
+
+```python
+import re, json
+
+with open('skilltrees_data4.json', 'r') as f:
+    text = f.read()
+
+icons = re.findall(
+    r'"icon":\s*\{[^}]*"value":\s*"Asset[^"]*/(c4sh_passive_(?:blue|red|green)_\d+)', text)
+tooltips = re.findall(
+    r'"tooltip":\s*\{[^}]*"value":\s*"uitooltipdata\'tooltip_robo_passive_(\d+_\w+)\'"', text)
+
+for i in range(min(len(icons), len(tooltips))):
+    print(f'{icons[i]} -> {tooltips[i]}')
+```
+
+**Important notes:**
+- Some icons appear in multiple trees (e.g. `blue_11` appears 3 times for Devil's Tines variants across all trees)
+- Stat nodes with `nodetype=None` may not have tooltip references — these are generic stat boost nodes without unique icons
+- The number of icons (101) exceeds the number of tooltip-mapped skills (85) because stat nodes reuse icons
+
+### Tooltip internal names vs display names
+
+The tooltip key like `tooltip_robo_passive_01_TableFLip` contains the INTERNAL name ("TableFlip"), NOT the display name ("Fast Hands"). You need a mapping table from internal→display. The display names come from the `uitooltipdata4.json` header fields or from in-game observation.
+
+Example mappings that are NOT obvious:
+- `TableFLip` → "Fast Hands"
+- `HeroCall` → "Insurance"
+- `Steam` → "Splash the Pot"
+- `TheFuries` → "Hot Hand"
+- `BoneShrapnel` → "Trick Shot"
+- `RideWithTheDevil` → "A Blur of Fingers and Brass"
+- `Unchained` (31) → "Unleashed"
+- `Unchained` (38) → "Ride to Ruin" (yes, two different skills share the internal name)
+
+### Skill stat descriptions from uitooltipdata4.json
 
 Search for tooltip entries matching the character prefix (e.g. `tooltip_robo_passive_`). Each has a `formattext` field with the stat description:
 
@@ -346,8 +390,74 @@ Search for tooltip entries matching the character prefix (e.g. `tooltip_robo_pas
 }
 ```
 
-Tags to strip: `[secondary]`, `[/secondary]`, `[newline]`, `[flavor]`, `[/flavor]`, `[rd_color]`, `[/rd_color]`, `[primary]`, `[/primary]`.
-`{0} {1}` = dynamic values filled by the game engine.
+**Extract all descriptions:**
+
+```python
+import re
+
+with open('uitooltipdata4.json', 'r') as f:
+    text = f.read()
+
+for m in re.finditer(
+    r'tooltip_robo_passive_(\d+)_(\w+).*?"formattext".*?"value":\s*"([^"]+)"',
+    text, re.DOTALL):
+    num, name, desc = m.group(1), m.group(2), m.group(3)
+    # Clean markup
+    desc = re.sub(r'RoboDealer_Passives_UI,\s*\w+,\s*', '', desc)
+    desc = re.sub(r'\[/?(?:secondary|flavor|newline|rd_color|primary)\]', '', desc)
+    print(f'Passive_{num} ({name}): {desc.strip()}')
+```
+
+**Tags to strip:** `[secondary]`, `[/secondary]`, `[newline]`, `[flavor]`, `[/flavor]`, `[rd_color]`, `[/rd_color]`, `[primary]`, `[/primary]`, `[nowrap]`, `[fire_icon]`, `[fire]`, etc.
+
+`{0} {1}` = dynamic values filled by the game engine (percentages, numbers).
+`$VALUE$` = alternative template placeholder used by some skills.
+
+Skills with only flavor text (no stat description) need manual enrichment from in-game:
+- These have descriptions like "I bring a fork." or "Truth is... the game was rigged from the start."
+- They're typically capstone or special interaction skills
+
+### Class Mod Legendary Descriptions from ui_stat4.json
+
+Search for `uistat_cm_{char}_legendary_` entries:
+
+```python
+import re
+
+with open('ui_stat4.json', 'r') as f:
+    text = f.read()
+
+# Descriptions
+for m in re.finditer(
+    r'"uistat_cm_robo_legendary_(\w+?)".*?"formattext".*?"value":\s*"([^"]+)"',
+    text, re.DOTALL):
+    name = m.group(1)
+    if '_redtext' not in name:
+        print(f'{name}: {m.group(2)[:200]}')
+
+# Red text
+for m in re.finditer(
+    r'"uistat_cm_robo_legendary_(\w+_redtext)".*?"formattext".*?"value":\s*"([^"]+)"',
+    text, re.DOTALL):
+    print(f'RED {m.group(1)}: {m.group(2)}')
+```
+
+These descriptions go into `web/src/data/classModNameDescriptions.ts` for the hover card popups.
+
+### Weapon Legendary Descriptions from ui_stat4.json
+
+Same file, search for `uistat_WEAPONNAME_desc` and `uistat_WEAPONNAME_red_text`:
+
+```python
+# Example: search for all weapon descriptions
+for m in re.finditer(
+    r'"uistat_(\w+?)_(?:desc|red_text)".*?"formattext".*?"value":\s*"([^"]+)"',
+    text, re.DOTALL):
+    print(f'{m.group(1)}: {m.group(2)[:200]}')
+```
+
+The description format is: `[rarity_legendary]PerkName[/rarity_legendary] - Effect description`
+Red text format: flavor text (goes in the Description column of the CSV)
 
 ---
 
@@ -362,13 +472,30 @@ Icon paths follow this pattern:
 /Game/DLC/Cowbell/uiresources/skill_icons/trait/vh_trait_c4sh
 ```
 
+Base game characters use a different path pattern:
+```
+/Game/uiresources/_shared/assets/ico_ui_art_passives/{CharName}/ico_passive_{char}_{skill}
+```
+
 ### Step 2: Extract with FModel
 
 1. Open FModel, point at BL4 install directory
-2. Navigate: **Content > DLC > [DLC_NAME] > uiresources > skill_icons > passives**
-3. Select all textures, right-click > **Save Texture (.png)**
+2. The `/Game/` path maps to the **Content** folder in FModel
+3. Navigate: **Content > DLC > [DLC_NAME] > uiresources > skill_icons > passives**
+4. Select all textures, right-click > **Save Texture (.png)**
+5. Also grab from `trait/` and `augments/` if needed
 
-### Step 3: Rename for the app
+**Important FModel notes:**
+- DLC pak files must be loaded first (Archives menu)
+- The `Content` folder is at the top level, alongside `Config`, `Plugins`, etc.
+- NCS parsed data does NOT contain actual image files — only asset path references
+- The Cheat Engine UE5Dumper tool cannot extract textures either — it's for runtime memory inspection only
+
+### Step 3: Map icons to skills BEFORE renaming
+
+**DO NOT rename by icon number order.** Use the skilltrees_data mapping (see "Icon-to-Skill Mapping" section above). The icon file `c4sh_passive_blue_01` might map to a completely different skill than you'd expect.
+
+### Step 4: Rename for the app
 
 The app generates icon filenames via `getClassModSkillIconFilename()`:
 - Strip diacritics (NFD normalize)
@@ -381,13 +508,16 @@ The app generates icon filenames via `getClassModSkillIconFilename()`:
 
 Example: `"Before She Knows You're Dead"` → `before_she_knows_youre_dead_5.png`
 
-### Step 4: Color tint icons
+### Step 5: Color tint icons by TREE, not by icon filename
 
-Existing character icons have color tints baked in. New character icons from FModel are grayscale/white. Tint them with Python:
+**CRITICAL:** Tint by the skill's ACTUAL TREE, not by the icon's filename color. The game reuses icons across trees — `c4sh_passive_blue_06` belongs to the GREEN tree (Luck Be a Robot), so it gets GREEN tinting, not blue.
+
+Existing character icons have color tints baked in. New character icons from FModel are grayscale/white on transparent. Tint them with Python:
 
 ```python
 from PIL import Image
 import numpy as np
+import os
 
 def tint_image(path, tint_rgb):
     img = Image.open(path).convert('RGBA')
@@ -398,15 +528,25 @@ def tint_image(path, tint_rgb):
     arr[:,:,2] = lum * tint_rgb[2]
     Image.fromarray(arr.clip(0,255).astype(np.uint8), 'RGBA').save(path)
 
-# Blue tree
-tint_image("skill_icon.png", (60, 140, 255))
-# Red tree
-tint_image("skill_icon.png", (255, 80, 60))
-# Green tree
-tint_image("skill_icon.png", (60, 220, 120))
+BLUE = (60, 140, 255)
+RED = (255, 80, 60)
+GREEN = (60, 220, 120)
+NEUTRAL = (200, 200, 200)  # For shared skills like Devil's Tines
+
+# Tint each icon by its SKILL TREE, not filename
+for skill_name in blue_tree_skills:
+    tint_image(f'class_mods/C4SH/{skill_name}_5.png', BLUE)
+for skill_name in red_tree_skills:
+    tint_image(f'class_mods/C4SH/{skill_name}_5.png', RED)
+for skill_name in green_tree_skills:
+    tint_image(f'class_mods/C4SH/{skill_name}_5.png', GREEN)
+# Shared skills
+tint_image('class_mods/C4SH/devils_tines_5.png', NEUTRAL)
 ```
 
-### Step 5: Place icons
+The skill tree assignment for color-coding is also used in the frontend (`UnifiedItemBuilderPage.tsx`) via `C4SH_BLUE_SKILLS`, `C4SH_RED_SKILLS`, `C4SH_GREEN_SKILLS` Sets that color the skill names in the UI.
+
+### Step 6: Place icons
 
 Put renamed + tinted PNGs in `class_mods/{CHARACTER_NAME}/`. The API serves them via:
 `GET /accessories/class-mod/skill-icon/{className}/{filename}`
@@ -464,23 +604,109 @@ Then rebuild: `node scripts/build_parts_db.js`
 
 This generates `api/data/parts.json` and `master_search/db/universal_parts_db.json` from all the CSVs above.
 
+**IMPORTANT:** The build script reads from ALL these CSV sources. Weapons come from `weapon_edit/all_weapon_part_EN.csv` + `elemental.csv`. If a CSV isn't listed in the build script, items won't appear in Master Search or the Parts Translator.
+
+**weapon_rarity.csv** is a SEPARATE file that feeds the weapon builder's rarity dropdown specifically. It's NOT read by the build script. New legendaries need to be added to BOTH `all_weapon_part_EN.csv` AND `weapon_rarity.csv`.
+
+### Enrichment Checklist
+
+For each new item, ensure the database entry has:
+- **Weapons**: barrel damage stats, fire rate, accuracy, shot count, legendary perk name, perk description, red/flavor text
+- **Shields**: legendary perk name, perk effect description, red text, model stats (capacity, regen, delay)
+- **Grenades**: legendary perk name, payload description, red text
+- **Repkits**: legendary perk name, augment effect description, red text
+- **Class mods**: legendary body name, skill param reference, stat bonus type
+
+Source for enrichment:
+- `ui_stat4.json` — weapon/gear descriptions via `uistat_ITEMNAME_desc` and `uistat_ITEMNAME_red_text`
+- `uitooltipdata4.json` — skill descriptions via `tooltip_CHAR_passive_XX_Name`
+- `inv4.json` barrel entries — damage attributes, fire rate, projectiles per shot, burst count
+
 ---
 
 ## Adding a New Character (Checklist)
 
 When a new playable character is added:
 
-1. **Extract from NCS**: class type ID, rarity IDs, body IDs, legendary IDs, skill tier IDs
-2. **Update CSVs**: `Skills.csv`, `Class_rarity_name.csv`, `Class_legendary_map.csv`
-3. **Create skills JSON**: `class_mods/{NAME}_skills_full.json` (flat array format)
-4. **Extract + tint icons**: FModel → rename → tint → place in `class_mods/{NAME}/`
-5. **Update code files**:
-   - `api/src/data/classModBuilder.ts` — CLASS_IDS, CLASS_NAMES, PER_CLASS_RARITIES
-   - `api/src/routes/accessories.ts` — allowedClasses array
-   - `web/src/pages/beta/UnifiedItemBuilderPage.tsx` — CLASS_MOD_CLASS_IDS, CLASS_MOD_PER_CLASS_RARITIES, suffixMap
-   - `web/src/pages/accessories/ClassModBuilderView.tsx` — CLASS_IDS, suffixMap
-   - `web/src/components/SkillCardPopup.tsx` — suffixMap
-   - `web/src/data/classModNameDescriptions.ts` — character type union + color
-   - `web/src/components/ClassModNameHoverCard.tsx` — character color theme
-   - `scripts/build_parts_db.js` — CLASS_IDS_MAP
-6. **Rebuild**: `node scripts/build_parts_db.js`
+### Phase 1: Extract data from NCS
+1. Find class mod root in `inv4.json` → get **class type ID** (Root serialindex)
+2. Extract **rarity IDs** (comp_01_common through comp_04_epic serialindex values)
+3. Extract **body IDs** (body_01 through body_10 + legendary bodies)
+4. Extract **legendary comp IDs** (comp_05_legendary_01 through _06 + DLC legendaries)
+5. Extract **skill tier IDs** from passive_points entries (5 tiers per skill)
+6. Extract **class mod name parts** from `inv_name_part4.json` (np_cm_CHAR_01 through _10 + leg names)
+7. Map **icon files to skills** using `skilltrees_data4.json` icon+tooltip pairs (DO NOT GUESS)
+8. Extract **skill descriptions** from `uitooltipdata4.json` formattext fields
+9. Extract **legendary class mod descriptions** from `ui_stat4.json` (uistat_cm_CHAR_legendary_*)
+10. Check for **Pearlescent** items (look for `pearlescent` tag in basetags)
+
+### Phase 2: Update CSVs
+1. `class_mods/Skills.csv` — all skills with 5-tier IDs
+2. `class_mods/Class_rarity_name.csv` — normal + legendary names with name_codes
+3. `class_mods/Class_legendary_map.csv` — legendary name → item card ID mapping
+
+### Phase 3: Create supporting files
+1. `class_mods/{NAME}_skills_full.json` — flat array format: `[{ name, type, description, stats[] }]`
+   - Must match format of `Amon_skills_full.json` (flat array, NOT nested object)
+   - Skill names must EXACTLY match what's in `Skills.csv`
+2. `web/src/data/classModNameDescriptions.ts` — add legendary + normal class mod name descriptions
+   - Legendary entries need full perk description + red text
+   - Normal entries can be simple "Character standard class mod."
+
+### Phase 4: Extract + process icons
+1. Use **FModel** (Content > DLC > [NAME] > uiresources > skill_icons > passives)
+2. Map icon files to skills using `skilltrees_data4.json` (Step 7 above) — **NOT by position order**
+3. Rename to `{skill_name_underscored}_{suffix}.png` matching `getClassModSkillIconFilename()` output
+4. Handle hyphens: the function strips hyphens, so "Trick-Taker" → `tricktaker_5.png` not `trick-taker_5.png`
+5. Handle apostrophes: stripped, so "Dealer's Bluff" → `dealers_bluff_5.png`
+6. Tint by **actual skill tree** color, not icon filename color
+7. Place in `class_mods/{NAME}/`
+
+### Phase 5: Update code files
+1. `api/src/data/classModBuilder.ts` — CLASS_IDS, CLASS_NAMES, PER_CLASS_RARITIES
+2. `api/src/routes/accessories.ts` — add to allowedClasses array
+3. `web/src/pages/beta/UnifiedItemBuilderPage.tsx`:
+   - CLASS_MOD_CLASS_IDS, CLASS_MOD_PER_CLASS_RARITIES, suffixMap
+   - Add color-coding Sets (e.g. C4SH_BLUE_SKILLS, C4SH_RED_SKILLS, C4SH_GREEN_SKILLS)
+   - Add `getC4SHSkillColor()` function and conditional in skill name rendering
+4. `web/src/pages/accessories/ClassModBuilderView.tsx` — CLASS_IDS, suffixMap
+5. `web/src/components/SkillCardPopup.tsx` — suffixMap
+6. `web/src/data/classModNameDescriptions.ts` — character type union + color + all name entries
+7. `web/src/components/ClassModNameHoverCard.tsx` — character color theme (border, gradient, badge, name color)
+8. `scripts/build_parts_db.js` — CLASS_IDS_MAP
+
+### Phase 6: Rebuild and verify
+1. Run `node scripts/build_parts_db.js` — verify entry count increased
+2. Check that skills appear in class mod builder dropdown
+3. Check that icons display correctly with proper tree colors
+4. Check that clicking skill names shows popup with description
+5. Check that clicking legendary class mod names shows hover card with perk description
+6. Check that "Max All Skills" button works for new character
+
+---
+
+## Lessons Learned (Cowbell DLC, March 2026)
+
+1. **NCS parser output format matters.** The older `ncs_automation` parser produces flat string/numeric pools. The **Borderlands-4.NcsParser** produces structured JSON with typed fields and `serialindex` — use this one.
+
+2. **DLC content is additive.** The Cowbell DLC added 546 new files in a `_12_P` pakchunk. Zero base game files were modified. All diffing should look for new pakchunk variants.
+
+3. **Icon filenames do NOT match skill tree colors.** The game internally names icons `c4sh_passive_blue_XX` but those icons can belong to any tree. Always use the `skilltrees_data4.json` mapping.
+
+4. **Two different parsers produce different folder structures.** The `ncs_automation` parser outputs to `parsed/`, `decompressed/`, `ncs_files/`. The `Borderlands-4.NcsParser` outputs to `output/json/` with `_metadata.json` companion files.
+
+5. **`weapon_rarity.csv` is separate from `all_weapon_part_EN.csv`.** New legendaries must go in BOTH files or they won't appear in the weapon builder's rarity dropdown.
+
+6. **The build script (`build_parts_db.js`) generates both `parts.json` and `universal_parts_db.json`.** Both must be rebuilt. The script now includes weapon CSVs + elemental.csv as of the Cowbell update.
+
+7. **Pearl rarity detection:** Search for `"pearlescent"` in the `basetags` of `comp_05_legendary_*` entries. Not all legendaries are pearl — only specific ones tagged with `rarity'06_pearlescent'`.
+
+8. **Class mod skill descriptions come from two places:** stat-based descriptions from `uitooltipdata4.json`, and legendary class mod perk descriptions from `ui_stat4.json`. Both need to be extracted.
+
+9. **Some skills have only flavor text in the NCS data** (capstones, special interactions). These need manual enrichment from in-game observation or community wikis.
+
+10. **`usePersistedState` does not work with JavaScript Sets.** If you change a `useState<string>` to `useState<Set<string>>`, it will break localStorage serialization. Use plain `useState` for Sets.
+
+11. **`replace_all` in the Edit tool is dangerous.** It can catch variable names in declarations, turning `moddedWeaponSpecialModes` into `moddedWeaponSpecialModess`. Always verify after bulk renames.
+
+12. **The NCS `inv4.json` does NOT contain actual numeric stat values** (damage, fire rate, accuracy). It contains column NAME references to external UE data tables. The actual numbers are in the game's data tables, not extractable from NCS alone. Barrel stat strings in the CSVs were originally obtained from in-game observation or lootlemon.
