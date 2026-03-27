@@ -25,7 +25,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description
 267,11,Legendary Perk,Ninja Speed,"Consecutive hits grant +10% movement speed for a short duration, stacks up to 7 times"
 267,12,Rarity,Legendary,Sho Kunai skin
 267,13,Perk,Repeater Augment,Spawns additional Grenades while midflight
-267,19,Legendary Perk,Bismuth-Tipped Dagger,DLC Legendary Grenade - 5 elemental variants
+267,19,Legendary Perk,Bismuth-Tipped Dagger,"Bismuth - Attaches on Hit. Enemies take more elemental damage for each attached Dagger. 5 element variants. Red Text: Get down with the Bismuth!"
 267,20,Rarity,Legendary,Bismuth-Tipped Dagger Skin
 270,1,Rarity,Common,
 270,2,Rarity,Uncommon,
@@ -71,7 +71,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description
 291,7,Rarity,Legendary,Blockbuster skin
 291,8,Legendary Perk,Waterfall,Causes additional explosions when damaging targets
 291,9,Rarity,Legendary,Waterfall skin
-291,11,Legendary Perk,Barb'ara,DLC Legendary Grenade
+291,11,Legendary Perk,Barb'ara,"Tentacles. Red Text: Ooh mami."
 291,12,Rarity,Legendary,Barb'ara Skin
 291,10,Perk,Vladof,Grenade explodes on impact
 298,1,Rarity,Common,

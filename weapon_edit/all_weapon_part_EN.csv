@@ -3734,67 +3734,68 @@ Stats: ""Item Type ID: 24, Item ID: 97""
 Model: Rare"
 27,Jakobs,Assault Rifle,79,Rarity,Rowdy Rider,Legendary: Rowdy Rider,Legendary: Rowdy Rider
 9,Jakobs,Shotgun,100,Rarity,Hellwalker Skin,Can be used for skin,Can be used for skin
-5,Tediore,Pistol,86,Rarity,TED_PS.part_rarity,Can be used for skin,Inscriber Skin
+5,Tediore,Pistol,86,Rarity,Inscriber,"Effigy - Hitting enemies spawns 4 projectiles behind them. Red Text: For those who come after.","Effigy - Hitting enemies spawns 4 projectiles behind them. Red Text: For those who come after."
 275,Ripper,Heavy Weapon,10,Rarity,Jelly Skin,Can be used for skin,Can be used for skin
-23,Ripper,Sniper,57,Rarity,Rainmaker,Legendary,Legendary
-10,Maliwan,Shotgun,80,Rarity,Mantra,Legendary,Legendary
-13,Daedalus,Assault Rifle,82,Barrel,DAD_AR.part_barrel_mercredi,"Mercredi Barrel",
-13,Daedalus,Assault Rifle,83,Rarity,Mercredi,"Legendary: Mercredi",
-2,Daedalus,Pistol,79,Barrel,DAD_PS.part_barrel_soulsurvivor,"Soul Survivor Barrel",
-2,Daedalus,Pistol,80,Rarity,Soul Survivor,"Legendary: Soul Survivor",
-20,Daedalus,SMG,1,Barrel,DAD_SM.part_barrel_follower,"Prowler Barrel",
-20,Daedalus,SMG,2,Rarity,Prowler,"Legendary: Prowler",
-3,Jakobs,Pistol,82,Barrel,JAK_PS.part_barrel_shalashaska,"Shalashaska Barrel",
-3,Jakobs,Pistol,83,Rarity,Shalashaska,"Legendary: Shalashaska",
-9,Jakobs,Shotgun,99,Barrel,JAK_SG.part_barrel_doeshot,"Doeshot Barrel",
-24,Jakobs,Sniper Rifle,77,Barrel,JAK_SR.part_barrel_fearstalker,"Fearstalker Barrel",
-24,Jakobs,Sniper Rifle,78,Rarity,Fearstalker,"Legendary: Fearstalker",
-289,Maliwan,Heavy Weapon,27,Barrel,MAL_HW.part_barrel_ichor,"Ichor Barrel",
-289,Maliwan,Heavy Weapon,28,Rarity,Ichor,"Legendary: Ichor",
-21,Maliwan,SMG,80,Barrel,MAL_SM.part_barrel_songbird,"Broken Wings Barrel",
-21,Maliwan,SMG,81,Rarity,Broken Wings,"Legendary: Broken Wings (Songbird)",
-21,Maliwan,SMG,84,Barrel,MAL_SM.part_barrel_flashcyclone,"Flash Cyclone Barrel",
-21,Maliwan,SMG,85,Rarity,Flash Cyclone,"Legendary: Flash Cyclone",
-10,Maliwan,Shotgun,60,Barrel,MAL_SG.part_barrel_reminisce,"Reminisce Barrel",
-10,Maliwan,Shotgun,61,Rarity,Reminisce,"Legendary: Reminisce",
-25,Maliwan,Sniper Rifle,81,Barrel,MAL_SR.part_barrel_conflux,"Conflux Barrel",
-25,Maliwan,Sniper Rifle,82,Rarity,Conflux,"Legendary: Conflux",
-15,Order,Assault Rifle,78,Barrel,ORD_AR.part_barrel_crowsourced,"Crow-Sourced Barrel",
-15,Order,Assault Rifle,77,Rarity,Crow-Sourced,"Legendary: Crow-Sourced",
-4,Order,Pistol,84,Barrel,ORD_PS.part_barrel_roulette,"Roulette Barrel",
-4,Order,Pistol,85,Rarity,Roulette,"Legendary: Roulette",
-4,Order,Pistol,82,Barrel,ORD_PS.part_barrel_sunspot,"Sunspot Barrel",
-4,Order,Pistol,83,Rarity,Sunspot,"Legendary: Sunspot",
-275,Ripper,Heavy Weapon,35,Barrel,BOR_HW.part_barrel_jetset,"Jetsetter Barrel",
-275,Ripper,Heavy Weapon,36,Rarity,Jetsetter,"Legendary: Jetsetter",
-19,Ripper,SMG,58,Barrel,BOR_SM.part_barrel_falke,"Falke Barrel",
-19,Ripper,SMG,59,Rarity,Falke,"Legendary: Falke",
-7,Ripper,Shotgun,21,Barrel,BOR_SG.part_barrel_crazedearl,"Crazed Earl Barrel",
-7,Ripper,Shotgun,54,Rarity,Crazed Earl,"Legendary: Crazed Earl",
-7,Ripper,Shotgun,56,Rarity,Hair Trigger,"Legendary: Hair Trigger (Demo)",
-23,Ripper,Sniper Rifle,22,Barrel,BOR_SR.part_barrel_tankbuster,"Tankbuster Barrel",
-23,Ripper,Sniper Rifle,56,Rarity,Tankbuster,"Legendary: Tankbuster",
-14,Tediore,Assault Rifle,78,Barrel,TED_AR.part_barrel_laserdisc,"Laser Disker Barrel",
-14,Tediore,Assault Rifle,79,Rarity,Laser Disker,"Legendary: Laser Disker",
-11,Tediore,Shotgun,81,Barrel,TED_SG.part_barrel_eigenburst,"Eigenburst Barrel",
-11,Tediore,Shotgun,82,Rarity,Eigenburst,"Legendary: Eigenburst",
-17,Torgue,Assault Rifle,82,Barrel,TOR_AR.part_barrel_fleabag,"Fleabag Barrel",
-17,Torgue,Assault Rifle,83,Rarity,Fleabag,"Legendary: Fleabag",
-273,Torgue,Heavy Weapon,42,Barrel,TOR_HW.part_barrel_dahlfather,"Heimdahl Barrel",
-273,Torgue,Heavy Weapon,43,Rarity,Heimdahl,"Legendary: Heimdahl (DahlFather)",
-6,Torgue,Pistol,77,Barrel,TOR_PS.part_barrel_handcannon,"Handcannon Barrel",
-6,Torgue,Pistol,78,Rarity,Handcannon,"Legendary: Handcannon",
-6,Torgue,Pistol,56,Barrel,TOR_PS.part_barrel_scootshoot,"Scoot'n'Shoot Barrel",
-6,Torgue,Pistol,57,Rarity,Scoot'n'Shoot,"Legendary: Scoot'n'Shoot",
-12,Torgue,Shotgun,78,Barrel,TOR_SG.part_barrel_arctic,"Arctic Barrel",
-12,Torgue,Shotgun,79,Rarity,Arctic,"Legendary: Arctic",
-12,Torgue,Shotgun,76,Barrel,TOR_SG.part_barrel_unstable_kor,"Unstable Kor Barrel",
-12,Torgue,Shotgun,77,Rarity,Unstable Kor,"Legendary: Unstable Kor",
-18,Vladof,Assault Rifle,99,Barrel,VLA_AR.part_barrel_bubbles,"Bubbles Barrel",
-18,Vladof,Assault Rifle,100,Rarity,Bubbles,"Legendary: Bubbles",
-18,Vladof,Assault Rifle,102,Barrel,VLA_AR.part_barrel_lasercutter,"Laser-Cutter Barrel",
-18,Vladof,Assault Rifle,103,Rarity,Laser-Cutter,"Legendary: Laser-Cutter",
-22,Vladof,SMG,91,Barrel,VLA_SM.part_barrel_mercury,"Mercurious Barrel",
-22,Vladof,SMG,92,Rarity,Mercurious,"Legendary: Mercurious (Mercury)",
-16,Vladof,Sniper Rifle,87,Barrel,VLA_SR.part_barrel_hemorrhage,"Hemorrhage Barrel",
-16,Vladof,Sniper Rifle,88,Rarity,Hemorrhage,"Legendary: Hemorrhage",
+23,Ripper,Sniper,57,Rarity,Rainmaker,"Irrigation. Red Text: Drown in lead.","Irrigation. Red Text: Drown in lead."
+10,Maliwan,Shotgun,80,Rarity,Mantra,"Chakra - Deals Melee damage. Red Text: Punch your way to self-actualization","Chakra - Deals Melee damage. Red Text: Punch your way to self-actualization"
+13,Daedalus,Assault Rifle,82,Barrel,DAD_AR.part_barrel_mercredi,"Mercredi Barrel - Cycles between firing styles on Reload. While Target-locked gain stacking Damage buff",
+13,Daedalus,Assault Rifle,83,Rarity,Mercredi,"Cyclical - Cycles between firing styles on Reload. While Target-locked gain stacking Damage buff. Red Text: Lord Tuesday wishes to speak of burgers.","Cyclical - Cycles between firing styles on Reload. While Target-locked gain stacking Damage buff. Red Text: Lord Tuesday wishes to speak of burgers."
+2,Daedalus,Pistol,79,Barrel,DAD_PS.part_barrel_soulsurvivor,"Soul Survivor Barrel - Deals increased Damage for each ally in Fight For Your Life",
+2,Daedalus,Pistol,80,Rarity,Soul Survivor,"Adrenaline - Deals increased Damage for each ally in Fight For Your Life. Red Text: At first I was afraid...","Adrenaline - Deals increased Damage for each ally in Fight For Your Life. Red Text: At first I was afraid..."
+20,Daedalus,SMG,1,Barrel,DAD_SM.part_barrel_follower,"Prowler Barrel - Bullets slowly home in on targets. Reloading accelerates them toward targets",
+20,Daedalus,SMG,2,Rarity,Prowler,"Pounce - Bullets slowly home in on targets. Reloading accelerates them toward targets. Red Text: Nope.","Pounce - Bullets slowly home in on targets. Reloading accelerates them toward targets. Red Text: Nope."
+3,Jakobs,Pistol,82,Barrel,JAK_PS.part_barrel_shalashaska,"Shalashaska Barrel - On Auto-Reload grants Exhiliration stacks increasing Ricochets",
+3,Jakobs,Pistol,83,Rarity,Shalashaska,"Aweful Lot - On Auto-Reload grants Exhiliration stacks increasing Ricochets. Red Text: I love to reload during a battle.","Aweful Lot - On Auto-Reload grants Exhiliration stacks increasing Ricochets. Red Text: I love to reload during a battle."
+9,Jakobs,Shotgun,99,Barrel,JAK_SG.part_barrel_doeshot,"Doeshot Barrel - Doer",
+9,Jakobs,Shotgun,100,Rarity,Doeshot,"Doer. Red Text: So La Ti Buck","Doer. Red Text: So La Ti Buck"
+24,Jakobs,Sniper Rifle,77,Barrel,JAK_SR.part_barrel_fearstalker,"Fearstalker Barrel - Critical Hits grant Deduction stacks. Non-Critical Hits grant Observation stacks",
+24,Jakobs,Sniper Rifle,78,Rarity,Fearstalker,"Improbable - Critical Hits grant Deduction stacks increasing next Non-Critical Damage. Non-Critical Hits grant Observation stacks increasing next Critical Damage. Red Text: Quite right...mauled to death it seems.","Improbable - Critical Hits grant Deduction stacks increasing next Non-Critical Damage. Non-Critical Hits grant Observation stacks increasing next Critical Damage. Red Text: Quite right...mauled to death it seems."
+289,Maliwan,Heavy Weapon,27,Barrel,MAL_HW.part_barrel_ichor,"Ichor Barrel - Deals Incendiary and Corrosive Damage",
+289,Maliwan,Heavy Weapon,28,Rarity,Ichor,"Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips.","Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips."
+21,Maliwan,SMG,80,Barrel,MAL_SM.part_barrel_songbird,"Broken Wings Barrel - Fledgling",
+21,Maliwan,SMG,81,Rarity,Broken Wings,"Fledgling. Red Text: It's a sprint not a marathon.","Fledgling. Red Text: It's a sprint not a marathon."
+21,Maliwan,SMG,84,Barrel,MAL_SM.part_barrel_flashcyclone,"Flash Cyclone Barrel - Chance on Hit to Explode and Spawn additional projectiles",
+21,Maliwan,SMG,85,Rarity,Flash Cyclone,"Flash Freeze - Chance on Hit to Explode and Spawn additional projectiles. Red Text: What cyclone? Its a couple of flakes!","Flash Freeze - Chance on Hit to Explode and Spawn additional projectiles. Red Text: What cyclone? Its a couple of flakes!"
+10,Maliwan,Shotgun,60,Barrel,MAL_SG.part_barrel_reminisce,"Reminisce Barrel - Does not reload instead refills Ammo when projectiles return",
+10,Maliwan,Shotgun,61,Rarity,Reminisce,"Remnant - Does not reload instead refills Ammo when projectiles return. Red Text: What goes around...","Remnant - Does not reload instead refills Ammo when projectiles return. Red Text: What goes around..."
+25,Maliwan,Sniper Rifle,81,Barrel,MAL_SR.part_barrel_conflux,"Conflux Barrel - Deals bonus Damage per Status Effect on the target",
+25,Maliwan,Sniper Rifle,82,Rarity,Conflux,"Sinew - Deals bonus Damage per Status Effect on the target. Red Text: It's self-indulgent I admit.","Sinew - Deals bonus Damage per Status Effect on the target. Red Text: It's self-indulgent I admit."
+15,Order,Assault Rifle,78,Barrel,ORD_AR.part_barrel_crowsourced,"Crow-Sourced Barrel - Fires random objects",
+15,Order,Assault Rifle,77,Rarity,Crow-Sourced,"Left of the Murder - Fires random objects. Red Text: And we had to share the rock!","Left of the Murder - Fires random objects. Red Text: And we had to share the rock!"
+4,Order,Pistol,84,Barrel,ORD_PS.part_barrel_roulette,"Roulette Barrel - On Reload gain random buffs",
+4,Order,Pistol,85,Rarity,Roulette,"Lord Luck - On Reload gain random buffs. Red Text: Papa needs a new pair of class mods!","Lord Luck - On Reload gain random buffs. Red Text: Papa needs a new pair of class mods!"
+4,Order,Pistol,82,Barrel,ORD_PS.part_barrel_sunspot,"Sunspot Barrel - Damage scales based on the emptiness of the Magazine",
+4,Order,Pistol,83,Rarity,Sunspot,"Eclipse - Damage scales based on the emptiness of the Magazine. Red Text: Sun Spot! Sun Spot run! Run Spot run!","Eclipse - Damage scales based on the emptiness of the Magazine. Red Text: Sun Spot! Sun Spot run! Run Spot run!"
+275,Ripper,Heavy Weapon,35,Barrel,BOR_HW.part_barrel_jetset,"Jetsetter Barrel - Frequent Flyer",
+275,Ripper,Heavy Weapon,36,Rarity,Jetsetter,"Frequent Flyer. Red Text: A real crowd pleaser!","Frequent Flyer. Red Text: A real crowd pleaser!"
+19,Ripper,SMG,58,Barrel,BOR_SM.part_barrel_falke,"Falke Barrel - Resonance",
+19,Ripper,SMG,59,Rarity,Falke,"Resonance. Red Text: Let us become whole again.","Resonance. Red Text: Let us become whole again."
+7,Ripper,Shotgun,21,Barrel,BOR_SG.part_barrel_crazedearl,"Crazed Earl Barrel - Fires Shards that stick into enemies. Meleeing enemies with Shards explodes them",
+7,Ripper,Shotgun,54,Rarity,Crazed Earl,"BOGO - Fires Shards that stick into enemies. Meleeing enemies with Shards explodes them toward other enemies. Red Text: Earlescent.","BOGO - Fires Shards that stick into enemies. Meleeing enemies with Shards explodes them toward other enemies. Red Text: Earlescent."
+7,Ripper,Shotgun,56,Rarity,Hair Trigger,"Timed Charge - Projectiles explode when releasing the trigger. Red Text: You're going to regret this the rest of your life...","Timed Charge - Projectiles explode when releasing the trigger. Red Text: You're going to regret this the rest of your life..."
+23,Ripper,Sniper Rifle,22,Barrel,BOR_SR.part_barrel_tankbuster,"Tankbuster Barrel - Heals nearby enemies to deal additional Damage per enemy healed",
+23,Ripper,Sniper Rifle,56,Rarity,Tankbuster,"Funnel - Heals nearby enemies to deal additional Damage per enemy healed. Red Text: What you feel makes part of what they'll feel","Funnel - Heals nearby enemies to deal additional Damage per enemy healed. Red Text: What you feel makes part of what they'll feel"
+14,Tediore,Assault Rifle,78,Barrel,TED_AR.part_barrel_laserdisc,"Laser Disker Barrel - Deals bonus Damage to airborne enemies",
+14,Tediore,Assault Rifle,79,Rarity,Laser Disker,"Shazbot - Deals bonus Damage to airborne enemies. Red Text: A U.F.O. is just an I.F.O. you haven't met.","Shazbot - Deals bonus Damage to airborne enemies. Red Text: A U.F.O. is just an I.F.O. you haven't met."
+11,Tediore,Shotgun,81,Barrel,TED_SG.part_barrel_eigenburst,"Eigenburst Barrel - Damage increases as loaded ammo decreases",
+11,Tediore,Shotgun,82,Rarity,Eigenburst,"Determined - Damage increases as loaded ammo decreases. Red Text: An affinity for disobedience.","Determined - Damage increases as loaded ammo decreases. Red Text: An affinity for disobedience."
+17,Torgue,Assault Rifle,82,Barrel,TOR_AR.part_barrel_fleabag,"Fleabag Barrel - Sticky Projectiles move to the most recently hit target",
+17,Torgue,Assault Rifle,83,Rarity,Fleabag,"Ringleader - Sticky Projectiles move to the most recently hit target. Red Text: Can't you see the fleas?","Ringleader - Sticky Projectiles move to the most recently hit target. Red Text: Can't you see the fleas?"
+273,Torgue,Heavy Weapon,42,Barrel,TOR_HW.part_barrel_dahlfather,"Heimdahl Barrel - Fires Dahl soldier heads that attack nearby enemies",
+273,Torgue,Heavy Weapon,43,Rarity,Heimdahl,"Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service.","Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service."
+6,Torgue,Pistol,77,Barrel,TOR_PS.part_barrel_handcannon,"Handcannon Barrel - Sticky Projectiles deal Damage while attached to targets",
+6,Torgue,Pistol,78,Rarity,Handcannon,"Click Boom Boom - Sticky Projectiles deal Damage while attached to targets. Red Text: Dangerous toys are fun but you could get hurt.","Click Boom Boom - Sticky Projectiles deal Damage while attached to targets. Red Text: Dangerous toys are fun but you could get hurt."
+6,Torgue,Pistol,56,Barrel,TOR_PS.part_barrel_scootshoot,"Scoot'n'Shoot Barrel - Phantom Guns fire from previous shot locations. Reset on reload",
+6,Torgue,Pistol,57,Rarity,Scoot'n'Shoot,"Rollin' Deep - Phantom Guns fire from previous shot locations. Reset on reload. Red Text: Move it or lose it!","Rollin' Deep - Phantom Guns fire from previous shot locations. Reset on reload. Red Text: Move it or lose it!"
+12,Torgue,Shotgun,78,Barrel,TOR_SG.part_barrel_arctic,"Arctic Barrel - KA-BOOM",
+12,Torgue,Shotgun,79,Rarity,Arctic,"KA-BOOM. Red Text: Not to go off on a tangent...","KA-BOOM. Red Text: Not to go off on a tangent..."
+12,Torgue,Shotgun,76,Barrel,TOR_SG.part_barrel_unstable_kor,"Unstable Kor Barrel - Detonating Stickies triggers a Nova. Nova Damage scales with number of attached Stickies",
+12,Torgue,Shotgun,77,Rarity,Unstable Kor,"Full Belly - Detonating Stickies triggers a Nova. Nova Damage scales with number of attached Stickies. Red Text: It's building up building up building deep inside.","Full Belly - Detonating Stickies triggers a Nova. Nova Damage scales with number of attached Stickies. Red Text: It's building up building up building deep inside."
+18,Vladof,Assault Rifle,99,Barrel,VLA_AR.part_barrel_bubbles,"Bubbles Barrel - Squeaky Clean",
+18,Vladof,Assault Rifle,100,Rarity,Bubbles,"Squeaky Clean. Red Text: So sassy.","Squeaky Clean. Red Text: So sassy."
+18,Vladof,Assault Rifle,102,Barrel,VLA_AR.part_barrel_lasercutter,"Laser-Cutter Barrel - Bone Saw",
+18,Vladof,Assault Rifle,103,Rarity,Laser-Cutter,"Bone Saw. Red Text: Isaac's bestie.","Bone Saw. Red Text: Isaac's bestie."
+22,Vladof,SMG,91,Barrel,VLA_SM.part_barrel_mercury,"Mercurious Barrel - Bullet Damage scales with Movement Speed",
+22,Vladof,SMG,92,Rarity,Mercurious,"Fleet Footed - Bullet Damage scales with Movement Speed. Red Text: The mighty giant-killer stood there spellbound.","Fleet Footed - Bullet Damage scales with Movement Speed. Red Text: The mighty giant-killer stood there spellbound."
+16,Vladof,Sniper Rifle,87,Barrel,VLA_SR.part_barrel_hemorrhage,"Hemorrhage Barrel - Deals increased Damage the farther away the target is",
+16,Vladof,Sniper Rifle,88,Rarity,Hemorrhage,"Black Death - Deals increased Damage the farther away the target is. Red Text: Stay back I have powers.","Black Death - Deals increased Damage the farther away the target is. Red Text: Stay back I have powers."

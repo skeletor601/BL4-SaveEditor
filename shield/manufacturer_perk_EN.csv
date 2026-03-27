@@ -9,7 +9,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 279,8,Legendary Perk,Psychosis,"When damaged, gain +15% Elemental Resistance and +50% Resistance to the last damage type received for 5s",Psychosis,mal_shield.part_unique_momento
 279,9,Rarity,Legendary,Pandoran Memento skin,Pandoran Momento,mal_shield.comp_05_momento
 279,10,Rarity,Legendary,Extra Medium skin,Extra Medium,mal_shield.comp_05_supernova
-279,11,Legendary Perk,Elpis Star,DLC Legendary Shield Effect,Elpis Star,mal_shield.part_unique_elpisstar
+279,11,Legendary Perk,Elpis Star,"Moonfall - When dealing Melee Damage spawn a Meteor Cluster to fall on the damaged enemy. Red Text: Make a wish.",Elpis Star,mal_shield.part_unique_elpisstar
 279,12,Rarity,Legendary,Elpis Star Skin,Elpis Star,mal_shield.comp_05_elpisstar
 283,1,Rarity,Common,,,vla_shield.comp_01_common
 283,2,Rarity,Uncommon,,,vla_shield.comp_02_uncommon
@@ -21,7 +21,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 283,8,Legendary Perk,Bareknuckle,"On Melee Hit, consume an Armor Segment to gain +100% Melee Damage. When Armor Shield is 0, gain +50% Melee Damage",Bareknuckle,vla_shield.part_body_armor_HeavyWeight
 283,9,Rarity,Legendary,Heavyweight skin,Heavyweight,vla_shield.comp_05_legendary_HeavyWeight
 283,10,Model,/,"5577, 4, 19%",,vla_shield.part_body_armor
-283,11,Legendary Perk,Exoskeleton,"On Armor Segment break, grants 753 Overshield",,vla_shield.part_body_armor_undershield
+283,11,Legendary Perk,Undershield,"Exoskeleton - On Armor Segment break grants Overshield. Red Text: Anything worth doing is worth doing in excess.",Undershield,vla_shield.part_body_armor_undershield
 283,12,Rarity,Legendary,Undershield skin,exo Skellington,vla_shield.comp_05_legendary_undershield
 287,1,Rarity,Common,,,ted_shield.comp_01_common
 287,2,Rarity,Uncommon,,,ted_shield.comp_02_uncommon
@@ -34,7 +34,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 287,9,Legendary Perk,Bininu,"While equipped, gain +7436 Max Health, regenerate +372 Health/s, and reduce Damage Taken by 33%",Bininu,ted_shield.part_body_timekeeper
 287,10,Model,/,"8923, 2, 25%",,ted_shield.part_body_armor
 287,11,Rarity,Legendary,Hopscotch Skin,Hopscotch,ted_shield.comp_05_legendary_hopscotch
-287,12,Legendary Perk,Hopscotch,Raid Legendary Shield Effect,Hopscotch,ted_shield.part_body_hopscotch
+287,12,Legendary Perk,Hopscotch,"Shook - Spawns a Singularity when an Armor Segment breaks. Red Text: I kept you hopping didn't I?",Hopscotch,ted_shield.part_body_hopscotch
 293,1,Legendary Perk,Glass,"When damaged, gain a stack of Determination. Each stack reduces Damage Taken by 2%, max 25 stacks. When Energy Shield breaks, release a Star Burst dealing 7436 Damage, increased by +20% per stack of Determination",Glass,ord_shield.part_unique_cindershelly
 293,2,Legendary Perk,Direct Current,"Toggle via Ground Slam. When active, continuously drains Shield to gain +40% Bonus Shock Damage, but incoming Damage bypasses Shield",Direct Current,ord_shield.part_body_energy_ProteanCell
 293,3,Rarity,Legendary,Protean Cell skin,Protean Cell,ord_shield.comp_05_legendary_ProteanCell
@@ -78,7 +78,7 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 312,9,Rarity,Legendary,Super Soldier skin,Super Soldier,dad_shield.comp_05_legendary_SuperSoldier
 312,10,Model,/,"8551, 2677/s, 4.3",,dad_shield.part_body_energy
 312,11,Rarity,Legendary,Honey Badger Skin,Honey Badger,dad_shield.comp_05_legendary_honeybadger
-312,12,Legendary Perk,Honey Badger,DLC Legendary Shield Effect,Honey Badger,dad_shield.part_body_honeybadger
+312,12,Legendary Perk,Honey Badger,"Ferocity - Reduces self-Damage Dealt while Shield is active. Red Text: You're saying it in your head so I don't have to type it.",Honey Badger,dad_shield.part_body_honeybadger
 321,1,Rarity,Common,,,tor_shield.comp_01_common
 321,2,Rarity,Uncommon,,,tor_shield.comp_02_uncommon
 321,3,Rarity,Rare,,,tor_shield.comp_03_rare

@@ -313,9 +313,8 @@ export function generateModdedGrenade(
   ];
   const combinedPerkBlock = `{245:[${combinedIds.join(" ")}]}`;
 
-  // ── Pearl rarity — every 10th grenade ──────────────────────────────────────
-  const rollCounter = Math.floor(Math.random() * 10);
-  const isPearl = rollCounter === 0;
+  // ── Pearl rarity — 33% chance ──────────────────────────────────────────────
+  const isPearl = Math.random() < 0.33;
   const pearlToken = isPearl ? pick(["{11:82}", "{25:82}"]) : "";
 
   // ── Grenade anchors ─────────────────────────────────────────────────────────

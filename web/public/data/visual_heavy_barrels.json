@@ -151,5 +151,22 @@
   { "name": "Bonnie and Clyde", "code": "{27:73}", "visual": true },
   { "name": "Screenwriter", "code": "{27:76}" },
   { "name": "Rowdy Rider", "code": "{27:78}" },
-  { "name": "Rowans Charge", "code": "{27:75}" }
+  { "name": "Rowans Charge", "code": "{27:75}" },
+  { "name": "Mercredi", "code": "{13:82}", "visual": true },
+  { "name": "Soul Survivor", "code": "{2:79}", "visual": true },
+  { "name": "Prowler", "code": "{20:1}", "visual": true },
+  { "name": "Fearstalker", "code": "{24:77}", "visual": true },
+  { "name": "Ichor", "code": "{289:27}", "visual": true },
+  { "name": "Flash Cyclone", "code": "{21:84}", "visual": true },
+  { "name": "Reminisce", "code": "{10:60}", "visual": true },
+  { "name": "Crow-Sourced", "code": "{15:78}", "visual": true },
+  { "name": "Sunspot", "code": "{4:82}", "visual": true },
+  { "name": "Falke", "code": "{19:58}", "visual": true },
+  { "name": "Crazed Earl", "code": "{7:21}", "visual": true },
+  { "name": "Hair Trigger", "code": "{7:56}", "visual": true },
+  { "name": "Scoot'n'Shoot", "code": "{6:56}", "visual": true },
+  { "name": "Unstable Kor", "code": "{12:76}", "visual": true },
+  { "name": "Heimdahl", "code": "{273:42}", "visual": true },
+  { "name": "Laser-Cutter", "code": "{18:102}", "visual": true },
+  { "name": "Hemorrhage", "code": "{16:87}", "visual": true }
 ]

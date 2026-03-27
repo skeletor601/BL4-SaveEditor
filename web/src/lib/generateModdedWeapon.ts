@@ -1549,9 +1549,12 @@ export function generateModdedWeapon(
     "{25:81}": "{25:82}",  // Conflux
     "{27:73}": "{27:1}",   // Bonnie and Clyde
   };
-  const pearlRarityToken = options.customMode && options.forcedRarityToken
-    ? options.forcedRarityToken
-    : VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]);
+  const isPearl = options.customMode && options.forcedRarityToken
+    ? true
+    : Math.random() < 0.33;
+  const pearlRarityToken = isPearl
+    ? (options.forcedRarityToken ?? VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]))
+    : "";
 
   // Removed: extreme same-prefix stacking and body ×10 repeats (bloat without synergy).
 
