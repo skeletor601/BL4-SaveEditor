@@ -121,3 +121,9 @@ Manufacturer ID,Part_ID,Part_type,String,Stat,Description,BigEditor_Effects,Spaw
 289,24,Barrel,Barrel_01_GammaVoid,"Radiation Exposure - Creates a Singularity for 6s, in which enemies take +50% Radiation Damage over time","Gamma Void, 100s CD, 2008 Damage, 65% Acc, 5.0/s FR 1 Shot","Radiation Exposure - Creates a Singularity for 6s, in which enemies take +50% Radiation Damage over time",MAL_HW.part_barrel_02_GammaVoid
 289,25,Rarity,,Legendary,Gamma Void Skin,Gamma Void,MAL_HW.comp_05_legendary_GammaVoid
 289,26,Barrel,Barrel_02_BottledLightning,Strike Twice,"Bottled Lightning, 75s CD, 6692 Damage, 65% Acc, 1.6/s FR, 2 Shots",Strike Twice,MAL_HW.part_barrel_02_BottledLightning
+289,27,Barrel,Barrel_01_Ichor,Deihazard - Deals Incendiary and Corrosive Damage,"Ichor, DLC Cowbell",Deihazard - Deals Incendiary and Corrosive Damage,MAL_HW.part_barrel_01_ichor
+289,28,Rarity,,Legendary,Ichor Skin,Ichor,MAL_HW.comp_05_legendary_ichor
+273,37,Barrel,Barrel_01_Sidewinder,Sidewinder,"Sidewinder, PreOrder DLC, charge-fire rocket",Sidewinder,TOR_HW.part_unique_barrel_01_sidewinder
+273,38,Rarity,,Legendary,Sidewinder Skin,Sidewinder,TOR_HW.comp_05_legendary_sidewinder
+273,42,Barrel,Barrel_01_Dahlfather,Rig - Fires Dahl soldier heads that attack nearby enemies,"Heimdahl, DLC Cowbell",Rig - Fires Dahl soldier heads that attack nearby enemies,TOR_HW.part_barrel_dahlfather
+273,43,Rarity,,Legendary,Heimdahl Skin,Heimdahl,TOR_HW.comp_05_legendary_dahlfather

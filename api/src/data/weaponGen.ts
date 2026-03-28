@@ -56,8 +56,8 @@ export interface WeaponGenData {
   partsByMfgTypeId: Record<string, Record<string, { partId: string; label: string }[]>>;
   /** Key: "mfgWtId". Rarity options (non-Legendary) */
   rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]>;
-  legendaryByMfgTypeId: Record<string, { partId: string; description: string }[]>;
-  pearlByMfgTypeId: Record<string, { partId: string; description: string }[]>;
+  legendaryByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]>;
+  pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]>;
   elemental: { partId: string; stat: string }[];
   godrolls: GodRoll[];
   skins: WeaponSkin[];
@@ -273,23 +273,65 @@ export function getWeaponGenData(): WeaponGenData {
     }
   }
 
+  // Load legendary effects lookup — flatten categorized JSON into a single map keyed by item name
+  const flatEffects: Record<string, { perk?: string; desc?: string; redText?: string }> = {};
+  const effectsPath = getPath("api/data/legendary_effects.json");
+  if (existsSync(effectsPath)) {
+    try {
+      const raw = JSON.parse(readFileSync(effectsPath, "utf-8"));
+      // Handle categorized format: { weapons: { "Anarchy": { perk, desc, redText } }, shields: { ... }, ... }
+      for (const category of Object.values(raw)) {
+        if (category && typeof category === "object") {
+          for (const [itemName, entry] of Object.entries(category as Record<string, any>)) {
+            const key = itemName.toLowerCase().replace(/['']/g, "").replace(/\s+/g, " ").trim();
+            flatEffects[key] = { perk: entry.perk, desc: entry.desc, redText: entry.redText };
+          }
+        }
+      }
+    } catch { /* ignore */ }
+  }
+  const getEffect = (name: string): string | undefined => {
+    const key = name.toLowerCase().replace(/['']/g, "").replace(/\s+/g, " ").trim();
+    const entry = flatEffects[key];
+    if (!entry) return undefined;
+    let result = entry.perk && entry.desc ? `${entry.perk} - ${entry.desc}` : entry.desc || entry.perk || "";
+    if (entry.redText) result += ` | ${entry.redText}`;
+    return result || undefined;
+  };
+  const getLegendaryDetail = (name: string): { perk?: string; desc?: string; redText?: string } | undefined => {
+    const key = name.toLowerCase().replace(/['']/g, "").replace(/\s+/g, " ").trim();
+    return flatEffects[key];
+  };
+
   const rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]> = {};
-  const legendaryByMfgTypeId: Record<string, { partId: string; description: string }[]> = {};
-  const pearlByMfgTypeId: Record<string, { partId: string; description: string }[]> = {};
+  const legendaryByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]> = {};
+  const pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]> = {};
   for (const row of rarityRows) {
     if (!row.mfgWtId || !row.partId) continue;
     const rarityStat = String(row.stat ?? "").trim().toLowerCase();
     if (rarityStat === "legendary") {
       if (!legendaryByMfgTypeId[row.mfgWtId]) legendaryByMfgTypeId[row.mfgWtId] = [];
+      const desc = row.description || row.partId;
+      const detail = getLegendaryDetail(desc);
       legendaryByMfgTypeId[row.mfgWtId].push({
         partId: row.partId,
-        description: row.description || row.partId,
+        description: desc,
+        effect: getEffect(desc),
+        perk: detail?.perk,
+        perkDesc: detail?.desc,
+        redText: detail?.redText,
       });
     } else if (rarityStat === "pearl" || rarityStat === "pearlescent") {
       if (!pearlByMfgTypeId[row.mfgWtId]) pearlByMfgTypeId[row.mfgWtId] = [];
+      const desc = row.description || row.partId;
+      const detail = getLegendaryDetail(desc);
       pearlByMfgTypeId[row.mfgWtId].push({
         partId: row.partId,
-        description: row.description || row.partId,
+        description: desc,
+        effect: getEffect(desc),
+        perk: detail?.perk,
+        perkDesc: detail?.desc,
+        redText: detail?.redText,
       });
     } else {
       if (!rarityByMfgTypeId[row.mfgWtId]) rarityByMfgTypeId[row.mfgWtId] = [];

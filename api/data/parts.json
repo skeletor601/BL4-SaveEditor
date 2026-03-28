@@ -3020,6 +3020,74 @@
     "category": "Grenade"
   },
   {
+    "code": "{278:14}",
+    "partName": "Ripper_Grenade.legendary_perk",
+    "itemType": "Message from the Void",
+    "partType": "Legendary Perk",
+    "effect": "Transmitter legendary grenade payload. Forces fire element.",
+    "manufacturer": "Ripper",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
+    "code": "{278:15}",
+    "partName": "Ripper_Grenade.rarity_15",
+    "itemType": "Legendary - Transmitter skin",
+    "partType": "Rarity",
+    "manufacturer": "Ripper",
+    "category": "Grenade"
+  },
+  {
+    "code": "{267:14}",
+    "partName": "Jakobs_Grenade.legendary_perk",
+    "itemType": "Bismuth (Shock)",
+    "partType": "Legendary Perk",
+    "effect": "Attaches on Hit. Enemies take more Shock damage for each attached Dagger.",
+    "manufacturer": "Jakobs",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
+    "code": "{267:15}",
+    "partName": "Jakobs_Grenade.legendary_perk",
+    "itemType": "Bismuth (Radiation)",
+    "partType": "Legendary Perk",
+    "effect": "Attaches on Hit. Enemies take more Radiation damage for each attached Dagger.",
+    "manufacturer": "Jakobs",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
+    "code": "{267:16}",
+    "partName": "Jakobs_Grenade.legendary_perk",
+    "itemType": "Bismuth (Fire)",
+    "partType": "Legendary Perk",
+    "effect": "Attaches on Hit. Enemies take more Fire damage for each attached Dagger.",
+    "manufacturer": "Jakobs",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
+    "code": "{267:17}",
+    "partName": "Jakobs_Grenade.legendary_perk",
+    "itemType": "Bismuth (Cryo)",
+    "partType": "Legendary Perk",
+    "effect": "Attaches on Hit. Enemies take more Cryo damage for each attached Dagger.",
+    "manufacturer": "Jakobs",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
+    "code": "{267:18}",
+    "partName": "Jakobs_Grenade.legendary_perk",
+    "itemType": "Bismuth (Corrosive)",
+    "partType": "Legendary Perk",
+    "effect": "Attaches on Hit. Enemies take more Corrosive damage for each attached Dagger.",
+    "manufacturer": "Jakobs",
+    "rarity": "Legendary",
+    "category": "Grenade"
+  },
+  {
     "code": "{243:1}",
     "partName": "Repkit.Firmware_1",
     "itemType": "God Killer",
@@ -25795,46 +25863,6 @@
     "category": "Class Mod"
   },
   {
-    "code": "{404:207}",
-    "partName": "C4SH_ClassMod.skill_207",
-    "itemType": "Rattlesnake",
-    "partType": "Skill",
-    "manufacturer": "C4SH",
-    "category": "Class Mod"
-  },
-  {
-    "code": "{404:175}",
-    "partName": "C4SH_ClassMod.skill_175",
-    "itemType": "Rattlesnake",
-    "partType": "Skill",
-    "manufacturer": "C4SH",
-    "category": "Class Mod"
-  },
-  {
-    "code": "{404:143}",
-    "partName": "C4SH_ClassMod.skill_143",
-    "itemType": "Rattlesnake",
-    "partType": "Skill",
-    "manufacturer": "C4SH",
-    "category": "Class Mod"
-  },
-  {
-    "code": "{404:111}",
-    "partName": "C4SH_ClassMod.skill_111",
-    "itemType": "Rattlesnake",
-    "partType": "Skill",
-    "manufacturer": "C4SH",
-    "category": "Class Mod"
-  },
-  {
-    "code": "{404:79}",
-    "partName": "C4SH_ClassMod.skill_79",
-    "itemType": "Rattlesnake",
-    "partType": "Skill",
-    "manufacturer": "C4SH",
-    "category": "Class Mod"
-  },
-  {
     "code": "{244:1}",
     "partName": "Heavy.Firmware_1",
     "itemType": "God Killer",
@@ -27236,6 +27264,69 @@
     "weaponType": "Heavy Weapon",
     "partType": "Barrel",
     "effect": "Barrel part for Bottled Lightning",
+    "category": "Weapon"
+  },
+  {
+    "code": "{289:27}",
+    "partName": "MAL_HW.part_barrel_ichor",
+    "itemType": "Ichor Barrel - Deals Incendiary and Corrosive Damage",
+    "manufacturer": "Maliwan",
+    "weaponType": "Heavy Weapon",
+    "partType": "Barrel",
+    "effect": "Ichor Barrel - Deals Incendiary and Corrosive Damage",
+    "category": "Weapon"
+  },
+  {
+    "code": "{289:28}",
+    "partName": "Ichor",
+    "itemType": "Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips.",
+    "manufacturer": "Maliwan",
+    "weaponType": "Heavy Weapon",
+    "partType": "Rarity",
+    "effect": "Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips.",
+    "rarity": "Deihazard",
+    "category": "Weapon"
+  },
+  {
+    "code": "{273:37}",
+    "partName": "TOR_HW.part_unique_barrel_01_sidewinder",
+    "itemType": "Sidewinder, 4s CD, 6692 Damage, 64% Acc, 1.5/s FR 5 Shots",
+    "manufacturer": "Torgue",
+    "weaponType": "Heavy Weapon",
+    "partType": "Barrel",
+    "effect": "Sidewinder, 4s CD, 6692 Damage, 64% Acc, 1.5/s FR 5 Shots",
+    "category": "Weapon"
+  },
+  {
+    "code": "{273:38}",
+    "partName": "Sidewinder",
+    "itemType": "Description: Item Type ID: 273, Item ID: 38 mod",
+    "manufacturer": "Torgue",
+    "weaponType": "Heavy Weapon",
+    "partType": "Rarity",
+    "effect": "Description: Item Type ID: 273, Item ID: 38 mod",
+    "rarity": "Description:",
+    "category": "Weapon"
+  },
+  {
+    "code": "{273:42}",
+    "partName": "TOR_HW.part_barrel_dahlfather",
+    "itemType": "Heimdahl Barrel - Fires Dahl soldier heads that attack nearby enemies",
+    "manufacturer": "Torgue",
+    "weaponType": "Heavy Weapon",
+    "partType": "Barrel",
+    "effect": "Heimdahl Barrel - Fires Dahl soldier heads that attack nearby enemies",
+    "category": "Weapon"
+  },
+  {
+    "code": "{273:43}",
+    "partName": "Heimdahl",
+    "itemType": "Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service.",
+    "manufacturer": "Torgue",
+    "weaponType": "Heavy Weapon",
+    "partType": "Rarity",
+    "effect": "Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service.",
+    "rarity": "Rig",
     "category": "Weapon"
   },
   {
@@ -47029,16 +47120,6 @@
     "category": "Weapon"
   },
   {
-    "code": "{273:37}",
-    "partName": "TOR_HW.part_unique_barrel_01_sidewinder",
-    "itemType": "Sidewinder, 4s CD, 6692 Damage, 64% Acc, 1.5/s FR 5 Shots",
-    "manufacturer": "Torgue",
-    "weaponType": "Heavy Weapon",
-    "partType": "Barrel",
-    "effect": "Sidewinder, 4s CD, 6692 Damage, 64% Acc, 1.5/s FR 5 Shots",
-    "category": "Weapon"
-  },
-  {
     "code": "{282:4}",
     "partName": "VLA_HW.part_barrel_02_ad",
     "itemType": "just adds gestalt for A and D combo",
@@ -47306,17 +47387,6 @@
     "weaponType": "Assault Rifle",
     "partType": "Rarity",
     "effect": "Description: Item Type ID: 27, Item ID: 74 mod",
-    "rarity": "Description:",
-    "category": "Weapon"
-  },
-  {
-    "code": "{273:38}",
-    "partName": "Sidewinder",
-    "itemType": "Description: Item Type ID: 273, Item ID: 38 mod",
-    "manufacturer": "Torgue",
-    "weaponType": "Heavy Weapon",
-    "partType": "Rarity",
-    "effect": "Description: Item Type ID: 273, Item ID: 38 mod",
     "rarity": "Description:",
     "category": "Weapon"
   },
@@ -49284,27 +49354,6 @@
     "category": "Weapon"
   },
   {
-    "code": "{289:27}",
-    "partName": "MAL_HW.part_barrel_ichor",
-    "itemType": "Ichor Barrel - Deals Incendiary and Corrosive Damage",
-    "manufacturer": "Maliwan",
-    "weaponType": "Heavy Weapon",
-    "partType": "Barrel",
-    "effect": "Ichor Barrel - Deals Incendiary and Corrosive Damage",
-    "category": "Weapon"
-  },
-  {
-    "code": "{289:28}",
-    "partName": "Ichor",
-    "itemType": "Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips.",
-    "manufacturer": "Maliwan",
-    "weaponType": "Heavy Weapon",
-    "partType": "Rarity",
-    "effect": "Deihazard - Deals Incendiary and Corrosive Damage. Red Text: Their excellence already bursting from their fingertips.",
-    "rarity": "Deihazard",
-    "category": "Weapon"
-  },
-  {
     "code": "{21:80}",
     "partName": "MAL_SM.part_barrel_songbird",
     "itemType": "Broken Wings Barrel - Fledgling",
@@ -49586,27 +49635,6 @@
     "partType": "Rarity",
     "effect": "Ringleader - Sticky Projectiles move to the most recently hit target. Red Text: Can't you see the fleas?",
     "rarity": "Ringleader",
-    "category": "Weapon"
-  },
-  {
-    "code": "{273:42}",
-    "partName": "TOR_HW.part_barrel_dahlfather",
-    "itemType": "Heimdahl Barrel - Fires Dahl soldier heads that attack nearby enemies",
-    "manufacturer": "Torgue",
-    "weaponType": "Heavy Weapon",
-    "partType": "Barrel",
-    "effect": "Heimdahl Barrel - Fires Dahl soldier heads that attack nearby enemies",
-    "category": "Weapon"
-  },
-  {
-    "code": "{273:43}",
-    "partName": "Heimdahl",
-    "itemType": "Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service.",
-    "manufacturer": "Torgue",
-    "weaponType": "Heavy Weapon",
-    "partType": "Rarity",
-    "effect": "Rig - Fires Dahl soldier heads that attack nearby enemies. Red Text: In his eternal service.",
-    "rarity": "Rig",
     "category": "Weapon"
   },
   {

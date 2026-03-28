@@ -148,7 +148,9 @@ export default function PartHoverCard({ data, cardTop, side = "right" }: PartHov
           <div>
             <p className="text-[9px] uppercase tracking-widest text-[var(--color-text-muted)] mb-1">Effect / Stats</p>
             <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.25)] px-3 py-2">
-              <p className="text-xs text-[var(--color-text)] leading-relaxed line-clamp-4">{data.effect}</p>
+              {data.effect.split("\n").map((line, i) => (
+                <p key={i} className={`text-xs leading-relaxed ${i > 0 ? "mt-1" : ""} ${line.startsWith('"') ? "text-red-400/80 italic text-[10px]" : line.startsWith("Perk:") ? "text-amber-300 font-semibold" : "text-[var(--color-text)]"}`}>{line}</p>
+              ))}
             </div>
           </div>
         )}

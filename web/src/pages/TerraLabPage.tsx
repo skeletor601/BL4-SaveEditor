@@ -129,7 +129,7 @@ export default function TerraLabPage() {
           </div>
           <div className="p-5 space-y-2 text-sm">
             <CheckItem label="Select C4SH in class mod builder — do all 100 skills show with colored icons?" />
-            <CheckItem label="Click a C4SH skill — does the popup show name + description?" />
+            <CheckItem label="Click a C4SH skill — does the popup show name + description (all 16 placeholders now filled)?" />
             <CheckItem label="Max All Skills button works for C4SH?" />
             <CheckItem label="Build a C4SH legendary class mod — does the code generate correctly?" />
             <CheckItem label="New DLC weapons show in weapon builder rarity dropdown (Shalashaska, Roulette, etc.)?" />
@@ -138,10 +138,17 @@ export default function TerraLabPage() {
             <CheckItem label="Grenade Reload + Inf Alt Fire both selected — does the weapon get both?" />
             <CheckItem label="Generate 10+ weapons — ~33% should be Pearl rarity?" />
             <CheckItem label="New shields in shield builder (Honey Badger, Hopscotch, Undershield, Elpis Star)?" />
-            <CheckItem label="New grenades in grenade builder (Urchin, Slippy, Barb'ara, Bismuth)?" />
+            <CheckItem label="New grenades in grenade builder (Urchin, Slippy, Barb'ara, Bismuth, Transmitter)?" />
             <CheckItem label="New repkits in repkit builder (Healthraiser, Blood Moon, Geiger-Roid)?" />
             <CheckItem label="Master Search — search 'Mantra' or 'Shalashaska' — do new weapons appear?" />
             <CheckItem label="Modded repkit generator — test all 8 categories (Tank, DPS, Healer, etc.)?" />
+            <CheckItem label="NEW: Hover over legendary type in weapon builder — does hover card show perk name + description + red text?" />
+            <CheckItem label="NEW: Hover over barrels in weapon builder — do legendary barrels show perk info in hover card?" />
+            <CheckItem label="NEW: Custom modded weapon generator — legendary list shows hover cards on the right side?" />
+            <CheckItem label="NEW: Custom modded grenade generator — legendary list shows hover cards on the right side?" />
+            <CheckItem label="NEW: Shield legendary picker — hover cards show perk descriptions?" />
+            <CheckItem label="NEW: Repkit legendary picker — hover cards show perk descriptions?" />
+            <CheckItem label="NEW: Heavy weapons in database — Sidewinder, Heimdahl, Ichor show up in Master Search?" />
           </div>
         </div>
 

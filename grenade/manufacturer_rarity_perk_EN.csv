@@ -98,3 +98,10 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description
 311,12,Rarity,Legendary,Urchin skin
 298,11,Legendary Perk,Countermeasure,Launches flares that distract nearby enemies (Decoy)
 298,12,Rarity,Legendary,Countermeasure skin
+278,14,Legendary Perk,Message from the Void,Transmitter legendary grenade payload. Forces fire element.
+278,15,Rarity,Legendary,Transmitter skin
+267,14,Legendary Perk,Bismuth (Shock),Attaches on Hit. Enemies take more Shock damage for each attached Dagger.
+267,15,Legendary Perk,Bismuth (Radiation),Attaches on Hit. Enemies take more Radiation damage for each attached Dagger.
+267,16,Legendary Perk,Bismuth (Fire),Attaches on Hit. Enemies take more Fire damage for each attached Dagger.
+267,17,Legendary Perk,Bismuth (Cryo),Attaches on Hit. Enemies take more Cryo damage for each attached Dagger.
+267,18,Legendary Perk,Bismuth (Corrosive),Attaches on Hit. Enemies take more Corrosive damage for each attached Dagger.

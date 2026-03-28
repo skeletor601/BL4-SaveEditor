@@ -113,8 +113,8 @@ interface WeaponGenData {
   mfgWtIdList: { manufacturer: string; weaponType: string; mfgWtId: string }[];
   partsByMfgTypeId: Record<string, Record<string, { partId: string; label: string }[]>>;
   rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]>;
-  legendaryByMfgTypeId: Record<string, { partId: string; description: string }[]>;
-  pearlByMfgTypeId: Record<string, { partId: string; description: string }[]>;
+  legendaryByMfgTypeId: Record<string, { partId: string; description: string; effect?: string }[]>;
+  pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string }[]>;
   elemental: { partId: string; stat: string }[];
   godrolls?: { name: string; decoded: string }[];
   skins?: { label: string; value: string }[];
@@ -366,7 +366,7 @@ const C4SH_RED_SKILLS = new Set([
   "Hot Hand","Trick Shot","Ride to Ruin","A Blur of Fingers and Brass","Brimstone","Fast C4SH",
   "Firestorm","Burn the House Down","High Noon","Bloodstained Moon","Lawless","Truck Full of Nitro",
   "War Wagon","Pale Rider","Nothing Beats Lead","Forsaken","Broken Arrow","Maverick","Cottonmouth",
-  "Bad Men Must Bleed","The Wind","Rattlesnake",
+  "Bad Men Must Bleed","The Wind",
 ]);
 const C4SH_GREEN_SKILLS = new Set([
   "Luck Be a Robot","Sweet Roll","Charm Bracelet","O Fortuna","Red Moon Rising","Ready to Roll",
@@ -4015,6 +4015,47 @@ export default function UnifiedItemBuilderPage() {
     return universalRowToHoverData(p);
   }, [universalParts, universalRowToHoverData]);
 
+  /** Build a flat lookup of legendary/pearl effects from weaponData + gear builders for hover enrichment */
+  const legEffectLookup = useMemo(() => {
+    const map: Record<string, { perk?: string; perkDesc?: string; redText?: string; effect?: string }> = {};
+    if (weaponData) {
+      for (const entries of Object.values(weaponData.legendaryByMfgTypeId ?? {})) {
+        for (const e of entries) {
+          const key = e.description.toLowerCase().replace(/['']/g, "").trim();
+          map[key] = { perk: e.perk, perkDesc: e.perkDesc, redText: e.redText, effect: e.effect };
+        }
+      }
+      for (const entries of Object.values(weaponData.pearlByMfgTypeId ?? {})) {
+        for (const e of entries) {
+          const key = e.description.toLowerCase().replace(/['']/g, "").trim();
+          map[key] = { perk: e.perk, perkDesc: e.perkDesc, redText: e.redText, effect: e.effect };
+        }
+      }
+    }
+    // Grenade legendaries
+    if (grenadeData) {
+      for (const l of grenadeData.legendaryPerks ?? []) {
+        const key = l.stat.toLowerCase().replace(/['']/g, "").trim();
+        if (!map[key]) map[key] = { perk: l.stat, perkDesc: l.description, effect: l.description ? `${l.stat} - ${l.description}` : l.stat };
+      }
+    }
+    // Shield legendaries
+    if (shieldData) {
+      for (const l of (shieldData as any).legendaryPerks ?? []) {
+        const key = (l.stat || "").toLowerCase().replace(/['']/g, "").trim();
+        if (!map[key]) map[key] = { perk: l.stat, perkDesc: l.description, effect: l.description ? `${l.stat} - ${l.description}` : l.stat };
+      }
+    }
+    // Repkit legendaries
+    if (repkitData) {
+      for (const l of (repkitData as any).legendaryPerks ?? []) {
+        const key = (l.stat || "").toLowerCase().replace(/['']/g, "").trim();
+        if (!map[key]) map[key] = { perk: l.stat, perkDesc: l.description, effect: l.description ? `${l.stat} - ${l.description}` : l.stat };
+      }
+    }
+    return map;
+  }, [weaponData, grenadeData, shieldData, repkitData]);
+
   /** Look up a UniversalPartRow by label (for slot item / picker hover). Falls back to label-only data. */
   const hoverDataByLabel = useCallback((label: string, description?: string, partTypeOverride?: string): HoverCardData => {
     const p = universalParts.find((u) => u.label === label);
@@ -4025,8 +4066,26 @@ export default function UnifiedItemBuilderPage() {
           const name = pieces.length > 1 ? pieces.slice(1).join(" - ").trim() : label;
           return { code: "", name, effect: description } as HoverCardData;
         })();
-    return partTypeOverride ? { ...base, partType: partTypeOverride } : base;
-  }, [universalParts, universalRowToHoverData]);
+    const result = partTypeOverride ? { ...base, partType: partTypeOverride } : base;
+
+    // Enrich barrel/legendary hover cards with perk info from legendary effects
+    if (result.name) {
+      // Extract weapon name from barrel stats label like "Stellium, 5131 Damage, 77% Acc..."
+      const barrelName = result.name.split(",")[0]?.trim();
+      const lookupKey = (barrelName || result.name).toLowerCase().replace(/['']/g, "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+      const legInfo = legEffectLookup[lookupKey];
+      if (legInfo && (legInfo.perk || legInfo.perkDesc)) {
+        const parts: string[] = [];
+        if (legInfo.perk) parts.push(`Perk: ${legInfo.perk}`);
+        if (legInfo.perkDesc) parts.push(legInfo.perkDesc);
+        if (legInfo.redText) parts.push(`"${legInfo.redText}"`);
+        const legEffect = parts.join("\n");
+        result.effect = result.effect ? `${result.effect}\n${legEffect}` : legEffect;
+        if (!result.rarity) result.rarity = "Legendary";
+      }
+    }
+    return result;
+  }, [universalParts, universalRowToHoverData, legEffectLookup]);
 
   const startHover = useCallback((data: HoverCardData, top: number, side: "left" | "right" = "right") => {
     if (hoverCardTimer.current) clearTimeout(hoverCardTimer.current);
@@ -4526,11 +4585,14 @@ export default function UnifiedItemBuilderPage() {
               const hasLeg = customMfgWtId ? (wd?.legendaryByMfgTypeId[customMfgWtId]?.length ?? 0) > 0 : false;
               const hasPearl = customMfgWtId ? (wd?.pearlByMfgTypeId[customMfgWtId]?.length ?? 0) > 0 : false;
               const rarityOpts = [...customRarityStats.filter((s) => s !== "Legendary" && s !== "Pearl" && s !== "Pearlescent"), ...(hasLeg ? ["Legendary"] : []), ...(hasPearl ? ["Pearl"] : [])];
-              const legPearlOpts = customWepRarity === "Legendary"
-                ? (wd?.legendaryByMfgTypeId[customMfgWtId] ?? []).map((r) => `${r.partId} - ${r.description}`)
+              const legPearlEntries = customWepRarity === "Legendary"
+                ? (wd?.legendaryByMfgTypeId[customMfgWtId] ?? [])
                 : customWepRarity === "Pearl"
-                  ? (wd?.pearlByMfgTypeId[customMfgWtId] ?? []).map((r) => `${r.partId} - ${r.description}`)
+                  ? (wd?.pearlByMfgTypeId[customMfgWtId] ?? [])
                   : [];
+              const legPearlOpts = legPearlEntries.map((r) => `${r.partId} - ${r.description}`);
+              const selectedLegPearlEntry = legPearlEntries.find((r) => `${r.partId} - ${r.description}` === customWepLegPearl);
+              const selectedLegPearlEffect = selectedLegPearlEntry?.effect;
               const canGenerate = !!customMfgWtId && !!customWepRarity && (customWepRarity !== "Legendary" && customWepRarity !== "Pearl" || !!customWepLegPearl);
               const selClass = "w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3";
               return (
@@ -4583,13 +4645,41 @@ export default function UnifiedItemBuilderPage() {
                         </>
                       )}
 
-                      {(customWepRarity === "Legendary" || customWepRarity === "Pearl") && legPearlOpts.length > 0 && (
+                      {(customWepRarity === "Legendary" || customWepRarity === "Pearl") && legPearlEntries.length > 0 && (
                         <>
-                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">{customWepRarity} Type</label>
-                          <select value={customWepLegPearl} onChange={(e) => setCustomWepLegPearl(e.target.value)} className={selClass}>
-                            <option value="">Select...</option>
-                            {legPearlOpts.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">{customWepRarity} Type {customWepLegPearl && <span className="text-[var(--color-accent)]">— {customWepLegPearl.split(" - ").slice(1).join(" - ")}</span>}</label>
+                          <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] max-h-[200px] overflow-y-auto mb-3 divide-y divide-[var(--color-panel-border)]/30">
+                            {legPearlEntries.map((r) => {
+                              const optVal = `${r.partId} - ${r.description}`;
+                              const isSelected = customWepLegPearl === optVal;
+                              return (
+                                <button
+                                  key={optVal}
+                                  type="button"
+                                  onClick={() => setCustomWepLegPearl(isSelected ? "" : optVal)}
+                                  onMouseEnter={(e) => {
+                                    const parts: string[] = [];
+                                    if (r.perk) parts.push(`Perk: ${r.perk}`);
+                                    if (r.perkDesc) parts.push(r.perkDesc);
+                                    else if (r.effect) parts.push(r.effect);
+                                    if (r.redText) parts.push(`"${r.redText}"`);
+                                    startHover({
+                                      code: r.partId,
+                                      name: r.description,
+                                      effect: parts.join("\n") || undefined,
+                                      rarity: customWepRarity === "Pearl" ? "Pearl" : "Legendary",
+                                      partType: `${customWepRarity} Type`,
+                                    }, e.currentTarget.getBoundingClientRect().top);
+                                  }}
+                                  onMouseLeave={endHover}
+                                  className={`w-full text-left px-3 py-2 text-sm hover:bg-[var(--color-accent)]/10 transition-colors ${isSelected ? (customWepRarity === "Pearl" ? "bg-cyan-500/15 text-cyan-300" : "bg-amber-500/15 text-amber-300") : "text-[var(--color-text)]"}`}
+                                >
+                                  {r.description}
+                                  {isSelected && <span className="ml-2 text-[10px] opacity-60">✓</span>}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </>
                       )}
 
@@ -4738,6 +4828,14 @@ export default function UnifiedItemBuilderPage() {
                     return `${label} (${mfg})`;
                   };
                   type PartOpt = { partId: string; label: string; description?: string; isStock: boolean };
+                  const makeLegPearlOpt = (r: { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }, mfg: string, isStock: boolean): PartOpt => {
+                    const parts: string[] = [];
+                    if (r.perk) parts.push(`Perk: ${r.perk}`);
+                    if (r.perkDesc) parts.push(r.perkDesc);
+                    if (r.redText) parts.push(`"${r.redText}"`);
+                    const desc = parts.length > 0 ? parts.join("\n") : r.effect;
+                    return { partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, mfg), description: desc, isStock };
+                  };
                   const legendaryOptions: PartOpt[] = showAllMfgs
                     ? (() => {
                         const stock: PartOpt[] = [], extra: PartOpt[] = [];
@@ -4745,15 +4843,13 @@ export default function UnifiedItemBuilderPage() {
                           const mfg = getMfgName(id);
                           const isStock = id === weaponMfgWtId;
                           (weaponData.legendaryByMfgTypeId[id] ?? []).forEach((r) => {
-                            const item = { partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, mfg), isStock };
+                            const item = makeLegPearlOpt(r, mfg, isStock);
                             if (isStock) stock.push(item); else extra.push(item);
                           });
                         });
                         return [...stock, ...extra];
                       })()
-                    : (weaponData.legendaryByMfgTypeId[weaponMfgWtId] ?? []).map((r) => ({
-                        partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, weaponManufacturer), isStock: true,
-                      }));
+                    : (weaponData.legendaryByMfgTypeId[weaponMfgWtId] ?? []).map((r) => makeLegPearlOpt(r, weaponManufacturer, true));
                   const pearlOptions: PartOpt[] = showAllMfgs
                     ? (() => {
                         const stock: PartOpt[] = [], extra: PartOpt[] = [];
@@ -4761,15 +4857,13 @@ export default function UnifiedItemBuilderPage() {
                           const mfg = getMfgName(id);
                           const isStock = id === weaponMfgWtId;
                           (weaponData.pearlByMfgTypeId[id] ?? []).forEach((r) => {
-                            const item = { partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, mfg), isStock };
+                            const item = makeLegPearlOpt(r, mfg, isStock);
                             if (isStock) stock.push(item); else extra.push(item);
                           });
                         });
                         return [...stock, ...extra];
                       })()
-                    : (weaponData.pearlByMfgTypeId[weaponMfgWtId] ?? []).map((r) => ({
-                        partId: r.partId, label: withMfgIfNeeded(`${r.partId} - ${r.description}`, weaponManufacturer), isStock: true,
-                      }));
+                    : (weaponData.pearlByMfgTypeId[weaponMfgWtId] ?? []).map((r) => makeLegPearlOpt(r, weaponManufacturer, true));
                   const elementalOptions: PartOpt[] = weaponData.elemental.map((e) => ({ partId: e.partId, label: `${e.partId} - ${e.stat}`, isStock: true }));
                   const getOpts = (partType: string): PartOpt[] => {
                     if (partType === "Rarity") return rarityOptions.map((o) => ({ partId: o, label: o, isStock: true }));
@@ -5274,11 +5368,40 @@ export default function UnifiedItemBuilderPage() {
 
                       {selectedMfg && legsForMfg.length > 0 && (
                         <>
-                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">Legendary</label>
-                          <select value={customGrenadeLeg} onChange={(e) => setCustomGrenadeLeg(e.target.value)} className={selClass}>
-                            <option value="">Random legendary...</option>
-                            {legsForMfg.map((l) => <option key={`${l.mfgId}:${l.partId}`} value={`${l.mfgId}:${l.partId}`}>{l.stat || `${l.mfgName} #${l.partId}`}</option>)}
-                          </select>
+                          <label className="block text-xs text-[var(--color-text-muted)] mb-1">
+                            Legendary {customGrenadeLeg && <span className="text-purple-300">— {legsForMfg.find((l) => `${l.mfgId}:${l.partId}` === customGrenadeLeg)?.stat ?? customGrenadeLeg}</span>}
+                          </label>
+                          <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.2)] max-h-[200px] overflow-y-auto mb-3 divide-y divide-[var(--color-panel-border)]/30">
+                            {legsForMfg.map((l) => {
+                              const val = `${l.mfgId}:${l.partId}`;
+                              const isSelected = customGrenadeLeg === val;
+                              return (
+                                <button
+                                  key={val}
+                                  type="button"
+                                  onClick={() => setCustomGrenadeLeg(isSelected ? "" : val)}
+                                  onMouseEnter={(e) => {
+                                    const parts: string[] = [];
+                                    if (l.stat) parts.push(`Perk: ${l.stat}`);
+                                    if (l.description) parts.push(l.description);
+                                    startHover({
+                                      code: String(l.partId),
+                                      name: l.stat || `${l.mfgName} #${l.partId}`,
+                                      effect: parts.join("\n") || undefined,
+                                      rarity: "Legendary",
+                                      partType: "Legendary Perk",
+                                      manufacturer: l.mfgName,
+                                    }, e.currentTarget.getBoundingClientRect().top);
+                                  }}
+                                  onMouseLeave={endHover}
+                                  className={`w-full text-left px-3 py-2 text-sm hover:bg-purple-500/10 transition-colors ${isSelected ? "bg-purple-500/15 text-purple-300" : "text-[var(--color-text)]"}`}
+                                >
+                                  {l.stat || `${l.mfgName} #${l.partId}`}
+                                  {isSelected && <span className="ml-2 text-[10px] opacity-60">✓</span>}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </>
                       )}
 
@@ -6313,7 +6436,25 @@ export default function UnifiedItemBuilderPage() {
                             const checked = shieldLegendarySelectedIds.has(key);
                             const currentQty = shieldLegendaryQtyById[key] ?? 0;
                             return (
-                              <label key={key} className="flex items-center gap-3 px-3 py-2 cursor-pointer">
+                              <label
+                                key={key}
+                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[var(--color-accent)]/10"
+                                onMouseEnter={(e) => {
+                                  const parts: string[] = [];
+                                  if (p.stat) parts.push(`Perk: ${p.stat}`);
+                                  if (p.description) parts.push(p.description);
+                                  startHover({
+                                    code: String(p.partId),
+                                    name: `${p.mfgName}: ${p.stat}`,
+                                    effect: parts.join("\n") || undefined,
+                                    rarity: "Legendary",
+                                    partType: "Legendary Perk",
+                                    manufacturer: p.mfgName,
+                                    category: "Shield",
+                                  }, e.currentTarget.getBoundingClientRect().top);
+                                }}
+                                onMouseLeave={endHover}
+                              >
                                 <input
                                   type="checkbox"
                                   checked={checked}
@@ -8703,7 +8844,25 @@ export default function UnifiedItemBuilderPage() {
                             const checked = repkitLegendarySelectedIds.has(key);
                             const currentQty = repkitLegendaryQtyById[key] ?? 0;
                             return (
-                              <label key={key} className="flex items-center gap-3 px-3 py-2 cursor-pointer">
+                              <label
+                                key={key}
+                                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[var(--color-accent)]/10"
+                                onMouseEnter={(e) => {
+                                  const parts: string[] = [];
+                                  if (p.stat) parts.push(`Perk: ${p.stat}`);
+                                  if (p.description) parts.push(p.description);
+                                  startHover({
+                                    code: String(p.partId),
+                                    name: `${p.mfgName}: ${p.stat}`,
+                                    effect: parts.join("\n") || undefined,
+                                    rarity: "Legendary",
+                                    partType: "Legendary Perk",
+                                    manufacturer: p.mfgName,
+                                    category: "Repkit",
+                                  }, e.currentTarget.getBoundingClientRect().top);
+                                }}
+                                onMouseLeave={endHover}
+                              >
                                 <input
                                   type="checkbox"
                                   checked={checked}
