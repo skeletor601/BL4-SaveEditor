@@ -66,6 +66,10 @@ CHARACTER_CLASSES = {
     "name": "Rafa",
     "class": "Exo-Soldier",
   },
+  "RoboDealer": {
+    "name": "C4SH",
+    "class": "Gambler",
+  },
 }
 
 MAX_LEVEL = 60

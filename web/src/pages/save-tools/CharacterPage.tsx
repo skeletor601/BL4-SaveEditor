@@ -35,6 +35,7 @@ const CHARACTER_CLASSES: { key: string; name: string }[] = [
   { key: "Paladin", name: "Amon (Forgeknight)" },
   { key: "Gravitar", name: "Harlowe (Gravitar)" },
   { key: "ExoSoldier", name: "Rafa (Exo-Soldier)" },
+  { key: "RoboDealer", name: "C4SH (Gambler)" },
 ];
 
 export default function CharacterPage() {
