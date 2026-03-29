@@ -313,6 +313,29 @@ for (const r of readCsv("class_mods/Class_perk.csv")) {
   addPart({ code: `{234:${perkId}}`, partName: perkNameEN, itemType: perkNameEN, partType: "Perk", category: "Class Mod" });
 }
 
+// Class mod rarity part IDs (Common/Uncommon/Rare/Epic per class)
+const CLASS_RARITY_IDS = {
+  "254": { Common: 217, Uncommon: 218, Rare: 219, Epic: 220 },     // Vex
+  "256": { Common: 66, Uncommon: 67, Rare: 68, Epic: 69 },          // Rafa
+  "259": { Common: 224, Uncommon: 223, Rare: 222, Epic: 221 },      // Harlowe
+  "255": { Common: 70, Uncommon: 69, Rare: 68, Epic: 67 },          // Amon
+  "404": { Common: 52, Uncommon: 53, Rare: 54, Epic: 55 },          // C4SH
+};
+for (const [classId, rarities] of Object.entries(CLASS_RARITY_IDS)) {
+  const className = CLASS_IDS_MAP[classId] || classId;
+  for (const [rarity, partId] of Object.entries(rarities)) {
+    addPart({ code: `{${classId}:${partId}}`, partName: `${rarity} Rarity`, itemType: `${rarity} Rarity`, partType: "Rarity", rarity, manufacturer: className, category: "Class Mod" });
+  }
+}
+
+// Class mod legendary comp IDs from Class_legendary_map.csv
+for (const r of readCsv("class_mods/Class_legendary_map.csv")) {
+  const classId = r["class_ID"], className = r["class_name"] || CLASS_IDS_MAP[r["class_ID"]] || r["class_ID"];
+  const nameId = r["L_name_ID"], cardId = r["item_card_ID"];
+  if (!classId || !cardId) continue;
+  addPart({ code: `{${classId}:${cardId}}`, partName: `Legendary Rarity`, itemType: `Legendary Rarity`, partType: "Rarity", rarity: "Legendary", manufacturer: className, category: "Class Mod" });
+}
+
 for (const r of readCsv("class_mods/Skills.csv")) {
   const classId = r["class_ID"], className = CLASS_IDS_MAP[r["class_ID"]] || r["class_ID"];
   const skillNameEN = r["skill_name_EN"];
@@ -364,7 +387,7 @@ for (const r of readCsv("weapon_edit/all_weapon_part_EN.csv")) {
   const rarity = partType === "Rarity" ? (stat || "").split(" ")[0] || undefined : undefined;
   addPart({
     code: `{${typeId}:${partId}}`,
-    partName: desc || stat || string || `${mfg} ${weaponType} ${partType} ${partId}`,
+    partName: string || `${mfg}_${weaponType}.part_${partId}`,
     itemType: displayName,
     manufacturer: mfg || undefined,
     weaponType: weaponType || undefined,
@@ -495,6 +518,25 @@ for (const r of readCsv("trash/reference htmls/BL4_master_database.csv")) {
     effect: effect || undefined,
     category,
   });
+}
+
+// ── Supplemental parts (entries not generated from CSVs) ─────────────────────
+
+const supplementalPath = path.join(ROOT, "api", "data", "supplemental_parts.json");
+if (fs.existsSync(supplementalPath)) {
+  try {
+    const supplemental = JSON.parse(fs.readFileSync(supplementalPath, "utf8"));
+    let added = 0;
+    for (const entry of supplemental) {
+      if (entry.code && !byCode.has(entry.code)) {
+        addPart(entry);
+        added++;
+      }
+    }
+    console.log(`Added ${added} supplemental parts from supplemental_parts.json`);
+  } catch (e) {
+    console.warn("Could not load supplemental_parts.json:", e.message);
+  }
 }
 
 // ── Build final list ──────────────────────────────────────────────────────────

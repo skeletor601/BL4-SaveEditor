@@ -50,3 +50,7 @@ tools/merge_embedded_parts_into_databases.py
 tools/merge_reference_save_editor_into_db.py
 ncs_control_pre_dlc/
 dlc_diff/
+# NCS automation tool - do not push
+ncs_automation/
+*.decomp
+*.ncs

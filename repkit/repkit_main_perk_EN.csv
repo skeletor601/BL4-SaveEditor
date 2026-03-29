@@ -99,4 +99,10 @@ Repkit_perk_main_ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects
 243,105,Perfix,Large,"More healing, longer cooldown",
 243,106,Perfix,Mega,"Even more healing, even longer cooldown",
 243,112,Firmware,Risky Boots,,
-243,113,Firmware,Skillcraft,,
+243,113,Firmware,Skillcraft,,243,53,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,55,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,72,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,76,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,78,PLACEHOLDER,No Stat Changes,No Stat Changes
+243,89,Lower healing, longer cooldown,repair_kit.part_aug_o_nova_blast_on_use_sec,-Healing, -HoT, +CD
+243,95,PLACEHOLDER,No Stat Changes,No Stat Changes

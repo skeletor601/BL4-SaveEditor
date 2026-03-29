@@ -126,6 +126,22 @@
   { "label": "Phosphene - Vamoose", "value": "Cosmetics_Weapon_Shiny_Vamoose" },
   { "label": "Phosphene - WF", "value": "Cosmetics_Weapon_Shiny_WF" },
   { "label": "Phosphene - WomboCombo", "value": "Cosmetics_Weapon_Shiny_WomboCombo" },
-  { "label": "Phosphene - Zipgun", "value": "Cosmetics_Weapon_Shiny_Zipgun" }
+  { "label": "Phosphene - Zipgun", "value": "Cosmetics_Weapon_Shiny_Zipgun" },
+  { "label": "Hand that Feeds - Gore", "value": "Cosmetics_Weapon_Mat51_Gore" },
+  { "label": "Discontent - Ghostly", "value": "Cosmetics_Weapon_Mat52_Ghostly" },
+  { "label": "Shoot What Thou Wilt - Occult", "value": "Cosmetics_Weapon_Mat53_Occult" },
+  { "label": "Stock and Stone - Shipwreck", "value": "Cosmetics_Weapon_Mat54_Shipwreck" },
+  { "label": "Phosphene - CrazedEarl", "value": "Cosmetics_Weapon_Shiny_CrazedEarl" },
+  { "label": "Phosphene - Falke", "value": "Cosmetics_Weapon_Shiny_Falke" },
+  { "label": "Phosphene - Fearstalker", "value": "Cosmetics_Weapon_Shiny_Fearstalker" },
+  { "label": "Phosphene - FlashCyclone", "value": "Cosmetics_Weapon_Shiny_FlashCyclone" },
+  { "label": "Phosphene - Follower", "value": "Cosmetics_Weapon_Shiny_Follower" },
+  { "label": "Phosphene - Hemorrhage", "value": "Cosmetics_Weapon_Shiny_Hemorrhage" },
+  { "label": "Phosphene - LaserCutter", "value": "Cosmetics_Weapon_Shiny_LaserCutter" },
+  { "label": "Phosphene - Reminisce", "value": "Cosmetics_Weapon_Shiny_Reminisce" },
+  { "label": "Phosphene - ScootShoot", "value": "Cosmetics_Weapon_Shiny_ScootShoot" },
+  { "label": "Phosphene - SoulSurvivor", "value": "Cosmetics_Weapon_Shiny_SoulSurvivor" },
+  { "label": "Phosphene - Sunspot", "value": "Cosmetics_Weapon_Shiny_Sunspot" },
+  { "label": "Phosphene - Unstable", "value": "Cosmetics_Weapon_Shiny_Unstable" }
 ]
 

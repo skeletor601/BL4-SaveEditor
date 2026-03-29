@@ -235,4 +235,8 @@ manufacturers_ID,perk_ID,perk_name_EN,perk_name_ZH,perk_description_EN,BigEditor
 247,245,Sniper Splash Radius +75%,狙击枪溅射半径 +75%,Sniper Splash Radius +75%,Sniper Splash Radius +75%
 247,246,Sniper Status Effect Chance +38%,狙击枪状态效果率 +38%,Sniper Status Effect Chance +38%,Sniper Status Effect Chance +38%
 247,247,Sniper Status Effect DMG +38%,狙击枪状态效果伤害 +38%,Sniper Status Effect Damage +38%,Sniper Status Effect Damage +38%
-247,248,Skillcraft,技能工艺 -固件,,
+247,248,Skillcraft,技能工艺 -固件,,247,98,Enhancement.comp_01_common,,NOT USED,
+247,99,Enhancement.comp_02_uncommon,,NOT USED,
+247,100,Enhancement.comp_03_rare,,NOT USED,
+247,101,Enhancement.comp_04_epic,,NOT USED,
+247,102,Enhancement.comp_05_legendary,,NOT USED,

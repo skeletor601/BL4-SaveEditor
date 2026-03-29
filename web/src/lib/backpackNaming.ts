@@ -57,24 +57,58 @@ export function collectLookupCodesFromDecoded(decodedFull: string): string[] {
   return Array.from(out);
 }
 
-/** Extract a clean display name from a partName like "TOR_SG.comp_05_legendary_LeadBalloon" → "Lead Balloon" */
+/** Extract a clean display name from a partName.
+ * Handles both spawn code patterns and human-readable names:
+ * - "TOR_SG.comp_05_legendary_LeadBalloon" → "Lead Balloon"
+ * - "DAD_AR.part_barrel_03_onslaught" → "Onslaught"
+ * - "Legendary - Guardian Angel skin" → "Guardian Angel"
+ * - "Nucleosynthesis" → "Nucleosynthesis"
+ * - "Hellwalker, 1071 x 10 Damage, 45% Acc" → "Hellwalker"
+ */
 function extractCleanName(partName: string): string | undefined {
   if (!partName) return undefined;
-  // Try to get the name after the last underscore in legendary/pearl part names
-  // e.g. "TOR_SG.comp_05_legendary_LeadBalloon" → "LeadBalloon" → "Lead Balloon"
-  // Skip generic names like "legendary_perk" or "legendary_Perk"
+
+  // Pattern 1: spawn code with legendary/pearl name
+  // "TOR_SG.comp_05_legendary_LeadBalloon" → "LeadBalloon" → "Lead Balloon"
   const legendaryMatch = partName.match(/(?:legendary|pearl|pearlescent)_(\w+)/i);
   if (legendaryMatch?.[1] && !/^perk$/i.test(legendaryMatch[1])) {
-    // Split CamelCase into words: "LeadBalloon" → "Lead Balloon"
     return legendaryMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
   }
-  // Try barrel part names:
+
+  // Pattern 2: spawn code with barrel name
   // "DAD_AR.part_barrel_03_onslaught" → "Onslaught"
-  // "BOR_SG.part_unique_barrel_02_convergence" → "Convergence"
   const barrelMatch = partName.match(/part_(?:unique_)?barrel_\d+_(\w+)/i);
   if (barrelMatch?.[1]) {
     return barrelMatch[1].replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").trim();
   }
+
+  // Pattern 3: human-readable "Legendary - Name skin" or "Legendary - Name"
+  const legDashMatch = partName.match(/^(?:Legendary|Pearl)\s*-\s*(.+?)(?:\s+skin)?$/i);
+  if (legDashMatch?.[1]) {
+    const name = legDashMatch[1].trim();
+    if (name.length >= 3 && !/^gold$/i.test(name)) return name;
+  }
+
+  // Pattern 4: human-readable stat string "Hellwalker, 1071 x 10 Damage..."
+  // First word before comma is the name
+  if (partName.includes(",") && /\d/.test(partName)) {
+    const firstName = partName.split(",")[0].trim();
+    if (firstName.length >= 3 && firstName.length <= 30 && !/^\d/.test(firstName) &&
+        !firstName.includes(".") && !firstName.toLowerCase().startsWith("no stat")) {
+      return firstName;
+    }
+  }
+
+  // Pattern 5: plain name without patterns (e.g. "Nucleosynthesis", "Honey Badger")
+  // Only if it's a short clean name, not a description or spawn code
+  if (partName.length >= 3 && partName.length <= 30 &&
+      !partName.includes(".") && !partName.includes("_") &&
+      !partName.includes("{") && !/^\d/.test(partName) &&
+      !partName.toLowerCase().startsWith("no stat") &&
+      !/common|uncommon|rare|epic|model|firmware/i.test(partName)) {
+    return partName.trim();
+  }
+
   return undefined;
 }
 
@@ -168,15 +202,15 @@ export function preferItemNameFromDecoded(decodedFull: string, partsByCode: Map<
         // WEAPONS: only barrel names (first barrel = weapon name)
         const isBarrel = type.includes("barrel") && !type.includes("accessory");
         if (!isBarrel) continue;
-        const cleanName = extractCleanName(part.partName ?? "");
+        const cleanName = extractCleanName(part.partName ?? "") ?? extractCleanName(part.itemType ?? "");
         if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
           barrelNames.push(cleanName);
         }
       } else {
-        // NON-WEAPONS: rarity skin name (same prefix only)
+        // NON-WEAPONS: rarity skin name — try itemType first (human name), fall back to partName (spawn code)
         const isRarity = type.includes("rarity");
         if (!isRarity) continue;
-        const cleanName = extractCleanName(part.partName ?? "");
+        const cleanName = extractCleanName(part.itemType ?? "") ?? extractCleanName(part.partName ?? "");
         if (cleanName && cleanName.length >= 3 && cleanName.length <= 40) {
           rarityNames.push(cleanName);
         }

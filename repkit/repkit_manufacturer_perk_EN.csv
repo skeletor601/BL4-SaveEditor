@@ -59,4 +59,8 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description,BigEditor_Effects,SpawnCode
 269,4,Rarity,Epic,,,vla_repair_kit.comp_04_epic
 269,5,Rarity,Legendary,Adrenaline Pump Skin,Adrenaline Pump,vla_repair_kit.comp_05_legendary_AdrenalinePUmp
 269,6,Legendary Perk,Blood Rush,Automatically regenerates Health during Fight For Your Life,,
-269,7,Model,Sobirat,"2082, , 16s CD",,
+269,7,Model,Sobirat,"2082, , 16s CD",,266,119,Augment,mal_repair_kit.part_aug_unique_geigerroid_corrosive_sec,,,
+266,118,Augment,mal_repair_kit.part_aug_unique_geigerroid_cryo_sec,,,
+266,117,Augment,mal_repair_kit.part_aug_unique_geigerroid_fire_sec,,,
+266,116,Augment,mal_repair_kit.part_aug_unique_geigerroid_radiation_sec,,,
+266,115,Augment,mal_repair_kit.part_aug_unique_geigerroid_shock_sec,,,

@@ -105,3 +105,8 @@ Manufacturer ID,Part_ID,Part_type,Stat,Description
 267,16,Legendary Perk,Bismuth (Fire),Attaches on Hit. Enemies take more Fire damage for each attached Dagger.
 267,17,Legendary Perk,Bismuth (Cryo),Attaches on Hit. Enemies take more Cryo damage for each attached Dagger.
 267,18,Legendary Perk,Bismuth (Corrosive),Attaches on Hit. Enemies take more Corrosive damage for each attached Dagger.
+35,6,Rarity,ORD.part_rarity,Faulty Detonator Skin
+35,7,Rarity,ORD.part_rarity,Swarm Skin
+35,8,Rarity,ORD.part_rarity,UAV Skin
+35,9,Rarity,ORD.part_rarity,Chaumurky Skin
+35,11,Rarity,ORD.part_rarity,Sho Kunai Skin

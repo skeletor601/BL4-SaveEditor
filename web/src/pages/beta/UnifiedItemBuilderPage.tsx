@@ -3410,7 +3410,7 @@ export default function UnifiedItemBuilderPage() {
       // Avoid duplicates
       const arr = map.get(typeId)!;
       if (!arr.some((x) => x.partId === partId)) {
-        arr.push({ partId, label: p.label, effect: p.effect });
+        arr.push({ partId, label: p.itemType || p.label, effect: p.effect });
       }
     }
     return map;
