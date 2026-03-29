@@ -55,6 +55,13 @@ interface UniversalPartRow {
   partType?: string;
   rarity?: string;
   category?: string;
+  weaponType?: string;
+  perkName?: string;
+  perkDescription?: string;
+  redText?: string;
+  spawnCode?: string;
+  element?: string;
+  dlc?: string;
 }
 
 const CATEGORY_COLORS: Record<ItemCategory, { active: string; inactive: string }> = {
@@ -3363,26 +3370,29 @@ export default function UnifiedItemBuilderPage() {
             const code = String(raw.code ?? raw.Code ?? "").trim();
             const label =
               String(raw.partName ?? raw.name ?? raw.String ?? raw["Canonical Name"] ?? "").trim() || code;
-            const effectPieces = [
-              raw.effect,
-              raw.Effect,
-              raw["Stats (Level 50, Common)"],
-              raw.Stats,
-              raw["Search Text"],
-              raw.Description,
-            ]
-              .map((v) => String(v ?? "").trim())
-              .filter(Boolean);
-            const effect = effectPieces.length ? effectPieces.join(" ") : undefined;
+            const effect = String(raw.effect ?? "").trim() || undefined;
+            const str = (key: string): string | undefined => {
+              const v = raw[key];
+              if (v == null) return undefined;
+              const s = String(v).trim();
+              return s || undefined;
+            };
             return {
               code,
               label,
               effect,
-              itemType: String(raw.itemType ?? raw["Item Type"] ?? "").trim() || undefined,
-              manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? "").trim() || undefined,
-              partType: String(raw.partType ?? raw["Part Type"] ?? "").trim() || undefined,
-              rarity: String(raw.rarity ?? raw.Rarity ?? "").trim() || undefined,
-              category: String(raw.category ?? raw.Category ?? "").trim() || undefined,
+              itemType: str("itemType"),
+              manufacturer: str("manufacturer"),
+              partType: str("partType"),
+              rarity: str("rarity"),
+              category: str("category"),
+              weaponType: str("weaponType"),
+              perkName: str("perkName"),
+              perkDescription: str("perkDescription"),
+              redText: str("redText"),
+              spawnCode: str("spawnCode"),
+              element: str("element"),
+              dlc: str("dlc"),
             };
           })
           .filter((r) => r.code);
@@ -3399,6 +3409,12 @@ export default function UnifiedItemBuilderPage() {
   /** Map part code → label for Current build parts list. Uses itemType (human name) when available. */
   const partsByCode = useMemo(
     () => new Map(universalParts.filter((p) => p.code).map((p) => [p.code, p.itemType || p.label])),
+    [universalParts],
+  );
+
+  /** Map part code → partType for "Current build parts" part type label. */
+  const universalPartTypeByCode = useMemo(
+    () => new Map(universalParts.filter((p) => p.code && p.partType).map((p) => [p.code, p.partType!])),
     [universalParts],
   );
 
@@ -3853,7 +3869,7 @@ export default function UnifiedItemBuilderPage() {
     const q = addPartsSearch.trim().toLowerCase();
     if (q) {
       list = list.filter((p) => {
-        const hay = [p.label, p.code, p.effect ?? "", p.itemType ?? "", p.manufacturer ?? "", p.partType ?? "", p.rarity ?? ""].join(" ").toLowerCase();
+        const hay = [p.label, p.code, p.effect ?? "", p.itemType ?? "", p.manufacturer ?? "", p.partType ?? "", p.rarity ?? "", p.weaponType ?? "", p.perkName ?? "", p.redText ?? "", p.spawnCode ?? "", p.dlc ?? ""].join(" ").toLowerCase();
         return hay.includes(q);
       });
     }
@@ -3905,6 +3921,32 @@ export default function UnifiedItemBuilderPage() {
     setPendingAddPart(null);
     setPendingAddQty("1");
   }, [pendingAddPart, pendingAddQty, appendToDecoded, category, weaponMfgWtId, grenadeMfgId, shieldMfgId, repkitMfgId, enhancementMfgName, heavyMfgId]);
+
+  /** When crossMfgExpand ("All Parts") is ON, augment a builder's options with all matching parts from the universal DB. */
+  const expandWithUniversal = useCallback(
+    (baseOpts: { partId: string; label: string; description?: string }[], partType: string, categoryFilter: string) => {
+      if (!crossMfgExpand) return baseOpts;
+      const seenIds = new Set(baseOpts.map((o) => o.partId));
+      const extra: { partId: string; label: string; description?: string }[] = [];
+      const ptLower = partType.toLowerCase();
+      for (const up of universalParts) {
+        if (!up.code) continue;
+        const upPt = (up.partType || "").toLowerCase();
+        if (upPt !== ptLower) continue;
+        const cat = (up.category || "").toLowerCase();
+        if (cat !== categoryFilter) continue;
+        const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+        if (!m) continue;
+        const pid = m[2];
+        if (seenIds.has(pid)) continue;
+        seenIds.add(pid);
+        const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
+        extra.push({ partId: pid, label: `${pid} - ${up.itemType || up.label || up.effect || pid}${mfgLabel}`, description: up.effect });
+      }
+      return [...baseOpts, ...extra];
+    },
+    [crossMfgExpand, universalParts],
+  );
 
   const currentBuildParts = useMemo(() => {
     const segment = getPartsSegmentFromFirstLine(liveDecoded);
@@ -5612,11 +5654,11 @@ export default function UnifiedItemBuilderPage() {
               const getOpts = (partType: string): { partId: string; label: string; description?: string }[] => {
                 if (partType === "Rarity") return rarities.map((r) => ({ partId: String(r.id), label: r.label }));
                 if (partType === "Legendary") return legendaryOptions;
-                if (partType === "Element") return elementOptions;
-                if (partType === "Firmware") return firmwareOptions;
-                if (partType === "Mfg Perk") return mfgPerkOptions;
-                if (partType === "Universal Perk") return universalPerkOptions;
-                return [];
+                if (partType === "Element") return expandWithUniversal(elementOptions, partType, "grenade");
+                if (partType === "Firmware") return expandWithUniversal(firmwareOptions, partType, "grenade");
+                if (partType === "Mfg Perk") return expandWithUniversal(mfgPerkOptions, partType, "grenade");
+                if (partType === "Universal Perk") return expandWithUniversal(universalPerkOptions, partType, "grenade");
+                return expandWithUniversal([], partType, "grenade");
               };
               const list = (partType: string) => grenadePartSelections[partType] ?? [];
               const removePartAt = (partType: string, index: number) => {
@@ -6112,12 +6154,12 @@ export default function UnifiedItemBuilderPage() {
               const getOpts = (partType: string): { partId: string; label: string; description?: string }[] => {
                 if (partType === "Rarity") return rarities.map((r) => ({ partId: String(r.id), label: r.label, description: undefined }));
                 if (partType === "Legendary") return legendaryOptions;
-                if (partType === "Element") return elementOptions;
-                if (partType === "Firmware") return firmwareOptions;
-                if (partType === "Universal Perk") return universalOptions;
-                if (partType === "Energy Perk") return energyOptions;
-                if (partType === "Armor Perk") return armorOptions;
-                return [];
+                if (partType === "Element") return expandWithUniversal(elementOptions, partType, "shield");
+                if (partType === "Firmware") return expandWithUniversal(firmwareOptions, partType, "shield");
+                if (partType === "Universal Perk") return expandWithUniversal(universalOptions, partType, "shield");
+                if (partType === "Energy Perk") return expandWithUniversal(energyOptions, partType, "shield");
+                if (partType === "Armor Perk") return expandWithUniversal(armorOptions, partType, "shield");
+                return expandWithUniversal([], partType, "shield");
               };
 
               const list = (partType: string) => shieldPartSelections[partType] ?? [];
@@ -7516,12 +7558,12 @@ export default function UnifiedItemBuilderPage() {
 
               const getOpts = (partType: string): { partId: string; label: string; description?: string }[] => {
                 if (partType === "Rarity") return rarities.map((r) => ({ partId: String(r.id), label: r.label }));
-                if (partType === "Prefix") return prefixOptions;
-                if (partType === "Firmware") return firmwareOptions;
-                if (partType === "Resistance") return resistanceOptions;
+                if (partType === "Prefix") return expandWithUniversal(prefixOptions, partType, "repkit");
+                if (partType === "Firmware") return expandWithUniversal(firmwareOptions, partType, "repkit");
+                if (partType === "Resistance") return expandWithUniversal(resistanceOptions, partType, "repkit");
                 if (partType === "Legendary") return legendaryOptions;
-                if (partType === "Universal perks") return universalOptions;
-                return [];
+                if (partType === "Universal perks") return expandWithUniversal(universalOptions, "Universal Perk", "repkit");
+                return expandWithUniversal([], partType, "repkit");
               };
 
               const list = (partType: string) => repkitPartSelections[partType] ?? [];
@@ -7966,8 +8008,9 @@ export default function UnifiedItemBuilderPage() {
                   opts.push({ partId: String(r.id), label: r.label });
                 });
               } else if (heavyPartPickerPartType === "Barrel") {
-                heavyData.barrel.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
+                heavyData.barrel.filter((p) => crossMfgExpand || p.mfgId === heavyMfgId).forEach((p) => {
+                  const mfgLabel = crossMfgExpand && p.mfgId !== heavyMfgId ? ` (${heavyData.mfgs.find((m) => m.id === p.mfgId)?.name ?? ""})` : "";
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}${mfgLabel}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Element") {
                 heavyData.element.forEach((p) => {
@@ -7978,12 +8021,14 @@ export default function UnifiedItemBuilderPage() {
                   opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Barrel Accessory") {
-                heavyData.barrelAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
+                heavyData.barrelAccPerks.filter((p) => crossMfgExpand || p.mfgId === heavyMfgId).forEach((p) => {
+                  const mfgLabel = crossMfgExpand && p.mfgId !== heavyMfgId ? ` (${heavyData.mfgs.find((m) => m.id === p.mfgId)?.name ?? ""})` : "";
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}${mfgLabel}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Body Accessory") {
-                heavyData.bodyAccPerks.filter((p) => p.mfgId === heavyMfgId).forEach((p) => {
-                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}`, description: p.description });
+                heavyData.bodyAccPerks.filter((p) => crossMfgExpand || p.mfgId === heavyMfgId).forEach((p) => {
+                  const mfgLabel = crossMfgExpand && p.mfgId !== heavyMfgId ? ` (${heavyData.mfgs.find((m) => m.id === p.mfgId)?.name ?? ""})` : "";
+                  opts.push({ partId: String(p.partId), label: `${p.partId} - ${p.stat}${mfgLabel}`, description: p.description });
                 });
               } else if (heavyPartPickerPartType === "Underbarrel") {
                 // ALL underbarrels from the entire database (91 unique, filtered: no atlas/malswitch)
@@ -8552,6 +8597,22 @@ export default function UnifiedItemBuilderPage() {
                       classModData.perks.forEach((p) => {
                         opts.push({ id: String(p.perkId), label: `${p.perkId} - ${p.perkNameEN}` });
                       });
+                      if (crossMfgExpand) {
+                        const seenIds = new Set(opts.map((o) => o.id));
+                        for (const up of universalParts) {
+                          if (!up.code) continue;
+                          const cat = (up.category || "").toLowerCase();
+                          if (cat !== "class mod") continue;
+                          const pt = (up.partType || "").toLowerCase();
+                          if (pt !== "perk" && pt !== "core perk") continue;
+                          const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+                          if (!m) continue;
+                          const pid = m[2];
+                          if (seenIds.has(pid)) continue;
+                          seenIds.add(pid);
+                          opts.push({ id: pid, label: `${pid} - ${up.itemType || up.label || pid}` });
+                        }
+                      }
                     }
                     return (
                       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setClassModPartPickerKey(null)}>
@@ -9604,6 +9665,19 @@ export default function UnifiedItemBuilderPage() {
                 opts = ENHANCEMENT_RARITY_ORDER.filter((r) => r in (mfg.rarities || {})).map((r) => ({ partId: r, label: r }));
               } else if (mfg && enhancementPartPickerPartType === "Manufacturer perks") {
                 opts = (mfg.perks || []).filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.index)).map((p) => ({ partId: String(p.index), label: `[${p.index}] ${p.name}`, description: p.description }));
+                if (crossMfgExpand) {
+                  const seenIds = new Set(opts.map((o) => o.partId));
+                  for (const [name, om] of Object.entries(enhancementData.manufacturers)) {
+                    if (name === enhancementMfgName) continue;
+                    for (const p of om.perks || []) {
+                      if (!ENHANCEMENT_PERK_ORDER.includes(p.index)) continue;
+                      const pid = String(p.index);
+                      if (seenIds.has(pid)) continue;
+                      seenIds.add(pid);
+                      opts.push({ partId: `${om.code}:${p.index}`, label: `${om.code}:${p.index} - ${p.name} (${name})`, description: p.description });
+                    }
+                  }
+                }
               } else if (enhancementPartPickerPartType === "Stacked perks" && enhancementMfgName) {
                 for (const [name, om] of Object.entries(enhancementData.manufacturers)) {
                   if (name === enhancementMfgName) continue;
@@ -9805,10 +9879,18 @@ export default function UnifiedItemBuilderPage() {
                           : null,
                       );
 
+                      // Show simple {xx:yy} code, not stacked {xx:[yy yy yy...]}
+                      const simpleCode = part.prefix != null && part.partId != null
+                        ? `{${part.prefix}:${part.partId}}`
+                        : part.raw;
+
                       if (!richDetailView) {
+                        const nameDisplay = String(rawLabel ?? "").trim();
+                        const showName = nameDisplay && nameDisplay !== simpleCode && nameDisplay !== part.raw;
                         return (
                           <div className="text-sm text-[var(--color-text)] break-words">
-                            {rawLabel}
+                            <span className="font-mono text-[11px] text-[var(--color-text-muted)]">{simpleCode}</span>
+                            {showName && <span className="ml-2">{nameDisplay}</span>}
                           </div>
                         );
                       }
@@ -9879,16 +9961,12 @@ export default function UnifiedItemBuilderPage() {
                         }
                       }
 
-                      const idDisplay =
-                        part.partId != null
-                          ? part.partId
-                          : part.prefix != null
-                          ? part.prefix
-                          : null;
-                      const primary = idDisplay != null ? `${idDisplay} - ${name}` : name;
                       return (
                         <div className="text-sm text-[var(--color-text)] break-words">
-                          <div>{primary}</div>
+                          <div>
+                            <span className="font-mono text-[11px] text-[var(--color-text-muted)]">{simpleCode}</span>
+                            <span className="ml-2">{name}</span>
+                          </div>
                           {info && (
                             <div className="text-xs text-[var(--color-text-muted)] mt-0.5">
                               {info}
@@ -9941,40 +10019,28 @@ export default function UnifiedItemBuilderPage() {
                   <>
                     {(() => {
                       const computeType = (): string | undefined => {
+                        // Try builder-specific maps first
                         if (category === "weapon") {
-                          const t =
-                            weaponPartTypeByRaw.get(part.raw) ??
-                            (part.prefix != null && part.partId != null
-                              ? weaponPartTypeByRaw.get(`{${part.prefix}:${part.partId}}`)
-                              : undefined);
-                          return t;
+                          const t = weaponPartTypeByRaw.get(part.raw) ??
+                            (part.prefix != null && part.partId != null ? weaponPartTypeByRaw.get(`{${part.prefix}:${part.partId}}`) : undefined);
+                          if (t) return t;
+                        } else if (category === "shield") {
+                          const t = shieldPartTypeByRaw.get(part.raw) ??
+                            (part.prefix != null && part.partId != null ? shieldPartTypeByRaw.get(`{${part.prefix}:${part.partId}}`) : undefined);
+                          if (t) return t;
+                        } else if (category === "grenade") {
+                          const t = grenadePartTypeByRaw.get(part.raw) ??
+                            (part.prefix != null && part.partId != null ? grenadePartTypeByRaw.get(`{${part.prefix}:${part.partId}}`) : undefined);
+                          if (t) return t;
                         }
-                        if (category === "shield") {
-                          const t =
-                            shieldPartTypeByRaw.get(part.raw) ??
-                            (part.prefix != null && part.partId != null
-                              ? shieldPartTypeByRaw.get(`{${part.prefix}:${part.partId}}`)
-                              : undefined);
-                          return t;
-                        }
-                        if (category === "grenade") {
-                          const t =
-                            grenadePartTypeByRaw.get(part.raw) ??
-                            (part.prefix != null && part.partId != null
-                              ? grenadePartTypeByRaw.get(`{${part.prefix}:${part.partId}}`)
-                              : undefined);
-                          return t;
-                        }
-                        return undefined;
+                        // Universal fallback — works for ALL builders
+                        return universalPartTypeByCode.get(part.raw) ??
+                          (part.prefix != null && part.partId != null ? universalPartTypeByCode.get(`{${part.prefix}:${part.partId}}`) : undefined);
                       };
-                      const partType = computeType();
-                      if (!partType) return null;
-                      const lower = partType.toLowerCase();
-                      const typeClass =
-                        lower === "universal perk"
-                          ? "text-xs text-[var(--color-text-muted)] text-center lowercase mb-0.5"
-                          : "text-xs text-[var(--color-text-muted)] text-left lowercase mb-0.5";
-                      return <div className={typeClass}>{lower}</div>;
+                      const partTypeLabel = computeType();
+                      if (!partTypeLabel) return null;
+                      const lower = partTypeLabel.toLowerCase();
+                      return <div className="text-[10px] text-[var(--color-text-muted)]/70 uppercase tracking-wider mb-0.5">{lower}</div>;
                     })()}
                     <div className="pt-0.5 border-t border-[var(--color-panel-border)] flex items-center justify-between">
                       <span className="text-xs text-[var(--color-text-muted)]">
@@ -10090,17 +10156,23 @@ export default function UnifiedItemBuilderPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="font-mono text-[11px] text-[var(--color-text-muted)]">{p.code}</span>
-                      <span className="text-sm text-[var(--color-text)] truncate">{p.label}</span>
+                      <span className="text-sm text-[var(--color-text)] truncate">{p.itemType || p.label}</span>
                     </div>
                     {richDetailView && (
                       <>
-                        {(p.manufacturer || p.rarity || p.partType) && (
+                        {(p.manufacturer || p.rarity || p.partType || p.weaponType) && (
                           <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                            {[p.manufacturer, p.rarity, p.partType].filter(Boolean).join(" · ")}
+                            {[p.manufacturer, p.weaponType, p.partType, p.rarity].filter(Boolean).join(" · ")}
                           </p>
                         )}
                         {p.effect && (
                           <p className="text-xs text-[var(--color-accent)]/80 mt-0.5 truncate">{p.effect}</p>
+                        )}
+                        {p.redText && (
+                          <p className="text-xs text-red-400/80 mt-0.5 italic truncate">"{p.redText}"</p>
+                        )}
+                        {p.dlc && (
+                          <span className="inline-block text-[10px] text-purple-400/80 mt-0.5 px-1.5 py-0.5 rounded bg-purple-400/10 border border-purple-400/20">{p.dlc}</span>
                         )}
                       </>
                     )}

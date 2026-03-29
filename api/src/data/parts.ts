@@ -32,6 +32,12 @@ export interface PartItem {
   manufacturer?: string;
   partType?: string;
   weaponType?: string;
+  perkName?: string;
+  perkDescription?: string;
+  redText?: string;
+  spawnCode?: string;
+  element?: string;
+  dlc?: string;
   id?: number;
 }
 
@@ -47,11 +53,35 @@ function pickStr(obj: Record<string, unknown>, ...keys: string[]): string {
 }
 
 function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
+  const name = pickStr(raw, "name", "Name");
+  const perkName = pickStr(raw, "perkName", "PerkName", "Perk Name");
+  const description = pickStr(raw, "description", "Description");
+  const spawnCode = pickStr(raw, "spawnCode", "SpawnCode", "Spawn Code");
+  const rarity = pickStr(raw, "canonicalRarity", "Canonical Rarity", "rarity", "Rarity");
+  const partType = pickStr(raw, "canonicalPartType", "Specific Category", "partType", "part_type", "Part Type");
+  // itemType: human-readable display name.
+  // 1. Try dedicated itemType fields
+  // 2. For rarity parts with no real name, use the rarity tier ("Common", "Legendary", etc.)
+  // 3. Try perkName (good for legendaries)
+  // 4. Fall back to name if it's not a number or spawn code
+  const isNameUsable = name && !/^\d+$/.test(name) && !name.includes(".");
+  let itemType = pickStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name");
+  if (!itemType && partType === "Rarity" && rarity) {
+    // For legendary rarities, include the weapon name if different from rarity tier
+    itemType = (rarity === "Legendary" || rarity === "Pearl") && perkName && perkName !== rarity
+      ? `${rarity} - ${perkName}`
+      : rarity;
+  }
+  if (!itemType) itemType = perkName || "";
+  if (!itemType && isNameUsable) itemType = name;
+  // If itemType is just a number (generic barrels), extract the real name from description
+  if (/^\d+$/.test(itemType) && description) {
+    const firstComma = description.indexOf(",");
+    itemType = firstComma > 0 ? description.substring(0, firstComma).trim() : description.split("\n")[0].trim();
+  }
   return {
     code: pickStr(raw, "code", "Code"),
-    itemType: pickStr(raw, "itemType", "item_type", "Item Type", "Model Name", "model_name", "Weapon Type"),
-    // Prefer explicit canonical/name fields, but fall back to short perk / effect
-    // text when no dedicated name is present (common for heavy/grenade/repkit perks).
+    itemType,
     partName: pickStr(
       raw,
       "Canonical Name",
@@ -59,17 +89,29 @@ function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
       "part_name",
       "Part Name",
       "String",
+      "name",
       "Name",
       "Effects",
       "effect",
       "Effect",
     ),
-    effect: pickStr(raw, "effect", "Effect", "Stats (Level 50, Common)", "stats", "Stats", "Description", "Search Text"),
+    effect: (() => {
+      const eff = pickStr(raw, "effect", "Effect", "description", "Description", "Stats (Level 50, Common)", "stats", "Stats", "Search Text");
+      // Skip junk auto-generated descriptions for rarity entries
+      if (eff && eff.startsWith("Description: Item Type ID:")) return "";
+      return eff;
+    })(),
     category: pickStr(raw, "category", "Category", "General Category") || undefined,
-    rarity: pickStr(raw, "canonicalRarity", "Canonical Rarity", "rarity", "Rarity") || undefined,
+    rarity: rarity || undefined,
     manufacturer: pickStr(raw, "canonicalManufacturer", "manufacturer", "Manufacturer") || undefined,
-    partType: pickStr(raw, "canonicalPartType", "Specific Category", "partType", "part_type", "Part Type") || undefined,
+    partType: partType || undefined,
     weaponType: pickStr(raw, "weaponType", "Weapon Type", "weapon_type") || undefined,
+    perkName: perkName || undefined,
+    perkDescription: pickStr(raw, "perkDescription", "PerkDescription", "Perk Description") || undefined,
+    redText: pickStr(raw, "redText", "RedText", "Red Text") || undefined,
+    spawnCode: spawnCode || undefined,
+    element: pickStr(raw, "element", "Element") || undefined,
+    dlc: pickStr(raw, "dlc", "DLC") || undefined,
     id: typeof raw.id === "number" ? raw.id : typeof raw.ID === "number" ? raw.ID : undefined,
   };
 }

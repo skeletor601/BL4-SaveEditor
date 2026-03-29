@@ -10,11 +10,6 @@ function getPath(relative: string): string {
   return join(repoRoot, relative);
 }
 
-function readCsv(path: string): { headers: string[]; rows: Record<string, string>[] } {
-  const content = readFileSync(path, "utf-8");
-  return parseCsv(content);
-}
-
 function trim(s: unknown): string {
   return String(s ?? "").trim();
 }
@@ -27,6 +22,9 @@ export const CLASS_IDS: Record<string, number> = {
   Vex: 254,
   C4SH: 404,
 };
+
+const CLASS_ID_TO_NAME: Record<number, string> = {};
+for (const [name, id] of Object.entries(CLASS_IDS)) CLASS_ID_TO_NAME[id] = name;
 
 export const CLASS_NAMES = ["Amon", "Harlowe", "Rafa", "Vex", "C4SH"] as const;
 
@@ -68,63 +66,102 @@ export interface ClassModBuilderData {
   rarityCode: (classKey: string, rarityEn: string) => number | null;
 }
 
+interface UniversalRow {
+  code: string; name: string; manufacturer: string; category: string;
+  partType: string; description: string; rarity: string; character: string;
+}
+
+function loadUniversalDb(): UniversalRow[] {
+  const path = getPath("master_search/db/universal_parts_db.json");
+  if (!existsSync(path)) return [];
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf-8"));
+    return (raw?.rows ?? raw ?? []) as UniversalRow[];
+  } catch { return []; }
+}
+
+function parseCode(code: string): { typeId: number; partId: number } {
+  const m = code.match(/^\{(\d+):(\d+)\}$/);
+  return m ? { typeId: parseInt(m[1]), partId: parseInt(m[2]) } : { typeId: 0, partId: 0 };
+}
+
 let cached: ClassModBuilderData | null = null;
 
 export function getClassModBuilderData(): ClassModBuilderData {
   if (cached) return cached;
 
-  const namesPath = getPath("class_mods/Class_rarity_name.csv");
-  const skillsPath = getPath("class_mods/Skills.csv");
-  const perksPath = getPath("class_mods/Class_perk.csv");
-  const legendaryMapPath = getPath("class_mods/Class_legendary_map.csv");
+  const allRows = loadUniversalDb().filter((r) => r.category === "Class Mod");
 
   const namesByClassRarity: Record<string, ClassModNameOption[]> = {};
   const skillsByClass: Record<string, ClassModSkill[]> = {};
   const legendaryMap: Record<string, number> = {};
   const perks: ClassModPerk[] = [];
+  const seenPerks = new Set<number>();
 
-  if (existsSync(namesPath)) {
-    const { rows } = readCsv(namesPath);
-    for (const r of rows) {
-      const classId = trim(r["class_ID"]);
-      const rarity = trim(r["rarity"]).toLowerCase(); // "legendary" | "normal"
-      const nameCode = parseInt(trim(r["name_code"]), 10);
-      const nameEN = trim(r["name_EN"]);
-      if (!classId || !Number.isFinite(nameCode)) continue;
-      const key = `${classId},${rarity}`;
-      if (!namesByClassRarity[key]) namesByClassRarity[key] = [];
-      namesByClassRarity[key].push({ nameCode, nameEN });
-    }
+  // --- Names from universal DB ---
+  for (const row of allRows) {
+    if (row.partType !== "Name") continue;
+    const { typeId, partId } = parseCode(row.code);
+    if (!partId) continue;
+    const className = row.character || CLASS_ID_TO_NAME[typeId] || "";
+    if (!className) continue;
+    const classId = CLASS_IDS[className];
+    if (!classId) continue;
+    const rarity = (row.rarity || "").toLowerCase().includes("legendary") ? "legendary" : "normal";
+    const nameEN = trim(row.description) || trim(row.name).split(" - ").pop() || "";
+    const key = `${classId},${rarity}`;
+    if (!namesByClassRarity[key]) namesByClassRarity[key] = [];
+    namesByClassRarity[key].push({ nameCode: partId, nameEN });
   }
 
-  if (existsSync(skillsPath)) {
-    const { rows } = readCsv(skillsPath);
-    for (const r of rows) {
-      const classId = trim(r["class_ID"]);
-      const skillNameEN = trim(r["skill_name_EN"]);
-      const skillIds: number[] = [];
-      for (let i = 1; i <= 5; i++) {
-        const id = parseInt(trim(r[`skill_ID_${i}`]), 10);
-        if (Number.isFinite(id)) skillIds.push(id);
-      }
-      if (!classId || !skillNameEN) continue;
-      if (!skillsByClass[classId]) skillsByClass[classId] = [];
-      skillsByClass[classId].push({ skillNameEN, skillIds });
+  // --- Skills from universal DB ---
+  // Skills have 5 entries per skill (one per tier). Group by (character, skillName) → collect all partIds.
+  const skillGroups = new Map<string, { skillNameEN: string; skillIds: number[] }>();
+  for (const row of allRows) {
+    if (row.partType !== "Skill") continue;
+    const { partId } = parseCode(row.code);
+    if (!partId) continue;
+    const className = row.character || "";
+    if (!className) continue;
+    const classId = CLASS_IDS[className];
+    if (!classId) continue;
+    const skillName = trim(row.description) || trim(row.name).split(" - ").pop() || "";
+    if (!skillName) continue;
+    const groupKey = `${classId}|${skillName}`;
+    if (!skillGroups.has(groupKey)) {
+      skillGroups.set(groupKey, { skillNameEN: skillName, skillIds: [] });
     }
+    skillGroups.get(groupKey)!.skillIds.push(partId);
+  }
+  for (const [groupKey, skill] of skillGroups) {
+    const classId = groupKey.split("|")[0];
+    const className = CLASS_ID_TO_NAME[Number(classId)] || "";
+    if (!className) continue;
+    // Sort skill IDs ascending (tier 1 through 5)
+    skill.skillIds.sort((a, b) => a - b);
+    if (!skillsByClass[classId]) skillsByClass[classId] = [];
+    skillsByClass[classId].push(skill);
+  }
+  // Sort skills alphabetically within each class
+  for (const classId of Object.keys(skillsByClass)) {
+    skillsByClass[classId].sort((a, b) => a.skillNameEN.localeCompare(b.skillNameEN));
   }
 
-  if (existsSync(perksPath)) {
-    const { rows } = readCsv(perksPath);
-    for (const r of rows) {
-      const perkId = parseInt(trim(r["perk_ID"]), 10);
-      const perkNameEN = trim(r["perk_name_EN"]);
-      if (!Number.isFinite(perkId)) continue;
-      perks.push({ perkId, perkNameEN });
-    }
+  // --- Perks from universal DB ---
+  for (const row of allRows) {
+    if (row.partType !== "Perk") continue;
+    const { partId } = parseCode(row.code);
+    if (!partId || seenPerks.has(partId)) continue;
+    seenPerks.add(partId);
+    const perkNameEN = trim(row.name) || trim(row.description) || "";
+    perks.push({ perkId: partId, perkNameEN });
   }
 
+  // --- Legendary map from CSV (cross-reference not in universal DB) ---
+  const legendaryMapPath = getPath("class_mods/Class_legendary_map.csv");
   if (existsSync(legendaryMapPath)) {
-    const { rows } = readCsv(legendaryMapPath);
+    const content = readFileSync(legendaryMapPath, "utf-8");
+    const { rows } = parseCsv(content);
     for (const r of rows) {
       const classId = trim(r["class_ID"]);
       const lNameId = trim(r["L_name_ID"]);

@@ -60,13 +60,34 @@ export function getHeavyBuilderData(): HeavyBuilderData {
     const stat = row.name || row.description || "";
     const desc = row.description && row.description !== stat ? row.description : undefined;
 
-    if (typeId === 244) { // Universal heavy parts
-      if (pt === "Element") element.push({ partId, stat, ...(desc ? { description: desc } : {}) });
-      else if (pt === "Firmware") firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
-    } else if (HEAVY_MFG_SET.has(typeId)) {
+    // Element and Firmware can come from any typeId (244 or 1)
+    if (pt === "Element") {
+      element.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      continue;
+    }
+    if (pt === "Firmware") {
+      firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      continue;
+    }
+    if (HEAVY_MFG_SET.has(typeId)) {
       if (pt === "Rarity") {
         if (!raritiesByMfg[typeId]) raritiesByMfg[typeId] = [];
-        raritiesByMfg[typeId].push({ id: partId, label: stat });
+        // Determine rarity tier from the rarity field, or infer from spawn code name
+        let rarityLabel = row.rarity || '';
+        if (!rarityLabel) {
+          const nameLower = (row.name || '').toLowerCase();
+          if (nameLower.includes('common') && !nameLower.includes('uncommon')) rarityLabel = 'Common';
+          else if (nameLower.includes('uncommon')) rarityLabel = 'Uncommon';
+          else if (nameLower.includes('rare') && !nameLower.includes('legendary')) rarityLabel = 'Rare';
+          else if (nameLower.includes('epic')) rarityLabel = 'Epic';
+          else if (nameLower.includes('legendary')) rarityLabel = 'Legendary';
+          else rarityLabel = stat;
+        }
+        // For legendary, show the weapon name. For others, show the tier.
+        const displayLabel = rarityLabel === 'Legendary' && stat !== 'Legendary'
+          ? `Legendary - ${stat}`
+          : rarityLabel;
+        raritiesByMfg[typeId].push({ id: partId, label: displayLabel });
       } else if (pt === "Barrel") {
         barrel.push({ partId, stat, mfgId: typeId, ...(desc ? { description: desc } : {}) });
       } else if (pt === "Barrel Accessory") {
