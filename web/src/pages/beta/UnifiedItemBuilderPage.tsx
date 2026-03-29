@@ -54,6 +54,7 @@ interface UniversalPartRow {
   manufacturer?: string;
   partType?: string;
   rarity?: string;
+  category?: string;
 }
 
 const CATEGORY_COLORS: Record<ItemCategory, { active: string; inactive: string }> = {
@@ -3231,6 +3232,9 @@ export default function UnifiedItemBuilderPage() {
   const resetClassModBuilder = useCallback(() => {
     setClassModPartSelections({});
     setClassModExtraTokens([]);
+    setClassModSkillPoints({});
+    setClassModRarity("Common");
+    setClassModSkinValue("");
     resetCodec();
   }, [resetCodec]);
 
@@ -3378,6 +3382,7 @@ export default function UnifiedItemBuilderPage() {
               manufacturer: String(raw.manufacturer ?? raw.Manufacturer ?? "").trim() || undefined,
               partType: String(raw.partType ?? raw["Part Type"] ?? "").trim() || undefined,
               rarity: String(raw.rarity ?? raw.Rarity ?? "").trim() || undefined,
+              category: String(raw.category ?? raw.Category ?? "").trim() || undefined,
             };
           })
           .filter((r) => r.code);
@@ -3391,9 +3396,9 @@ export default function UnifiedItemBuilderPage() {
     };
   }, []);
 
-  /** Map part code → label for Current build parts list. */
+  /** Map part code → label for Current build parts list. Uses itemType (human name) when available. */
   const partsByCode = useMemo(
-    () => new Map(universalParts.filter((p) => p.code).map((p) => [p.code, p.label])),
+    () => new Map(universalParts.filter((p) => p.code).map((p) => [p.code, p.itemType || p.label])),
     [universalParts],
   );
 
@@ -4960,16 +4965,32 @@ export default function UnifiedItemBuilderPage() {
                     if (partType === "Legendary Type") return legendaryOptions;
                     if (partType === "Pearl Type") return pearlOptions;
                     if (partType === "Element 1" || partType === "Element 2") return elementalOptions;
-                    if (showAllMfgs && weaponData.partsByMfgTypeId) {
+                    if (showAllMfgs) {
+                      // Pull ALL parts of this type from the universal DB
                       const stock: PartOpt[] = [], extra: PartOpt[] = [];
-                      mfgWtIds.forEach((id) => {
-                        const mfg = getMfgName(id);
-                        const isStock = id === weaponMfgWtId;
-                        (weaponData.partsByMfgTypeId[id]?.[partType] ?? []).forEach((p) => {
-                          const item = { partId: p.partId, label: withMfgIfNeeded(p.label, mfg), isStock };
-                          if (isStock) stock.push(item); else extra.push(item);
-                        });
+                      const ptLower = partType.toLowerCase();
+                      const seenIds = new Set<string>();
+                      // Stock parts first (from selected weapon)
+                      (weaponData.partsByMfgTypeId[weaponMfgWtId]?.[partType] ?? []).forEach((p) => {
+                        stock.push({ partId: p.partId, label: p.label, isStock: true });
+                        seenIds.add(p.partId);
                       });
+                      // Then ALL parts of this type from universal DB
+                      for (const up of universalParts) {
+                        if (!up.code) continue;
+                        const upPt = (up.partType || "").toLowerCase();
+                        if (upPt !== ptLower) continue;
+                        // Only weapon category parts
+                        const cat = (up.category || "").toLowerCase();
+                        if (cat !== "weapon") continue;
+                        const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+                        if (!m) continue;
+                        const pid = m[2];
+                        if (seenIds.has(pid)) continue;
+                        seenIds.add(pid);
+                        const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
+                        extra.push({ partId: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}`, description: up.effect, isStock: false });
+                      }
                       return [...stock, ...extra];
                     }
                     const parts = weaponData.partsByMfgTypeId[weaponMfgWtId]?.[partType] ?? [];

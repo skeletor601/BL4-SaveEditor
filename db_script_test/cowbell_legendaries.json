@@ -1,0 +1,101 @@
+{
+  "total": 13,
+  "items": [
+    {
+      "name": "Crazed Earl",
+      "mfg": "Borg",
+      "weapon_type": "Shotgun",
+      "category": "Weapon",
+      "part_type": "Barrel",
+      "stats": "damage_scale=1.5x, fire_rate=4.0, accuracy=3.5, impact_force=30000"
+    },
+    {
+      "name": "DahlFather",
+      "mfg": "Torgue",
+      "weapon_type": "Heavy Weapon",
+      "category": "Heavy",
+      "part_type": "Barrel",
+      "stats": "damage=2.0x, fire_rate=0.6, mag=3, cooldown=50s, splash=600"
+    },
+    {
+      "name": "Elpis Star",
+      "mfg": "Maliwan",
+      "category": "Shield",
+      "part_type": "Legendary Perk",
+      "stats": "damage=0.175, delay=2.0x, regen=1.0x, capacity=0.75x (Energy)"
+    },
+    {
+      "name": "Flash Cyclone",
+      "mfg": "Maliwan",
+      "weapon_type": "SMG",
+      "category": "Weapon",
+      "part_type": "Barrel"
+    },
+    {
+      "name": "Follower",
+      "mfg": "Daedalus",
+      "weapon_type": "SMG",
+      "category": "Weapon",
+      "part_type": "Barrel"
+    },
+    {
+      "name": "Honey Badger",
+      "mfg": "Daedalus",
+      "category": "Shield",
+      "part_type": "Legendary Perk",
+      "stats": "damage=0.1, delay=1.5x, regen=1.5x, capacity=0.9x (Armor)"
+    },
+    {
+      "name": "Laser Cutter",
+      "mfg": "Vladof",
+      "weapon_type": "Assault Rifle",
+      "category": "Weapon",
+      "part_type": "Underbarrel",
+      "stats": "mode_return=1.2x, mode_switch=1.2x"
+    },
+    {
+      "name": "Scoot Shoot",
+      "mfg": "Torgue",
+      "weapon_type": "Pistol",
+      "category": "Weapon",
+      "part_type": "Barrel"
+    },
+    {
+      "name": "Soul Survivor",
+      "mfg": "Daedalus",
+      "weapon_type": "Pistol",
+      "category": "Weapon",
+      "part_type": "Barrel"
+    },
+    {
+      "name": "Paleblood",
+      "mfg": "Order",
+      "category": "Repkit",
+      "part_type": "Legendary Augment",
+      "stats": "damage_instances=5, duration=4s, cooldown=0.25x"
+    },
+    {
+      "name": "Fearstalker",
+      "mfg": "Jakobs",
+      "weapon_type": "Sniper Rifle",
+      "category": "Weapon",
+      "part_type": "Barrel",
+      "stats": "max_stacks=5, crit+1, noncrit+2"
+    },
+    {
+      "name": "Sunspot",
+      "mfg": "Order",
+      "weapon_type": "Pistol",
+      "category": "Weapon",
+      "part_type": "Barrel"
+    },
+    {
+      "name": "Reminisce",
+      "mfg": "Maliwan",
+      "weapon_type": "Shotgun",
+      "category": "Weapon",
+      "part_type": "Barrel",
+      "stats": "target_dist=3000, damage=1.5x, fire_rate=4.0, status_dmg=1.5x"
+    }
+  ]
+}

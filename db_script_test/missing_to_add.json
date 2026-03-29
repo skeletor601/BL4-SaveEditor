@@ -1,0 +1,4912 @@
+[
+  {
+    "code": "{6:79}",
+    "partName": "TOR_PS.part_foregrip_03_Handcannon",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Pistol"
+  },
+  {
+    "code": "{6:80}",
+    "partName": "TOR_PS.part_foregrip_02_Handcannon",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Pistol"
+  },
+  {
+    "code": "{6:81}",
+    "partName": "TOR_PS.part_foregrip_01_Handcannon",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Pistol"
+  },
+  {
+    "code": "{7:55}",
+    "partName": "BOR_SG.part_unique_barrel_02_demo",
+    "itemType": "Barrel",
+    "partType": "Barrel",
+    "effect": "",
+    "manufacturer": "Ripper",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{13:84}",
+    "partName": "DAD_AR.part_barrel_01_firstimpression",
+    "itemType": "Barrel",
+    "partType": "Barrel",
+    "effect": "",
+    "manufacturer": "Daedalus",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{13:89}",
+    "partName": "DAD_AR.part_underbarrel_04_atlas_ball_Mercredi",
+    "itemType": "Underbarrel",
+    "partType": "Underbarrel",
+    "effect": "DAD_AR_UnderBarrel_04",
+    "manufacturer": "Daedalus",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{13:90}",
+    "partName": "DAD_AR.part_underbarrel_04_atlas_Mercredi",
+    "itemType": "Underbarrel",
+    "partType": "Underbarrel",
+    "effect": "DAD_AR_UnderBarrel_04",
+    "manufacturer": "Daedalus",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{17:79}",
+    "partName": "TOR_AR.part_foregrip_03_fleabag",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{17:80}",
+    "partName": "TOR_AR.part_foregrip_02_fleabag",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{17:81}",
+    "partName": "TOR_AR.part_foregrip_01_fleabag",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{21:79}",
+    "partName": "MAL_SM.part_mag_torgue_normal_songbird",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{21:82}",
+    "partName": "MAL_SM.part_barrel_02_firework",
+    "itemType": "Barrel",
+    "partType": "Barrel",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{22:89}",
+    "partName": "VLA_SM.part_mag_torgue_sticky_mercury",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Vladof",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{22:90}",
+    "partName": "VLA_SM.part_mag_torgue_normal_mercury",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Vladof",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{35:6}",
+    "partName": "ORD.part_rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Faulty Detonator Skin",
+    "manufacturer": "Tediore",
+    "category": "Grenade"
+  },
+  {
+    "code": "{35:7}",
+    "partName": "ORD.part_rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Swarm Skin",
+    "manufacturer": "Order",
+    "category": "Grenade"
+  },
+  {
+    "code": "{35:8}",
+    "partName": "ORD.part_rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "UAV Skin",
+    "manufacturer": "Tediore",
+    "category": "Grenade"
+  },
+  {
+    "code": "{35:9}",
+    "partName": "ORD.part_rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Chaumurky Skin",
+    "manufacturer": "Order",
+    "category": "Grenade"
+  },
+  {
+    "code": "{35:11}",
+    "partName": "ORD.part_rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Sho Kunai Skin",
+    "manufacturer": "Jakobs",
+    "category": "Grenade"
+  },
+  {
+    "code": "{234:69}",
+    "partName": "ClassMod.comp_01_common",
+    "itemType": "Common",
+    "partType": "Common",
+    "effect": "",
+    "manufacturer": "Secondary Rarity",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{234:70}",
+    "partName": "ClassMod.comp_02_uncommon",
+    "itemType": "Uncommon",
+    "partType": "Uncommon",
+    "effect": "",
+    "manufacturer": "Secondary Rarity",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{234:71}",
+    "partName": "ClassMod.comp_03_rare",
+    "itemType": "Rare",
+    "partType": "Rare",
+    "effect": "",
+    "manufacturer": "Secondary Rarity",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{234:72}",
+    "partName": "ClassMod.comp_04_epic",
+    "itemType": "Epic",
+    "partType": "Epic",
+    "effect": "",
+    "manufacturer": "Secondary Rarity",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{234:73}",
+    "partName": "ClassMod.comp_05_legendary",
+    "itemType": "Legendary",
+    "partType": "Legendary",
+    "effect": "",
+    "manufacturer": "Secondary Rarity",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{243:53}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:55}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:72}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:76}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:78}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:89}",
+    "partName": "repair_kit.part_aug_o_nova_blast_on_use_sec",
+    "itemType": "Lower healing, longer cooldown",
+    "partType": "Lower healing, longer cooldown",
+    "effect": "-Healing, -HoT, +CD",
+    "manufacturer": "Perk",
+    "category": "Repkit"
+  },
+  {
+    "code": "{243:95}",
+    "partName": "No Stat Changes",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "No Stat Changes",
+    "manufacturer": "Part",
+    "category": "Repkit"
+  },
+  {
+    "code": "{246:21}",
+    "partName": "Included when no Elemental Resistance is used",
+    "itemType": "PLACEHOLDER",
+    "partType": "PLACEHOLDER",
+    "effect": "Included when no Elemental Resistance is used",
+    "manufacturer": "Shield",
+    "category": "Weapon",
+    "weaponType": "Resistance"
+  },
+  {
+    "code": "{247:97}",
+    "partName": "Enhancement.part_Stat_weapon_magsize",
+    "itemType": "Gun Magazine Size",
+    "partType": "Gun Magazine Size",
+    "effect": "Gun Magazine +50%",
+    "manufacturer": "Enhancements",
+    "category": "Weapon",
+    "weaponType": "Stats"
+  },
+  {
+    "code": "{247:98}",
+    "partName": "Enhancement.comp_01_common",
+    "itemType": "Common",
+    "partType": "Common",
+    "effect": "NOT USED",
+    "manufacturer": "Enhancements",
+    "category": "Enhancement"
+  },
+  {
+    "code": "{247:99}",
+    "partName": "Enhancement.comp_02_uncommon",
+    "itemType": "Uncommon",
+    "partType": "Uncommon",
+    "effect": "NOT USED",
+    "manufacturer": "Enhancements",
+    "category": "Enhancement"
+  },
+  {
+    "code": "{247:100}",
+    "partName": "Enhancement.comp_03_rare",
+    "itemType": "Rare",
+    "partType": "Rare",
+    "effect": "NOT USED",
+    "manufacturer": "Enhancements",
+    "category": "Enhancement"
+  },
+  {
+    "code": "{247:101}",
+    "partName": "Enhancement.comp_04_epic",
+    "itemType": "Epic",
+    "partType": "Epic",
+    "effect": "NOT USED",
+    "manufacturer": "Enhancements",
+    "category": "Enhancement"
+  },
+  {
+    "code": "{247:102}",
+    "partName": "Enhancement.comp_05_legendary",
+    "itemType": "Enhancement.comp_05_legendary",
+    "partType": "",
+    "effect": "NOT USED",
+    "manufacturer": "Enhancements",
+    "category": "Enhancement"
+  },
+  {
+    "code": "{254:21}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:22}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:23}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:24}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:25}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:51}",
+    "partName": "classmod_dark_siren.leg_body_06",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Teen Witch Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:52}",
+    "partName": "classmod_dark_siren.leg_body_05",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Illusionist Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:53}",
+    "partName": "classmod_dark_siren.leg_body_04",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Kindred Spirit Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:54}",
+    "partName": "classmod_dark_siren.leg_body_03",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Undead Eye Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:55}",
+    "partName": "classmod_dark_siren.leg_body_02",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Avatar Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:56}",
+    "partName": "classmod_dark_siren.leg_body_01",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Technomancer Skin",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:58}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:64}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:67}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:75}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:79}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:90}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:96}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:99}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:107}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:111}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:122}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:128}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:131}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:139}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:143}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:154}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:160}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:163}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:171}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:175}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:186}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:192}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:195}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:203}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:207}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:217}",
+    "partName": "Common Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Common Rarity",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:218}",
+    "partName": "Uncommon Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Uncommon Rarity",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:219}",
+    "partName": "Rare Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Rare Rarity",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:220}",
+    "partName": "Epic Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Epic Rarity",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:228}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:234}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:241}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:249}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:256}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:263}",
+    "partName": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:270}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:274}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:284}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:291}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:297}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:304}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:312}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:319}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:326}",
+    "partName": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:333}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:337}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:347}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:354}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:360}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:367}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:375}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:382}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:389}",
+    "partName": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:396}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:400}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:410}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:417}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:423}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:430}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:438}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:445}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:452}",
+    "partName": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:459}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:463}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:473}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:480}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:486}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:493}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Green",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:501}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:508}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Red",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:515}",
+    "partName": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Red Tree Strike Me Down?????? BROKEN!!!",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:522}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:526}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:536}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Broken Blue",
+    "manufacturer": "Vex",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:20}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Forge Master Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:21}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Elementalist Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:22}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Blacksmith Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:23}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Shatterwight Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:24}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Viking Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:25}",
+    "partName": "Legendary Rarity",
+    "itemType": "item card",
+    "partType": "item card",
+    "effect": "Furnace Skin",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:26}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:38}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:42}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:50}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:53}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:62}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:67}",
+    "partName": "Epic Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:68}",
+    "partName": "Rare Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:69}",
+    "partName": "Uncommon Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:70}",
+    "partName": "Common Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:72}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:81}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:86}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:90}",
+    "partName": "Gut Punch",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:95}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:98}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:108}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:111}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:120}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:125}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:133}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:136}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:146}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:149}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:158}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:163}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:171}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:174}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:184}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:187}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:189}",
+    "partName": "Vital Organs",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:196}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:201}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:209}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:212}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:222}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:230}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:236}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:244}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:250}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:258}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:264}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:272}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:278}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:286}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:293}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:299}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:307}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:313}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:321}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:327}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:335}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:341}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:349}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:356}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:362}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:370}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:376}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:384}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:390}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:398}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:404}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:412}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:419}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:425}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:433}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:439}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:447}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:453}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:461}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:467}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:475}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:482}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:488}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:496}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:502}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:510}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:516}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:524}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:530}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:538}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:21}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Esgrimidor Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:22}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Buster Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:23}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Filantropo Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:24}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Grenazerker Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:25}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Dancer Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:26}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Instigator Skin",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:31}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:36}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:38}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:42}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:46}",
+    "partName": "Pa'Dentro",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:49}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:51}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:54}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:62}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:64}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:66}",
+    "partName": "Common Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:67}",
+    "partName": "Uncommon Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:68}",
+    "partName": "Rare Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:69}",
+    "partName": "Epic Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:70}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:75}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:80}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:82}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:86}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:91}",
+    "partName": "The Thrill",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:94}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:97}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:105}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:107}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:113}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:118}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:120}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:124}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:130}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:132}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:135}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:143}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:145}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:151}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:156}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:158}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:162}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:168}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:170}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:173}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:181}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:183}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:189}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:194}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:196}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:200}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:206}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:208}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:211}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:219}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:221}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:225}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:229}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:233}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:241}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:242}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:244}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:254}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:261}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:264}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:267}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:269}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:274}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:278}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:282}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:284}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:288}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:292}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:296}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:304}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:305}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:307}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:317}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:324}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:327}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:330}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:332}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:337}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:341}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:345}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:347}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:351}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:355}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:359}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:367}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:368}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:370}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:380}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:387}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:390}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:393}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:395}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:400}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:404}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:408}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:410}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:414}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:418}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:422}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:430}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:431}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:433}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:443}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:450}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:453}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:456}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:458}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:463}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:467}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:471}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:473}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:477}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:481}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:485}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:493}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:494}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:496}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:506}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:513}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:516}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:519}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:521}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:526}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:530}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:534}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:536}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Rafa",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:21}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Scientist Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:22}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Skeptic Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:23}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Driver Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:24}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Generator Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:25}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Reactor Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:26}",
+    "partName": "Legendary Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Bio Robot Skin",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:27}",
+    "partName": "ALWAYS COMES ON LEGENDARY",
+    "itemType": "Unknown",
+    "partType": "Unknown",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:34}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:38}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:44}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:47}",
+    "partName": "Negative Entropy",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:52}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:55}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:63}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:68}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:76}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:83}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:90}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:98}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:102}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:106}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:114}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:121}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:128}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:136}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:140}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:144}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:152}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:159}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:166}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:174}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:178}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:182}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:190}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:197}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:204}",
+    "partName": "Broken White",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:212}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:216}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:219}",
+    "partName": "Nothing that i can tell tested 3x",
+    "itemType": "Unknown",
+    "partType": "Unknown",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:221}",
+    "partName": "Epic Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:222}",
+    "partName": "Rare Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:223}",
+    "partName": "Uncommon Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:224}",
+    "partName": "Common Rarity",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:229}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:230}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:234}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:242}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:250}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:256}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:262}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:270}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:280}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:285}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:286}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:292}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:293}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:297}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:305}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:313}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:319}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:325}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:333}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:343}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:348}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:349}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:355}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:356}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:360}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:368}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:376}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:382}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:388}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:396}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:406}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:411}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:412}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:418}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:419}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:423}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:431}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:439}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:445}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:451}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:459}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:469}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:474}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:475}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:481}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:482}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:486}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:494}",
+    "partName": "Broken Green",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:502}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:508}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:514}",
+    "partName": "Broken Red",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:522}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:532}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:537}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:538}",
+    "partName": "Broken Blue",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "",
+    "manufacturer": "Harlowe",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{255:539}",
+    "partName": "Lamplighter",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Lamplighter",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:541}",
+    "partName": "Trooper",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Trooper",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:538}",
+    "partName": "Overdriver",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Overdriver",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:537}",
+    "partName": "Miscericorde",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Miscericorde",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:69}",
+    "partName": "classmod_paladin.comp_02_uncommon",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:68}",
+    "partName": "classmod_paladin.comp_03_rare",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:67}",
+    "partName": "classmod_paladin.comp_04_epic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:25}",
+    "partName": "Furnace",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Furnace",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:24}",
+    "partName": "Elementalist",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Elementalist",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:23}",
+    "partName": "Shatterwight",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Shatterwight",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:22}",
+    "partName": "Blacksmith",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Blacksmith",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:21}",
+    "partName": "Forge Master",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Forge Master",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:20}",
+    "partName": "Viking",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Viking",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:70}",
+    "partName": "classmod_paladin.comp_01_common",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:223}",
+    "partName": "classmod_gravitar.comp_02_uncommon",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:222}",
+    "partName": "classmod_gravitar.comp_03_rare",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:221}",
+    "partName": "classmod_gravitar.comp_04_epic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:26}",
+    "partName": "Bio-Robot",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Bio-Robot",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:25}",
+    "partName": "Reactor",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Reactor",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:24}",
+    "partName": "Generator",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Generator",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:23}",
+    "partName": "Atomic Driver",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Atomic Driver",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:22}",
+    "partName": "Skeptic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Skeptic",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:21}",
+    "partName": "Scientist",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Scientist",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:224}",
+    "partName": "classmod_gravitar.comp_01_common",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:67}",
+    "partName": "classmod_exo_soldier.comp_02_uncommon",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:68}",
+    "partName": "classmod_exo_soldier.comp_03_rare",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:69}",
+    "partName": "classmod_exo_soldier.comp_04_epic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:26}",
+    "partName": "Dancer",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Dancer",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:25}",
+    "partName": "Filántropo",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Filántropo",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:24}",
+    "partName": "Instigator",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Instigator",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:23}",
+    "partName": "Buster",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Buster",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:22}",
+    "partName": "Esgrimidor",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Esgrimidor",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:21}",
+    "partName": "Grenazerker",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Grenazerker",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:66}",
+    "partName": "classmod_exo_soldier.comp_01_common",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:218}",
+    "partName": "classmod_dark_siren.comp_02_uncommon",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:219}",
+    "partName": "classmod_dark_siren.comp_03_rare",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:220}",
+    "partName": "classmod_dark_siren.comp_04_epic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:56}",
+    "partName": "Technomancer",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Technomancer",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:55}",
+    "partName": "Avatar",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Avatar",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:54}",
+    "partName": "Undead Eye",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Undead Eye",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:53}",
+    "partName": "Spirits",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Spirits",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:52}",
+    "partName": "Illusionist",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Illusionist",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:51}",
+    "partName": "Teen Witch",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Teen Witch",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:217}",
+    "partName": "classmod_dark_siren.comp_01_common",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{404:52}",
+    "partName": "Common",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Common",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:53}",
+    "partName": "Uncommon",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Uncommon",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:54}",
+    "partName": "Rare",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Rare",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:55}",
+    "partName": "Epic",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Epic",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:221}",
+    "partName": "Rounder",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Rounder",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:220}",
+    "partName": "Ludopath",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Ludopath",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:219}",
+    "partName": "Hotshot",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Hotshot",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:218}",
+    "partName": "Cooler",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Cooler",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:217}",
+    "partName": "Whale",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Whale",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:56}",
+    "partName": "Windrider",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Windrider",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:540}",
+    "partName": "Gamer",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Gamer",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:539}",
+    "partName": "Hooligan",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Hooligan",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:242}",
+    "partName": "Snake Eyes",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Snake Eyes",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:305}",
+    "partName": "Snake Eyes",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Snake Eyes",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:368}",
+    "partName": "Snake Eyes",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Snake Eyes",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:431}",
+    "partName": "Snake Eyes",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Snake Eyes",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:494}",
+    "partName": "Snake Eyes",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Snake Eyes",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:243}",
+    "partName": "Call",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Call",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:306}",
+    "partName": "Call",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Call",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:369}",
+    "partName": "Call",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Call",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:432}",
+    "partName": "Call",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Call",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:495}",
+    "partName": "Call",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Call",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:207}",
+    "partName": "Ride to Ruin",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Ride to Ruin",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:175}",
+    "partName": "Ride to Ruin",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Ride to Ruin",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:143}",
+    "partName": "Ride to Ruin",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Ride to Ruin",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:111}",
+    "partName": "Ride to Ruin",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Ride to Ruin",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{404:79}",
+    "partName": "Ride to Ruin",
+    "itemType": "Skill",
+    "partType": "Skill",
+    "effect": "Ride to Ruin",
+    "manufacturer": "C4SH",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{18:101}",
+    "partName": "VLA_AR.part_underbarrel_lasercutter",
+    "itemType": "Underbarrel",
+    "partType": "Underbarrel",
+    "effect": "",
+    "manufacturer": "Vladof",
+    "category": "Weapon",
+    "weaponType": "Assault Rifle"
+  },
+  {
+    "code": "{2:82}",
+    "partName": "DAD_PS.part_mag_torgue_normal_soulsurvivor",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Daedalus",
+    "category": "Weapon",
+    "weaponType": "Pistol"
+  },
+  {
+    "code": "{2:81}",
+    "partName": "DAD_PS.part_mag_torgue_sticky_soulsurvivor",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Daedalus",
+    "category": "Weapon",
+    "weaponType": "Pistol"
+  },
+  {
+    "code": "{12:75}",
+    "partName": "TOR_SG.part_foregrip_unstable_kor_1",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{12:60}",
+    "partName": "TOR_SG.part_foregrip_unstable_kor_2",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{12:59}",
+    "partName": "TOR_SG.part_foregrip_unstable_kor_3",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Torgue",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{7:58}",
+    "partName": "BOR_SG.part_mag_01_crazedearl",
+    "itemType": "Magazine",
+    "partType": "Magazine",
+    "effect": "",
+    "manufacturer": "Ripper",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{7:57}",
+    "partName": "BOR_SG.part_mag_02_crazedearl",
+    "itemType": "Magazine",
+    "partType": "Magazine",
+    "effect": "",
+    "manufacturer": "Ripper",
+    "category": "Weapon",
+    "weaponType": "Shotgun"
+  },
+  {
+    "code": "{21:88}",
+    "partName": "MAL_SM.part_foregrip_flashcyclone_1",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{21:87}",
+    "partName": "MAL_SM.part_foregrip_flashcyclone_2",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{21:86}",
+    "partName": "MAL_SM.part_foregrip_flashcyclone_3",
+    "itemType": "Foregrip",
+    "partType": "Foregrip",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Weapon",
+    "weaponType": "SMG"
+  },
+  {
+    "code": "{24:81}",
+    "partName": "JAK_SR.part_mag_torgue_normal_fearstalker",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Jakobs",
+    "category": "Weapon",
+    "weaponType": "Sniper"
+  },
+  {
+    "code": "{24:80}",
+    "partName": "JAK_SR.part_mag_torgue_sticky_fearstalker",
+    "itemType": "Manufacturer Part",
+    "partType": "Manufacturer Part",
+    "effect": "",
+    "manufacturer": "Jakobs",
+    "category": "Weapon",
+    "weaponType": "Sniper"
+  },
+  {
+    "code": "{255:541}",
+    "partName": "classmod_paladin.comp_05_legendary_tempest",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Tempest",
+    "manufacturer": "Paladin",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{255:540}",
+    "partName": "classmod_paladin.leg_body_tempest",
+    "itemType": "Tempest",
+    "partType": "Tempest",
+    "effect": "",
+    "manufacturer": "Paladin",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{259:543}",
+    "partName": "classmod_gravitar.comp_05_legendary_phlebotomist",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Phlebotomist",
+    "manufacturer": "Gravitar",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{259:542}",
+    "partName": "classmod_gravitar.leg_body_phlebotomist",
+    "itemType": "Phlebotomist",
+    "partType": "Phlebotomist",
+    "effect": "",
+    "manufacturer": "Gravitar",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{256:541}",
+    "partName": "classmod_exo_soldier.comp_05_legendary_reaparicion",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Reaparicion",
+    "manufacturer": "Exo Soldier",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{256:540}",
+    "partName": "classmod_exo_soldier.leg_body_reaparicion",
+    "itemType": "Reaparicion",
+    "partType": "Reaparicion",
+    "effect": "",
+    "manufacturer": "Exo Soldier",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{254:540}",
+    "partName": "classmod_dark_siren.comp_05_legendary_configuration",
+    "itemType": "Rarity",
+    "partType": "Rarity",
+    "effect": "Configuration",
+    "manufacturer": "Siren",
+    "category": "Weapon",
+    "weaponType": "Class Mod"
+  },
+  {
+    "code": "{254:539}",
+    "partName": "classmod_dark_siren.leg_body_configuration",
+    "itemType": "Configuration",
+    "partType": "Configuration",
+    "effect": "",
+    "manufacturer": "Siren",
+    "category": "Class Mod"
+  },
+  {
+    "code": "{266:119}",
+    "partName": "mal_repair_kit.part_aug_unique_geigerroid_corrosive_sec",
+    "itemType": "Augment",
+    "partType": "Augment",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Repkit"
+  },
+  {
+    "code": "{266:118}",
+    "partName": "mal_repair_kit.part_aug_unique_geigerroid_cryo_sec",
+    "itemType": "Augment",
+    "partType": "Augment",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Repkit"
+  },
+  {
+    "code": "{266:117}",
+    "partName": "mal_repair_kit.part_aug_unique_geigerroid_fire_sec",
+    "itemType": "Augment",
+    "partType": "Augment",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Repkit"
+  },
+  {
+    "code": "{266:116}",
+    "partName": "mal_repair_kit.part_aug_unique_geigerroid_radiation_sec",
+    "itemType": "Augment",
+    "partType": "Augment",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Repkit"
+  },
+  {
+    "code": "{266:115}",
+    "partName": "mal_repair_kit.part_aug_unique_geigerroid_shock_sec",
+    "itemType": "Augment",
+    "partType": "Augment",
+    "effect": "",
+    "manufacturer": "Maliwan",
+    "category": "Repkit"
+  }
+]

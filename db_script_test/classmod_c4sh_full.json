@@ -1,0 +1,5275 @@
+{
+  "character": "C4SH",
+  "internal": "robodealer",
+  "prefix": "robo",
+  "class_id": 404,
+  "rarities": {
+    "Common": 52,
+    "Uncommon": 53,
+    "Rare": 54,
+    "Epic": 55
+  },
+  "bodies": [
+    {
+      "key": "body_01",
+      "id": 1,
+      "namepart": "np_cm_robo_01"
+    },
+    {
+      "key": "body_02",
+      "id": 2,
+      "namepart": "np_cm_robo_02"
+    },
+    {
+      "key": "body_03",
+      "id": 3,
+      "namepart": "np_cm_robo_03"
+    },
+    {
+      "key": "body_04",
+      "id": 4,
+      "namepart": "np_cm_robo_04"
+    },
+    {
+      "key": "body_05",
+      "id": 5,
+      "namepart": "np_cm_robo_05"
+    },
+    {
+      "key": "body_06",
+      "id": 6,
+      "namepart": "np_cm_robo_06"
+    },
+    {
+      "key": "body_07",
+      "id": 7,
+      "namepart": "np_cm_robo_07"
+    },
+    {
+      "key": "body_08",
+      "id": 8,
+      "namepart": "np_cm_robo_08"
+    },
+    {
+      "key": "body_09",
+      "id": 9,
+      "namepart": "np_cm_robo_09"
+    },
+    {
+      "key": "body_10",
+      "id": 10,
+      "namepart": "np_cm_robo_10"
+    }
+  ],
+  "legendary_bodies": [
+    {
+      "key": "leg_body_01",
+      "id": 11,
+      "namepart": "np_cm_robo_leg_01"
+    },
+    {
+      "key": "leg_body_02",
+      "id": 12,
+      "namepart": "np_cm_robo_leg_02"
+    },
+    {
+      "key": "leg_body_03",
+      "id": 13,
+      "namepart": "np_cm_robo_leg_03"
+    },
+    {
+      "key": "leg_body_04",
+      "id": 14,
+      "namepart": "np_cm_robo_leg_04"
+    },
+    {
+      "key": "leg_body_05",
+      "id": 15,
+      "namepart": "np_cm_robo_leg_05"
+    },
+    {
+      "key": "leg_body_06",
+      "id": 51,
+      "namepart": "np_cm_robo_leg_06"
+    },
+    {
+      "key": "leg_body_dlc1",
+      "id": 222,
+      "namepart": "np_cm_robo_leg_dlc1"
+    },
+    {
+      "key": "leg_body_raid1",
+      "id": 538,
+      "namepart": "np_cm_robo_leg_raid1"
+    }
+  ],
+  "legendary_comps": [
+    {
+      "key": "comp_05_legendary_01",
+      "id": 221
+    },
+    {
+      "key": "comp_05_legendary_02",
+      "id": 220
+    },
+    {
+      "key": "comp_05_legendary_03",
+      "id": 219
+    },
+    {
+      "key": "comp_05_legendary_04",
+      "id": 218
+    },
+    {
+      "key": "comp_05_legendary_05",
+      "id": 217
+    },
+    {
+      "key": "comp_05_legendary_06",
+      "id": 56
+    },
+    {
+      "key": "comp_05_legendary_dlc1",
+      "id": 540
+    },
+    {
+      "key": "comp_05_legendary_raid1",
+      "id": 539
+    }
+  ],
+  "passive_display_names": {
+    "1": "Fast Hands",
+    "2": "Insurance",
+    "3": "Splash the Pot",
+    "4": "Alchemy",
+    "5": "Ante Up",
+    "6": "Sounds of Rain (Lucky Strike)",
+    "7": "Trick-Taker (Full Spread)",
+    "11": "Double-Down (Double or Nothing)",
+    "12": "Wretched Shadows",
+    "13": "High Roller (Ace in the Hole)",
+    "14": "Take the Pot",
+    "15": "Stack the Deck (Full House)",
+    "16": "Legerdemain (Wild Card)",
+    "17": "Vigorish",
+    "18": "Dealer's Bluff",
+    "19": "Ace in the Hole",
+    "20": "Around the Corner",
+    "21": "C4SH Game",
+    "23": "No Limit",
+    "24": "Go For Broke",
+    "25": "Kill Button",
+    "26": "Payout",
+    "27": "Boom or Bust",
+    "28": "Tender Hearts",
+    "29": "Card Sharp",
+    "30": "Hot Streak",
+    "31": "Gunslinger",
+    "32": "Huckleberry",
+    "33": "The Determinator",
+    "34": "Hard Boiled",
+    "35": "Hot Hand",
+    "36": "Shootist",
+    "37": "Stand and Bleed",
+    "38": "A Blur of Fingers and Brass",
+    "39": "Trick Shot",
+    "41": "Lucky - REMOVED",
+    "42": "Brimstone",
+    "43": "Fast C4SH",
+    "44": "Firestorm",
+    "45": "Burn Down the House",
+    "46": "High Noon",
+    "47": "Bloodstained Moon",
+    "48": "Lawless",
+    "49": "Truck Full of Nitro",
+    "50": "War Wagon",
+    "51": "Pale Rider",
+    "52": "Nothing Beats Lead",
+    "53": "Mr Pocket",
+    "54": "Unshaken",
+    "55": "From Glaom Till Glow",
+    "56": "Dusty Trail",
+    "57": "Bleed the Bad",
+    "58": "Luck Be a Robot",
+    "59": "Sweet Roll",
+    "60": "Charm Bracelet",
+    "61": "O Fortuna",
+    "62": "Red Moon Rising",
+    "63": "Ready to Roll",
+    "64": "Riding High",
+    "65": "Bonemeal Ticket",
+    "66": "Restless Remains",
+    "67": "Luckless",
+    "68": "Can't Stop Winning",
+    "69": "Turn of Fate",
+    "70": "High Stakes",
+    "71": "Fortune's Favor",
+    "72": "Let it Ride",
+    "73": "The Wilds",
+    "74": "Potent Posse",
+    "75": "Before She Knows You're Dead",
+    "76": "Sorcerer",
+    "77": "Tooth and Nail",
+    "78": "Serendipity",
+    "79": "Sidekick's Revenge",
+    "80": "Dead Friend Redemption",
+    "81": "Accursed Bones",
+    "82": "Tormented",
+    "83": "Graveyard Shift",
+    "84": "Snake Eyes",
+    "85": "Call"
+  },
+  "passive_internal_names": {
+    "1": "TableFLip",
+    "2": "HeroCall",
+    "3": "Steam",
+    "4": "alchemy",
+    "5": "ante",
+    "6": "SoundsOfRain",
+    "7": "TrickTaker",
+    "9": "LateScratch",
+    "10": "devilsTines_SoH",
+    "11": "DoubleDown",
+    "12": "wretchedShadows",
+    "13": "HighRoller",
+    "14": "TakeThePot",
+    "15": "StackTheDeck",
+    "16": "Legerdemain",
+    "17": "Fortuity",
+    "18": "DealersBluff",
+    "19": "AceInTheHole",
+    "20": "AroundTheCorner",
+    "21": "C4SHGame",
+    "22": "TheHouse",
+    "23": "RiskyBusiness",
+    "24": "ReadTheSigns",
+    "25": "TheTurn",
+    "26": "Payout",
+    "27": "BoomOrBus",
+    "28": "HeartOfTheCards",
+    "29": "RunningLuck",
+    "30": "HotStreak",
+    "31": "Unchained",
+    "32": "DeathHunt",
+    "33": "Determinator",
+    "34": "HardBoiled",
+    "35": "TheFuries",
+    "36": "TheShootist",
+    "37": "StandAndBleed",
+    "38": "Unchained",
+    "39": "BoneShrapnel",
+    "40": "RideWithTheDevil",
+    "42": "Brimstone",
+    "43": "TheClaim",
+    "44": "TheGunfighter",
+    "45": "DebtsToPay",
+    "46": "HellAndBack",
+    "47": "BloodOnElpis",
+    "48": "Lawless",
+    "49": "TNT",
+    "50": "WarWagon",
+    "51": "PaleRider",
+    "52": "Forsaken",
+    "53": "TheWind",
+    "54": "Maverick",
+    "55": "Cottonmouth",
+    "56": "BrokenArrow",
+    "57": "BadMenMustBleed",
+    "58": "LucksARobot",
+    "59": "AllForOne",
+    "60": "LuckyCharm",
+    "61": "TheLuckyOne",
+    "62": "RedMoonRising",
+    "63": "RollingTheDeep",
+    "64": "RidingHigh",
+    "65": "GravePact",
+    "66": "Undying",
+    "67": "Luckless",
+    "68": "CriticalRole",
+    "69": "SpinOfFate",
+    "70": "HighStakes",
+    "71": "FortunesFavor",
+    "72": "LetItRide",
+    "73": "Wild",
+    "74": "PackMentality",
+    "75": "DoubleTime",
+    "76": "LoadedDice",
+    "77": "ShadowsEmbrace",
+    "78": "Serendipity",
+    "79": "SidekicksRevenge",
+    "80": "AlphasCall",
+    "81": "CursedCall",
+    "82": "Haunted",
+    "83": "GraveyardShift",
+    "84": "SnakeEyes",
+    "85": "WitchingHour"
+  },
+  "passive_descriptions": {
+    "1": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "2": {
+      "stats": [
+        "Shield Capacity: X X"
+      ]
+    },
+    "3": {
+      "stats": [
+        "Ordnance Damage: X X"
+      ]
+    },
+    "4": {
+      "stats": [
+        "Elemental Effect Chance: X X"
+      ]
+    },
+    "5": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "6": {
+      "stats": [
+        "Critical Hit Chance: up to X X"
+      ]
+    },
+    "7": {
+      "stats": [
+        "Elemental Damage: up to X X"
+      ]
+    },
+    "9": {
+      "stats": [
+        "I bring a fork."
+      ]
+    },
+    "10": {
+      "stats": [
+        "The Devil sends cookies.",
+        "God sends meat."
+      ]
+    },
+    "11": {
+      "stats": [
+        "Double Damage Chance: up to X X"
+      ]
+    },
+    "12": {
+      "stats": [
+        "Damage: up to X per second"
+      ]
+    },
+    "13": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "14": {
+      "stats": [
+        "Health Restored: up to X X"
+      ]
+    },
+    "15": {
+      "stats": [
+        "Skill Damage: up to X X"
+      ]
+    },
+    "16": {
+      "stats": [
+        "Reload Speed: up to X X"
+      ]
+    },
+    "17": {
+      "stats": [
+        "Bonus Damage: up to X X of Damage Dealt"
+      ]
+    },
+    "18": {
+      "stats": [
+        "Action Skill Cooldown Restored: X X"
+      ]
+    },
+    "19": {
+      "stats": [
+        "Gun Damage: X X per Fortune Stack"
+      ]
+    },
+    "20": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Fortune Stack"
+      ]
+    },
+    "21": {
+      "stats": [
+        "Minimum Fortune Stacks: X X"
+      ]
+    },
+    "22": {
+      "stats": [
+        "Truth is... the game was rigged from the start."
+      ]
+    },
+    "23": {
+      "stats": [
+        "Max Fortune Stacks: X X"
+      ]
+    },
+    "24": {
+      "stats": [
+        "Additional Fortune Stacks: X X"
+      ]
+    },
+    "25": {
+      "stats": [
+        "Ordnance Damage: up to X X"
+      ]
+    },
+    "26": {
+      "stats": [
+        "Fortune Skills: X X"
+      ]
+    },
+    "27": {
+      "stats": [
+        "Grenade Damage: X"
+      ]
+    },
+    "28": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "29": {
+      "stats": [
+        "Duration: X X second(s)"
+      ]
+    },
+    "30": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "31": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "32": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "33": {
+      "stats": [
+        "Health Regeneration: up to X X of missing Health per second"
+      ]
+    },
+    "34": {
+      "stats": [
+        "Action Skill Duration Restored: up to X X"
+      ]
+    },
+    "35": {
+      "stats": [
+        "Bonus Fire Damage: up to X X of Damage Dealt"
+      ]
+    },
+    "36": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "37": {
+      "stats": [
+        "Critical Hit Chance: X X"
+      ]
+    },
+    "38": {
+      "stats": [
+        "Reload Speed: X X per Stack"
+      ]
+    },
+    "39": {
+      "stats": [
+        "Ricochet Chance: up to X X"
+      ]
+    },
+    "40": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "43": {
+      "stats": [
+        "Movement Speed: up to X X"
+      ]
+    },
+    "44": {
+      "stats": [
+        "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed"
+      ]
+    },
+    "45": {
+      "stats": [
+        "Fire Mortar Damage: X X"
+      ]
+    },
+    "46": {
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    "47": {
+      "stats": [
+        "Elemental Effect Chance: X X per Stack"
+      ]
+    },
+    "48": {
+      "stats": [
+        "Kinetic Damage: X X"
+      ]
+    },
+    "49": {
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    "50": {
+      "stats": [
+        "Ammo Refill Chance: X X"
+      ]
+    },
+    "51": {
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    "52": {
+      "stats": [
+        "Elemental Damage Converted: X X of Damage Dealt"
+      ]
+    },
+    "53": {
+      "stats": [
+        "Duration Freeze: X X second(s)"
+      ]
+    },
+    "54": {
+      "stats": [
+        "Damage: X X per Fortune Stack lost"
+      ]
+    },
+    "55": {
+      "stats": [
+        "Overshield: X X of Damage Taken"
+      ]
+    },
+    "56": {
+      "stats": [
+        "Gun Damage: X X per Fortune Stack lost"
+      ]
+    },
+    "57": {
+      "stats": [
+        "Action Skill Duration Rate: X per failed attempt"
+      ]
+    },
+    "58": {
+      "stats": [
+        "Action Skill Cooldown Rate: up to X X"
+      ]
+    },
+    "59": {
+      "stats": [
+        "Max Health: X X"
+      ]
+    },
+    "60": {
+      "stats": [
+        "Skill Damage: X X"
+      ]
+    },
+    "61": {
+      "stats": [
+        "Windfall Chance: X X per Fortune Stack"
+      ]
+    },
+    "62": {
+      "stats": [
+        "Bonus Damage: X X of Damage Dealt"
+      ]
+    },
+    "63": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "64": {
+      "stats": [
+        "Windfall Duration: X X"
+      ]
+    },
+    "65": {
+      "stats": [
+        "Action Skill Duration: X X on kill"
+      ]
+    },
+    "66": {
+      "stats": [
+        "Respawn Chance: up to X X"
+      ]
+    },
+    "67": {
+      "stats": [
+        "Jinxed Enemy Damage Dealt: X"
+      ]
+    },
+    "68": {
+      "stats": [
+        "Gun Critical Hit Chance: X X"
+      ]
+    },
+    "69": {
+      "stats": [
+        "Lifesteal: X X of Damage Dealt"
+      ]
+    },
+    "70": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "71": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "72": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "73": {
+      "stats": [
+        "Bonus Elemental Damage: X X of Damage Dealt"
+      ]
+    },
+    "74": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "75": {
+      "stats": [
+        "Movement Speed: X X per active Bone Totem"
+      ]
+    },
+    "76": {
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    "77": {
+      "stats": [
+        "Melee Damage: X X"
+      ]
+    },
+    "78": {
+      "stats": [
+        "Health Restored: X X per missile"
+      ]
+    },
+    "79": {
+      "stats": [
+        "Health Converted: X of Current Health"
+      ]
+    },
+    "80": {
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    "81": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "82": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "83": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Jinxed enemy"
+      ]
+    },
+    "84": {
+      "stats": [
+        "Damage Taken: X"
+      ]
+    },
+    "85": {
+      "stats": [
+        "Duration: X seconds"
+      ]
+    }
+  },
+  "skill_tiers": {
+    "blue_1_1": {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tiers": {
+        "1": 194,
+        "2": 162,
+        "3": 130,
+        "4": 98,
+        "5": 66
+      }
+    },
+    "blue_1_2": {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tiers": {
+        "1": 193,
+        "2": 161,
+        "3": 129,
+        "4": 97,
+        "5": 65
+      }
+    },
+    "blue_1_3": {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tiers": {
+        "1": 40,
+        "2": 39,
+        "3": 38,
+        "4": 37,
+        "5": 36
+      }
+    },
+    "blue_1_4": {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tiers": {
+        "1": 192,
+        "2": 160,
+        "3": 128,
+        "4": 96,
+        "5": 64
+      }
+    },
+    "blue_1_5": {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tiers": {
+        "1": 191,
+        "2": 159,
+        "3": 127,
+        "4": 95,
+        "5": 63
+      }
+    },
+    "blue_2_1": {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tiers": {
+        "1": 190,
+        "2": 158,
+        "3": 126,
+        "4": 94,
+        "5": 62
+      }
+    },
+    "blue_2_3": {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tiers": {
+        "1": 189,
+        "2": 157,
+        "3": 125,
+        "4": 93,
+        "5": 61
+      }
+    },
+    "blue_2_5": {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tiers": {
+        "1": 188,
+        "2": 156,
+        "3": 124,
+        "4": 92,
+        "5": 60
+      }
+    },
+    "blue_3_1": {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tiers": {
+        "1": 35,
+        "2": 34,
+        "3": 33,
+        "4": 32,
+        "5": 31
+      }
+    },
+    "blue_3_2": {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tiers": {
+        "1": 187,
+        "2": 155,
+        "3": 123,
+        "4": 91,
+        "5": 59
+      }
+    },
+    "blue_3_3": {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tiers": {
+        "1": 186,
+        "2": 154,
+        "3": 122,
+        "4": 90,
+        "5": 58
+      }
+    },
+    "blue_3_4": {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tiers": {
+        "1": 30,
+        "2": 29,
+        "3": 28,
+        "4": 27,
+        "5": 26
+      }
+    },
+    "blue_3_5": {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tiers": {
+        "1": 185,
+        "2": 153,
+        "3": 121,
+        "4": 89,
+        "5": 57
+      }
+    },
+    "blue_left_4_1": {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 265,
+        "2": 328,
+        "3": 391,
+        "4": 454,
+        "5": 517
+      }
+    },
+    "blue_left_4_3": {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 266,
+        "2": 329,
+        "3": 392,
+        "4": 455,
+        "5": 518
+      }
+    },
+    "blue_left_5_1": {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 267,
+        "2": 330,
+        "3": 393,
+        "4": 456,
+        "5": 519
+      }
+    },
+    "blue_left_5_2": {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 268,
+        "2": 331,
+        "3": 394,
+        "4": 457,
+        "5": 520
+      }
+    },
+    "blue_left_5_3": {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 269,
+        "2": 332,
+        "3": 395,
+        "4": 458,
+        "5": 521
+      }
+    },
+    "blue_left_6_1": {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 270,
+        "2": 333,
+        "3": 396,
+        "4": 459,
+        "5": 522
+      }
+    },
+    "blue_left_6_3": {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 271,
+        "2": 334,
+        "3": 397,
+        "4": 460,
+        "5": 523
+      }
+    },
+    "blue_mid_4_1": {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 272,
+        "2": 335,
+        "3": 398,
+        "4": 461,
+        "5": 524
+      }
+    },
+    "blue_mid_4_3": {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 273,
+        "2": 336,
+        "3": 399,
+        "4": 462,
+        "5": 525
+      }
+    },
+    "blue_mid_5_1": {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 274,
+        "2": 337,
+        "3": 400,
+        "4": 463,
+        "5": 526
+      }
+    },
+    "blue_mid_5_2": {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 275,
+        "2": 338,
+        "3": 401,
+        "4": 464,
+        "5": 527
+      }
+    },
+    "blue_mid_5_3": {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 276,
+        "2": 339,
+        "3": 402,
+        "4": 465,
+        "5": 528
+      }
+    },
+    "blue_mid_6_1": {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 277,
+        "2": 340,
+        "3": 403,
+        "4": 466,
+        "5": 529
+      }
+    },
+    "blue_mid_6_3": {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 278,
+        "2": 341,
+        "3": 404,
+        "4": 467,
+        "5": 530
+      }
+    },
+    "blue_right_4_1": {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 279,
+        "2": 342,
+        "3": 405,
+        "4": 468,
+        "5": 531
+      }
+    },
+    "blue_right_4_3": {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 280,
+        "2": 343,
+        "3": 406,
+        "4": 469,
+        "5": 532
+      }
+    },
+    "blue_right_5_1": {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 281,
+        "2": 344,
+        "3": 407,
+        "4": 470,
+        "5": 533
+      }
+    },
+    "blue_right_5_2": {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 282,
+        "2": 345,
+        "3": 408,
+        "4": 471,
+        "5": 534
+      }
+    },
+    "blue_right_5_3": {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 283,
+        "2": 346,
+        "3": 409,
+        "4": 472,
+        "5": 535
+      }
+    },
+    "blue_right_6_1": {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 284,
+        "2": 347,
+        "3": 410,
+        "4": 473,
+        "5": 536
+      }
+    },
+    "blue_right_6_3": {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 285,
+        "2": 348,
+        "3": 411,
+        "4": 474,
+        "5": 537
+      }
+    },
+    "green_1_1": {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tiers": {
+        "1": 205,
+        "2": 173,
+        "3": 141,
+        "4": 109,
+        "5": 77
+      }
+    },
+    "green_1_2": {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tiers": {
+        "1": 45,
+        "2": 44,
+        "3": 43,
+        "4": 42,
+        "5": 41
+      }
+    },
+    "green_1_3": {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tiers": {
+        "1": 204,
+        "2": 172,
+        "3": 140,
+        "4": 108,
+        "5": 76
+      }
+    },
+    "green_1_4": {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tiers": {
+        "1": 203,
+        "2": 171,
+        "3": 139,
+        "4": 107,
+        "5": 75
+      }
+    },
+    "green_1_5": {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tiers": {
+        "1": 202,
+        "2": 170,
+        "3": 138,
+        "4": 106,
+        "5": 74
+      }
+    },
+    "green_2_1": {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tiers": {
+        "1": 201,
+        "2": 169,
+        "3": 137,
+        "4": 105,
+        "5": 73
+      }
+    },
+    "green_2_3": {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tiers": {
+        "1": 200,
+        "2": 168,
+        "3": 136,
+        "4": 104,
+        "5": 72
+      }
+    },
+    "green_2_5": {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tiers": {
+        "1": 199,
+        "2": 167,
+        "3": 135,
+        "4": 103,
+        "5": 71
+      }
+    },
+    "green_3_1": {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tiers": {
+        "1": 195,
+        "2": 163,
+        "3": 131,
+        "4": 99,
+        "5": 67
+      }
+    },
+    "green_3_2": {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tiers": {
+        "1": 196,
+        "2": 164,
+        "3": 132,
+        "4": 100,
+        "5": 68
+      }
+    },
+    "green_3_3": {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tiers": {
+        "1": 50,
+        "2": 49,
+        "3": 48,
+        "4": 47,
+        "5": 46
+      }
+    },
+    "green_3_4": {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tiers": {
+        "1": 197,
+        "2": 165,
+        "3": 133,
+        "4": 101,
+        "5": 69
+      }
+    },
+    "green_3_5": {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tiers": {
+        "1": 198,
+        "2": 166,
+        "3": 134,
+        "4": 102,
+        "5": 70
+      }
+    },
+    "green_left_4_1": {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 223,
+        "2": 286,
+        "3": 349,
+        "4": 412,
+        "5": 475
+      }
+    },
+    "green_left_4_3": {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 224,
+        "2": 287,
+        "3": 350,
+        "4": 413,
+        "5": 476
+      }
+    },
+    "green_left_5_1": {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 225,
+        "2": 288,
+        "3": 351,
+        "4": 414,
+        "5": 477
+      }
+    },
+    "green_left_5_2": {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 226,
+        "2": 289,
+        "3": 352,
+        "4": 415,
+        "5": 478
+      }
+    },
+    "green_left_5_3": {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 227,
+        "2": 290,
+        "3": 353,
+        "4": 416,
+        "5": 479
+      }
+    },
+    "green_left_6_1": {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 228,
+        "2": 291,
+        "3": 354,
+        "4": 417,
+        "5": 480
+      }
+    },
+    "green_left_6_3": {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 229,
+        "2": 292,
+        "3": 355,
+        "4": 418,
+        "5": 481
+      }
+    },
+    "green_mid_4_1": {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 230,
+        "2": 293,
+        "3": 356,
+        "4": 419,
+        "5": 482
+      }
+    },
+    "green_mid_4_3": {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 231,
+        "2": 294,
+        "3": 357,
+        "4": 420,
+        "5": 483
+      }
+    },
+    "green_mid_5_1": {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 232,
+        "2": 295,
+        "3": 358,
+        "4": 421,
+        "5": 484
+      }
+    },
+    "green_mid_5_2": {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 233,
+        "2": 296,
+        "3": 359,
+        "4": 422,
+        "5": 485
+      }
+    },
+    "green_mid_5_3": {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 234,
+        "2": 297,
+        "3": 360,
+        "4": 423,
+        "5": 486
+      }
+    },
+    "green_mid_6_1": {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 235,
+        "2": 298,
+        "3": 361,
+        "4": 424,
+        "5": 487
+      }
+    },
+    "green_mid_6_3": {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 236,
+        "2": 299,
+        "3": 362,
+        "4": 425,
+        "5": 488
+      }
+    },
+    "green_right_4_1": {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 237,
+        "2": 300,
+        "3": 363,
+        "4": 426,
+        "5": 489
+      }
+    },
+    "green_right_4_3": {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 238,
+        "2": 301,
+        "3": 364,
+        "4": 427,
+        "5": 490
+      }
+    },
+    "green_right_5_1": {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 239,
+        "2": 302,
+        "3": 365,
+        "4": 428,
+        "5": 491
+      }
+    },
+    "green_right_5_2": {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 240,
+        "2": 303,
+        "3": 366,
+        "4": 429,
+        "5": 492
+      }
+    },
+    "green_right_5_3": {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 241,
+        "2": 304,
+        "3": 367,
+        "4": 430,
+        "5": 493
+      }
+    },
+    "green_right_6_1": {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 242,
+        "2": 305,
+        "3": 368,
+        "4": 431,
+        "5": 494
+      }
+    },
+    "green_right_6_3": {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 243,
+        "2": 306,
+        "3": 369,
+        "4": 432,
+        "5": 495
+      }
+    },
+    "red_1_1": {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tiers": {
+        "1": 216,
+        "2": 184,
+        "3": 152,
+        "4": 120,
+        "5": 88
+      }
+    },
+    "red_1_2": {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tiers": {
+        "1": 215,
+        "2": 183,
+        "3": 151,
+        "4": 119,
+        "5": 87
+      }
+    },
+    "red_1_3": {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tiers": {
+        "1": 214,
+        "2": 181,
+        "3": 149,
+        "4": 117,
+        "5": 85
+      }
+    },
+    "red_1_4": {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tiers": {
+        "1": 25,
+        "2": 24,
+        "3": 23,
+        "4": 22,
+        "5": 21
+      }
+    },
+    "red_1_5": {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tiers": {
+        "1": 212,
+        "2": 180,
+        "3": 148,
+        "4": 116,
+        "5": 84
+      }
+    },
+    "red_2_1": {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tiers": {
+        "1": 213,
+        "2": 182,
+        "3": 150,
+        "4": 118,
+        "5": 86
+      }
+    },
+    "red_2_3": {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tiers": {
+        "1": 211,
+        "2": 179,
+        "3": 147,
+        "4": 115,
+        "5": 83
+      }
+    },
+    "red_2_5": {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tiers": {
+        "1": 210,
+        "2": 178,
+        "3": 146,
+        "4": 114,
+        "5": 82
+      }
+    },
+    "red_3_1": {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tiers": {
+        "1": 209,
+        "2": 177,
+        "3": 145,
+        "4": 113,
+        "5": 81
+      }
+    },
+    "red_3_2": {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tiers": {
+        "1": 20,
+        "2": 19,
+        "3": 18,
+        "4": 17,
+        "5": 16
+      }
+    },
+    "red_3_3": {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tiers": {
+        "1": 208,
+        "2": 176,
+        "3": 144,
+        "4": 112,
+        "5": 80
+      }
+    },
+    "red_3_4": {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tiers": {
+        "1": 207,
+        "2": 175,
+        "3": 143,
+        "4": 111,
+        "5": 79
+      }
+    },
+    "red_3_5": {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tiers": {
+        "1": 206,
+        "2": 174,
+        "3": 142,
+        "4": 110,
+        "5": 78
+      }
+    },
+    "red_left_4_1": {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 244,
+        "2": 307,
+        "3": 370,
+        "4": 433,
+        "5": 496
+      }
+    },
+    "red_left_4_3": {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 245,
+        "2": 308,
+        "3": 371,
+        "4": 434,
+        "5": 497
+      }
+    },
+    "red_left_5_1": {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 246,
+        "2": 309,
+        "3": 372,
+        "4": 435,
+        "5": 498
+      }
+    },
+    "red_left_5_2": {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 247,
+        "2": 310,
+        "3": 373,
+        "4": 436,
+        "5": 499
+      }
+    },
+    "red_left_5_3": {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 248,
+        "2": 311,
+        "3": 374,
+        "4": 437,
+        "5": 500
+      }
+    },
+    "red_left_6_1": {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 249,
+        "2": 312,
+        "3": 375,
+        "4": 438,
+        "5": 501
+      }
+    },
+    "red_left_6_3": {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 250,
+        "2": 313,
+        "3": 376,
+        "4": 439,
+        "5": 502
+      }
+    },
+    "red_mid_4_1": {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 251,
+        "2": 314,
+        "3": 377,
+        "4": 440,
+        "5": 503
+      }
+    },
+    "red_mid_4_3": {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 252,
+        "2": 315,
+        "3": 378,
+        "4": 441,
+        "5": 504
+      }
+    },
+    "red_mid_5_1": {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 253,
+        "2": 316,
+        "3": 379,
+        "4": 442,
+        "5": 505
+      }
+    },
+    "red_mid_5_2": {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 254,
+        "2": 317,
+        "3": 380,
+        "4": 443,
+        "5": 506
+      }
+    },
+    "red_mid_5_3": {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 255,
+        "2": 318,
+        "3": 381,
+        "4": 444,
+        "5": 507
+      }
+    },
+    "red_mid_6_1": {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 256,
+        "2": 319,
+        "3": 382,
+        "4": 445,
+        "5": 508
+      }
+    },
+    "red_mid_6_3": {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 257,
+        "2": 320,
+        "3": 383,
+        "4": 446,
+        "5": 509
+      }
+    },
+    "red_right_4_1": {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tiers": {
+        "1": 258,
+        "2": 321,
+        "3": 384,
+        "4": 447,
+        "5": 510
+      }
+    },
+    "red_right_4_3": {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tiers": {
+        "1": 259,
+        "2": 322,
+        "3": 385,
+        "4": 448,
+        "5": 511
+      }
+    },
+    "red_right_5_1": {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tiers": {
+        "1": 260,
+        "2": 323,
+        "3": 386,
+        "4": 449,
+        "5": 512
+      }
+    },
+    "red_right_5_2": {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tiers": {
+        "1": 261,
+        "2": 324,
+        "3": 387,
+        "4": 450,
+        "5": 513
+      }
+    },
+    "red_right_5_3": {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tiers": {
+        "1": 262,
+        "2": 325,
+        "3": 388,
+        "4": 451,
+        "5": 514
+      }
+    },
+    "red_right_6_1": {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tiers": {
+        "1": 263,
+        "2": 326,
+        "3": 389,
+        "4": 452,
+        "5": 515
+      }
+    },
+    "red_right_6_3": {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tiers": {
+        "1": 264,
+        "2": 327,
+        "3": 390,
+        "4": 453,
+        "5": 516
+      }
+    }
+  },
+  "icon_mapping": [
+    {
+      "icon_file": "c4sh_passive_blue_06",
+      "passive_number": 58,
+      "internal_name": "LucksARobot",
+      "display_name": "Luck Be a Robot"
+    },
+    {
+      "icon_file": "c4sh_passive_green_02",
+      "passive_number": 59,
+      "internal_name": "AllForOne",
+      "display_name": "Sweet Roll"
+    },
+    {
+      "icon_file": "c4sh_passive_green_03",
+      "passive_number": 60,
+      "internal_name": "LuckyCharm",
+      "display_name": "Charm Bracelet"
+    },
+    {
+      "icon_file": "c4sh_passive_green_04",
+      "passive_number": 61,
+      "internal_name": "TheLuckyOne",
+      "display_name": "O Fortuna"
+    },
+    {
+      "icon_file": "c4sh_passive_green_05",
+      "passive_number": 62,
+      "internal_name": "RedMoonRising",
+      "display_name": "Red Moon Rising"
+    },
+    {
+      "icon_file": "c4sh_passive_green_06",
+      "passive_number": 63,
+      "internal_name": "RollingTheDeep",
+      "display_name": "Ready to Roll"
+    },
+    {
+      "icon_file": "c4sh_passive_green_07",
+      "passive_number": 64,
+      "internal_name": "RidingHigh",
+      "display_name": "Riding High"
+    },
+    {
+      "icon_file": "c4sh_passive_green_08",
+      "passive_number": 65,
+      "internal_name": "GravePact",
+      "display_name": "Bonemeal Ticket"
+    },
+    {
+      "icon_file": "c4sh_passive_green_09",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CL",
+      "display_name": "devilsTines_CL"
+    },
+    {
+      "icon_file": "c4sh_passive_green_10",
+      "passive_number": 75,
+      "internal_name": "DoubleTime",
+      "display_name": "Before She Knows You're Dead"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 67,
+      "internal_name": "Luckless",
+      "display_name": "Luckless"
+    },
+    {
+      "icon_file": "c4sh_passive_green_12",
+      "passive_number": 68,
+      "internal_name": "CriticalRole",
+      "display_name": "Can't Stop Winning"
+    },
+    {
+      "icon_file": "c4sh_passive_green_13",
+      "passive_number": 69,
+      "internal_name": "SpinOfFate",
+      "display_name": "Turn of Fate"
+    },
+    {
+      "icon_file": "c4sh_passive_green_14",
+      "passive_number": 70,
+      "internal_name": "HighStakes",
+      "display_name": "High Stakes"
+    },
+    {
+      "icon_file": "c4sh_passive_green_15",
+      "passive_number": 71,
+      "internal_name": "FortunesFavor",
+      "display_name": "Fortune's Favor"
+    },
+    {
+      "icon_file": "c4sh_passive_green_16",
+      "passive_number": 72,
+      "internal_name": "LetItRide",
+      "display_name": "Let it Ride"
+    },
+    {
+      "icon_file": "c4sh_passive_green_17",
+      "passive_number": 73,
+      "internal_name": "Wild",
+      "display_name": "The Wilds"
+    },
+    {
+      "icon_file": "c4sh_passive_green_18",
+      "passive_number": 74,
+      "internal_name": "PackMentality",
+      "display_name": "Potent Posse"
+    },
+    {
+      "icon_file": "c4sh_passive_green_19",
+      "passive_number": 66,
+      "internal_name": "Undying",
+      "display_name": "Restless Remains"
+    },
+    {
+      "icon_file": "c4sh_passive_green_20",
+      "passive_number": 76,
+      "internal_name": "LoadedDice",
+      "display_name": "Sorcerer"
+    },
+    {
+      "icon_file": "c4sh_passive_green_21",
+      "passive_number": 77,
+      "internal_name": "ShadowsEmbrace",
+      "display_name": "Tooth and Nail"
+    },
+    {
+      "icon_file": "c4sh_passive_green_22",
+      "passive_number": 78,
+      "internal_name": "Serendipity",
+      "display_name": "Serendipity"
+    },
+    {
+      "icon_file": "c4sh_passive_green_23",
+      "passive_number": 79,
+      "internal_name": "SidekicksRevenge",
+      "display_name": "Sidekick's Revenge"
+    },
+    {
+      "icon_file": "c4sh_passive_green_24",
+      "passive_number": 80,
+      "internal_name": "AlphasCall",
+      "display_name": "Dead Friend Redemption"
+    },
+    {
+      "icon_file": "c4sh_passive_green_25",
+      "passive_number": 81,
+      "internal_name": "CursedCall",
+      "display_name": "Accursed Bones"
+    },
+    {
+      "icon_file": "c4sh_passive_green_26",
+      "passive_number": 82,
+      "internal_name": "Haunted",
+      "display_name": "Tormented"
+    },
+    {
+      "icon_file": "c4sh_passive_green_27",
+      "passive_number": 83,
+      "internal_name": "GraveyardShift",
+      "display_name": "Graveyard Shift"
+    },
+    {
+      "icon_file": "c4sh_passive_green_28",
+      "passive_number": 84,
+      "internal_name": "SnakeEyes",
+      "display_name": "Snake Eyes"
+    },
+    {
+      "icon_file": "c4sh_passive_green_29",
+      "passive_number": 85,
+      "internal_name": "WitchingHour",
+      "display_name": "Call"
+    },
+    {
+      "icon_file": "c4sh_passive_green_30",
+      "passive_number": 31,
+      "internal_name": "Unchained",
+      "display_name": "Gunslinger"
+    },
+    {
+      "icon_file": "c4sh_passive_green_31",
+      "passive_number": 32,
+      "internal_name": "DeathHunt",
+      "display_name": "Huckleberry"
+    },
+    {
+      "icon_file": "c4sh_passive_green_32",
+      "passive_number": 33,
+      "internal_name": "Determinator",
+      "display_name": "The Determinator"
+    },
+    {
+      "icon_file": "c4sh_passive_green_33",
+      "passive_number": 34,
+      "internal_name": "HardBoiled",
+      "display_name": "Hard Boiled"
+    },
+    {
+      "icon_file": "c4sh_passive_green_34",
+      "passive_number": 36,
+      "internal_name": "TheShootist",
+      "display_name": "Shootist"
+    },
+    {
+      "icon_file": "c4sh_passive_red_01",
+      "passive_number": 37,
+      "internal_name": "StandAndBleed",
+      "display_name": "Stand and Bleed"
+    },
+    {
+      "icon_file": "c4sh_passive_red_02",
+      "passive_number": 35,
+      "internal_name": "TheFuries",
+      "display_name": "Hot Hand"
+    },
+    {
+      "icon_file": "c4sh_passive_red_03",
+      "passive_number": 39,
+      "internal_name": "BoneShrapnel",
+      "display_name": "Trick Shot"
+    },
+    {
+      "icon_file": "c4sh_passive_red_04",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CF",
+      "display_name": "devilsTines_CF"
+    },
+    {
+      "icon_file": "c4sh_passive_red_05",
+      "passive_number": 40,
+      "internal_name": "RideWithTheDevil",
+      "display_name": "RideWithTheDevil"
+    },
+    {
+      "icon_file": "c4sh_passive_red_06",
+      "passive_number": 38,
+      "internal_name": "Unchained",
+      "display_name": "A Blur of Fingers and Brass"
+    },
+    {
+      "icon_file": "c4sh_passive_red_07",
+      "passive_number": 42,
+      "internal_name": "Brimstone",
+      "display_name": "Brimstone"
+    },
+    {
+      "icon_file": "c4sh_passive_red_08",
+      "passive_number": 43,
+      "internal_name": "TheClaim",
+      "display_name": "Fast C4SH"
+    },
+    {
+      "icon_file": "c4sh_passive_red_09",
+      "passive_number": 44,
+      "internal_name": "TheGunfighter",
+      "display_name": "Firestorm"
+    },
+    {
+      "icon_file": "c4sh_passive_red_10",
+      "passive_number": 45,
+      "internal_name": "DebtsToPay",
+      "display_name": "Burn Down the House"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 46,
+      "internal_name": "HellAndBack",
+      "display_name": "High Noon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_12",
+      "passive_number": 47,
+      "internal_name": "BloodOnElpis",
+      "display_name": "Bloodstained Moon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_13",
+      "passive_number": 48,
+      "internal_name": "Lawless",
+      "display_name": "Lawless"
+    },
+    {
+      "icon_file": "c4sh_passive_red_14",
+      "passive_number": 49,
+      "internal_name": "TNT",
+      "display_name": "Truck Full of Nitro"
+    },
+    {
+      "icon_file": "c4sh_passive_red_15",
+      "passive_number": 50,
+      "internal_name": "WarWagon",
+      "display_name": "War Wagon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_16",
+      "passive_number": 51,
+      "internal_name": "PaleRider",
+      "display_name": "Pale Rider"
+    },
+    {
+      "icon_file": "c4sh_passive_red_17",
+      "passive_number": 52,
+      "internal_name": "Forsaken",
+      "display_name": "Nothing Beats Lead"
+    },
+    {
+      "icon_file": "c4sh_passive_red_18",
+      "passive_number": 53,
+      "internal_name": "TheWind",
+      "display_name": "Mr Pocket"
+    },
+    {
+      "icon_file": "c4sh_passive_red_19",
+      "passive_number": 54,
+      "internal_name": "Maverick",
+      "display_name": "Unshaken"
+    },
+    {
+      "icon_file": "c4sh_passive_red_20",
+      "passive_number": 55,
+      "internal_name": "Cottonmouth",
+      "display_name": "From Glaom Till Glow"
+    },
+    {
+      "icon_file": "c4sh_passive_red_21",
+      "passive_number": 56,
+      "internal_name": "BrokenArrow",
+      "display_name": "Dusty Trail"
+    },
+    {
+      "icon_file": "c4sh_passive_red_22",
+      "passive_number": 57,
+      "internal_name": "BadMenMustBleed",
+      "display_name": "Bleed the Bad"
+    },
+    {
+      "icon_file": "c4sh_passive_red_23",
+      "passive_number": 1,
+      "internal_name": "TableFLip",
+      "display_name": "Fast Hands"
+    },
+    {
+      "icon_file": "c4sh_passive_red_24",
+      "passive_number": 2,
+      "internal_name": "HeroCall",
+      "display_name": "Insurance"
+    },
+    {
+      "icon_file": "c4sh_passive_red_25",
+      "passive_number": 3,
+      "internal_name": "Steam",
+      "display_name": "Splash the Pot"
+    },
+    {
+      "icon_file": "c4sh_passive_red_26",
+      "passive_number": 4,
+      "internal_name": "alchemy",
+      "display_name": "Alchemy"
+    },
+    {
+      "icon_file": "c4sh_passive_red_27",
+      "passive_number": 24,
+      "internal_name": "ReadTheSigns",
+      "display_name": "Go For Broke"
+    },
+    {
+      "icon_file": "c4sh_passive_red_28",
+      "passive_number": 6,
+      "internal_name": "SoundsOfRain",
+      "display_name": "Sounds of Rain (Lucky Strike)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_29",
+      "passive_number": 7,
+      "internal_name": "TrickTaker",
+      "display_name": "Trick-Taker (Full Spread)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_30",
+      "passive_number": 9,
+      "internal_name": "LateScratch",
+      "display_name": "LateScratch"
+    },
+    {
+      "icon_file": "c4sh_passive_red_31",
+      "passive_number": 10,
+      "internal_name": "devilsTines_SoH",
+      "display_name": "devilsTines_SoH"
+    },
+    {
+      "icon_file": "c4sh_passive_red_32",
+      "passive_number": 11,
+      "internal_name": "DoubleDown",
+      "display_name": "Double-Down (Double or Nothing)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_33",
+      "passive_number": 12,
+      "internal_name": "wretchedShadows",
+      "display_name": "Wretched Shadows"
+    },
+    {
+      "icon_file": "c4sh_passive_red_34",
+      "passive_number": 13,
+      "internal_name": "HighRoller",
+      "display_name": "High Roller (Ace in the Hole)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_01",
+      "passive_number": 14,
+      "internal_name": "TakeThePot",
+      "display_name": "Take the Pot"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_02",
+      "passive_number": 15,
+      "internal_name": "StackTheDeck",
+      "display_name": "Stack the Deck (Full House)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_03",
+      "passive_number": 16,
+      "internal_name": "Legerdemain",
+      "display_name": "Legerdemain (Wild Card)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_04",
+      "passive_number": 17,
+      "internal_name": "Fortuity",
+      "display_name": "Vigorish"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_05",
+      "passive_number": 18,
+      "internal_name": "DealersBluff",
+      "display_name": "Dealer's Bluff"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_23",
+      "passive_number": 19,
+      "internal_name": "AceInTheHole",
+      "display_name": "Ace in the Hole"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_07",
+      "passive_number": 20,
+      "internal_name": "AroundTheCorner",
+      "display_name": "Around the Corner"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_08",
+      "passive_number": 22,
+      "internal_name": "TheHouse",
+      "display_name": "TheHouse"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_09",
+      "passive_number": 21,
+      "internal_name": "C4SHGame",
+      "display_name": "C4SH Game"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_10",
+      "passive_number": 23,
+      "internal_name": "RiskyBusiness",
+      "display_name": "No Limit"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 5,
+      "internal_name": "ante",
+      "display_name": "Ante Up"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_12",
+      "passive_number": 25,
+      "internal_name": "TheTurn",
+      "display_name": "Kill Button"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_13",
+      "passive_number": 26,
+      "internal_name": "Payout",
+      "display_name": "Payout"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_20",
+      "passive_number": 27,
+      "internal_name": "BoomOrBus",
+      "display_name": "Boom or Bust"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_15",
+      "passive_number": 28,
+      "internal_name": "HeartOfTheCards",
+      "display_name": "Tender Hearts"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_16",
+      "passive_number": 29,
+      "internal_name": "RunningLuck",
+      "display_name": "Card Sharp"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_17",
+      "passive_number": 30,
+      "internal_name": "HotStreak",
+      "display_name": "Hot Streak"
+    }
+  ],
+  "legendary_descriptions": {
+    "dlc1": {
+      "description": "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critically Hit, he gains a 7% Chance to spawn a [roll_icon]Chaos Totem. While [wfll_icon]Windfall is active, double that Chance.",
+      "red_text": "Luck is what happens when preparation meets opportunity."
+    },
+    "l01": {
+      "description": "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains {0} Charges and resets his Action Skill Duration.",
+      "red_text": "And for my next trick..."
+    },
+    "l02": {
+      "description": "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains {2} Fire Rate and {4} Movement Speed for every Ludopath Stack. C4SH has a Max of {0} Ludopath Stacks and each Stack lasts for {1} seconds.",
+      "red_text": "They see me rollin'"
+    },
+    "l03": {
+      "description": "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals Fire Damage. If [wfll_icon]Windfall is active, these Beams always Critically Hit enemies.",
+      "red_text": "Spin to win"
+    },
+    "l04": {
+      "description": "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains {0} Ordnance Cooldown Rate for {1} seconds. This effect stacks up to {2} times.",
+      "red_text": "Do do that voodoo that you do so well."
+    },
+    "l05": {
+      "description": "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. Whenever he gains a Stack of [frtn_icon]Fortune, he restores {0} of his Action Skill Cooldown, gains {1} Fire Rate, and {2} Reload Speed for {3} seconds.",
+      "red_text": "I have not yet begun to defile myself."
+    },
+    "l06": {
+      "description": "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his [frtn_icon]Fortune Stacks, otherwise killing an enemy with a Gun drains half of C4SH's [frtn_icon]Fortune Stacks. Whenever C4SH gains [frtn_icon]Fortune, he restores {0} of his Maximum Health. Whenever C4SH loses [frtn_icon]Fortune, he gains {1} of his Max Overshield.",
+      "red_text": "Play to win. Never play to not lose."
+    },
+    "raid1": {
+      "description": "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal {0} Bonus Fire Damage per Stack. If [wfll_icon]Windfall is active, only consume half of the Stacks. C4SH can have up to {1} Hooligan Stacks.",
+      "red_text": "Here we go, here we go, here we go!"
+    }
+  },
+  "body_display_names": {
+    "np_cm_robo_01": "Pistoleer",
+    "np_cm_robo_02": "Bane",
+    "np_cm_robo_03": "Gambler",
+    "np_cm_robo_04": "Puppeteer",
+    "np_cm_robo_05": "Swindler",
+    "np_cm_robo_06": "Antagonist",
+    "np_cm_robo_07": "Powderbot",
+    "np_cm_robo_08": "Triggerbot",
+    "np_cm_robo_09": "Crack Shot",
+    "np_cm_robo_10": "Pack Leader",
+    "np_cm_robo_leg_01": "Rounder",
+    "np_cm_robo_leg_02": "Ludopath",
+    "np_cm_robo_leg_03": "Hotshot",
+    "np_cm_robo_leg_04": "Cooler",
+    "np_cm_robo_leg_05": "Whale",
+    "np_cm_robo_leg_06": "Windrider",
+    "np_cm_robo_leg_dlc1": "Gamer",
+    "np_cm_robo_leg_raid1": "Hooligan"
+  },
+  "skills_csv": [
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_1_1",
+      "tier_ids": [
+        194,
+        162,
+        130,
+        98,
+        66
+      ],
+      "display_name": "Fast Hands",
+      "csv_row": "404,C4SH,Fast Hands,,194,162,130,98,66"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_1_2",
+      "tier_ids": [
+        193,
+        161,
+        129,
+        97,
+        65
+      ],
+      "display_name": "Insurance",
+      "csv_row": "404,C4SH,Insurance,,193,161,129,97,65"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_1_3",
+      "tier_ids": [
+        40,
+        39,
+        38,
+        37,
+        36
+      ],
+      "display_name": "Ante",
+      "csv_row": "404,C4SH,Ante,,40,39,38,37,36"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_1_4",
+      "tier_ids": [
+        192,
+        160,
+        128,
+        96,
+        64
+      ],
+      "display_name": "Splash the Pot",
+      "csv_row": "404,C4SH,Splash the Pot,,192,160,128,96,64"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_1_5",
+      "tier_ids": [
+        191,
+        159,
+        127,
+        95,
+        63
+      ],
+      "display_name": "Alchemy",
+      "csv_row": "404,C4SH,Alchemy,,191,159,127,95,63"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_2_1",
+      "tier_ids": [
+        190,
+        158,
+        126,
+        94,
+        62
+      ],
+      "display_name": "Go for Broke",
+      "csv_row": "404,C4SH,Go for Broke,,190,158,126,94,62"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_2_3",
+      "tier_ids": [
+        189,
+        157,
+        125,
+        93,
+        61
+      ],
+      "display_name": "Sounds of Rain",
+      "csv_row": "404,C4SH,Sounds of Rain,,189,157,125,93,61"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_2_5",
+      "tier_ids": [
+        188,
+        156,
+        124,
+        92,
+        60
+      ],
+      "display_name": "Trick-Taker",
+      "csv_row": "404,C4SH,Trick-Taker,,188,156,124,92,60"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_3_1",
+      "tier_ids": [
+        35,
+        34,
+        33,
+        32,
+        31
+      ],
+      "display_name": "Devil's Tines",
+      "csv_row": "404,C4SH,Devil's Tines,,35,34,33,32,31"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_3_2",
+      "tier_ids": [
+        187,
+        155,
+        123,
+        91,
+        59
+      ],
+      "display_name": "Late Scratch",
+      "csv_row": "404,C4SH,Late Scratch,,187,155,123,91,59"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_3_3",
+      "tier_ids": [
+        186,
+        154,
+        122,
+        90,
+        58
+      ],
+      "display_name": "Wretched Shadows",
+      "csv_row": "404,C4SH,Wretched Shadows,,186,154,122,90,58"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_3_4",
+      "tier_ids": [
+        30,
+        29,
+        28,
+        27,
+        26
+      ],
+      "display_name": "Double-Down",
+      "csv_row": "404,C4SH,Double-Down,,30,29,28,27,26"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_3_5",
+      "tier_ids": [
+        185,
+        153,
+        121,
+        89,
+        57
+      ],
+      "display_name": "High Roller",
+      "csv_row": "404,C4SH,High Roller,,185,153,121,89,57"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_4_1",
+      "tier_ids": [
+        265,
+        328,
+        391,
+        454,
+        517
+      ],
+      "display_name": "Take the Pot",
+      "csv_row": "404,C4SH,Take the Pot,,265,328,391,454,517"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_4_3",
+      "tier_ids": [
+        266,
+        329,
+        392,
+        455,
+        518
+      ],
+      "display_name": "Stack the Deck",
+      "csv_row": "404,C4SH,Stack the Deck,,266,329,392,455,518"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_5_1",
+      "tier_ids": [
+        267,
+        330,
+        393,
+        456,
+        519
+      ],
+      "display_name": "Legerdemain",
+      "csv_row": "404,C4SH,Legerdemain,,267,330,393,456,519"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_5_2",
+      "tier_ids": [
+        268,
+        331,
+        394,
+        457,
+        520
+      ],
+      "display_name": "Vigorish",
+      "csv_row": "404,C4SH,Vigorish,,268,331,394,457,520"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_5_3",
+      "tier_ids": [
+        269,
+        332,
+        395,
+        458,
+        521
+      ],
+      "display_name": "Dealer's Bluff",
+      "csv_row": "404,C4SH,Dealer's Bluff,,269,332,395,458,521"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_6_1",
+      "tier_ids": [
+        270,
+        333,
+        396,
+        459,
+        522
+      ],
+      "display_name": "Read the Signs",
+      "csv_row": "404,C4SH,Read the Signs,,270,333,396,459,522"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_left_6_3",
+      "tier_ids": [
+        271,
+        334,
+        397,
+        460,
+        523
+      ],
+      "display_name": "The Turn",
+      "csv_row": "404,C4SH,The Turn,,271,334,397,460,523"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_4_1",
+      "tier_ids": [
+        272,
+        335,
+        398,
+        461,
+        524
+      ],
+      "display_name": "Ace in the Hole",
+      "csv_row": "404,C4SH,Ace in the Hole,,272,335,398,461,524"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_4_3",
+      "tier_ids": [
+        273,
+        336,
+        399,
+        462,
+        525
+      ],
+      "display_name": "Around the Corner",
+      "csv_row": "404,C4SH,Around the Corner,,273,336,399,462,525"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_5_1",
+      "tier_ids": [
+        274,
+        337,
+        400,
+        463,
+        526
+      ],
+      "display_name": "House Edge",
+      "csv_row": "404,C4SH,House Edge,,274,337,400,463,526"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_5_2",
+      "tier_ids": [
+        275,
+        338,
+        401,
+        464,
+        527
+      ],
+      "display_name": "C4SH Game",
+      "csv_row": "404,C4SH,C4SH Game,,275,338,401,464,527"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_5_3",
+      "tier_ids": [
+        276,
+        339,
+        402,
+        465,
+        528
+      ],
+      "display_name": "No Limit",
+      "csv_row": "404,C4SH,No Limit,,276,339,402,465,528"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_6_1",
+      "tier_ids": [
+        277,
+        340,
+        403,
+        466,
+        529
+      ],
+      "display_name": "Ante Up",
+      "csv_row": "404,C4SH,Ante Up,,277,340,403,466,529"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_mid_6_3",
+      "tier_ids": [
+        278,
+        341,
+        404,
+        467,
+        530
+      ],
+      "display_name": "Risky Business",
+      "csv_row": "404,C4SH,Risky Business,,278,341,404,467,530"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_4_1",
+      "tier_ids": [
+        279,
+        342,
+        405,
+        468,
+        531
+      ],
+      "display_name": "Kill Button",
+      "csv_row": "404,C4SH,Kill Button,,279,342,405,468,531"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_4_3",
+      "tier_ids": [
+        280,
+        343,
+        406,
+        469,
+        532
+      ],
+      "display_name": "Payout",
+      "csv_row": "404,C4SH,Payout,,280,343,406,469,532"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_5_1",
+      "tier_ids": [
+        281,
+        344,
+        407,
+        470,
+        533
+      ],
+      "display_name": "Boom or Bust",
+      "csv_row": "404,C4SH,Boom or Bust,,281,344,407,470,533"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_5_2",
+      "tier_ids": [
+        282,
+        345,
+        408,
+        471,
+        534
+      ],
+      "display_name": "Tender Hearts",
+      "csv_row": "404,C4SH,Tender Hearts,,282,345,408,471,534"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_5_3",
+      "tier_ids": [
+        283,
+        346,
+        409,
+        472,
+        535
+      ],
+      "display_name": "Card Sharp",
+      "csv_row": "404,C4SH,Card Sharp,,283,346,409,472,535"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_6_1",
+      "tier_ids": [
+        284,
+        347,
+        410,
+        473,
+        536
+      ],
+      "display_name": "Hot Streak",
+      "csv_row": "404,C4SH,Hot Streak,,284,347,410,473,536"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "blue_right_6_3",
+      "tier_ids": [
+        285,
+        348,
+        411,
+        474,
+        537
+      ],
+      "display_name": "Heart of the Cards",
+      "csv_row": "404,C4SH,Heart of the Cards,,285,348,411,474,537"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_1_1",
+      "tier_ids": [
+        205,
+        173,
+        141,
+        109,
+        77
+      ],
+      "display_name": "Luck Be a Robot",
+      "csv_row": "404,C4SH,Luck Be a Robot,,205,173,141,109,77"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_1_2",
+      "tier_ids": [
+        45,
+        44,
+        43,
+        42,
+        41
+      ],
+      "display_name": "Sweet Roll",
+      "csv_row": "404,C4SH,Sweet Roll,,45,44,43,42,41"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_1_3",
+      "tier_ids": [
+        204,
+        172,
+        140,
+        108,
+        76
+      ],
+      "display_name": "Charm Bracelet",
+      "csv_row": "404,C4SH,Charm Bracelet,,204,172,140,108,76"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_1_4",
+      "tier_ids": [
+        203,
+        171,
+        139,
+        107,
+        75
+      ],
+      "display_name": "O Fortuna",
+      "csv_row": "404,C4SH,O Fortuna,,203,171,139,107,75"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_1_5",
+      "tier_ids": [
+        202,
+        170,
+        138,
+        106,
+        74
+      ],
+      "display_name": "Red Moon Rising",
+      "csv_row": "404,C4SH,Red Moon Rising,,202,170,138,106,74"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_2_1",
+      "tier_ids": [
+        201,
+        169,
+        137,
+        105,
+        73
+      ],
+      "display_name": "Ready to Roll",
+      "csv_row": "404,C4SH,Ready to Roll,,201,169,137,105,73"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_2_3",
+      "tier_ids": [
+        200,
+        168,
+        136,
+        104,
+        72
+      ],
+      "display_name": "Riding High",
+      "csv_row": "404,C4SH,Riding High,,200,168,136,104,72"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_2_5",
+      "tier_ids": [
+        199,
+        167,
+        135,
+        103,
+        71
+      ],
+      "display_name": "Bonemeal Ticket",
+      "csv_row": "404,C4SH,Bonemeal Ticket,,199,167,135,103,71"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_3_1",
+      "tier_ids": [
+        195,
+        163,
+        131,
+        99,
+        67
+      ],
+      "display_name": "Before She Knows You're Dead",
+      "csv_row": "404,C4SH,Before She Knows You're Dead,,195,163,131,99,67"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_3_2",
+      "tier_ids": [
+        196,
+        164,
+        132,
+        100,
+        68
+      ],
+      "display_name": "Luckless",
+      "csv_row": "404,C4SH,Luckless,,196,164,132,100,68"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_3_3",
+      "tier_ids": [
+        50,
+        49,
+        48,
+        47,
+        46
+      ],
+      "display_name": "Double Time",
+      "csv_row": "404,C4SH,Double Time,,50,49,48,47,46"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_3_4",
+      "tier_ids": [
+        197,
+        165,
+        133,
+        101,
+        69
+      ],
+      "display_name": "Can't Stop Winning",
+      "csv_row": "404,C4SH,Can't Stop Winning,,197,165,133,101,69"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_3_5",
+      "tier_ids": [
+        198,
+        166,
+        134,
+        102,
+        70
+      ],
+      "display_name": "Turn of Fate",
+      "csv_row": "404,C4SH,Turn of Fate,,198,166,134,102,70"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_4_1",
+      "tier_ids": [
+        223,
+        286,
+        349,
+        412,
+        475
+      ],
+      "display_name": "High Stakes",
+      "csv_row": "404,C4SH,High Stakes,,223,286,349,412,475"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_4_3",
+      "tier_ids": [
+        224,
+        287,
+        350,
+        413,
+        476
+      ],
+      "display_name": "Fortune's Favor",
+      "csv_row": "404,C4SH,Fortune's Favor,,224,287,350,413,476"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_5_1",
+      "tier_ids": [
+        225,
+        288,
+        351,
+        414,
+        477
+      ],
+      "display_name": "Let it Ride",
+      "csv_row": "404,C4SH,Let it Ride,,225,288,351,414,477"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_5_2",
+      "tier_ids": [
+        226,
+        289,
+        352,
+        415,
+        478
+      ],
+      "display_name": "The Wilds",
+      "csv_row": "404,C4SH,The Wilds,,226,289,352,415,478"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_5_3",
+      "tier_ids": [
+        227,
+        290,
+        353,
+        416,
+        479
+      ],
+      "display_name": "Potent Posse",
+      "csv_row": "404,C4SH,Potent Posse,,227,290,353,416,479"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_6_1",
+      "tier_ids": [
+        228,
+        291,
+        354,
+        417,
+        480
+      ],
+      "display_name": "Restless Remains",
+      "csv_row": "404,C4SH,Restless Remains,,228,291,354,417,480"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_left_6_3",
+      "tier_ids": [
+        229,
+        292,
+        355,
+        418,
+        481
+      ],
+      "display_name": "Loaded Dice",
+      "csv_row": "404,C4SH,Loaded Dice,,229,292,355,418,481"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_4_1",
+      "tier_ids": [
+        230,
+        293,
+        356,
+        419,
+        482
+      ],
+      "display_name": "Sorcerer",
+      "csv_row": "404,C4SH,Sorcerer,,230,293,356,419,482"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_4_3",
+      "tier_ids": [
+        231,
+        294,
+        357,
+        420,
+        483
+      ],
+      "display_name": "Tooth and Nail",
+      "csv_row": "404,C4SH,Tooth and Nail,,231,294,357,420,483"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_5_1",
+      "tier_ids": [
+        232,
+        295,
+        358,
+        421,
+        484
+      ],
+      "display_name": "Serendipity",
+      "csv_row": "404,C4SH,Serendipity,,232,295,358,421,484"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_5_2",
+      "tier_ids": [
+        233,
+        296,
+        359,
+        422,
+        485
+      ],
+      "display_name": "Sidekick's Revenge",
+      "csv_row": "404,C4SH,Sidekick's Revenge,,233,296,359,422,485"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_5_3",
+      "tier_ids": [
+        234,
+        297,
+        360,
+        423,
+        486
+      ],
+      "display_name": "The Glorious Dead",
+      "csv_row": "404,C4SH,The Glorious Dead,,234,297,360,423,486"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_6_1",
+      "tier_ids": [
+        235,
+        298,
+        361,
+        424,
+        487
+      ],
+      "display_name": "Shadow's Embrace",
+      "csv_row": "404,C4SH,Shadow's Embrace,,235,298,361,424,487"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_mid_6_3",
+      "tier_ids": [
+        236,
+        299,
+        362,
+        425,
+        488
+      ],
+      "display_name": "Cursed Call",
+      "csv_row": "404,C4SH,Cursed Call,,236,299,362,425,488"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_4_1",
+      "tier_ids": [
+        237,
+        300,
+        363,
+        426,
+        489
+      ],
+      "display_name": "Accursed Bones",
+      "csv_row": "404,C4SH,Accursed Bones,,237,300,363,426,489"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_4_3",
+      "tier_ids": [
+        238,
+        301,
+        364,
+        427,
+        490
+      ],
+      "display_name": "Tormented",
+      "csv_row": "404,C4SH,Tormented,,238,301,364,427,490"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_5_1",
+      "tier_ids": [
+        239,
+        302,
+        365,
+        428,
+        491
+      ],
+      "display_name": "Graveyard Shift",
+      "csv_row": "404,C4SH,Graveyard Shift,,239,302,365,428,491"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_5_2",
+      "tier_ids": [
+        240,
+        303,
+        366,
+        429,
+        492
+      ],
+      "display_name": "Snake Eyes",
+      "csv_row": "404,C4SH,Snake Eyes,,240,303,366,429,492"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_5_3",
+      "tier_ids": [
+        241,
+        304,
+        367,
+        430,
+        493
+      ],
+      "display_name": "Call",
+      "csv_row": "404,C4SH,Call,,241,304,367,430,493"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_6_1",
+      "tier_ids": [
+        242,
+        305,
+        368,
+        431,
+        494
+      ],
+      "display_name": "NewSkill_green_right_6_1",
+      "csv_row": "404,C4SH,NewSkill_green_right_6_1,,242,305,368,431,494"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "green_right_6_3",
+      "tier_ids": [
+        243,
+        306,
+        369,
+        432,
+        495
+      ],
+      "display_name": "NewSkill_green_right_6_3",
+      "csv_row": "404,C4SH,NewSkill_green_right_6_3,,243,306,369,432,495"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_1_1",
+      "tier_ids": [
+        216,
+        184,
+        152,
+        120,
+        88
+      ],
+      "display_name": "Unleashed",
+      "csv_row": "404,C4SH,Unleashed,,216,184,152,120,88"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_1_2",
+      "tier_ids": [
+        215,
+        183,
+        151,
+        119,
+        87
+      ],
+      "display_name": "Your Huckleberry",
+      "csv_row": "404,C4SH,Your Huckleberry,,215,183,151,119,87"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_1_3",
+      "tier_ids": [
+        214,
+        181,
+        149,
+        117,
+        85
+      ],
+      "display_name": "The Determinator",
+      "csv_row": "404,C4SH,The Determinator,,214,181,149,117,85"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_1_4",
+      "tier_ids": [
+        25,
+        24,
+        23,
+        22,
+        21
+      ],
+      "display_name": "Hard-Boiled",
+      "csv_row": "404,C4SH,Hard-Boiled,,25,24,23,22,21"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_1_5",
+      "tier_ids": [
+        212,
+        180,
+        148,
+        116,
+        84
+      ],
+      "display_name": "Running Luck",
+      "csv_row": "404,C4SH,Running Luck,,212,180,148,116,84"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_2_1",
+      "tier_ids": [
+        213,
+        182,
+        150,
+        118,
+        86
+      ],
+      "display_name": "Shootist",
+      "csv_row": "404,C4SH,Shootist,,213,182,150,118,86"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_2_3",
+      "tier_ids": [
+        211,
+        179,
+        147,
+        115,
+        83
+      ],
+      "display_name": "Stand and Bleed",
+      "csv_row": "404,C4SH,Stand and Bleed,,211,179,147,115,83"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_2_5",
+      "tier_ids": [
+        210,
+        178,
+        146,
+        114,
+        82
+      ],
+      "display_name": "Hot Hand",
+      "csv_row": "404,C4SH,Hot Hand,,210,178,146,114,82"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_3_1",
+      "tier_ids": [
+        209,
+        177,
+        145,
+        113,
+        81
+      ],
+      "display_name": "Trick Shot",
+      "csv_row": "404,C4SH,Trick Shot,,209,177,145,113,81"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_3_2",
+      "tier_ids": [
+        20,
+        19,
+        18,
+        17,
+        16
+      ],
+      "display_name": "Ride to Ruin",
+      "csv_row": "404,C4SH,Ride to Ruin,,20,19,18,17,16"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_3_3",
+      "tier_ids": [
+        208,
+        176,
+        144,
+        112,
+        80
+      ],
+      "display_name": "A Blur of Fingers and Brass",
+      "csv_row": "404,C4SH,A Blur of Fingers and Brass,,208,176,144,112,80"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_3_4",
+      "tier_ids": [
+        207,
+        175,
+        143,
+        111,
+        79
+      ],
+      "display_name": "NewSkill_red_3_4",
+      "csv_row": "404,C4SH,NewSkill_red_3_4,,207,175,143,111,79"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_3_5",
+      "tier_ids": [
+        206,
+        174,
+        142,
+        110,
+        78
+      ],
+      "display_name": "Bad Men Must Bleed",
+      "csv_row": "404,C4SH,Bad Men Must Bleed,,206,174,142,110,78"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_4_1",
+      "tier_ids": [
+        244,
+        307,
+        370,
+        433,
+        496
+      ],
+      "display_name": "Brimstone",
+      "csv_row": "404,C4SH,Brimstone,,244,307,370,433,496"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_4_3",
+      "tier_ids": [
+        245,
+        308,
+        371,
+        434,
+        497
+      ],
+      "display_name": "Fast C4SH",
+      "csv_row": "404,C4SH,Fast C4SH,,245,308,371,434,497"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_5_1",
+      "tier_ids": [
+        246,
+        309,
+        372,
+        435,
+        498
+      ],
+      "display_name": "Firestorm",
+      "csv_row": "404,C4SH,Firestorm,,246,309,372,435,498"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_5_2",
+      "tier_ids": [
+        247,
+        310,
+        373,
+        436,
+        499
+      ],
+      "display_name": "Burn the House Down",
+      "csv_row": "404,C4SH,Burn the House Down,,247,310,373,436,499"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_5_3",
+      "tier_ids": [
+        248,
+        311,
+        374,
+        437,
+        500
+      ],
+      "display_name": "High Noon",
+      "csv_row": "404,C4SH,High Noon,,248,311,374,437,500"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_6_1",
+      "tier_ids": [
+        249,
+        312,
+        375,
+        438,
+        501
+      ],
+      "display_name": "Bloodstained Moon",
+      "csv_row": "404,C4SH,Bloodstained Moon,,249,312,375,438,501"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_left_6_3",
+      "tier_ids": [
+        250,
+        313,
+        376,
+        439,
+        502
+      ],
+      "display_name": "Cottonmouth",
+      "csv_row": "404,C4SH,Cottonmouth,,250,313,376,439,502"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_4_1",
+      "tier_ids": [
+        251,
+        314,
+        377,
+        440,
+        503
+      ],
+      "display_name": "Lawless",
+      "csv_row": "404,C4SH,Lawless,,251,314,377,440,503"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_4_3",
+      "tier_ids": [
+        252,
+        315,
+        378,
+        441,
+        504
+      ],
+      "display_name": "Truck Full of Nitro",
+      "csv_row": "404,C4SH,Truck Full of Nitro,,252,315,378,441,504"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_5_1",
+      "tier_ids": [
+        253,
+        316,
+        379,
+        442,
+        505
+      ],
+      "display_name": "War Wagon",
+      "csv_row": "404,C4SH,War Wagon,,253,316,379,442,505"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_5_2",
+      "tier_ids": [
+        254,
+        317,
+        380,
+        443,
+        506
+      ],
+      "display_name": "Pale Rider",
+      "csv_row": "404,C4SH,Pale Rider,,254,317,380,443,506"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_5_3",
+      "tier_ids": [
+        255,
+        318,
+        381,
+        444,
+        507
+      ],
+      "display_name": "Nothing Beats Lead",
+      "csv_row": "404,C4SH,Nothing Beats Lead,,255,318,381,444,507"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_6_1",
+      "tier_ids": [
+        256,
+        319,
+        382,
+        445,
+        508
+      ],
+      "display_name": "Forsaken",
+      "csv_row": "404,C4SH,Forsaken,,256,319,382,445,508"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_mid_6_3",
+      "tier_ids": [
+        257,
+        320,
+        383,
+        446,
+        509
+      ],
+      "display_name": "The Wind",
+      "csv_row": "404,C4SH,The Wind,,257,320,383,446,509"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_4_1",
+      "tier_ids": [
+        258,
+        321,
+        384,
+        447,
+        510
+      ],
+      "display_name": "Mr. Pocket",
+      "csv_row": "404,C4SH,Mr. Pocket,,258,321,384,447,510"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_4_3",
+      "tier_ids": [
+        259,
+        322,
+        385,
+        448,
+        511
+      ],
+      "display_name": "Unshaken",
+      "csv_row": "404,C4SH,Unshaken,,259,322,385,448,511"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_5_1",
+      "tier_ids": [
+        260,
+        323,
+        386,
+        449,
+        512
+      ],
+      "display_name": "From Gloam to Glow",
+      "csv_row": "404,C4SH,From Gloam to Glow,,260,323,386,449,512"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_5_2",
+      "tier_ids": [
+        261,
+        324,
+        387,
+        450,
+        513
+      ],
+      "display_name": "Dusty Trail",
+      "csv_row": "404,C4SH,Dusty Trail,,261,324,387,450,513"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_5_3",
+      "tier_ids": [
+        262,
+        325,
+        388,
+        451,
+        514
+      ],
+      "display_name": "Bleed the Bad",
+      "csv_row": "404,C4SH,Bleed the Bad,,262,325,388,451,514"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_6_1",
+      "tier_ids": [
+        263,
+        326,
+        389,
+        452,
+        515
+      ],
+      "display_name": "Broken Arrow",
+      "csv_row": "404,C4SH,Broken Arrow,,263,326,389,452,515"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_key": "red_right_6_3",
+      "tier_ids": [
+        264,
+        327,
+        390,
+        453,
+        516
+      ],
+      "display_name": "Maverick",
+      "csv_row": "404,C4SH,Maverick,,264,327,390,453,516"
+    }
+  ],
+  "rarity_name_csv": [
+    "404,C4SH,normal,1,Pistoleer,",
+    "404,C4SH,normal,2,Bane,",
+    "404,C4SH,normal,3,Gambler,",
+    "404,C4SH,normal,4,Puppeteer,",
+    "404,C4SH,normal,5,Swindler,",
+    "404,C4SH,normal,6,Antagonist,",
+    "404,C4SH,normal,7,Powderbot,",
+    "404,C4SH,normal,8,Triggerbot,",
+    "404,C4SH,normal,9,Crack Shot,",
+    "404,C4SH,normal,10,Pack Leader,",
+    "404,C4SH,legendary,11,Rounder,",
+    "404,C4SH,legendary,12,Ludopath,",
+    "404,C4SH,legendary,13,Hotshot,",
+    "404,C4SH,legendary,14,Cooler,",
+    "404,C4SH,legendary,15,Whale,",
+    "404,C4SH,legendary,51,Windrider,",
+    "404,C4SH,legendary,222,Gamer,",
+    "404,C4SH,legendary,538,Hooligan,"
+  ],
+  "legendary_map_csv": [
+    "404,C4SH,11,221",
+    "404,C4SH,12,220",
+    "404,C4SH,13,219",
+    "404,C4SH,14,218",
+    "404,C4SH,15,217",
+    "404,C4SH,51,56",
+    "404,C4SH,222,540",
+    "404,C4SH,538,539"
+  ],
+  "skills_full_json": [
+    {
+      "name": "Fast Hands",
+      "type": "Passive",
+      "description": "Reload Speed: X X",
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    {
+      "name": "Insurance",
+      "type": "Passive",
+      "description": "Shield Capacity: X X",
+      "stats": [
+        "Shield Capacity: X X"
+      ]
+    },
+    {
+      "name": "Splash the Pot",
+      "type": "Passive",
+      "description": "Ordnance Damage: X X",
+      "stats": [
+        "Ordnance Damage: X X"
+      ]
+    },
+    {
+      "name": "Alchemy",
+      "type": "Passive",
+      "description": "Elemental Effect Chance: X X",
+      "stats": [
+        "Elemental Effect Chance: X X"
+      ]
+    },
+    {
+      "name": "Ante Up",
+      "type": "Passive",
+      "description": "Gun Damage: up to X X",
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Sounds of Rain (Lucky Strike)",
+      "type": "Passive",
+      "description": "Critical Hit Chance: up to X X",
+      "stats": [
+        "Critical Hit Chance: up to X X"
+      ]
+    },
+    {
+      "name": "Trick-Taker (Full Spread)",
+      "type": "Passive",
+      "description": "Elemental Damage: up to X X",
+      "stats": [
+        "Elemental Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Double-Down (Double or Nothing)",
+      "type": "Passive",
+      "description": "Double Damage Chance: up to X X",
+      "stats": [
+        "Double Damage Chance: up to X X"
+      ]
+    },
+    {
+      "name": "Wretched Shadows",
+      "type": "Passive",
+      "description": "Damage: up to X per second",
+      "stats": [
+        "Damage: up to X per second"
+      ]
+    },
+    {
+      "name": "High Roller (Ace in the Hole)",
+      "type": "Passive",
+      "description": "Gun Damage: up to X X",
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Take the Pot",
+      "type": "Passive",
+      "description": "Health Restored: up to X X",
+      "stats": [
+        "Health Restored: up to X X"
+      ]
+    },
+    {
+      "name": "Stack the Deck (Full House)",
+      "type": "Passive",
+      "description": "Skill Damage: up to X X",
+      "stats": [
+        "Skill Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Legerdemain (Wild Card)",
+      "type": "Passive",
+      "description": "Reload Speed: up to X X",
+      "stats": [
+        "Reload Speed: up to X X"
+      ]
+    },
+    {
+      "name": "Vigorish",
+      "type": "Passive",
+      "description": "Bonus Damage: up to X X of Damage Dealt",
+      "stats": [
+        "Bonus Damage: up to X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Dealer's Bluff",
+      "type": "Passive",
+      "description": "Action Skill Cooldown Restored: X X",
+      "stats": [
+        "Action Skill Cooldown Restored: X X"
+      ]
+    },
+    {
+      "name": "Ace in the Hole",
+      "type": "Passive",
+      "description": "Gun Damage: X X per Fortune Stack",
+      "stats": [
+        "Gun Damage: X X per Fortune Stack"
+      ]
+    },
+    {
+      "name": "Around the Corner",
+      "type": "Passive",
+      "description": "Action Skill Cooldown Rate: X X per Fortune Stack",
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Fortune Stack"
+      ]
+    },
+    {
+      "name": "C4SH Game",
+      "type": "Passive",
+      "description": "Minimum Fortune Stacks: X X",
+      "stats": [
+        "Minimum Fortune Stacks: X X"
+      ]
+    },
+    {
+      "name": "No Limit",
+      "type": "Passive",
+      "description": "Max Fortune Stacks: X X",
+      "stats": [
+        "Max Fortune Stacks: X X"
+      ]
+    },
+    {
+      "name": "Go For Broke",
+      "type": "Passive",
+      "description": "Additional Fortune Stacks: X X",
+      "stats": [
+        "Additional Fortune Stacks: X X"
+      ]
+    },
+    {
+      "name": "Kill Button",
+      "type": "Passive",
+      "description": "Ordnance Damage: up to X X",
+      "stats": [
+        "Ordnance Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Payout",
+      "type": "Passive",
+      "description": "Fortune Skills: X X",
+      "stats": [
+        "Fortune Skills: X X"
+      ]
+    },
+    {
+      "name": "Boom or Bust",
+      "type": "Passive",
+      "description": "Grenade Damage: X",
+      "stats": [
+        "Grenade Damage: X"
+      ]
+    },
+    {
+      "name": "Tender Hearts",
+      "type": "Passive",
+      "description": "Critical Hit Damage: X X",
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    {
+      "name": "Card Sharp",
+      "type": "Passive",
+      "description": "Duration: X X second(s)",
+      "stats": [
+        "Duration: X X second(s)"
+      ]
+    },
+    {
+      "name": "Hot Streak",
+      "type": "Passive",
+      "description": "Critical Hit Damage: X X",
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    {
+      "name": "Gunslinger",
+      "type": "Passive",
+      "description": "Fire Rate: X X",
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    {
+      "name": "Huckleberry",
+      "type": "Passive",
+      "description": "Critical Hit Damage: X X",
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    {
+      "name": "The Determinator",
+      "type": "Passive",
+      "description": "Health Regeneration: up to X X of missing Health per second",
+      "stats": [
+        "Health Regeneration: up to X X of missing Health per second"
+      ]
+    },
+    {
+      "name": "Hard Boiled",
+      "type": "Passive",
+      "description": "Action Skill Duration Restored: up to X X",
+      "stats": [
+        "Action Skill Duration Restored: up to X X"
+      ]
+    },
+    {
+      "name": "Hot Hand",
+      "type": "Passive",
+      "description": "Bonus Fire Damage: up to X X of Damage Dealt",
+      "stats": [
+        "Bonus Fire Damage: up to X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Shootist",
+      "type": "Passive",
+      "description": "Gun Damage: X X",
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    {
+      "name": "Stand and Bleed",
+      "type": "Passive",
+      "description": "Critical Hit Chance: X X",
+      "stats": [
+        "Critical Hit Chance: X X"
+      ]
+    },
+    {
+      "name": "A Blur of Fingers and Brass",
+      "type": "Passive",
+      "description": "Reload Speed: X X per Stack",
+      "stats": [
+        "Reload Speed: X X per Stack"
+      ]
+    },
+    {
+      "name": "Trick Shot",
+      "type": "Passive",
+      "description": "Ricochet Chance: up to X X",
+      "stats": [
+        "Ricochet Chance: up to X X"
+      ]
+    },
+    {
+      "name": "Brimstone",
+      "type": "Passive",
+      "description": "Brimstone skill.",
+      "stats": []
+    },
+    {
+      "name": "Fast C4SH",
+      "type": "Passive",
+      "description": "Movement Speed: up to X X",
+      "stats": [
+        "Movement Speed: up to X X"
+      ]
+    },
+    {
+      "name": "Firestorm",
+      "type": "Passive",
+      "description": "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed",
+      "stats": [
+        "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed"
+      ]
+    },
+    {
+      "name": "Burn Down the House",
+      "type": "Passive",
+      "description": "Fire Mortar Damage: X X",
+      "stats": [
+        "Fire Mortar Damage: X X"
+      ]
+    },
+    {
+      "name": "High Noon",
+      "type": "Passive",
+      "description": "Fire Nova Damage: X X",
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    {
+      "name": "Bloodstained Moon",
+      "type": "Passive",
+      "description": "Elemental Effect Chance: X X per Stack",
+      "stats": [
+        "Elemental Effect Chance: X X per Stack"
+      ]
+    },
+    {
+      "name": "Lawless",
+      "type": "Passive",
+      "description": "Kinetic Damage: X X",
+      "stats": [
+        "Kinetic Damage: X X"
+      ]
+    },
+    {
+      "name": "Truck Full of Nitro",
+      "type": "Passive",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt",
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "War Wagon",
+      "type": "Passive",
+      "description": "Ammo Refill Chance: X X",
+      "stats": [
+        "Ammo Refill Chance: X X"
+      ]
+    },
+    {
+      "name": "Pale Rider",
+      "type": "Passive",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt",
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Nothing Beats Lead",
+      "type": "Passive",
+      "description": "Elemental Damage Converted: X X of Damage Dealt",
+      "stats": [
+        "Elemental Damage Converted: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Mr Pocket",
+      "type": "Passive",
+      "description": "Duration Freeze: X X second(s)",
+      "stats": [
+        "Duration Freeze: X X second(s)"
+      ]
+    },
+    {
+      "name": "Unshaken",
+      "type": "Passive",
+      "description": "Damage: X X per Fortune Stack lost",
+      "stats": [
+        "Damage: X X per Fortune Stack lost"
+      ]
+    },
+    {
+      "name": "From Glaom Till Glow",
+      "type": "Passive",
+      "description": "Overshield: X X of Damage Taken",
+      "stats": [
+        "Overshield: X X of Damage Taken"
+      ]
+    },
+    {
+      "name": "Dusty Trail",
+      "type": "Passive",
+      "description": "Gun Damage: X X per Fortune Stack lost",
+      "stats": [
+        "Gun Damage: X X per Fortune Stack lost"
+      ]
+    },
+    {
+      "name": "Bleed the Bad",
+      "type": "Passive",
+      "description": "Action Skill Duration Rate: X per failed attempt",
+      "stats": [
+        "Action Skill Duration Rate: X per failed attempt"
+      ]
+    },
+    {
+      "name": "Luck Be a Robot",
+      "type": "Passive",
+      "description": "Action Skill Cooldown Rate: up to X X",
+      "stats": [
+        "Action Skill Cooldown Rate: up to X X"
+      ]
+    },
+    {
+      "name": "Sweet Roll",
+      "type": "Passive",
+      "description": "Max Health: X X",
+      "stats": [
+        "Max Health: X X"
+      ]
+    },
+    {
+      "name": "Charm Bracelet",
+      "type": "Passive",
+      "description": "Skill Damage: X X",
+      "stats": [
+        "Skill Damage: X X"
+      ]
+    },
+    {
+      "name": "O Fortuna",
+      "type": "Passive",
+      "description": "Windfall Chance: X X per Fortune Stack",
+      "stats": [
+        "Windfall Chance: X X per Fortune Stack"
+      ]
+    },
+    {
+      "name": "Red Moon Rising",
+      "type": "Passive",
+      "description": "Bonus Damage: X X of Damage Dealt",
+      "stats": [
+        "Bonus Damage: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Ready to Roll",
+      "type": "Passive",
+      "description": "Action Skill Cooldown Rate: X X",
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    {
+      "name": "Riding High",
+      "type": "Passive",
+      "description": "Windfall Duration: X X",
+      "stats": [
+        "Windfall Duration: X X"
+      ]
+    },
+    {
+      "name": "Bonemeal Ticket",
+      "type": "Passive",
+      "description": "Action Skill Duration: X X on kill",
+      "stats": [
+        "Action Skill Duration: X X on kill"
+      ]
+    },
+    {
+      "name": "Restless Remains",
+      "type": "Passive",
+      "description": "Respawn Chance: up to X X",
+      "stats": [
+        "Respawn Chance: up to X X"
+      ]
+    },
+    {
+      "name": "Luckless",
+      "type": "Passive",
+      "description": "Jinxed Enemy Damage Dealt: X",
+      "stats": [
+        "Jinxed Enemy Damage Dealt: X"
+      ]
+    },
+    {
+      "name": "Can't Stop Winning",
+      "type": "Passive",
+      "description": "Gun Critical Hit Chance: X X",
+      "stats": [
+        "Gun Critical Hit Chance: X X"
+      ]
+    },
+    {
+      "name": "Turn of Fate",
+      "type": "Passive",
+      "description": "Lifesteal: X X of Damage Dealt",
+      "stats": [
+        "Lifesteal: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "High Stakes",
+      "type": "Passive",
+      "description": "Fire Rate: X X",
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    {
+      "name": "Fortune's Favor",
+      "type": "Passive",
+      "description": "Gun Damage: up to X X",
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Let it Ride",
+      "type": "Passive",
+      "description": "Gun Damage: X X",
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    {
+      "name": "The Wilds",
+      "type": "Passive",
+      "description": "Bonus Elemental Damage: X X of Damage Dealt",
+      "stats": [
+        "Bonus Elemental Damage: X X of Damage Dealt"
+      ]
+    },
+    {
+      "name": "Potent Posse",
+      "type": "Passive",
+      "description": "Gun Damage: up to X X",
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    {
+      "name": "Before She Knows You're Dead",
+      "type": "Passive",
+      "description": "Movement Speed: X X per active Bone Totem",
+      "stats": [
+        "Movement Speed: X X per active Bone Totem"
+      ]
+    },
+    {
+      "name": "Sorcerer",
+      "type": "Passive",
+      "description": "Fire Nova Damage: X X",
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    {
+      "name": "Tooth and Nail",
+      "type": "Passive",
+      "description": "Melee Damage: X X",
+      "stats": [
+        "Melee Damage: X X"
+      ]
+    },
+    {
+      "name": "Serendipity",
+      "type": "Passive",
+      "description": "Health Restored: X X per missile",
+      "stats": [
+        "Health Restored: X X per missile"
+      ]
+    },
+    {
+      "name": "Sidekick's Revenge",
+      "type": "Passive",
+      "description": "Health Converted: X of Current Health",
+      "stats": [
+        "Health Converted: X of Current Health"
+      ]
+    },
+    {
+      "name": "Dead Friend Redemption",
+      "type": "Passive",
+      "description": "Gun Damage: X X per Stack",
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    {
+      "name": "Accursed Bones",
+      "type": "Passive",
+      "description": "Lifesteal: X X",
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    {
+      "name": "Tormented",
+      "type": "Passive",
+      "description": "Critical Hit Damage: X X",
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    {
+      "name": "Graveyard Shift",
+      "type": "Passive",
+      "description": "Action Skill Cooldown Rate: X X per Jinxed enemy",
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Jinxed enemy"
+      ]
+    },
+    {
+      "name": "Snake Eyes",
+      "type": "Passive",
+      "description": "Damage Taken: X",
+      "stats": [
+        "Damage Taken: X"
+      ]
+    },
+    {
+      "name": "Call",
+      "type": "Passive",
+      "description": "Duration: X seconds",
+      "stats": [
+        "Duration: X seconds"
+      ]
+    }
+  ],
+  "icon_reference": [
+    {
+      "icon_file": "c4sh_passive_blue_06",
+      "passive_number": 58,
+      "internal_name": "LucksARobot",
+      "display_name": "Luck Be a Robot",
+      "description": "Action Skill Cooldown Rate: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_02",
+      "passive_number": 59,
+      "internal_name": "AllForOne",
+      "display_name": "Sweet Roll",
+      "description": "Max Health: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_03",
+      "passive_number": 60,
+      "internal_name": "LuckyCharm",
+      "display_name": "Charm Bracelet",
+      "description": "Skill Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_04",
+      "passive_number": 61,
+      "internal_name": "TheLuckyOne",
+      "display_name": "O Fortuna",
+      "description": "Windfall Chance: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_green_05",
+      "passive_number": 62,
+      "internal_name": "RedMoonRising",
+      "display_name": "Red Moon Rising",
+      "description": "Bonus Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_06",
+      "passive_number": 63,
+      "internal_name": "RollingTheDeep",
+      "display_name": "Ready to Roll",
+      "description": "Action Skill Cooldown Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_07",
+      "passive_number": 64,
+      "internal_name": "RidingHigh",
+      "display_name": "Riding High",
+      "description": "Windfall Duration: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_08",
+      "passive_number": 65,
+      "internal_name": "GravePact",
+      "display_name": "Bonemeal Ticket",
+      "description": "Action Skill Duration: X X on kill"
+    },
+    {
+      "icon_file": "c4sh_passive_green_09",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CL",
+      "display_name": "devilsTines_CL",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_green_10",
+      "passive_number": 75,
+      "internal_name": "DoubleTime",
+      "display_name": "Before She Knows You're Dead",
+      "description": "Movement Speed: X X per active Bone Totem"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 67,
+      "internal_name": "Luckless",
+      "display_name": "Luckless",
+      "description": "Jinxed Enemy Damage Dealt: X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_12",
+      "passive_number": 68,
+      "internal_name": "CriticalRole",
+      "display_name": "Can't Stop Winning",
+      "description": "Gun Critical Hit Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_13",
+      "passive_number": 69,
+      "internal_name": "SpinOfFate",
+      "display_name": "Turn of Fate",
+      "description": "Lifesteal: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_14",
+      "passive_number": 70,
+      "internal_name": "HighStakes",
+      "display_name": "High Stakes",
+      "description": "Fire Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_15",
+      "passive_number": 71,
+      "internal_name": "FortunesFavor",
+      "display_name": "Fortune's Favor",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_16",
+      "passive_number": 72,
+      "internal_name": "LetItRide",
+      "display_name": "Let it Ride",
+      "description": "Gun Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_17",
+      "passive_number": 73,
+      "internal_name": "Wild",
+      "display_name": "The Wilds",
+      "description": "Bonus Elemental Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_18",
+      "passive_number": 74,
+      "internal_name": "PackMentality",
+      "display_name": "Potent Posse",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_19",
+      "passive_number": 66,
+      "internal_name": "Undying",
+      "display_name": "Restless Remains",
+      "description": "Respawn Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_20",
+      "passive_number": 76,
+      "internal_name": "LoadedDice",
+      "display_name": "Sorcerer",
+      "description": "Fire Nova Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_21",
+      "passive_number": 77,
+      "internal_name": "ShadowsEmbrace",
+      "display_name": "Tooth and Nail",
+      "description": "Melee Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_22",
+      "passive_number": 78,
+      "internal_name": "Serendipity",
+      "display_name": "Serendipity",
+      "description": "Health Restored: X X per missile"
+    },
+    {
+      "icon_file": "c4sh_passive_green_23",
+      "passive_number": 79,
+      "internal_name": "SidekicksRevenge",
+      "display_name": "Sidekick's Revenge",
+      "description": "Health Converted: X of Current Health"
+    },
+    {
+      "icon_file": "c4sh_passive_green_24",
+      "passive_number": 80,
+      "internal_name": "AlphasCall",
+      "display_name": "Dead Friend Redemption",
+      "description": "Gun Damage: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_green_25",
+      "passive_number": 81,
+      "internal_name": "CursedCall",
+      "display_name": "Accursed Bones",
+      "description": "Lifesteal: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_26",
+      "passive_number": 82,
+      "internal_name": "Haunted",
+      "display_name": "Tormented",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_27",
+      "passive_number": 83,
+      "internal_name": "GraveyardShift",
+      "display_name": "Graveyard Shift",
+      "description": "Action Skill Cooldown Rate: X X per Jinxed enemy"
+    },
+    {
+      "icon_file": "c4sh_passive_green_28",
+      "passive_number": 84,
+      "internal_name": "SnakeEyes",
+      "display_name": "Snake Eyes",
+      "description": "Damage Taken: X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_29",
+      "passive_number": 85,
+      "internal_name": "WitchingHour",
+      "display_name": "Call",
+      "description": "Duration: X seconds"
+    },
+    {
+      "icon_file": "c4sh_passive_green_30",
+      "passive_number": 31,
+      "internal_name": "Unchained",
+      "display_name": "Gunslinger",
+      "description": "Fire Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_31",
+      "passive_number": 32,
+      "internal_name": "DeathHunt",
+      "display_name": "Huckleberry",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_32",
+      "passive_number": 33,
+      "internal_name": "Determinator",
+      "display_name": "The Determinator",
+      "description": "Health Regeneration: up to X X of missing Health per second"
+    },
+    {
+      "icon_file": "c4sh_passive_green_33",
+      "passive_number": 34,
+      "internal_name": "HardBoiled",
+      "display_name": "Hard Boiled",
+      "description": "Action Skill Duration Restored: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_34",
+      "passive_number": 36,
+      "internal_name": "TheShootist",
+      "display_name": "Shootist",
+      "description": "Gun Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_01",
+      "passive_number": 37,
+      "internal_name": "StandAndBleed",
+      "display_name": "Stand and Bleed",
+      "description": "Critical Hit Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_02",
+      "passive_number": 35,
+      "internal_name": "TheFuries",
+      "display_name": "Hot Hand",
+      "description": "Bonus Fire Damage: up to X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_03",
+      "passive_number": 39,
+      "internal_name": "BoneShrapnel",
+      "display_name": "Trick Shot",
+      "description": "Ricochet Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_04",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CF",
+      "display_name": "devilsTines_CF",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_red_05",
+      "passive_number": 40,
+      "internal_name": "RideWithTheDevil",
+      "display_name": "RideWithTheDevil",
+      "description": "Reload Speed: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_06",
+      "passive_number": 38,
+      "internal_name": "Unchained",
+      "display_name": "A Blur of Fingers and Brass",
+      "description": "Reload Speed: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_red_07",
+      "passive_number": 42,
+      "internal_name": "Brimstone",
+      "display_name": "Brimstone",
+      "description": ""
+    },
+    {
+      "icon_file": "c4sh_passive_red_08",
+      "passive_number": 43,
+      "internal_name": "TheClaim",
+      "display_name": "Fast C4SH",
+      "description": "Movement Speed: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_09",
+      "passive_number": 44,
+      "internal_name": "TheGunfighter",
+      "display_name": "Firestorm",
+      "description": "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed"
+    },
+    {
+      "icon_file": "c4sh_passive_red_10",
+      "passive_number": 45,
+      "internal_name": "DebtsToPay",
+      "display_name": "Burn Down the House",
+      "description": "Fire Mortar Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 46,
+      "internal_name": "HellAndBack",
+      "display_name": "High Noon",
+      "description": "Fire Nova Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_12",
+      "passive_number": 47,
+      "internal_name": "BloodOnElpis",
+      "display_name": "Bloodstained Moon",
+      "description": "Elemental Effect Chance: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_red_13",
+      "passive_number": 48,
+      "internal_name": "Lawless",
+      "display_name": "Lawless",
+      "description": "Kinetic Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_14",
+      "passive_number": 49,
+      "internal_name": "TNT",
+      "display_name": "Truck Full of Nitro",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_15",
+      "passive_number": 50,
+      "internal_name": "WarWagon",
+      "display_name": "War Wagon",
+      "description": "Ammo Refill Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_16",
+      "passive_number": 51,
+      "internal_name": "PaleRider",
+      "display_name": "Pale Rider",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_17",
+      "passive_number": 52,
+      "internal_name": "Forsaken",
+      "display_name": "Nothing Beats Lead",
+      "description": "Elemental Damage Converted: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_18",
+      "passive_number": 53,
+      "internal_name": "TheWind",
+      "display_name": "Mr Pocket",
+      "description": "Duration Freeze: X X second(s)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_19",
+      "passive_number": 54,
+      "internal_name": "Maverick",
+      "display_name": "Unshaken",
+      "description": "Damage: X X per Fortune Stack lost"
+    },
+    {
+      "icon_file": "c4sh_passive_red_20",
+      "passive_number": 55,
+      "internal_name": "Cottonmouth",
+      "display_name": "From Glaom Till Glow",
+      "description": "Overshield: X X of Damage Taken"
+    },
+    {
+      "icon_file": "c4sh_passive_red_21",
+      "passive_number": 56,
+      "internal_name": "BrokenArrow",
+      "display_name": "Dusty Trail",
+      "description": "Gun Damage: X X per Fortune Stack lost"
+    },
+    {
+      "icon_file": "c4sh_passive_red_22",
+      "passive_number": 57,
+      "internal_name": "BadMenMustBleed",
+      "display_name": "Bleed the Bad",
+      "description": "Action Skill Duration Rate: X per failed attempt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_23",
+      "passive_number": 1,
+      "internal_name": "TableFLip",
+      "display_name": "Fast Hands",
+      "description": "Reload Speed: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_24",
+      "passive_number": 2,
+      "internal_name": "HeroCall",
+      "display_name": "Insurance",
+      "description": "Shield Capacity: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_25",
+      "passive_number": 3,
+      "internal_name": "Steam",
+      "display_name": "Splash the Pot",
+      "description": "Ordnance Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_26",
+      "passive_number": 4,
+      "internal_name": "alchemy",
+      "display_name": "Alchemy",
+      "description": "Elemental Effect Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_27",
+      "passive_number": 24,
+      "internal_name": "ReadTheSigns",
+      "display_name": "Go For Broke",
+      "description": "Additional Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_28",
+      "passive_number": 6,
+      "internal_name": "SoundsOfRain",
+      "display_name": "Sounds of Rain (Lucky Strike)",
+      "description": "Critical Hit Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_29",
+      "passive_number": 7,
+      "internal_name": "TrickTaker",
+      "display_name": "Trick-Taker (Full Spread)",
+      "description": "Elemental Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_30",
+      "passive_number": 9,
+      "internal_name": "LateScratch",
+      "display_name": "LateScratch",
+      "description": "I bring a fork."
+    },
+    {
+      "icon_file": "c4sh_passive_red_31",
+      "passive_number": 10,
+      "internal_name": "devilsTines_SoH",
+      "display_name": "devilsTines_SoH",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_red_32",
+      "passive_number": 11,
+      "internal_name": "DoubleDown",
+      "display_name": "Double-Down (Double or Nothing)",
+      "description": "Double Damage Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_33",
+      "passive_number": 12,
+      "internal_name": "wretchedShadows",
+      "display_name": "Wretched Shadows",
+      "description": "Damage: up to X per second"
+    },
+    {
+      "icon_file": "c4sh_passive_red_34",
+      "passive_number": 13,
+      "internal_name": "HighRoller",
+      "display_name": "High Roller (Ace in the Hole)",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_01",
+      "passive_number": 14,
+      "internal_name": "TakeThePot",
+      "display_name": "Take the Pot",
+      "description": "Health Restored: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_02",
+      "passive_number": 15,
+      "internal_name": "StackTheDeck",
+      "display_name": "Stack the Deck (Full House)",
+      "description": "Skill Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_03",
+      "passive_number": 16,
+      "internal_name": "Legerdemain",
+      "display_name": "Legerdemain (Wild Card)",
+      "description": "Reload Speed: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_04",
+      "passive_number": 17,
+      "internal_name": "Fortuity",
+      "display_name": "Vigorish",
+      "description": "Bonus Damage: up to X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_05",
+      "passive_number": 18,
+      "internal_name": "DealersBluff",
+      "display_name": "Dealer's Bluff",
+      "description": "Action Skill Cooldown Restored: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_23",
+      "passive_number": 19,
+      "internal_name": "AceInTheHole",
+      "display_name": "Ace in the Hole",
+      "description": "Gun Damage: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_07",
+      "passive_number": 20,
+      "internal_name": "AroundTheCorner",
+      "display_name": "Around the Corner",
+      "description": "Action Skill Cooldown Rate: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_08",
+      "passive_number": 22,
+      "internal_name": "TheHouse",
+      "display_name": "TheHouse",
+      "description": "Truth is... the game was rigged from the start."
+    },
+    {
+      "icon_file": "c4sh_passive_blue_09",
+      "passive_number": 21,
+      "internal_name": "C4SHGame",
+      "display_name": "C4SH Game",
+      "description": "Minimum Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_10",
+      "passive_number": 23,
+      "internal_name": "RiskyBusiness",
+      "display_name": "No Limit",
+      "description": "Max Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 5,
+      "internal_name": "ante",
+      "display_name": "Ante Up",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_12",
+      "passive_number": 25,
+      "internal_name": "TheTurn",
+      "display_name": "Kill Button",
+      "description": "Ordnance Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_13",
+      "passive_number": 26,
+      "internal_name": "Payout",
+      "display_name": "Payout",
+      "description": "Fortune Skills: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_20",
+      "passive_number": 27,
+      "internal_name": "BoomOrBus",
+      "display_name": "Boom or Bust",
+      "description": "Grenade Damage: X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_15",
+      "passive_number": 28,
+      "internal_name": "HeartOfTheCards",
+      "display_name": "Tender Hearts",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_16",
+      "passive_number": 29,
+      "internal_name": "RunningLuck",
+      "display_name": "Card Sharp",
+      "description": "Duration: X X second(s)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_17",
+      "passive_number": 30,
+      "internal_name": "HotStreak",
+      "display_name": "Hot Streak",
+      "description": "Critical Hit Damage: X X"
+    }
+  ],
+  "classmod_name_descriptions": {
+    "pistoleer": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "bane": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "gambler": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "puppeteer": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "swindler": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "antagonist": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "powderbot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "triggerbot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "crack shot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "pack leader": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "rounder": {
+      "character": "C4SH",
+      "description": "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains {0} Charges and resets his Action Skill Duration. Red Text: And for my next trick..."
+    },
+    "ludopath": {
+      "character": "C4SH",
+      "description": "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains {2} Fire Rate and {4} Movement Speed for every Ludopath Stack. C4SH has a Max of {0} Ludopath Stacks and each Stack lasts for {1} seconds. Red Text: They see me rollin'"
+    },
+    "hotshot": {
+      "character": "C4SH",
+      "description": "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals Fire Damage. If [wfll_icon]Windfall is active, these Beams always Critically Hit enemies. Red Text: Spin to win"
+    },
+    "cooler": {
+      "character": "C4SH",
+      "description": "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains {0} Ordnance Cooldown Rate for {1} seconds. This effect stacks up to {2} times. Red Text: Do do that voodoo that you do so well."
+    },
+    "whale": {
+      "character": "C4SH",
+      "description": "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. Whenever he gains a Stack of [frtn_icon]Fortune, he restores {0} of his Action Skill Cooldown, gains {1} Fire Rate, and {2} Reload Speed for {3} seconds. Red Text: I have not yet begun to defile myself."
+    },
+    "windrider": {
+      "character": "C4SH",
+      "description": "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his [frtn_icon]Fortune Stacks, otherwise killing an enemy with a Gun drains half of C4SH's [frtn_icon]Fortune Stacks. Whenever C4SH gains [frtn_icon]Fortune, he restores {0} of his Maximum Health. Whenever C4SH loses [frtn_icon]Fortune, he gains {1} of his Max Overshield. Red Text: Play to win. Never play to not lose."
+    },
+    "gamer": {
+      "character": "C4SH",
+      "description": "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critically Hit, he gains a 7% Chance to spawn a [roll_icon]Chaos Totem. While [wfll_icon]Windfall is active, double that Chance. Red Text: Luck is what happens when preparation meets opportunity."
+    },
+    "hooligan": {
+      "character": "C4SH",
+      "description": "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal {0} Bonus Fire Damage per Stack. If [wfll_icon]Windfall is active, only consume half of the Stacks. C4SH can have up to {1} Hooligan Stacks. Red Text: Here we go, here we go, here we go!"
+    }
+  }
+}

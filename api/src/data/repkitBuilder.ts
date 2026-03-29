@@ -1,69 +1,42 @@
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { parseCsv } from "./csvParse.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..", "..");
+function getPath(relative: string): string { return join(repoRoot, relative); }
 
-function getPath(relative: string): string {
-  return join(repoRoot, relative);
-}
-
-function readCsv(path: string): { headers: string[]; rows: Record<string, string>[] } {
-  const content = readFileSync(path, "utf-8");
-  return parseCsv(content);
-}
-
-/** Repkit manufacturer IDs (same order as desktop). */
 const REPKIT_MFG_IDS = [277, 265, 266, 285, 274, 290, 261, 269] as const;
-
+const REPKIT_MFG_SET = new Set<number>(REPKIT_MFG_IDS);
 const REPKIT_MFG_NAMES: Record<number, string> = {
-  277: "Daedalus",
-  265: "Jakobs",
-  266: "Maliwan",
-  285: "Order",
-  274: "Ripper",
-  290: "Tediore",
-  261: "Torgue",
-  269: "Vladof",
+  277: "Daedalus", 265: "Jakobs", 266: "Maliwan", 285: "Order",
+  274: "Ripper", 290: "Tediore", 261: "Torgue", 269: "Vladof",
 };
 
-export interface RepkitBuilderPart {
-  partId: number;
-  stat: string;
-  description?: string;
-}
-
-export interface RepkitBuilderLegendaryPart extends RepkitBuilderPart {
-  mfgId: number;
-  mfgName: string;
-}
-
-export interface RepkitBuilderRarity {
-  id: number;
-  label: string;
-}
-
+export interface RepkitBuilderPart { partId: number; stat: string; description?: string; }
+export interface RepkitBuilderLegendaryPart extends RepkitBuilderPart { mfgId: number; mfgName: string; }
+export interface RepkitBuilderRarity { id: number; label: string; }
 export interface RepkitBuilderData {
   mfgs: { id: number; name: string }[];
   raritiesByMfg: Record<number, RepkitBuilderRarity[]>;
-  /** Prefix (\"Perfix\" in CSV) options (single-select radio). */
   prefix: RepkitBuilderPart[];
-  /** Firmware options (single-select radio). */
   firmware: RepkitBuilderPart[];
-  /** Resistance / Immunity options (single-select radio). */
   resistance: RepkitBuilderPart[];
-  /** Universal perks list (dual list with multiplier). */
   universalPerks: RepkitBuilderPart[];
-  /** Legendary perks from manufacturer CSV. */
   legendaryPerks: RepkitBuilderLegendaryPart[];
-  /** Rarity + model info per manufacturer. */
   modelsByMfg: Record<number, number | null>;
 }
 
-function trim(s: unknown): string {
-  return String(s ?? "").trim();
+interface UniversalRow { code: string; name: string; manufacturer: string; category: string; partType: string; description: string; rarity: string; }
+
+function loadUniversalDb(): UniversalRow[] {
+  const path = getPath("master_search/db/universal_parts_db.json");
+  if (!existsSync(path)) return [];
+  try { const raw = JSON.parse(readFileSync(path, "utf-8")); return (raw?.rows ?? raw ?? []) as UniversalRow[]; } catch { return []; }
+}
+function parseCode(code: string): { typeId: number; partId: number } {
+  const m = code.match(/^\{(\d+):(\d+)\}$/);
+  return m ? { typeId: parseInt(m[1]), partId: parseInt(m[2]) } : { typeId: 0, partId: 0 };
 }
 
 let cached: RepkitBuilderData | null = null;
@@ -71,137 +44,42 @@ let cached: RepkitBuilderData | null = null;
 export function getRepkitBuilderData(): RepkitBuilderData {
   if (cached) return cached;
 
-  const mainBase = "repkit/repkit_main_perk";
-  const mfgBase = "repkit/repkit_manufacturer_perk";
-  const mainEn = getPath(`${mainBase}_EN.csv`);
-  const mainPath = existsSync(mainEn) ? mainEn : getPath(`${mainBase}.csv`);
-  const mfgEn = getPath(`${mfgBase}_EN.csv`);
-  const mfgPath = existsSync(mfgEn) ? mfgEn : getPath(`${mfgBase}.csv`);
-
-  const mfgs = REPKIT_MFG_IDS.map((id) => ({
-    id,
-    name: REPKIT_MFG_NAMES[id] ?? `Manufacturer ${id}`,
-  }));
+  const allRows = loadUniversalDb().filter((r) => r.category === "Repkit");
+  const mfgs = REPKIT_MFG_IDS.map((id) => ({ id, name: REPKIT_MFG_NAMES[id] ?? `Manufacturer ${id}` }));
 
   const raritiesByMfg: Record<number, RepkitBuilderRarity[]> = {};
   const legendaryPerks: RepkitBuilderLegendaryPart[] = [];
   const modelsByMfg: Record<number, number | null> = {};
-
-  if (existsSync(mfgPath)) {
-    const { rows } = readCsv(mfgPath);
-    for (const r of rows) {
-      const mfgId = parseInt(trim(r["Manufacturer ID"]), 10);
-      if (!Number.isFinite(mfgId)) continue;
-      const partId = parseInt(trim(r["Part_ID"]), 10);
-      if (!Number.isFinite(partId)) continue;
-      const partType = trim(r["Part_type"]);
-      const stat = trim(r["Stat"]);
-      const desc = trim(r["Description"]);
-
-      if (partType === "Rarity") {
-        if (!raritiesByMfg[mfgId]) raritiesByMfg[mfgId] = [];
-        raritiesByMfg[mfgId].push({
-          id: partId,
-          label: desc ? `${stat} - ${desc}` : stat,
-        });
-      } else if (partType === "Legendary Perk") {
-        legendaryPerks.push({
-          partId,
-          mfgId,
-          mfgName: REPKIT_MFG_NAMES[mfgId] ?? `Mfg ${mfgId}`,
-          stat,
-          ...(desc ? { description: desc } : {}),
-        });
-      } else if (partType === "Model") {
-        modelsByMfg[mfgId] = partId;
-      }
-    }
-  }
-
   const prefix: RepkitBuilderPart[] = [];
   const firmware: RepkitBuilderPart[] = [];
   const resistance: RepkitBuilderPart[] = [];
   const universalPerks: RepkitBuilderPart[] = [];
 
-  if (existsSync(mainPath)) {
-    const { rows } = readCsv(mainPath);
-    for (const r of rows) {
-      const partId = parseInt(trim(r["Part_ID"]), 10);
-      if (!Number.isFinite(partId)) continue;
-      const partType = trim(r["Part_type"]);
-      const name = trim(r["Name"]);
-      const statFromCsv = trim(r["Stat"]);
-      const desc = trim(r["Description"]);
+  for (const row of allRows) {
+    const { typeId, partId } = parseCode(row.code);
+    if (!partId) continue;
+    const pt = (row.partType || "").trim();
+    const stat = row.name || row.description || "";
+    const desc = row.description && row.description !== stat ? row.description : undefined;
 
-      // Treat "Name" as the short perk name; treat Stat/Description as longer effect text.
-      const stat = name || statFromCsv;
-      const description = desc || statFromCsv;
-
-      const base: RepkitBuilderPart = description ? { partId, stat, description } : { partId, stat };
-
-      // Prefix group (typo \"Perfix\" is used in some datasets).
-      if (partType === "Perfix" || partType === "Prefix") {
-        prefix.push(base);
-      } else if (partType === "Firmware") {
-        firmware.push(base);
-      } else if (partType === "Resistance" || partType === "Immunity") {
-        resistance.push(base);
-      } else {
-        // Everything else (Perk, Splat, Nova, Part, etc.) goes into the universal list.
-        universalPerks.push(base);
+    if (typeId === 243) {
+      const ptLower = pt.toLowerCase();
+      if (ptLower === "prefix" || ptLower === "perfix") prefix.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      else if (ptLower === "firmware") firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      else if (ptLower === "resistance" || ptLower === "immunity") resistance.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      else if (ptLower === "perk") universalPerks.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+    } else if (REPKIT_MFG_SET.has(typeId)) {
+      if (pt === "Rarity") {
+        if (!raritiesByMfg[typeId]) raritiesByMfg[typeId] = [];
+        raritiesByMfg[typeId].push({ id: partId, label: desc ? `${stat} - ${desc}` : stat });
+      } else if (pt === "Legendary Perk") {
+        legendaryPerks.push({ partId, mfgId: typeId, mfgName: REPKIT_MFG_NAMES[typeId] ?? `Mfg ${typeId}`, stat, ...(desc ? { description: desc } : {}) });
+      } else if (pt === "Model") {
+        modelsByMfg[typeId] = partId;
       }
     }
   }
 
-  // Merge in additional stat/description text from master list if present.
-  const masterPath = getPath("repkit/Borderlands 4 Item Parts Master List - Repkits.csv");
-  if (existsSync(masterPath)) {
-    const { rows: masterRows } = readCsv(masterPath);
-    const masterById = new Map<number, { stat: string; desc: string }>();
-    for (const r of masterRows) {
-      const id = parseInt(trim(r["ID"]), 10);
-      if (!Number.isFinite(id)) continue;
-      const stats = trim(r["Stats"]);
-      const effects = trim(r["Effects"]);
-      const statText = stats || effects;
-      const desc = trim(r["Comments"]);
-      masterById.set(id, { stat: statText, desc });
-    }
-
-    const applyMaster = (list: RepkitBuilderPart[]) => {
-      for (const p of list) {
-        const m = masterById.get(p.partId);
-        if (!m) continue;
-        // Preserve the short name already in p.stat; use master data to enrich description only.
-        const pieces: string[] = [];
-        if (m.stat) pieces.push(m.stat);
-        if (m.desc) pieces.push(m.desc);
-        const combined = pieces.join(" ");
-        if (combined) p.description = combined;
-      }
-    };
-
-    applyMaster(prefix);
-    applyMaster(firmware);
-    applyMaster(resistance);
-    applyMaster(universalPerks);
-  }
-
-  // Ensure all known mfgs have an entry in modelsByMfg, even if null.
-  for (const id of REPKIT_MFG_IDS) {
-    if (!(id in modelsByMfg)) modelsByMfg[id] = null;
-  }
-
-  cached = {
-    mfgs,
-    raritiesByMfg,
-    prefix,
-    firmware,
-    resistance,
-    universalPerks,
-    legendaryPerks,
-    modelsByMfg,
-  };
+  cached = { mfgs, raritiesByMfg, prefix, firmware, resistance, universalPerks, legendaryPerks, modelsByMfg };
   return cached;
 }
-

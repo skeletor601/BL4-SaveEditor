@@ -1,0 +1,196 @@
+BORDERLANDS 4 — ALL LEGENDARY & PEARLESCENT EFFECTS
+====================================================
+
+
+WEAPONS
+----------------------------------------
+Aegon's Dream > Prophetic
+Anchor > Anchor
+Anarchy > Mutualism > On Auto-Reload or kill, grants Damage and Accuracy stacks, which reset on manual Reload
+ARC-TAN > KA-BOOM
+Asher's Rise > Slow Burn > Critical Hits apply Status Effects instead of increased impact Damage
+Birt's Bees > Hivemind
+Bloody Lumberjack > Timber
+Bod > All-Arounder > Counts as a Shotgun, an Assault Rifle, a Sniper Rifle, a Pistol, and an SMG
+Bonnie and Clyde > Pair of Thieves > On kill, grants Damage for the Gun's other Mode and refills its Magazine
+Boomslang > Bullet Pollinator > After Reloading, the first Critical Hit Ricochets a Sticky Projectile to nearby enemies
+Broken Wings > Fledgling
+Bubbles > Squeaky Clean
+Budget Deity > Color Spray > Shoots Corrosive, Cryo, and Incendiary droplets (element combo varies)
+Bugbear > Rotary Gun > Scales up to max Damage and Damage Radius based on the emptiness of the Magazine
+Bully > Defense Protocol > When Gun Shields are activated, launches an Attack Drone periodically
+Cold Shoulder > Iced Out
+Complex Root > Sierpinski > Spawns additional diverging Projectiles along its path
+Conflux > Sinew > Deals bonus Damage per Status Effect on the target
+Convergence > Asymptotic
+Crazed Earl > BOGO > Fires Shards that stick into enemies. Meleeing enemies with Shards will explode the Shards and send them toward other nearby enemies.
+Crow-Sourced > Left of the Murder > Fires random objects
+Darkbeast > Parley > Bullets pierce enemies, and have a chance when hitting an enemy to cause an explosion
+Divided Focus > Conquerer > Fires bouncing Projectiles that pierce enemies
+Doeshot > Doer
+Eigenburst > Determined > Damage increases as loaded ammo decreases
+Falke > Resonance
+Fearstalker > Improbable > Critical Hits grant a Stack of Deduction that increases the next Non-Critical Hit Damage. Non-Critical Hits grant a Stack of Observation that increases the next Critical Hit Damage.
+Finnity XXX-L > Pipin' Hot Barrels > Does not consume Ammo while Overheating
+First Impression > Firm Handshake > Chance to Critically Hit based on the target's health percentage
+Fisheye > Ultima Ratio Regum > Fires wide, penetrating triple Railgun shots with bonus Critical Damage
+Flash Cyclone > Flash Freeze > Chance on Hit to Explode and Spawn additional projectiles
+Fleabag > Ringleader > Sticky Projectiles move to the most recently hit target
+Forsaken Chaos > Wide Net
+G.M.R. > Big Name Hunter > When Zoomed In, Damage increases, Shot Cost increases, and Fire Rate decreases
+Goalkeeper > Amper Camper > When Gun Shield is depleted, grants bonus Damage for a duration
+Golden God > Rage > When Overheating, the Bulletforge does not break, but instead continually consumes greater amounts of Ammo
+Goremaster > Chief Execution Officer > Deals bonus Damage to enemies below a Health threshold
+Hair Trigger > Timed Charge > Projectiles explode when releasing the trigger
+Handcannon > Click Boom Boom > Sticky Projectiles deal Damage while attached to targets
+Hardpoint > Breach
+Hellwalker > Soothslayer
+Hemorrhage > Black Death > Deals increased Damage the farther away the target is
+Hot Slugger > Blazing Barrel > On kill, deal bonus Damage for a duration, Maximum 3 Stacks
+Inkling > Inkling > Fires bouncing Projectiles that leave an Elemental Splat on bounce
+Inscriber > Effigy > Hitting enemies spawns 4 projectiles behind them
+Kaleidosplode > Colorful Mess
+Kaoson > Granted
+Katagawa's Revenge > Stormcloud
+Kickballer > Force Bunt
+King's Gambit > Holy Hell > When shot, thrown Gun Ricochets Projectiles to nearby enemies
+Laser-Cutter > Bone Saw
+Laser Disker > Shazbot > Deals bonus Damage to airborne enemies
+Lead Balloon > Lightweight > Projectiles float upward and spawn child Projectiles upon exploding
+Linebacker > Full Coverage > Bouncing Projectiles increase Damage and Damage Radius per bounce
+Lucian's Flank > Trample > Critical Hits refill Ammo to the Gun's Magazine
+Lucky Clover > Kismet > On Reload, fires 2 Homing Rockets
+Luty Madlad > Homemade Ingenuity > Overheats quickly, but also Cools down quickly
+Mantra > Chakra > Deals Melee damage
+Matador's Match > Sparkler
+Mercredi > Cyclical > Cycles between different firing styles on Reload. While Target-locked, gain a stacking Damage buff.
+Mercurious > Fleet Footed > Bullet Damage scales with Movement Speed
+Midnight Defiance > Crowd Sourced > On hit, additional Projectiles spawn from nearby enemies
+Missilaser > Misstical > Underbarrel fires Sticky Rockets that are detonated by the Gun's laser
+Murmur > Executor > Deals Critical Damage to enemies under 35% health
+Noisy Cricket > Silence
+Ohm I Got > Energy Transfer > When Energy Shield is active, grants Damage by consuming the Shield's energy instead of Ammo. When Overshield is also active, Energy Shield will not deplete.
+Onslaught > Keep It Coming > Chance for every bullet fired to deal extra Damage and not consume Ammo
+Oscar Mike > Tactical Rounds > The first half of your Magazine deals +50% Bonus Damage
+Phantom Flame > Midday > Zooming In acquires Lock On targets over time, and firing while Zoomed In shoots the entire Magazine
+Plasma Coil > Superheated
+Potato Thrower IV > Spud Gun
+Prince Harming > Pamplemousse > Hitting enemies deals Damage to you, and grants a Stack of Cruelty — on kill, restores Overshield per Stack
+Prowler > Pounce > Bullets slowly home in on targets. Reloading accelerates them toward their targets.
+Queen's Rest > Royal Armory > Fires high-speed rounds, and damaging enemies has a chance to spawn a Homing Sticky Projectile
+Rainmaker > Irrigation
+Rangefinder > Precision
+Reminisce > Remnant > Does not reload, and instead refills Ammo when the projectiles return
+Roach > Flesh Eaters > Shoots eggs that hatch flying roaches when attached to flesh, living or dead
+Roil > Hydropower > Overheating prevents firing, and switching modes will reduce heat
+Rooker > Callous > [Alt-Fire] Fires 2 Needles that continuously home in on enemies that are being aimed at
+Roulette > Lord Luck > On Reload, gain random buffs
+Rowan's Charge > Stalker > Grants a chance for shots to be a Critical Hit, and refunds Ammo on Critical Hit
+Rowdy Rider > Overwhelming > Ricochet Projectiles on Critical Hits
+Ruby's Grasp > Grasp > Reloading the Gun fires Homing copies
+San Saba Songbird > Dueling Pistol > Deals bonus Damage after swapping Guns
+Scoot'n'Shoot > Rollin' Deep > Phantom Guns fire from the locations of your previous shots. Phantom Guns reset on reload.
+Shalashaska > Aweful Lot > On Auto-Reload, grants a Stack of Exhiliration. Each Stack increases the number of possible Ricochets by 1. Resets on manual Reload.
+Sideshow > Juggler > Shoot as many targets as possible before they hit the ground, and refill up to 2 Ammo per target hit
+Soul Survivor > Adrenaline > Deals increased Damage for each ally in Fight For Your Life
+Star Helix > Constellation > Projectiles can be fired vertically or horizontally
+Stop Gap > Reconfigure > When firing, Fire Rate decreases, but Damage increases
+Stray > Stray > Fires 2 secondary bullets that home in on nearby target(s)
+Sunspot > Eclipse > Damage scales based on the emptiness of the Magazine
+Sweet Embrace > Adoration
+Symmetry > Bilateral > Fires from reserve Ammo while charging
+T.K's Wave > Heirloom
+Tankbuster > Funnel > Heals nearby enemies to deal additional Damage per enemy healed
+Truck > Fixer-Upper
+Unstable Kor > Full Belly > Detonating Stickies triggers a Nova. Nova Damage scales with the number of attached Stickies.
+Vamoose > Scarce
+Whiskey Foxtrot > Overdrive > Switches to a secondary Magazine that can be fired on Full Auto
+Whiskey Foxtrot > Scrap Cannon > Fires a spread of shrapnel from the Underbarrel and increases target's Damage Taken for 8s
+Wombo Combo > Rip Rockets > Rockets automatically fire from the Underbarrel
+Zipper > Prison Rules > Grants Critical Damage and bonus Damage when hitting a target in the back
+
+
+SHIELDS
+----------------------------------------
+Cindershelly > Glass > When damaged, grants Stacks of Resolve that reduce Damage Taken. When the Energy Shield breaks, releases a Nova with Damage increased per Stack.
+Compleation > Sisyphusian > When Armor Shield is full, it instantly loses an Armor Segment
+Elpis Star > Moonfall > When dealing Melee Damage, spawn a Meteor Cluster to fall on the damaged enemy
+Extra Medium > Nucleosynthesis > When Energy Shield breaks or fills, it triggers a Nova
+Firebreak > Backdoor > When Energy Shield breaks, triggers a Nova on 3 enemies
+Firewerks > Bundled > On kill, spawns Missiles that home in on nearby enemies
+Guardian Angel > Wings of Grace > When equipped, grants faster revival from FFYL. When FFYL expires, grants 1 free Second Wind periodically
+Heavyweight > Bareknuckle > On Melee Hit, consumes an Armor Segment to grant Melee Damage. When Armor Shield is empty, grants Melee Damage
+Hoarder > Refreshments > On kill, chance to spawn an Ammo Booster that instantly refills your Gun
+Honey Badger > Ferocity > Reduces self-Damage Dealt while Shield is active
+Hopscotch > Shook > Spawns a Singularity when an Armor Segment breaks
+Oak-Aged Cask > Vintage
+Onion > Shallot Shell > On Armor Segment break, grants Immunity to Damage for a duration
+Pandoran Memento > Psychosis > When damaged, grants Elemental Resistance to the last Damage Type received
+Principal > Shield Boi > Spawns a Shield Boi when the last Armor Segment breaks
+Protean Cell > Direct Current > Ground Slam to toggle. While enabled, drains Shield to grant Bonus Shock Damage, and Damage Taken passes through Shield
+Short Circuit > Short Circuit > While Energy Shield is not full, it periodically Shocks nearby enemies
+Super Soldier > Power Play > When Energy Shield fills, grants Overshield. When full, grants Fire Rate, Movement Speed, and regens Ammo/s
+Timekeeper's New Shield > Bininu > When equipped, grants Maximum Health, Health Regen, and reduces Damage Taken
+Undershield > Exoskeleton > On Armor Segment break, grants Overshield
+Watts 4 Dinner > Overshield Eater > When Energy Shield is active, enemies have a chance to drop an Overshield when hit. When Overshield is active, grants Shock Damage
+
+
+GRENADES
+----------------------------------------
+Barb'ara > Tentacles
+Blockbuster > Got You Covered
+Budget Deity > D.O.P.E. Buoys > Throws 2 Combo Orbs, which place the Atlas Target Lock on enemies damaged by the Combo Orbs
+Buoy > Buoyant
+Buzz Axe > Makeshift
+Chaumurky > Incessant > Continuously homes in on a target
+Chuck > Pitcher
+Countermeasure > Decoy > Launches flares that distract nearby enemies
+Destructo Disco > Groove
+Faulty Detonator > Sticky Trigger > Grenade spawns Combo Orbs upon detonation
+Firepot > Spicy > Spawns homing Torgue Stickies over time
+Fuse > Fortified Position
+Jelly > Self-Replicating
+Recursive > Looping
+Sho Kunai > Ninja Speed > Grants Movement Speed with each consecutive hit
+Skully > Accursed
+Slippy > Swordfish > Deals Melee Damage on detonation
+Spinning Blade > Juggler > Catch the rebound to refund 1 Grenade Charge
+Swarm > Swoosh
+Transmitter > Message from the Void
+UAV > Death From Above
+Urchin > Snaboopie-pop
+Waterfall > Waterfall > Causes additional explosions when damaging targets
+
+
+REPKITS
+----------------------------------------
+Blood Rush > Blood Rush > Automatically restores Health on Second Wind
+Blood Siphon > Blood Siphon > On kill, converts excess Damage into Healing Orbs that seek out nearby allies
+Broken Vial > Broken Vial > Heals for recent instances of Damage taken
+Cardiac Shock > Cardiac Shock > When Health goes below a threshold, chance to replenish a Repkit Charge
+Chrome > Chrome > On use, grants Fire Rate and Movement Speed, and reduces Repkit Cooldown each time Damage is taken
+Healthraiser > Soothing > Spawns Health Boosters at the start and end of the Repkit's duration
+Heart Pump > Heart Pump > This Repkit has 3 Charges, and has a chance to replenish a Charge on kill
+Immunity Shot > Immunity Shot > On use, grants Immunity to the last Elemental Damage Taken
+Pulsometer > Pulsometer > Passively regenerates Health over time, increasing when Health is low
+Roid Rage (Corrosive) > Roid Rage > On Use applies Roid-Rage stacks. Each expired stack spawns a Corrosive Nova.
+Roid Rage (Cryo) > Roid Rage > On Use applies Roid-Rage stacks. Each expired stack spawns a Cryo Nova.
+Roid Rage (Fire) > Roid Rage > On Use applies Roid-Rage stacks. Each expired stack spawns a Fire Nova.
+Roid Rage (Radiation) > Roid Rage > On Use applies Roid-Rage stacks. Each expired stack spawns a Radiation Nova.
+Roid Rage (Shock) > Roid Rage > On Use applies Roid-Rage stacks. Each expired stack spawns a Shock Nova.
+Time Dilation > Time Dilation > Repkit Duration increased, Cooldown Duration decreased
+
+
+HEAVY WEAPONS
+----------------------------------------
+Atling Gun > Whistler
+Bottled Lightning > Strike Twice
+Disc Jockey > Bouncing Biscuits > Energy disc Projectiles bounce multiple times, gaining Damage per bounce
+Gamma Void > Radiation Exposure > Creates a Singularity in which enemies take Radiation Damage over time
+Heimdahl > Rig > Fires Dahl soldier heads that attack nearby enemies
+Ichor > Deihazard > Deals Incendiary and Corrosive Damage
+Jetsetter > Frequent Flyer
+Ravenfire > 621 > Explosions radiate outward from the point of impact
+Sidewinder > Sidewinder
+Sprezzatura > Gungnir
+Streamer > Delegation > Launches stationary Projectiles that each fire a Beam forward

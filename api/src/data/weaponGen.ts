@@ -1,7 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { parseCsv } from "./csvParse.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..", "..");
@@ -50,11 +49,8 @@ export interface MfgTypeIdEntry {
 export interface WeaponGenData {
   manufacturers: string[];
   weaponTypes: string[];
-  /** (manufacturer, weaponType) -> mfgWtId */
   mfgWtIdList: MfgTypeIdEntry[];
-  /** Key: "mfgWtId". Value: part type -> list of { partId, label } */
   partsByMfgTypeId: Record<string, Record<string, { partId: string; label: string }[]>>;
-  /** Key: "mfgWtId". Rarity options (non-Legendary) */
   rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]>;
   legendaryByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]>;
   pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]>;
@@ -67,69 +63,43 @@ function getPath(relative: string): string {
   return join(repoRoot, relative);
 }
 
-function readCsv(path: string): { headers: string[]; rows: Record<string, string>[] } {
-  const content = readFileSync(path, "utf-8");
-  return parseCsv(content);
+// ── Universal DB loader ──────────────────────────────────────────────────────
+
+interface UniversalRow {
+  code: string;
+  name: string;
+  manufacturer: string;
+  category: string;
+  partType: string;
+  weaponType: string;
+  description: string;
+  rarity: string;
+  element: string;
+  character: string;
+  perkName: string;
+  perkDescription: string;
+  redText: string;
+  spawnCode: string;
+  dlc: string;
 }
 
-function loadPartsCsv(): WeaponPartRow[] {
-  const enPath = getPath("weapon_edit/all_weapon_part_EN.csv");
-  const path = existsSync(enPath) ? enPath : getPath("weapon_edit/all_weapon_part.csv");
+function loadUniversalDb(): UniversalRow[] {
+  const path = getPath("master_search/db/universal_parts_db.json");
   if (!existsSync(path)) return [];
-  const { rows } = readCsv(path);
-  return rows.map((r) => ({
-    mfgWtId: String(r["Manufacturer & Weapon Type ID"] ?? "").trim(),
-    manufacturer: String(r["Manufacturer"] ?? "").trim(),
-    weaponType: String(r["Weapon Type"] ?? "").trim(),
-    partId: String(r["Part ID"] ?? "").trim().replace("<NA>", ""),
-    partType: String(r["Part Type"] ?? "").trim(),
-    stat: String(r["Stat"] ?? "").trim(),
-    description: String(r["Description"] ?? "").trim(),
-  }));
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf-8"));
+    return (raw?.rows ?? raw ?? []) as UniversalRow[];
+  } catch {
+    return [];
+  }
 }
 
-function loadElemental(): ElementalRow[] {
-  const path = getPath("weapon_edit/elemental.csv");
-  const byPartId = new Map<string, ElementalRow>();
-  if (existsSync(path)) {
-    const { rows } = readCsv(path);
-    for (const r of rows) {
-      const partId = String(r["Part_ID"] ?? "").trim();
-      if (!partId) continue;
-      byPartId.set(partId, {
-        partId,
-        stat: String(r["Stat"] ?? "").trim(),
-      });
-    }
-  }
-  const weaponElementalPath = getPath("master_search/db/Borderlands 4 Item Parts Master List - Weapon Elemental.csv");
-  if (existsSync(weaponElementalPath)) {
-    const { rows } = readCsv(weaponElementalPath);
-    for (const r of rows) {
-      const partId = String(r["ID"] ?? "").trim();
-      if (!partId) continue;
-      if (byPartId.has(partId)) continue;
-      const stat = String(r["Description"] ?? r["Element"] ?? r["String"] ?? "").trim() || partId;
-      byPartId.set(partId, { partId, stat });
-    }
-  }
-  return Array.from(byPartId.values()).sort((a, b) => Number(a.partId) - Number(b.partId));
+function parseCodeParts(code: string): { typeId: string; partId: string } {
+  const m = code.match(/^\{(\d+):(\d+)\}$/);
+  return m ? { typeId: m[1], partId: m[2] } : { typeId: "", partId: "" };
 }
 
-function loadWeaponRarity(): RarityRow[] {
-  const path = getPath("weapon_edit/weapon_rarity.csv");
-  if (!existsSync(path)) return [];
-  const { rows } = readCsv(path);
-  return rows.map((r) => ({
-    mfgWtId: String(r["Manufacturer & Weapon Type ID"] ?? "").trim(),
-    manufacturer: String(r["Manufacturer"] ?? "").trim(),
-    weaponType: String(r["Weapon Type"] ?? "").trim(),
-    partId: String(r["Part ID"] ?? "").trim(),
-    partType: String(r["Part Type"] ?? "").trim(),
-    stat: String(r["Stat"] ?? "").trim(),
-    description: String(r["Description"] ?? "").trim(),
-  }));
-}
+// ── Keep godrolls + skins as separate files (not in universal DB) ────────────
 
 function loadGodrolls(): GodRoll[] {
   const paths = [
@@ -174,17 +144,22 @@ function loadSkins(): WeaponSkin[] {
   }
 }
 
+// ── Main data builder ────────────────────────────────────────────────────────
+
 let cached: WeaponGenData | null = null;
 
 export function getWeaponGenData(): WeaponGenData {
   if (cached) return cached;
 
-  const partRows = loadPartsCsv();
-  const rarityRows = loadWeaponRarity();
-  const elemental = loadElemental();
+  const allRows = loadUniversalDb();
   const godrolls = loadGodrolls();
   const skins = loadSkins();
 
+  // Filter by category
+  const weaponRows = allRows.filter((r) => r.category === "Weapon");
+  const elementRows = allRows.filter((r) => r.category === "Element");
+
+  // ── Part types we care about ──
   const partTypesWeWantList = [
     "Body", "Body Accessory", "Barrel", "Barrel Accessory", "Magazine", "Stat Modifier",
     "Grip", "Foregrip", "Manufacturer Part", "Scope", "Scope Accessory", "Underbarrel", "Underbarrel Accessory",
@@ -196,35 +171,13 @@ export function getWeaponGenData(): WeaponGenData {
     return found ?? pt.trim();
   };
 
+  // ── Build mfgWtId list from weapon rows ──
   const mfgWtIdSet = new Map<string, string>();
-  for (const r of partRows) {
-    if (r.mfgWtId && r.manufacturer && r.weaponType) {
+  for (const r of weaponRows) {
+    const { typeId } = parseCodeParts(r.code);
+    if (typeId && r.manufacturer && r.weaponType) {
       const key = `${r.manufacturer}\t${r.weaponType}`;
-      if (!mfgWtIdSet.has(key)) mfgWtIdSet.set(key, r.mfgWtId);
-    }
-  }
-  // Add mfgWtIds from universal so Master Unlock can show all parts (including from sources not in weapon CSV)
-  const universalPath = getPath("master_search/db/universal_parts_db.json");
-  if (existsSync(universalPath)) {
-    try {
-      const raw = JSON.parse(readFileSync(universalPath, "utf-8"));
-      const rows = (raw?.rows ?? []) as Record<string, unknown>[];
-      for (const r of rows) {
-        const code = String(r.code ?? "").trim();
-        const partTypeRaw = String(r["Part Type"] ?? "").trim();
-        const partTypeCanon = partTypeNorm(partTypeRaw);
-        if (!partTypesWeWant.has(partTypeCanon)) continue;
-        const codeMatch = code.match(/^\s*\{\s*(\d+)\s*:/);
-        const typeId = codeMatch ? codeMatch[1] : "";
-        if (!typeId) continue;
-        const manufacturer = String(r.Manufacturer ?? "").trim();
-        const weaponType = String(r["Weapon Type"] ?? r.WeaponType ?? "").trim();
-        if (!manufacturer || !weaponType) continue;
-        const key = `${manufacturer}\t${weaponType}`;
-        if (!mfgWtIdSet.has(key)) mfgWtIdSet.set(key, typeId);
-      }
-    } catch {
-      // ignore
+      if (!mfgWtIdSet.has(key)) mfgWtIdSet.set(key, typeId);
     }
   }
 
@@ -235,51 +188,33 @@ export function getWeaponGenData(): WeaponGenData {
   const manufacturers = [...new Set(mfgWtIdList.map((e) => e.manufacturer))].sort();
   const weaponTypes = [...new Set(mfgWtIdList.map((e) => e.weaponType))].sort();
 
+  // ── Build parts grouped by mfgWtId ──
   const partsByMfgTypeId: Record<string, Record<string, { partId: string; label: string }[]>> = {};
-  for (const row of partRows) {
-    if (!row.mfgWtId || !row.partId || row.partType === "Rarity") continue;
-    if (!partsByMfgTypeId[row.mfgWtId]) partsByMfgTypeId[row.mfgWtId] = {};
+  for (const row of weaponRows) {
+    const { typeId, partId } = parseCodeParts(row.code);
+    if (!typeId || !partId) continue;
     const pt = partTypeNorm(row.partType);
     if (!partTypesWeWant.has(pt)) continue;
-    if (!partsByMfgTypeId[row.mfgWtId][pt]) partsByMfgTypeId[row.mfgWtId][pt] = [];
-    const label = row.stat ? `${row.partId} - ${row.stat}` : row.partId;
-    partsByMfgTypeId[row.mfgWtId][pt].push({ partId: row.partId, label });
-  }
-  const mfgWtIdByKey = new Map<string, string>();
-  mfgWtIdList.forEach((e) => mfgWtIdByKey.set(`${e.manufacturer}\t${e.weaponType}`, e.mfgWtId));
-  if (existsSync(universalPath)) {
-    try {
-      const raw = JSON.parse(readFileSync(universalPath, "utf-8"));
-      const rows = (raw?.rows ?? []) as Record<string, unknown>[];
-      for (const r of rows) {
-        const manufacturer = String(r.Manufacturer ?? "").trim();
-        const weaponType = String(r["Weapon Type"] ?? r.WeaponType ?? "").trim();
-        const partTypeRaw = String(r["Part Type"] ?? "").trim();
-        const partType = partTypeNorm(partTypeRaw);
-        const partId = String(r.ID ?? r.Id ?? "").trim();
-        if (!manufacturer || !weaponType || !partType || !partId || !partTypesWeWant.has(partType)) continue;
-        const key = `${manufacturer}\t${weaponType}`;
-        const mfgWtId = mfgWtIdByKey.get(key);
-        if (!mfgWtId) continue;
-        const stat = String(r["Stats (Level 50, Common)"] ?? r.Stats ?? r["Model Name"] ?? "").trim();
-        const label = stat ? `${partId} - ${stat}` : partId;
-        if (!partsByMfgTypeId[mfgWtId]) partsByMfgTypeId[mfgWtId] = {};
-        if (!partsByMfgTypeId[mfgWtId][partType]) partsByMfgTypeId[mfgWtId][partType] = [];
-        const exists = partsByMfgTypeId[mfgWtId][partType].some((p) => p.partId === partId);
-        if (!exists) partsByMfgTypeId[mfgWtId][partType].push({ partId, label });
-      }
-    } catch {
-      // ignore
-    }
+
+    if (!partsByMfgTypeId[typeId]) partsByMfgTypeId[typeId] = {};
+    if (!partsByMfgTypeId[typeId][pt]) partsByMfgTypeId[typeId][pt] = [];
+    const label = row.description ? `${partId} - ${row.description}` : partId;
+    const exists = partsByMfgTypeId[typeId][pt].some((p) => p.partId === partId);
+    if (!exists) partsByMfgTypeId[typeId][pt].push({ partId, label });
   }
 
-  // Load legendary effects lookup — flatten categorized JSON into a single map keyed by item name
+  // ── Elemental ──
+  const elemental: { partId: string; stat: string }[] = elementRows.map((r) => {
+    const { partId } = parseCodeParts(r.code);
+    return { partId, stat: r.name || r.description || `Element ${partId}` };
+  }).filter((e) => e.partId);
+
+  // ── Load legendary effects for enrichment ──
   const flatEffects: Record<string, { perk?: string; desc?: string; redText?: string }> = {};
   const effectsPath = getPath("api/data/legendary_effects.json");
   if (existsSync(effectsPath)) {
     try {
       const raw = JSON.parse(readFileSync(effectsPath, "utf-8"));
-      // Handle categorized format: { weapons: { "Anarchy": { perk, desc, redText } }, shields: { ... }, ... }
       for (const category of Object.values(raw)) {
         if (category && typeof category === "object") {
           for (const [itemName, entry] of Object.entries(category as Record<string, any>)) {
@@ -303,41 +238,47 @@ export function getWeaponGenData(): WeaponGenData {
     return flatEffects[key];
   };
 
+  // ── Rarity / Legendary / Pearl from universal DB ──
   const rarityByMfgTypeId: Record<string, { partId: string; stat: string; description?: string }[]> = {};
   const legendaryByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]> = {};
   const pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }[]> = {};
-  for (const row of rarityRows) {
-    if (!row.mfgWtId || !row.partId) continue;
-    const rarityStat = String(row.stat ?? "").trim().toLowerCase();
-    if (rarityStat === "legendary") {
-      if (!legendaryByMfgTypeId[row.mfgWtId]) legendaryByMfgTypeId[row.mfgWtId] = [];
-      const desc = row.description || row.partId;
-      const detail = getLegendaryDetail(desc);
-      legendaryByMfgTypeId[row.mfgWtId].push({
-        partId: row.partId,
-        description: desc,
-        effect: getEffect(desc),
-        perk: detail?.perk,
-        perkDesc: detail?.desc,
-        redText: detail?.redText,
+
+  for (const row of weaponRows) {
+    if (row.partType !== "Rarity") continue;
+    const { typeId, partId } = parseCodeParts(row.code);
+    if (!typeId || !partId) continue;
+
+    const rarityLower = (row.rarity || "").toLowerCase();
+    const descName = row.perkName || row.name || partId;
+
+    if (rarityLower === "legendary") {
+      if (!legendaryByMfgTypeId[typeId]) legendaryByMfgTypeId[typeId] = [];
+      // Try enrichment from legendary_effects.json first, then from universal DB fields
+      const detail = getLegendaryDetail(descName);
+      legendaryByMfgTypeId[typeId].push({
+        partId,
+        description: descName,
+        effect: getEffect(descName),
+        perk: detail?.perk || row.perkName || undefined,
+        perkDesc: detail?.desc || row.perkDescription || undefined,
+        redText: detail?.redText || row.redText || undefined,
       });
-    } else if (rarityStat === "pearl" || rarityStat === "pearlescent") {
-      if (!pearlByMfgTypeId[row.mfgWtId]) pearlByMfgTypeId[row.mfgWtId] = [];
-      const desc = row.description || row.partId;
-      const detail = getLegendaryDetail(desc);
-      pearlByMfgTypeId[row.mfgWtId].push({
-        partId: row.partId,
-        description: desc,
-        effect: getEffect(desc),
-        perk: detail?.perk,
-        perkDesc: detail?.desc,
-        redText: detail?.redText,
+    } else if (rarityLower === "pearl" || rarityLower === "pearlescent") {
+      if (!pearlByMfgTypeId[typeId]) pearlByMfgTypeId[typeId] = [];
+      const detail = getLegendaryDetail(descName);
+      pearlByMfgTypeId[typeId].push({
+        partId,
+        description: descName,
+        effect: getEffect(descName),
+        perk: detail?.perk || row.perkName || undefined,
+        perkDesc: detail?.desc || row.perkDescription || undefined,
+        redText: detail?.redText || row.redText || undefined,
       });
     } else {
-      if (!rarityByMfgTypeId[row.mfgWtId]) rarityByMfgTypeId[row.mfgWtId] = [];
-      rarityByMfgTypeId[row.mfgWtId].push({
-        partId: row.partId,
-        stat: row.stat,
+      if (!rarityByMfgTypeId[typeId]) rarityByMfgTypeId[typeId] = [];
+      rarityByMfgTypeId[typeId].push({
+        partId,
+        stat: row.rarity || row.name || "",
         description: row.description || undefined,
       });
     }

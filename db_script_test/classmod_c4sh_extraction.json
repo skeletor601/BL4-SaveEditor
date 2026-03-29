@@ -1,0 +1,7219 @@
+{
+  "character": "C4SH",
+  "internal_name": "robodealer",
+  "class_id": 404,
+  "rarities": {
+    "Common": 52,
+    "Uncommon": 53,
+    "Rare": 54,
+    "Epic": 55
+  },
+  "bodies": [
+    {
+      "key": "body_01",
+      "id": 1,
+      "namepart": "np_cm_robo_01"
+    },
+    {
+      "key": "body_02",
+      "id": 2,
+      "namepart": "np_cm_robo_02"
+    },
+    {
+      "key": "body_03",
+      "id": 3,
+      "namepart": "np_cm_robo_03"
+    },
+    {
+      "key": "body_04",
+      "id": 4,
+      "namepart": "np_cm_robo_04"
+    },
+    {
+      "key": "body_05",
+      "id": 5,
+      "namepart": "np_cm_robo_05"
+    },
+    {
+      "key": "body_06",
+      "id": 6,
+      "namepart": "np_cm_robo_06"
+    },
+    {
+      "key": "body_07",
+      "id": 7,
+      "namepart": "np_cm_robo_07"
+    },
+    {
+      "key": "body_08",
+      "id": 8,
+      "namepart": "np_cm_robo_08"
+    },
+    {
+      "key": "body_09",
+      "id": 9,
+      "namepart": "np_cm_robo_09"
+    },
+    {
+      "key": "body_10",
+      "id": 10,
+      "namepart": "np_cm_robo_10"
+    }
+  ],
+  "legendary_bodies": [
+    {
+      "key": "leg_body_01",
+      "id": 11,
+      "namepart": "np_cm_robo_leg_01"
+    },
+    {
+      "key": "leg_body_02",
+      "id": 12,
+      "namepart": "np_cm_robo_leg_02"
+    },
+    {
+      "key": "leg_body_03",
+      "id": 13,
+      "namepart": "np_cm_robo_leg_03"
+    },
+    {
+      "key": "leg_body_04",
+      "id": 14,
+      "namepart": "np_cm_robo_leg_04"
+    },
+    {
+      "key": "leg_body_05",
+      "id": 15,
+      "namepart": "np_cm_robo_leg_05"
+    },
+    {
+      "key": "leg_body_06",
+      "id": 51,
+      "namepart": "np_cm_robo_leg_06"
+    },
+    {
+      "key": "leg_body_dlc1",
+      "id": 222,
+      "namepart": "np_cm_robo_leg_dlc1"
+    },
+    {
+      "key": "leg_body_raid1",
+      "id": 538,
+      "namepart": "np_cm_robo_leg_raid1"
+    }
+  ],
+  "legendary_comps": [
+    {
+      "key": "comp_05_legendary_01",
+      "id": 221,
+      "name": "01"
+    },
+    {
+      "key": "comp_05_legendary_02",
+      "id": 220,
+      "name": "02"
+    },
+    {
+      "key": "comp_05_legendary_03",
+      "id": 219,
+      "name": "03"
+    },
+    {
+      "key": "comp_05_legendary_04",
+      "id": 218,
+      "name": "04"
+    },
+    {
+      "key": "comp_05_legendary_05",
+      "id": 217,
+      "name": "05"
+    },
+    {
+      "key": "comp_05_legendary_06",
+      "id": 56,
+      "name": "06"
+    },
+    {
+      "key": "comp_05_legendary_dlc1",
+      "id": 540,
+      "name": "dlc1"
+    },
+    {
+      "key": "comp_05_legendary_raid1",
+      "id": 539,
+      "name": "raid1"
+    }
+  ],
+  "skills": [
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tier": 1,
+      "id": 194,
+      "skill_key": "blue_1_1"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tier": 2,
+      "id": 162,
+      "skill_key": "blue_1_1"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tier": 3,
+      "id": 130,
+      "skill_key": "blue_1_1"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tier": 4,
+      "id": 98,
+      "skill_key": "blue_1_1"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 1,
+      "tier": 5,
+      "id": 66,
+      "skill_key": "blue_1_1"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tier": 1,
+      "id": 193,
+      "skill_key": "blue_1_2"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tier": 2,
+      "id": 161,
+      "skill_key": "blue_1_2"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tier": 3,
+      "id": 129,
+      "skill_key": "blue_1_2"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tier": 4,
+      "id": 97,
+      "skill_key": "blue_1_2"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 2,
+      "tier": 5,
+      "id": 65,
+      "skill_key": "blue_1_2"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tier": 1,
+      "id": 40,
+      "skill_key": "blue_1_3"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tier": 2,
+      "id": 39,
+      "skill_key": "blue_1_3"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tier": 3,
+      "id": 38,
+      "skill_key": "blue_1_3"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tier": 4,
+      "id": 37,
+      "skill_key": "blue_1_3"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 3,
+      "tier": 5,
+      "id": 36,
+      "skill_key": "blue_1_3"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tier": 1,
+      "id": 192,
+      "skill_key": "blue_1_4"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tier": 2,
+      "id": 160,
+      "skill_key": "blue_1_4"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tier": 3,
+      "id": 128,
+      "skill_key": "blue_1_4"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tier": 4,
+      "id": 96,
+      "skill_key": "blue_1_4"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 4,
+      "tier": 5,
+      "id": 64,
+      "skill_key": "blue_1_4"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tier": 1,
+      "id": 191,
+      "skill_key": "blue_1_5"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tier": 2,
+      "id": 159,
+      "skill_key": "blue_1_5"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tier": 3,
+      "id": 127,
+      "skill_key": "blue_1_5"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tier": 4,
+      "id": 95,
+      "skill_key": "blue_1_5"
+    },
+    {
+      "tree": "blue",
+      "row": 1,
+      "col": 5,
+      "tier": 5,
+      "id": 63,
+      "skill_key": "blue_1_5"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tier": 1,
+      "id": 190,
+      "skill_key": "blue_2_1"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tier": 2,
+      "id": 158,
+      "skill_key": "blue_2_1"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tier": 3,
+      "id": 126,
+      "skill_key": "blue_2_1"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tier": 4,
+      "id": 94,
+      "skill_key": "blue_2_1"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 1,
+      "tier": 5,
+      "id": 62,
+      "skill_key": "blue_2_1"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tier": 1,
+      "id": 189,
+      "skill_key": "blue_2_3"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tier": 2,
+      "id": 157,
+      "skill_key": "blue_2_3"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tier": 3,
+      "id": 125,
+      "skill_key": "blue_2_3"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tier": 4,
+      "id": 93,
+      "skill_key": "blue_2_3"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 3,
+      "tier": 5,
+      "id": 61,
+      "skill_key": "blue_2_3"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tier": 1,
+      "id": 188,
+      "skill_key": "blue_2_5"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tier": 2,
+      "id": 156,
+      "skill_key": "blue_2_5"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tier": 3,
+      "id": 124,
+      "skill_key": "blue_2_5"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tier": 4,
+      "id": 92,
+      "skill_key": "blue_2_5"
+    },
+    {
+      "tree": "blue",
+      "row": 2,
+      "col": 5,
+      "tier": 5,
+      "id": 60,
+      "skill_key": "blue_2_5"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tier": 1,
+      "id": 35,
+      "skill_key": "blue_3_1"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tier": 2,
+      "id": 34,
+      "skill_key": "blue_3_1"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tier": 3,
+      "id": 33,
+      "skill_key": "blue_3_1"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tier": 4,
+      "id": 32,
+      "skill_key": "blue_3_1"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 1,
+      "tier": 5,
+      "id": 31,
+      "skill_key": "blue_3_1"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tier": 1,
+      "id": 187,
+      "skill_key": "blue_3_2"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tier": 2,
+      "id": 155,
+      "skill_key": "blue_3_2"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tier": 3,
+      "id": 123,
+      "skill_key": "blue_3_2"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tier": 4,
+      "id": 91,
+      "skill_key": "blue_3_2"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 2,
+      "tier": 5,
+      "id": 59,
+      "skill_key": "blue_3_2"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tier": 1,
+      "id": 186,
+      "skill_key": "blue_3_3"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tier": 2,
+      "id": 154,
+      "skill_key": "blue_3_3"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tier": 3,
+      "id": 122,
+      "skill_key": "blue_3_3"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tier": 4,
+      "id": 90,
+      "skill_key": "blue_3_3"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 3,
+      "tier": 5,
+      "id": 58,
+      "skill_key": "blue_3_3"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tier": 1,
+      "id": 30,
+      "skill_key": "blue_3_4"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tier": 2,
+      "id": 29,
+      "skill_key": "blue_3_4"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tier": 3,
+      "id": 28,
+      "skill_key": "blue_3_4"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tier": 4,
+      "id": 27,
+      "skill_key": "blue_3_4"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 4,
+      "tier": 5,
+      "id": 26,
+      "skill_key": "blue_3_4"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tier": 1,
+      "id": 185,
+      "skill_key": "blue_3_5"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tier": 2,
+      "id": 153,
+      "skill_key": "blue_3_5"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tier": 3,
+      "id": 121,
+      "skill_key": "blue_3_5"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tier": 4,
+      "id": 89,
+      "skill_key": "blue_3_5"
+    },
+    {
+      "tree": "blue",
+      "row": 3,
+      "col": 5,
+      "tier": 5,
+      "id": 57,
+      "skill_key": "blue_3_5"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 265,
+      "skill_key": "blue_left_4_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 328,
+      "skill_key": "blue_left_4_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 391,
+      "skill_key": "blue_left_4_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 454,
+      "skill_key": "blue_left_4_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 517,
+      "skill_key": "blue_left_4_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 266,
+      "skill_key": "blue_left_4_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 329,
+      "skill_key": "blue_left_4_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 392,
+      "skill_key": "blue_left_4_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 455,
+      "skill_key": "blue_left_4_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 518,
+      "skill_key": "blue_left_4_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 267,
+      "skill_key": "blue_left_5_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 330,
+      "skill_key": "blue_left_5_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 393,
+      "skill_key": "blue_left_5_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 456,
+      "skill_key": "blue_left_5_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 519,
+      "skill_key": "blue_left_5_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 268,
+      "skill_key": "blue_left_5_2"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 331,
+      "skill_key": "blue_left_5_2"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 394,
+      "skill_key": "blue_left_5_2"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 457,
+      "skill_key": "blue_left_5_2"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 520,
+      "skill_key": "blue_left_5_2"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 269,
+      "skill_key": "blue_left_5_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 332,
+      "skill_key": "blue_left_5_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 395,
+      "skill_key": "blue_left_5_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 458,
+      "skill_key": "blue_left_5_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 521,
+      "skill_key": "blue_left_5_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 270,
+      "skill_key": "blue_left_6_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 333,
+      "skill_key": "blue_left_6_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 396,
+      "skill_key": "blue_left_6_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 459,
+      "skill_key": "blue_left_6_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 522,
+      "skill_key": "blue_left_6_1"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 271,
+      "skill_key": "blue_left_6_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 334,
+      "skill_key": "blue_left_6_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 397,
+      "skill_key": "blue_left_6_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 460,
+      "skill_key": "blue_left_6_3"
+    },
+    {
+      "tree": "blue_left",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 523,
+      "skill_key": "blue_left_6_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 272,
+      "skill_key": "blue_mid_4_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 335,
+      "skill_key": "blue_mid_4_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 398,
+      "skill_key": "blue_mid_4_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 461,
+      "skill_key": "blue_mid_4_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 524,
+      "skill_key": "blue_mid_4_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 273,
+      "skill_key": "blue_mid_4_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 336,
+      "skill_key": "blue_mid_4_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 399,
+      "skill_key": "blue_mid_4_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 462,
+      "skill_key": "blue_mid_4_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 525,
+      "skill_key": "blue_mid_4_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 274,
+      "skill_key": "blue_mid_5_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 337,
+      "skill_key": "blue_mid_5_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 400,
+      "skill_key": "blue_mid_5_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 463,
+      "skill_key": "blue_mid_5_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 526,
+      "skill_key": "blue_mid_5_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 275,
+      "skill_key": "blue_mid_5_2"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 338,
+      "skill_key": "blue_mid_5_2"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 401,
+      "skill_key": "blue_mid_5_2"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 464,
+      "skill_key": "blue_mid_5_2"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 527,
+      "skill_key": "blue_mid_5_2"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 276,
+      "skill_key": "blue_mid_5_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 339,
+      "skill_key": "blue_mid_5_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 402,
+      "skill_key": "blue_mid_5_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 465,
+      "skill_key": "blue_mid_5_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 528,
+      "skill_key": "blue_mid_5_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 277,
+      "skill_key": "blue_mid_6_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 340,
+      "skill_key": "blue_mid_6_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 403,
+      "skill_key": "blue_mid_6_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 466,
+      "skill_key": "blue_mid_6_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 529,
+      "skill_key": "blue_mid_6_1"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 278,
+      "skill_key": "blue_mid_6_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 341,
+      "skill_key": "blue_mid_6_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 404,
+      "skill_key": "blue_mid_6_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 467,
+      "skill_key": "blue_mid_6_3"
+    },
+    {
+      "tree": "blue_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 530,
+      "skill_key": "blue_mid_6_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 279,
+      "skill_key": "blue_right_4_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 342,
+      "skill_key": "blue_right_4_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 405,
+      "skill_key": "blue_right_4_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 468,
+      "skill_key": "blue_right_4_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 531,
+      "skill_key": "blue_right_4_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 280,
+      "skill_key": "blue_right_4_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 343,
+      "skill_key": "blue_right_4_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 406,
+      "skill_key": "blue_right_4_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 469,
+      "skill_key": "blue_right_4_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 532,
+      "skill_key": "blue_right_4_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 281,
+      "skill_key": "blue_right_5_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 344,
+      "skill_key": "blue_right_5_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 407,
+      "skill_key": "blue_right_5_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 470,
+      "skill_key": "blue_right_5_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 533,
+      "skill_key": "blue_right_5_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 282,
+      "skill_key": "blue_right_5_2"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 345,
+      "skill_key": "blue_right_5_2"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 408,
+      "skill_key": "blue_right_5_2"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 471,
+      "skill_key": "blue_right_5_2"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 534,
+      "skill_key": "blue_right_5_2"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 283,
+      "skill_key": "blue_right_5_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 346,
+      "skill_key": "blue_right_5_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 409,
+      "skill_key": "blue_right_5_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 472,
+      "skill_key": "blue_right_5_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 535,
+      "skill_key": "blue_right_5_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 284,
+      "skill_key": "blue_right_6_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 347,
+      "skill_key": "blue_right_6_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 410,
+      "skill_key": "blue_right_6_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 473,
+      "skill_key": "blue_right_6_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 536,
+      "skill_key": "blue_right_6_1"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 285,
+      "skill_key": "blue_right_6_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 348,
+      "skill_key": "blue_right_6_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 411,
+      "skill_key": "blue_right_6_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 474,
+      "skill_key": "blue_right_6_3"
+    },
+    {
+      "tree": "blue_right",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 537,
+      "skill_key": "blue_right_6_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tier": 1,
+      "id": 205,
+      "skill_key": "green_1_1"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tier": 2,
+      "id": 173,
+      "skill_key": "green_1_1"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tier": 3,
+      "id": 141,
+      "skill_key": "green_1_1"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tier": 4,
+      "id": 109,
+      "skill_key": "green_1_1"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 1,
+      "tier": 5,
+      "id": 77,
+      "skill_key": "green_1_1"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tier": 1,
+      "id": 45,
+      "skill_key": "green_1_2"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tier": 2,
+      "id": 44,
+      "skill_key": "green_1_2"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tier": 3,
+      "id": 43,
+      "skill_key": "green_1_2"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tier": 4,
+      "id": 42,
+      "skill_key": "green_1_2"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 2,
+      "tier": 5,
+      "id": 41,
+      "skill_key": "green_1_2"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tier": 1,
+      "id": 204,
+      "skill_key": "green_1_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tier": 2,
+      "id": 172,
+      "skill_key": "green_1_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tier": 3,
+      "id": 140,
+      "skill_key": "green_1_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tier": 4,
+      "id": 108,
+      "skill_key": "green_1_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 3,
+      "tier": 5,
+      "id": 76,
+      "skill_key": "green_1_3"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tier": 1,
+      "id": 203,
+      "skill_key": "green_1_4"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tier": 2,
+      "id": 171,
+      "skill_key": "green_1_4"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tier": 3,
+      "id": 139,
+      "skill_key": "green_1_4"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tier": 4,
+      "id": 107,
+      "skill_key": "green_1_4"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 4,
+      "tier": 5,
+      "id": 75,
+      "skill_key": "green_1_4"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tier": 1,
+      "id": 202,
+      "skill_key": "green_1_5"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tier": 2,
+      "id": 170,
+      "skill_key": "green_1_5"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tier": 3,
+      "id": 138,
+      "skill_key": "green_1_5"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tier": 4,
+      "id": 106,
+      "skill_key": "green_1_5"
+    },
+    {
+      "tree": "green",
+      "row": 1,
+      "col": 5,
+      "tier": 5,
+      "id": 74,
+      "skill_key": "green_1_5"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tier": 1,
+      "id": 201,
+      "skill_key": "green_2_1"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tier": 2,
+      "id": 169,
+      "skill_key": "green_2_1"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tier": 3,
+      "id": 137,
+      "skill_key": "green_2_1"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tier": 4,
+      "id": 105,
+      "skill_key": "green_2_1"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 1,
+      "tier": 5,
+      "id": 73,
+      "skill_key": "green_2_1"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tier": 1,
+      "id": 200,
+      "skill_key": "green_2_3"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tier": 2,
+      "id": 168,
+      "skill_key": "green_2_3"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tier": 3,
+      "id": 136,
+      "skill_key": "green_2_3"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tier": 4,
+      "id": 104,
+      "skill_key": "green_2_3"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 3,
+      "tier": 5,
+      "id": 72,
+      "skill_key": "green_2_3"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tier": 1,
+      "id": 199,
+      "skill_key": "green_2_5"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tier": 2,
+      "id": 167,
+      "skill_key": "green_2_5"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tier": 3,
+      "id": 135,
+      "skill_key": "green_2_5"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tier": 4,
+      "id": 103,
+      "skill_key": "green_2_5"
+    },
+    {
+      "tree": "green",
+      "row": 2,
+      "col": 5,
+      "tier": 5,
+      "id": 71,
+      "skill_key": "green_2_5"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tier": 1,
+      "id": 195,
+      "skill_key": "green_3_1"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tier": 2,
+      "id": 163,
+      "skill_key": "green_3_1"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tier": 3,
+      "id": 131,
+      "skill_key": "green_3_1"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tier": 4,
+      "id": 99,
+      "skill_key": "green_3_1"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 1,
+      "tier": 5,
+      "id": 67,
+      "skill_key": "green_3_1"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tier": 1,
+      "id": 196,
+      "skill_key": "green_3_2"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tier": 2,
+      "id": 164,
+      "skill_key": "green_3_2"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tier": 3,
+      "id": 132,
+      "skill_key": "green_3_2"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tier": 4,
+      "id": 100,
+      "skill_key": "green_3_2"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 2,
+      "tier": 5,
+      "id": 68,
+      "skill_key": "green_3_2"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tier": 1,
+      "id": 50,
+      "skill_key": "green_3_3"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tier": 2,
+      "id": 49,
+      "skill_key": "green_3_3"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tier": 3,
+      "id": 48,
+      "skill_key": "green_3_3"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tier": 4,
+      "id": 47,
+      "skill_key": "green_3_3"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 3,
+      "tier": 5,
+      "id": 46,
+      "skill_key": "green_3_3"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tier": 1,
+      "id": 197,
+      "skill_key": "green_3_4"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tier": 2,
+      "id": 165,
+      "skill_key": "green_3_4"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tier": 3,
+      "id": 133,
+      "skill_key": "green_3_4"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tier": 4,
+      "id": 101,
+      "skill_key": "green_3_4"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 4,
+      "tier": 5,
+      "id": 69,
+      "skill_key": "green_3_4"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tier": 1,
+      "id": 198,
+      "skill_key": "green_3_5"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tier": 2,
+      "id": 166,
+      "skill_key": "green_3_5"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tier": 3,
+      "id": 134,
+      "skill_key": "green_3_5"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tier": 4,
+      "id": 102,
+      "skill_key": "green_3_5"
+    },
+    {
+      "tree": "green",
+      "row": 3,
+      "col": 5,
+      "tier": 5,
+      "id": 70,
+      "skill_key": "green_3_5"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 223,
+      "skill_key": "green_left_4_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 286,
+      "skill_key": "green_left_4_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 349,
+      "skill_key": "green_left_4_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 412,
+      "skill_key": "green_left_4_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 475,
+      "skill_key": "green_left_4_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 224,
+      "skill_key": "green_left_4_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 287,
+      "skill_key": "green_left_4_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 350,
+      "skill_key": "green_left_4_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 413,
+      "skill_key": "green_left_4_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 476,
+      "skill_key": "green_left_4_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 225,
+      "skill_key": "green_left_5_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 288,
+      "skill_key": "green_left_5_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 351,
+      "skill_key": "green_left_5_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 414,
+      "skill_key": "green_left_5_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 477,
+      "skill_key": "green_left_5_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 226,
+      "skill_key": "green_left_5_2"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 289,
+      "skill_key": "green_left_5_2"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 352,
+      "skill_key": "green_left_5_2"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 415,
+      "skill_key": "green_left_5_2"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 478,
+      "skill_key": "green_left_5_2"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 227,
+      "skill_key": "green_left_5_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 290,
+      "skill_key": "green_left_5_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 353,
+      "skill_key": "green_left_5_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 416,
+      "skill_key": "green_left_5_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 479,
+      "skill_key": "green_left_5_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 228,
+      "skill_key": "green_left_6_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 291,
+      "skill_key": "green_left_6_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 354,
+      "skill_key": "green_left_6_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 417,
+      "skill_key": "green_left_6_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 480,
+      "skill_key": "green_left_6_1"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 229,
+      "skill_key": "green_left_6_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 292,
+      "skill_key": "green_left_6_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 355,
+      "skill_key": "green_left_6_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 418,
+      "skill_key": "green_left_6_3"
+    },
+    {
+      "tree": "green_left",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 481,
+      "skill_key": "green_left_6_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 230,
+      "skill_key": "green_mid_4_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 293,
+      "skill_key": "green_mid_4_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 356,
+      "skill_key": "green_mid_4_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 419,
+      "skill_key": "green_mid_4_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 482,
+      "skill_key": "green_mid_4_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 231,
+      "skill_key": "green_mid_4_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 294,
+      "skill_key": "green_mid_4_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 357,
+      "skill_key": "green_mid_4_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 420,
+      "skill_key": "green_mid_4_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 483,
+      "skill_key": "green_mid_4_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 232,
+      "skill_key": "green_mid_5_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 295,
+      "skill_key": "green_mid_5_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 358,
+      "skill_key": "green_mid_5_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 421,
+      "skill_key": "green_mid_5_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 484,
+      "skill_key": "green_mid_5_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 233,
+      "skill_key": "green_mid_5_2"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 296,
+      "skill_key": "green_mid_5_2"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 359,
+      "skill_key": "green_mid_5_2"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 422,
+      "skill_key": "green_mid_5_2"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 485,
+      "skill_key": "green_mid_5_2"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 234,
+      "skill_key": "green_mid_5_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 297,
+      "skill_key": "green_mid_5_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 360,
+      "skill_key": "green_mid_5_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 423,
+      "skill_key": "green_mid_5_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 486,
+      "skill_key": "green_mid_5_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 235,
+      "skill_key": "green_mid_6_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 298,
+      "skill_key": "green_mid_6_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 361,
+      "skill_key": "green_mid_6_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 424,
+      "skill_key": "green_mid_6_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 487,
+      "skill_key": "green_mid_6_1"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 236,
+      "skill_key": "green_mid_6_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 299,
+      "skill_key": "green_mid_6_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 362,
+      "skill_key": "green_mid_6_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 425,
+      "skill_key": "green_mid_6_3"
+    },
+    {
+      "tree": "green_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 488,
+      "skill_key": "green_mid_6_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 237,
+      "skill_key": "green_right_4_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 300,
+      "skill_key": "green_right_4_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 363,
+      "skill_key": "green_right_4_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 426,
+      "skill_key": "green_right_4_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 489,
+      "skill_key": "green_right_4_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 238,
+      "skill_key": "green_right_4_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 301,
+      "skill_key": "green_right_4_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 364,
+      "skill_key": "green_right_4_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 427,
+      "skill_key": "green_right_4_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 490,
+      "skill_key": "green_right_4_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 239,
+      "skill_key": "green_right_5_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 302,
+      "skill_key": "green_right_5_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 365,
+      "skill_key": "green_right_5_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 428,
+      "skill_key": "green_right_5_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 491,
+      "skill_key": "green_right_5_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 240,
+      "skill_key": "green_right_5_2"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 303,
+      "skill_key": "green_right_5_2"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 366,
+      "skill_key": "green_right_5_2"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 429,
+      "skill_key": "green_right_5_2"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 492,
+      "skill_key": "green_right_5_2"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 241,
+      "skill_key": "green_right_5_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 304,
+      "skill_key": "green_right_5_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 367,
+      "skill_key": "green_right_5_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 430,
+      "skill_key": "green_right_5_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 493,
+      "skill_key": "green_right_5_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 242,
+      "skill_key": "green_right_6_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 305,
+      "skill_key": "green_right_6_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 368,
+      "skill_key": "green_right_6_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 431,
+      "skill_key": "green_right_6_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 494,
+      "skill_key": "green_right_6_1"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 243,
+      "skill_key": "green_right_6_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 306,
+      "skill_key": "green_right_6_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 369,
+      "skill_key": "green_right_6_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 432,
+      "skill_key": "green_right_6_3"
+    },
+    {
+      "tree": "green_right",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 495,
+      "skill_key": "green_right_6_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tier": 1,
+      "id": 216,
+      "skill_key": "red_1_1"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tier": 2,
+      "id": 184,
+      "skill_key": "red_1_1"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tier": 3,
+      "id": 152,
+      "skill_key": "red_1_1"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tier": 4,
+      "id": 120,
+      "skill_key": "red_1_1"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 1,
+      "tier": 5,
+      "id": 88,
+      "skill_key": "red_1_1"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tier": 1,
+      "id": 215,
+      "skill_key": "red_1_2"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tier": 2,
+      "id": 183,
+      "skill_key": "red_1_2"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tier": 3,
+      "id": 151,
+      "skill_key": "red_1_2"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tier": 4,
+      "id": 119,
+      "skill_key": "red_1_2"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 2,
+      "tier": 5,
+      "id": 87,
+      "skill_key": "red_1_2"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tier": 1,
+      "id": 214,
+      "skill_key": "red_1_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tier": 2,
+      "id": 181,
+      "skill_key": "red_1_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tier": 3,
+      "id": 149,
+      "skill_key": "red_1_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tier": 4,
+      "id": 117,
+      "skill_key": "red_1_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 3,
+      "tier": 5,
+      "id": 85,
+      "skill_key": "red_1_3"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tier": 1,
+      "id": 25,
+      "skill_key": "red_1_4"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tier": 2,
+      "id": 24,
+      "skill_key": "red_1_4"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tier": 3,
+      "id": 23,
+      "skill_key": "red_1_4"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tier": 4,
+      "id": 22,
+      "skill_key": "red_1_4"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 4,
+      "tier": 5,
+      "id": 21,
+      "skill_key": "red_1_4"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tier": 1,
+      "id": 212,
+      "skill_key": "red_1_5"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tier": 2,
+      "id": 180,
+      "skill_key": "red_1_5"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tier": 3,
+      "id": 148,
+      "skill_key": "red_1_5"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tier": 4,
+      "id": 116,
+      "skill_key": "red_1_5"
+    },
+    {
+      "tree": "red",
+      "row": 1,
+      "col": 5,
+      "tier": 5,
+      "id": 84,
+      "skill_key": "red_1_5"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tier": 1,
+      "id": 213,
+      "skill_key": "red_2_1"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tier": 2,
+      "id": 182,
+      "skill_key": "red_2_1"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tier": 3,
+      "id": 150,
+      "skill_key": "red_2_1"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tier": 4,
+      "id": 118,
+      "skill_key": "red_2_1"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 1,
+      "tier": 5,
+      "id": 86,
+      "skill_key": "red_2_1"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tier": 1,
+      "id": 211,
+      "skill_key": "red_2_3"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tier": 2,
+      "id": 179,
+      "skill_key": "red_2_3"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tier": 3,
+      "id": 147,
+      "skill_key": "red_2_3"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tier": 4,
+      "id": 115,
+      "skill_key": "red_2_3"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 3,
+      "tier": 5,
+      "id": 83,
+      "skill_key": "red_2_3"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tier": 1,
+      "id": 210,
+      "skill_key": "red_2_5"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tier": 2,
+      "id": 178,
+      "skill_key": "red_2_5"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tier": 3,
+      "id": 146,
+      "skill_key": "red_2_5"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tier": 4,
+      "id": 114,
+      "skill_key": "red_2_5"
+    },
+    {
+      "tree": "red",
+      "row": 2,
+      "col": 5,
+      "tier": 5,
+      "id": 82,
+      "skill_key": "red_2_5"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tier": 1,
+      "id": 209,
+      "skill_key": "red_3_1"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tier": 2,
+      "id": 177,
+      "skill_key": "red_3_1"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tier": 3,
+      "id": 145,
+      "skill_key": "red_3_1"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tier": 4,
+      "id": 113,
+      "skill_key": "red_3_1"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 1,
+      "tier": 5,
+      "id": 81,
+      "skill_key": "red_3_1"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tier": 1,
+      "id": 20,
+      "skill_key": "red_3_2"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tier": 2,
+      "id": 19,
+      "skill_key": "red_3_2"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tier": 3,
+      "id": 18,
+      "skill_key": "red_3_2"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tier": 4,
+      "id": 17,
+      "skill_key": "red_3_2"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 2,
+      "tier": 5,
+      "id": 16,
+      "skill_key": "red_3_2"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tier": 1,
+      "id": 208,
+      "skill_key": "red_3_3"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tier": 2,
+      "id": 176,
+      "skill_key": "red_3_3"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tier": 3,
+      "id": 144,
+      "skill_key": "red_3_3"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tier": 4,
+      "id": 112,
+      "skill_key": "red_3_3"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 3,
+      "tier": 5,
+      "id": 80,
+      "skill_key": "red_3_3"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tier": 1,
+      "id": 207,
+      "skill_key": "red_3_4"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tier": 2,
+      "id": 175,
+      "skill_key": "red_3_4"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tier": 3,
+      "id": 143,
+      "skill_key": "red_3_4"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tier": 4,
+      "id": 111,
+      "skill_key": "red_3_4"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 4,
+      "tier": 5,
+      "id": 79,
+      "skill_key": "red_3_4"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tier": 1,
+      "id": 206,
+      "skill_key": "red_3_5"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tier": 2,
+      "id": 174,
+      "skill_key": "red_3_5"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tier": 3,
+      "id": 142,
+      "skill_key": "red_3_5"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tier": 4,
+      "id": 110,
+      "skill_key": "red_3_5"
+    },
+    {
+      "tree": "red",
+      "row": 3,
+      "col": 5,
+      "tier": 5,
+      "id": 78,
+      "skill_key": "red_3_5"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 244,
+      "skill_key": "red_left_4_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 307,
+      "skill_key": "red_left_4_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 370,
+      "skill_key": "red_left_4_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 433,
+      "skill_key": "red_left_4_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 496,
+      "skill_key": "red_left_4_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 245,
+      "skill_key": "red_left_4_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 308,
+      "skill_key": "red_left_4_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 371,
+      "skill_key": "red_left_4_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 434,
+      "skill_key": "red_left_4_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 497,
+      "skill_key": "red_left_4_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 246,
+      "skill_key": "red_left_5_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 309,
+      "skill_key": "red_left_5_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 372,
+      "skill_key": "red_left_5_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 435,
+      "skill_key": "red_left_5_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 498,
+      "skill_key": "red_left_5_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 247,
+      "skill_key": "red_left_5_2"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 310,
+      "skill_key": "red_left_5_2"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 373,
+      "skill_key": "red_left_5_2"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 436,
+      "skill_key": "red_left_5_2"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 499,
+      "skill_key": "red_left_5_2"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 248,
+      "skill_key": "red_left_5_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 311,
+      "skill_key": "red_left_5_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 374,
+      "skill_key": "red_left_5_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 437,
+      "skill_key": "red_left_5_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 500,
+      "skill_key": "red_left_5_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 249,
+      "skill_key": "red_left_6_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 312,
+      "skill_key": "red_left_6_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 375,
+      "skill_key": "red_left_6_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 438,
+      "skill_key": "red_left_6_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 501,
+      "skill_key": "red_left_6_1"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 250,
+      "skill_key": "red_left_6_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 313,
+      "skill_key": "red_left_6_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 376,
+      "skill_key": "red_left_6_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 439,
+      "skill_key": "red_left_6_3"
+    },
+    {
+      "tree": "red_left",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 502,
+      "skill_key": "red_left_6_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 251,
+      "skill_key": "red_mid_4_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 314,
+      "skill_key": "red_mid_4_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 377,
+      "skill_key": "red_mid_4_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 440,
+      "skill_key": "red_mid_4_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 503,
+      "skill_key": "red_mid_4_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 252,
+      "skill_key": "red_mid_4_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 315,
+      "skill_key": "red_mid_4_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 378,
+      "skill_key": "red_mid_4_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 441,
+      "skill_key": "red_mid_4_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 504,
+      "skill_key": "red_mid_4_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 253,
+      "skill_key": "red_mid_5_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 316,
+      "skill_key": "red_mid_5_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 379,
+      "skill_key": "red_mid_5_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 442,
+      "skill_key": "red_mid_5_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 505,
+      "skill_key": "red_mid_5_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 254,
+      "skill_key": "red_mid_5_2"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 317,
+      "skill_key": "red_mid_5_2"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 380,
+      "skill_key": "red_mid_5_2"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 443,
+      "skill_key": "red_mid_5_2"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 506,
+      "skill_key": "red_mid_5_2"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 255,
+      "skill_key": "red_mid_5_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 318,
+      "skill_key": "red_mid_5_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 381,
+      "skill_key": "red_mid_5_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 444,
+      "skill_key": "red_mid_5_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 507,
+      "skill_key": "red_mid_5_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 256,
+      "skill_key": "red_mid_6_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 319,
+      "skill_key": "red_mid_6_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 382,
+      "skill_key": "red_mid_6_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 445,
+      "skill_key": "red_mid_6_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 508,
+      "skill_key": "red_mid_6_1"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 257,
+      "skill_key": "red_mid_6_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 320,
+      "skill_key": "red_mid_6_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 383,
+      "skill_key": "red_mid_6_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 446,
+      "skill_key": "red_mid_6_3"
+    },
+    {
+      "tree": "red_mid",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 509,
+      "skill_key": "red_mid_6_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tier": 1,
+      "id": 258,
+      "skill_key": "red_right_4_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tier": 2,
+      "id": 321,
+      "skill_key": "red_right_4_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tier": 3,
+      "id": 384,
+      "skill_key": "red_right_4_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tier": 4,
+      "id": 447,
+      "skill_key": "red_right_4_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 1,
+      "tier": 5,
+      "id": 510,
+      "skill_key": "red_right_4_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tier": 1,
+      "id": 259,
+      "skill_key": "red_right_4_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tier": 2,
+      "id": 322,
+      "skill_key": "red_right_4_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tier": 3,
+      "id": 385,
+      "skill_key": "red_right_4_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tier": 4,
+      "id": 448,
+      "skill_key": "red_right_4_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 4,
+      "col": 3,
+      "tier": 5,
+      "id": 511,
+      "skill_key": "red_right_4_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tier": 1,
+      "id": 260,
+      "skill_key": "red_right_5_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tier": 2,
+      "id": 323,
+      "skill_key": "red_right_5_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tier": 3,
+      "id": 386,
+      "skill_key": "red_right_5_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tier": 4,
+      "id": 449,
+      "skill_key": "red_right_5_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 1,
+      "tier": 5,
+      "id": 512,
+      "skill_key": "red_right_5_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tier": 1,
+      "id": 261,
+      "skill_key": "red_right_5_2"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tier": 2,
+      "id": 324,
+      "skill_key": "red_right_5_2"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tier": 3,
+      "id": 387,
+      "skill_key": "red_right_5_2"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tier": 4,
+      "id": 450,
+      "skill_key": "red_right_5_2"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 2,
+      "tier": 5,
+      "id": 513,
+      "skill_key": "red_right_5_2"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tier": 1,
+      "id": 262,
+      "skill_key": "red_right_5_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tier": 2,
+      "id": 325,
+      "skill_key": "red_right_5_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tier": 3,
+      "id": 388,
+      "skill_key": "red_right_5_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tier": 4,
+      "id": 451,
+      "skill_key": "red_right_5_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 5,
+      "col": 3,
+      "tier": 5,
+      "id": 514,
+      "skill_key": "red_right_5_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tier": 1,
+      "id": 263,
+      "skill_key": "red_right_6_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tier": 2,
+      "id": 326,
+      "skill_key": "red_right_6_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tier": 3,
+      "id": 389,
+      "skill_key": "red_right_6_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tier": 4,
+      "id": 452,
+      "skill_key": "red_right_6_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 1,
+      "tier": 5,
+      "id": 515,
+      "skill_key": "red_right_6_1"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tier": 1,
+      "id": 264,
+      "skill_key": "red_right_6_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tier": 2,
+      "id": 327,
+      "skill_key": "red_right_6_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tier": 3,
+      "id": 390,
+      "skill_key": "red_right_6_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tier": 4,
+      "id": 453,
+      "skill_key": "red_right_6_3"
+    },
+    {
+      "tree": "red_right",
+      "row": 6,
+      "col": 3,
+      "tier": 5,
+      "id": 516,
+      "skill_key": "red_right_6_3"
+    }
+  ],
+  "icon_mapping": [
+    {
+      "icon": "06",
+      "tooltip": "58_LucksARobot",
+      "skill_number": "58",
+      "skill_internal": "LucksARobot"
+    },
+    {
+      "icon": "02",
+      "tooltip": "59_AllForOne",
+      "skill_number": "59",
+      "skill_internal": "AllForOne"
+    },
+    {
+      "icon": "03",
+      "tooltip": "60_LuckyCharm",
+      "skill_number": "60",
+      "skill_internal": "LuckyCharm"
+    },
+    {
+      "icon": "04",
+      "tooltip": "61_TheLuckyOne",
+      "skill_number": "61",
+      "skill_internal": "TheLuckyOne"
+    },
+    {
+      "icon": "05",
+      "tooltip": "62_RedMoonRising",
+      "skill_number": "62",
+      "skill_internal": "RedMoonRising"
+    },
+    {
+      "icon": "06",
+      "tooltip": "63_RollingTheDeep",
+      "skill_number": "63",
+      "skill_internal": "RollingTheDeep"
+    },
+    {
+      "icon": "07",
+      "tooltip": "64_RidingHigh",
+      "skill_number": "64",
+      "skill_internal": "RidingHigh"
+    },
+    {
+      "icon": "08",
+      "tooltip": "65_GravePact",
+      "skill_number": "65",
+      "skill_internal": "GravePact"
+    },
+    {
+      "icon": "09",
+      "tooltip": "10_devilsTines_CL",
+      "skill_number": "10",
+      "skill_internal": "devilsTines_CL"
+    },
+    {
+      "icon": "10",
+      "tooltip": "75_DoubleTime",
+      "skill_number": "75",
+      "skill_internal": "DoubleTime"
+    },
+    {
+      "icon": "11",
+      "tooltip": "67_Luckless",
+      "skill_number": "67",
+      "skill_internal": "Luckless"
+    },
+    {
+      "icon": "12",
+      "tooltip": "68_CriticalRole",
+      "skill_number": "68",
+      "skill_internal": "CriticalRole"
+    },
+    {
+      "icon": "13",
+      "tooltip": "69_SpinOfFate",
+      "skill_number": "69",
+      "skill_internal": "SpinOfFate"
+    },
+    {
+      "icon": "14",
+      "tooltip": "70_HighStakes",
+      "skill_number": "70",
+      "skill_internal": "HighStakes"
+    },
+    {
+      "icon": "15",
+      "tooltip": "71_FortunesFavor",
+      "skill_number": "71",
+      "skill_internal": "FortunesFavor"
+    },
+    {
+      "icon": "16",
+      "tooltip": "72_LetItRide",
+      "skill_number": "72",
+      "skill_internal": "LetItRide"
+    },
+    {
+      "icon": "17",
+      "tooltip": "73_Wild",
+      "skill_number": "73",
+      "skill_internal": "Wild"
+    },
+    {
+      "icon": "18",
+      "tooltip": "74_PackMentality",
+      "skill_number": "74",
+      "skill_internal": "PackMentality"
+    },
+    {
+      "icon": "19",
+      "tooltip": "66_Undying",
+      "skill_number": "66",
+      "skill_internal": "Undying"
+    },
+    {
+      "icon": "20",
+      "tooltip": "76_LoadedDice",
+      "skill_number": "76",
+      "skill_internal": "LoadedDice"
+    },
+    {
+      "icon": "21",
+      "tooltip": "77_ShadowsEmbrace",
+      "skill_number": "77",
+      "skill_internal": "ShadowsEmbrace"
+    },
+    {
+      "icon": "22",
+      "tooltip": "78_Serendipity",
+      "skill_number": "78",
+      "skill_internal": "Serendipity"
+    },
+    {
+      "icon": "23",
+      "tooltip": "79_SidekicksRevenge",
+      "skill_number": "79",
+      "skill_internal": "SidekicksRevenge"
+    },
+    {
+      "icon": "24",
+      "tooltip": "80_AlphasCall",
+      "skill_number": "80",
+      "skill_internal": "AlphasCall"
+    },
+    {
+      "icon": "25",
+      "tooltip": "81_CursedCall",
+      "skill_number": "81",
+      "skill_internal": "CursedCall"
+    },
+    {
+      "icon": "26",
+      "tooltip": "82_Haunted",
+      "skill_number": "82",
+      "skill_internal": "Haunted"
+    },
+    {
+      "icon": "27",
+      "tooltip": "83_GraveyardShift",
+      "skill_number": "83",
+      "skill_internal": "GraveyardShift"
+    },
+    {
+      "icon": "28",
+      "tooltip": "84_SnakeEyes",
+      "skill_number": "84",
+      "skill_internal": "SnakeEyes"
+    },
+    {
+      "icon": "29",
+      "tooltip": "85_WitchingHour",
+      "skill_number": "85",
+      "skill_internal": "WitchingHour"
+    },
+    {
+      "icon": "30",
+      "tooltip": "31_Unchained",
+      "skill_number": "31",
+      "skill_internal": "Unchained"
+    },
+    {
+      "icon": "31",
+      "tooltip": "32_DeathHunt",
+      "skill_number": "32",
+      "skill_internal": "DeathHunt"
+    },
+    {
+      "icon": "32",
+      "tooltip": "33_Determinator",
+      "skill_number": "33",
+      "skill_internal": "Determinator"
+    },
+    {
+      "icon": "33",
+      "tooltip": "34_HardBoiled",
+      "skill_number": "34",
+      "skill_internal": "HardBoiled"
+    },
+    {
+      "icon": "34",
+      "tooltip": "36_TheShootist",
+      "skill_number": "36",
+      "skill_internal": "TheShootist"
+    },
+    {
+      "icon": "01",
+      "tooltip": "37_StandAndBleed",
+      "skill_number": "37",
+      "skill_internal": "StandAndBleed"
+    },
+    {
+      "icon": "02",
+      "tooltip": "35_TheFuries",
+      "skill_number": "35",
+      "skill_internal": "TheFuries"
+    },
+    {
+      "icon": "03",
+      "tooltip": "39_BoneShrapnel",
+      "skill_number": "39",
+      "skill_internal": "BoneShrapnel"
+    },
+    {
+      "icon": "04",
+      "tooltip": "10_devilsTines_CF",
+      "skill_number": "10",
+      "skill_internal": "devilsTines_CF"
+    },
+    {
+      "icon": "05",
+      "tooltip": "40_RideWithTheDevil",
+      "skill_number": "40",
+      "skill_internal": "RideWithTheDevil"
+    },
+    {
+      "icon": "06",
+      "tooltip": "38_Unchained",
+      "skill_number": "38",
+      "skill_internal": "Unchained"
+    },
+    {
+      "icon": "07",
+      "tooltip": "42_Brimstone",
+      "skill_number": "42",
+      "skill_internal": "Brimstone"
+    },
+    {
+      "icon": "08",
+      "tooltip": "43_TheClaim",
+      "skill_number": "43",
+      "skill_internal": "TheClaim"
+    },
+    {
+      "icon": "09",
+      "tooltip": "44_TheGunfighter",
+      "skill_number": "44",
+      "skill_internal": "TheGunfighter"
+    },
+    {
+      "icon": "10",
+      "tooltip": "45_DebtsToPay",
+      "skill_number": "45",
+      "skill_internal": "DebtsToPay"
+    },
+    {
+      "icon": "11",
+      "tooltip": "46_HellAndBack",
+      "skill_number": "46",
+      "skill_internal": "HellAndBack"
+    },
+    {
+      "icon": "12",
+      "tooltip": "47_BloodOnElpis",
+      "skill_number": "47",
+      "skill_internal": "BloodOnElpis"
+    },
+    {
+      "icon": "13",
+      "tooltip": "48_Lawless",
+      "skill_number": "48",
+      "skill_internal": "Lawless"
+    },
+    {
+      "icon": "14",
+      "tooltip": "49_TNT",
+      "skill_number": "49",
+      "skill_internal": "TNT"
+    },
+    {
+      "icon": "15",
+      "tooltip": "50_WarWagon",
+      "skill_number": "50",
+      "skill_internal": "WarWagon"
+    },
+    {
+      "icon": "16",
+      "tooltip": "51_PaleRider",
+      "skill_number": "51",
+      "skill_internal": "PaleRider"
+    },
+    {
+      "icon": "17",
+      "tooltip": "52_Forsaken",
+      "skill_number": "52",
+      "skill_internal": "Forsaken"
+    },
+    {
+      "icon": "18",
+      "tooltip": "53_TheWind",
+      "skill_number": "53",
+      "skill_internal": "TheWind"
+    },
+    {
+      "icon": "19",
+      "tooltip": "54_Maverick",
+      "skill_number": "54",
+      "skill_internal": "Maverick"
+    },
+    {
+      "icon": "20",
+      "tooltip": "55_Cottonmouth",
+      "skill_number": "55",
+      "skill_internal": "Cottonmouth"
+    },
+    {
+      "icon": "21",
+      "tooltip": "56_BrokenArrow",
+      "skill_number": "56",
+      "skill_internal": "BrokenArrow"
+    },
+    {
+      "icon": "22",
+      "tooltip": "57_BadMenMustBleed",
+      "skill_number": "57",
+      "skill_internal": "BadMenMustBleed"
+    },
+    {
+      "icon": "23",
+      "tooltip": "01_TableFLip",
+      "skill_number": "01",
+      "skill_internal": "TableFLip"
+    },
+    {
+      "icon": "24",
+      "tooltip": "02_HeroCall",
+      "skill_number": "02",
+      "skill_internal": "HeroCall"
+    },
+    {
+      "icon": "25",
+      "tooltip": "03_Steam",
+      "skill_number": "03",
+      "skill_internal": "Steam"
+    },
+    {
+      "icon": "26",
+      "tooltip": "04_alchemy",
+      "skill_number": "04",
+      "skill_internal": "alchemy"
+    },
+    {
+      "icon": "27",
+      "tooltip": "24_ReadTheSigns",
+      "skill_number": "24",
+      "skill_internal": "ReadTheSigns"
+    },
+    {
+      "icon": "28",
+      "tooltip": "06_SoundsOfRain",
+      "skill_number": "06",
+      "skill_internal": "SoundsOfRain"
+    },
+    {
+      "icon": "29",
+      "tooltip": "07_TrickTaker",
+      "skill_number": "07",
+      "skill_internal": "TrickTaker"
+    },
+    {
+      "icon": "30",
+      "tooltip": "09_LateScratch",
+      "skill_number": "09",
+      "skill_internal": "LateScratch"
+    },
+    {
+      "icon": "31",
+      "tooltip": "10_devilsTines_SoH",
+      "skill_number": "10",
+      "skill_internal": "devilsTines_SoH"
+    },
+    {
+      "icon": "32",
+      "tooltip": "11_DoubleDown",
+      "skill_number": "11",
+      "skill_internal": "DoubleDown"
+    },
+    {
+      "icon": "33",
+      "tooltip": "12_wretchedShadows",
+      "skill_number": "12",
+      "skill_internal": "wretchedShadows"
+    },
+    {
+      "icon": "34",
+      "tooltip": "13_HighRoller",
+      "skill_number": "13",
+      "skill_internal": "HighRoller"
+    },
+    {
+      "icon": "01",
+      "tooltip": "14_TakeThePot",
+      "skill_number": "14",
+      "skill_internal": "TakeThePot"
+    },
+    {
+      "icon": "02",
+      "tooltip": "15_StackTheDeck",
+      "skill_number": "15",
+      "skill_internal": "StackTheDeck"
+    },
+    {
+      "icon": "03",
+      "tooltip": "16_Legerdemain",
+      "skill_number": "16",
+      "skill_internal": "Legerdemain"
+    },
+    {
+      "icon": "04",
+      "tooltip": "17_Fortuity",
+      "skill_number": "17",
+      "skill_internal": "Fortuity"
+    },
+    {
+      "icon": "05",
+      "tooltip": "18_DealersBluff",
+      "skill_number": "18",
+      "skill_internal": "DealersBluff"
+    },
+    {
+      "icon": "23",
+      "tooltip": "19_AceInTheHole",
+      "skill_number": "19",
+      "skill_internal": "AceInTheHole"
+    },
+    {
+      "icon": "07",
+      "tooltip": "20_AroundTheCorner",
+      "skill_number": "20",
+      "skill_internal": "AroundTheCorner"
+    },
+    {
+      "icon": "08",
+      "tooltip": "22_TheHouse",
+      "skill_number": "22",
+      "skill_internal": "TheHouse"
+    },
+    {
+      "icon": "09",
+      "tooltip": "21_C4SHGame",
+      "skill_number": "21",
+      "skill_internal": "C4SHGame"
+    },
+    {
+      "icon": "10",
+      "tooltip": "23_RiskyBusiness",
+      "skill_number": "23",
+      "skill_internal": "RiskyBusiness"
+    },
+    {
+      "icon": "11",
+      "tooltip": "05_ante",
+      "skill_number": "05",
+      "skill_internal": "ante"
+    },
+    {
+      "icon": "12",
+      "tooltip": "25_TheTurn",
+      "skill_number": "25",
+      "skill_internal": "TheTurn"
+    },
+    {
+      "icon": "13",
+      "tooltip": "26_Payout",
+      "skill_number": "26",
+      "skill_internal": "Payout"
+    },
+    {
+      "icon": "20",
+      "tooltip": "27_BoomOrBus",
+      "skill_number": "27",
+      "skill_internal": "BoomOrBus"
+    },
+    {
+      "icon": "15",
+      "tooltip": "28_HeartOfTheCards",
+      "skill_number": "28",
+      "skill_internal": "HeartOfTheCards"
+    },
+    {
+      "icon": "16",
+      "tooltip": "29_RunningLuck",
+      "skill_number": "29",
+      "skill_internal": "RunningLuck"
+    },
+    {
+      "icon": "17",
+      "tooltip": "30_HotStreak",
+      "skill_number": "30",
+      "skill_internal": "HotStreak"
+    }
+  ],
+  "skill_descriptions": {
+    "01_tableflip": {
+      "number": "01",
+      "internal_name": "tableflip",
+      "description": "Reload Speed: {0} {1}"
+    },
+    "02_herocall": {
+      "number": "02",
+      "internal_name": "herocall",
+      "description": "Shield Capacity: {0} {1}"
+    },
+    "03_steam": {
+      "number": "03",
+      "internal_name": "steam",
+      "description": "Ordnance Damage: {0} {1}"
+    },
+    "04_alchemy": {
+      "number": "04",
+      "internal_name": "alchemy",
+      "description": "Elemental Effect Chance: {0} {1}"
+    },
+    "05_ante": {
+      "number": "05",
+      "internal_name": "ante",
+      "description": "Gun Damage: up to {0} {1}"
+    },
+    "06_soundsofrain": {
+      "number": "06",
+      "internal_name": "soundsofrain",
+      "description": "Critical Hit Chance: up to {0} {1}"
+    },
+    "07_tricktaker": {
+      "number": "07",
+      "internal_name": "tricktaker",
+      "description": "Elemental Damage: up to {0} {1}"
+    },
+    "09_latescratch": {
+      "number": "09",
+      "internal_name": "latescratch",
+      "description": "I bring a fork."
+    },
+    "10_devilstines_cl": {
+      "number": "10",
+      "internal_name": "devilstines_cl",
+      "description": "The Devil sends cookies."
+    },
+    "10_devilstines_soh": {
+      "number": "10",
+      "internal_name": "devilstines_soh",
+      "description": "God sends meat."
+    },
+    "11_doubledown": {
+      "number": "11",
+      "internal_name": "doubledown",
+      "description": "Double Damage Chance: up to {0} {1}"
+    },
+    "12_wretchedshadows": {
+      "number": "12",
+      "internal_name": "wretchedshadows",
+      "description": "Damage: up to {0} per second"
+    },
+    "13_highroller": {
+      "number": "13",
+      "internal_name": "highroller",
+      "description": "Gun Damage: up to {0} {1}"
+    },
+    "14_takethepot": {
+      "number": "14",
+      "internal_name": "takethepot",
+      "description": "Health Restored: up to {0} {1}"
+    },
+    "15_stackthedeck": {
+      "number": "15",
+      "internal_name": "stackthedeck",
+      "description": "Skill Damage: up to {0} {1}"
+    },
+    "16_legerdemain": {
+      "number": "16",
+      "internal_name": "legerdemain",
+      "description": "Reload Speed: up to {0} {1}"
+    },
+    "17_fortuity": {
+      "number": "17",
+      "internal_name": "fortuity",
+      "description": "Bonus Damage: up to {0} {1} of Damage Dealt"
+    },
+    "18_dealersbluff": {
+      "number": "18",
+      "internal_name": "dealersbluff",
+      "description": "Action Skill Cooldown Restored: {0} {1}"
+    },
+    "19_aceinthehole": {
+      "number": "19",
+      "internal_name": "aceinthehole",
+      "description": "Gun Damage: {0} {1} per Fortune Stack"
+    },
+    "20_aroundthecorner": {
+      "number": "20",
+      "internal_name": "aroundthecorner",
+      "description": "Action Skill Cooldown Rate: {0} {1} per Fortune Stack"
+    },
+    "21_c4shgame": {
+      "number": "21",
+      "internal_name": "c4shgame",
+      "description": "Minimum Fortune Stacks: {0} {1}"
+    },
+    "22_thehouse": {
+      "number": "22",
+      "internal_name": "thehouse",
+      "description": "Truth is... the game was rigged from the start."
+    },
+    "23_riskybusiness": {
+      "number": "23",
+      "internal_name": "riskybusiness",
+      "description": "Max Fortune Stacks: {0} {1}"
+    },
+    "24_readthesigns": {
+      "number": "24",
+      "internal_name": "readthesigns",
+      "description": "Additional Fortune Stacks: {0} {1}"
+    },
+    "25_theturn": {
+      "number": "25",
+      "internal_name": "theturn",
+      "description": "Ordnance Damage: up to {0} {1}"
+    },
+    "26_payout": {
+      "number": "26",
+      "internal_name": "payout",
+      "description": "Fortune Skills: {0} {1}"
+    },
+    "27_boomorbus": {
+      "number": "27",
+      "internal_name": "boomorbus",
+      "description": "Grenade Damage: $VALUE$"
+    },
+    "28_heartofthecards": {
+      "number": "28",
+      "internal_name": "heartofthecards",
+      "description": "Critical Hit Damage: {0} {1}"
+    },
+    "29_runningluck": {
+      "number": "29",
+      "internal_name": "runningluck",
+      "description": "Duration: {0} {1} second(s)"
+    },
+    "30_hotstreak": {
+      "number": "30",
+      "internal_name": "hotstreak",
+      "description": "Critical Hit Damage: {0} {1}"
+    },
+    "31_unchained": {
+      "number": "31",
+      "internal_name": "unchained",
+      "description": "Fire Rate: {0} {1}"
+    },
+    "32_deathhunt": {
+      "number": "32",
+      "internal_name": "deathhunt",
+      "description": "Critical Hit Damage: {0} {1}"
+    },
+    "33_determinator": {
+      "number": "33",
+      "internal_name": "determinator",
+      "description": "Health Regeneration: up to {0} {1} of missing Health per second"
+    },
+    "34_hardboiled": {
+      "number": "34",
+      "internal_name": "hardboiled",
+      "description": "Action Skill Duration Restored: up to {0} {1}"
+    },
+    "35_thefuries": {
+      "number": "35",
+      "internal_name": "thefuries",
+      "description": "Bonus Fire Damage: up to {0} {1} of Damage Dealt"
+    },
+    "36_theshootist": {
+      "number": "36",
+      "internal_name": "theshootist",
+      "description": "Gun Damage: {0} {1}"
+    },
+    "37_standandbleed": {
+      "number": "37",
+      "internal_name": "standandbleed",
+      "description": "Critical Hit Chance: {0} {1}"
+    },
+    "38_unchained": {
+      "number": "38",
+      "internal_name": "unchained",
+      "description": "Reload Speed: {0} {1} per Stack"
+    },
+    "39_boneshrapnel": {
+      "number": "39",
+      "internal_name": "boneshrapnel",
+      "description": "Ricochet Chance: up to {0} {1}"
+    },
+    "40_ridewiththedevil": {
+      "number": "40",
+      "internal_name": "ridewiththedevil",
+      "description": "Reload Speed: {0} {1}"
+    },
+    "43_theclaim": {
+      "number": "43",
+      "internal_name": "theclaim",
+      "description": "Movement Speed: up to {0} {1}"
+    },
+    "44_thegunfighter": {
+      "number": "44",
+      "internal_name": "thegunfighter",
+      "description": "Bonus Fire Damage: {0} {1} of Damage Dealt at default Sprint speed"
+    },
+    "45_debtstopay": {
+      "number": "45",
+      "internal_name": "debtstopay",
+      "description": "Fire Mortar Damage: {0} {1}"
+    },
+    "46_hellandback": {
+      "number": "46",
+      "internal_name": "hellandback",
+      "description": "Fire Nova Damage: {0} {1}"
+    },
+    "47_bloodonelpis": {
+      "number": "47",
+      "internal_name": "bloodonelpis",
+      "description": "Elemental Effect Chance: {0} {1} per Stack"
+    },
+    "48_lawless": {
+      "number": "48",
+      "internal_name": "lawless",
+      "description": "Kinetic Damage: {0} {1}"
+    },
+    "49_tnt": {
+      "number": "49",
+      "internal_name": "tnt",
+      "description": "Bonus Kinetic Damage: {0} {1} of Damage Dealt"
+    },
+    "50_warwagon": {
+      "number": "50",
+      "internal_name": "warwagon",
+      "description": "Ammo Refill Chance: {0} {1}"
+    },
+    "51_palerider": {
+      "number": "51",
+      "internal_name": "palerider",
+      "description": "Bonus Kinetic Damage: {0} {1} of Damage Dealt"
+    },
+    "52_forsaken": {
+      "number": "52",
+      "internal_name": "forsaken",
+      "description": "Elemental Damage Converted: {0} {1} of Damage Dealt"
+    },
+    "53_thewind": {
+      "number": "53",
+      "internal_name": "thewind",
+      "description": "Duration Freeze: {0} {1} second(s)"
+    },
+    "54_maverick": {
+      "number": "54",
+      "internal_name": "maverick",
+      "description": "Damage: {0} {1} per Fortune Stack lost"
+    },
+    "55_cottonmouth": {
+      "number": "55",
+      "internal_name": "cottonmouth",
+      "description": "Overshield: {0} {1} of Damage Taken"
+    },
+    "56_brokenarrow": {
+      "number": "56",
+      "internal_name": "brokenarrow",
+      "description": "Gun Damage: {0} {1} per Fortune Stack lost"
+    },
+    "57_badmenmustbleed": {
+      "number": "57",
+      "internal_name": "badmenmustbleed",
+      "description": "Action Skill Duration Rate: {0} per failed attempt"
+    },
+    "58_lucksarobot": {
+      "number": "58",
+      "internal_name": "lucksarobot",
+      "description": "Action Skill Cooldown Rate: up to {0} {1}"
+    },
+    "59_allforone": {
+      "number": "59",
+      "internal_name": "allforone",
+      "description": "Max Health: {0} {1}"
+    },
+    "60_luckycharm": {
+      "number": "60",
+      "internal_name": "luckycharm",
+      "description": "Skill Damage: {0} {1}"
+    },
+    "61_theluckyone": {
+      "number": "61",
+      "internal_name": "theluckyone",
+      "description": "Windfall Chance: {0} {1} per Fortune Stack"
+    },
+    "62_redmoonrising": {
+      "number": "62",
+      "internal_name": "redmoonrising",
+      "description": "Bonus Damage: {0} {1} of Damage Dealt"
+    },
+    "63_rollingthedeep": {
+      "number": "63",
+      "internal_name": "rollingthedeep",
+      "description": "Action Skill Cooldown Rate: {0} {1}"
+    },
+    "64_ridinghigh": {
+      "number": "64",
+      "internal_name": "ridinghigh",
+      "description": "Windfall Duration: {0} {1}"
+    },
+    "65_gravepact": {
+      "number": "65",
+      "internal_name": "gravepact",
+      "description": "Action Skill Duration: {0} {1} on kill"
+    },
+    "66_undying": {
+      "number": "66",
+      "internal_name": "undying",
+      "description": "Respawn Chance: up to {0} {1}"
+    },
+    "67_luckless": {
+      "number": "67",
+      "internal_name": "luckless",
+      "description": "Jinxed Enemy Damage Dealt: {0}"
+    },
+    "68_criticalrole": {
+      "number": "68",
+      "internal_name": "criticalrole",
+      "description": "Gun Critical Hit Chance: {0} {1}"
+    },
+    "69_spinoffate": {
+      "number": "69",
+      "internal_name": "spinoffate",
+      "description": "Lifesteal: {0} {1} of Damage Dealt"
+    },
+    "70_highstakes": {
+      "number": "70",
+      "internal_name": "highstakes",
+      "description": "Fire Rate: {0} {1}"
+    },
+    "71_fortunesfavor": {
+      "number": "71",
+      "internal_name": "fortunesfavor",
+      "description": "Gun Damage: up to {0} {1}"
+    },
+    "72_letitride": {
+      "number": "72",
+      "internal_name": "letitride",
+      "description": "Gun Damage: {0} {1}"
+    },
+    "73_wild": {
+      "number": "73",
+      "internal_name": "wild",
+      "description": "Bonus Elemental Damage: {0} {1} of Damage Dealt"
+    },
+    "74_packmentality": {
+      "number": "74",
+      "internal_name": "packmentality",
+      "description": "Gun Damage: up to {0} {1}"
+    },
+    "75_doubletime": {
+      "number": "75",
+      "internal_name": "doubletime",
+      "description": "Movement Speed: {0} {1} per active Bone Totem"
+    },
+    "76_loadeddice": {
+      "number": "76",
+      "internal_name": "loadeddice",
+      "description": "Fire Nova Damage: {0} {1}"
+    },
+    "77_shadowsembrace": {
+      "number": "77",
+      "internal_name": "shadowsembrace",
+      "description": "Melee Damage: {0} {1}"
+    },
+    "78_serendipity": {
+      "number": "78",
+      "internal_name": "serendipity",
+      "description": "Health Restored: {0} {1} per missile"
+    },
+    "79_sidekicksrevenge": {
+      "number": "79",
+      "internal_name": "sidekicksrevenge",
+      "description": "Health Converted: {0} of Current Health"
+    },
+    "80_alphascall": {
+      "number": "80",
+      "internal_name": "alphascall",
+      "description": "Gun Damage: {0} {1} per Stack"
+    },
+    "81_cursedcall": {
+      "number": "81",
+      "internal_name": "cursedcall",
+      "description": "Lifesteal: {0} {1}"
+    },
+    "82_haunted": {
+      "number": "82",
+      "internal_name": "haunted",
+      "description": "Critical Hit Damage: {0} {1}"
+    },
+    "83_graveyardshift": {
+      "number": "83",
+      "internal_name": "graveyardshift",
+      "description": "Action Skill Cooldown Rate: {0} {1} per Jinxed enemy"
+    },
+    "84_snakeeyes": {
+      "number": "84",
+      "internal_name": "snakeeyes",
+      "description": "Damage Taken: $VALUE$"
+    },
+    "85_witchinghour": {
+      "number": "85",
+      "internal_name": "witchinghour",
+      "description": "Duration: {0} seconds"
+    }
+  },
+  "legendary_descriptions": {
+    "dlc1": {
+      "description": "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critically Hit, he gains a 7% Chance to spawn a [roll_icon]Chaos Totem. While [wfll_icon]Windfall is active, double that Chance.",
+      "red_text": "Luck is what happens when preparation meets opportunity."
+    },
+    "l01": {
+      "description": "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains {0} Charges and resets his Action Skill Duration.",
+      "red_text": "And for my next trick..."
+    },
+    "l02": {
+      "description": "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains {2} Fire Rate and {4} Movement Speed for every Ludopath Stack. C4SH has a Max of {0} Ludopath Stacks and each Stack lasts for {1} seconds.",
+      "red_text": "They see me rollin'"
+    },
+    "l03": {
+      "description": "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals [fire_icon][fire]Fire[/fire] [fire]Damage[/fire]. If [wfll_icon]Windfall is active, these Beams always Critically Hit enemies.",
+      "red_text": "Spin to win"
+    },
+    "l04": {
+      "description": "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains {0} Ordnance Cooldown Rate for {1} seconds. This effect stacks up to {2} times.",
+      "red_text": "Do do that voodoo that you do so well."
+    },
+    "l05": {
+      "description": "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. Whenever he gains a Stack of [frtn_icon]Fortune, he restores {0} of his Action Skill Cooldown, gains {1} Fire Rate, and {2} Reload Speed for {3} seconds.",
+      "red_text": "I have not yet begun to defile myself."
+    },
+    "l06": {
+      "description": "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his [frtn_icon]Fortune Stacks, otherwise killing an enemy with a Gun drains half of C4SH's [frtn_icon]Fortune Stacks. Whenever C4SH gains [frtn_icon]Fortune, he restores {0} of his Maximum Health. Whenever C4SH loses [frtn_icon]Fortune, he gains {1} of his Max Overshield.",
+      "red_text": "Play to win. Never play to not lose."
+    },
+    "raid1": {
+      "description": "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal {0} [fire_icon][fire]Bonus[/fire] [fire]Fire Damage[/fire] per Stack. If [wfll_icon]Windfall is active, only consume half of the Stacks. C4SH can have up to {1} Hooligan Stacks.",
+      "red_text": "Here we go, here we go, here we go!"
+    }
+  },
+  "skills_csv_rows": [
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_1_1",
+      "tier_ids": [
+        194,
+        162,
+        130,
+        98,
+        66
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_1_1,,194,162,130,98,66"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_1_2",
+      "tier_ids": [
+        193,
+        161,
+        129,
+        97,
+        65
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_1_2,,193,161,129,97,65"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "RideWithTheDevil",
+      "tier_ids": [
+        40,
+        39,
+        38,
+        37,
+        36
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,RideWithTheDevil,,40,39,38,37,36"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_1_4",
+      "tier_ids": [
+        192,
+        160,
+        128,
+        96,
+        64
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_1_4,,192,160,128,96,64"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_1_5",
+      "tier_ids": [
+        191,
+        159,
+        127,
+        95,
+        63
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_1_5,,191,159,127,95,63"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_2_1",
+      "tier_ids": [
+        190,
+        158,
+        126,
+        94,
+        62
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_2_1,,190,158,126,94,62"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_2_3",
+      "tier_ids": [
+        189,
+        157,
+        125,
+        93,
+        61
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_2_3,,189,157,125,93,61"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_2_5",
+      "tier_ids": [
+        188,
+        156,
+        124,
+        92,
+        60
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_2_5,,188,156,124,92,60"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "TheFuries",
+      "tier_ids": [
+        35,
+        34,
+        33,
+        32,
+        31
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,TheFuries,,35,34,33,32,31"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_3_2",
+      "tier_ids": [
+        187,
+        155,
+        123,
+        91,
+        59
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_3_2,,187,155,123,91,59"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_3_3",
+      "tier_ids": [
+        186,
+        154,
+        122,
+        90,
+        58
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_3_3,,186,154,122,90,58"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "HotStreak",
+      "tier_ids": [
+        30,
+        29,
+        28,
+        27,
+        26
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,HotStreak,,30,29,28,27,26"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_3_5",
+      "tier_ids": [
+        185,
+        153,
+        121,
+        89,
+        57
+      ],
+      "tree": "blue",
+      "csv_row": "404,C4SH,Skill_blue_3_5,,185,153,121,89,57"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_4_1",
+      "tier_ids": [
+        265,
+        328,
+        391,
+        454,
+        517
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_4_1,,265,328,391,454,517"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_4_3",
+      "tier_ids": [
+        266,
+        329,
+        392,
+        455,
+        518
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_4_3,,266,329,392,455,518"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_5_1",
+      "tier_ids": [
+        267,
+        330,
+        393,
+        456,
+        519
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_5_1,,267,330,393,456,519"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_5_2",
+      "tier_ids": [
+        268,
+        331,
+        394,
+        457,
+        520
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_5_2,,268,331,394,457,520"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_5_3",
+      "tier_ids": [
+        269,
+        332,
+        395,
+        458,
+        521
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_5_3,,269,332,395,458,521"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_6_1",
+      "tier_ids": [
+        270,
+        333,
+        396,
+        459,
+        522
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_6_1,,270,333,396,459,522"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_left_6_3",
+      "tier_ids": [
+        271,
+        334,
+        397,
+        460,
+        523
+      ],
+      "tree": "blue_left",
+      "csv_row": "404,C4SH,Skill_blue_left_6_3,,271,334,397,460,523"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_4_1",
+      "tier_ids": [
+        272,
+        335,
+        398,
+        461,
+        524
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_4_1,,272,335,398,461,524"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_4_3",
+      "tier_ids": [
+        273,
+        336,
+        399,
+        462,
+        525
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_4_3,,273,336,399,462,525"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_5_1",
+      "tier_ids": [
+        274,
+        337,
+        400,
+        463,
+        526
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_5_1,,274,337,400,463,526"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_5_2",
+      "tier_ids": [
+        275,
+        338,
+        401,
+        464,
+        527
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_5_2,,275,338,401,464,527"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_5_3",
+      "tier_ids": [
+        276,
+        339,
+        402,
+        465,
+        528
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_5_3,,276,339,402,465,528"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_6_1",
+      "tier_ids": [
+        277,
+        340,
+        403,
+        466,
+        529
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_6_1,,277,340,403,466,529"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_mid_6_3",
+      "tier_ids": [
+        278,
+        341,
+        404,
+        467,
+        530
+      ],
+      "tree": "blue_mid",
+      "csv_row": "404,C4SH,Skill_blue_mid_6_3,,278,341,404,467,530"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_4_1",
+      "tier_ids": [
+        279,
+        342,
+        405,
+        468,
+        531
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_4_1,,279,342,405,468,531"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_4_3",
+      "tier_ids": [
+        280,
+        343,
+        406,
+        469,
+        532
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_4_3,,280,343,406,469,532"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_5_1",
+      "tier_ids": [
+        281,
+        344,
+        407,
+        470,
+        533
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_5_1,,281,344,407,470,533"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_5_2",
+      "tier_ids": [
+        282,
+        345,
+        408,
+        471,
+        534
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_5_2,,282,345,408,471,534"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_5_3",
+      "tier_ids": [
+        283,
+        346,
+        409,
+        472,
+        535
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_5_3,,283,346,409,472,535"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_6_1",
+      "tier_ids": [
+        284,
+        347,
+        410,
+        473,
+        536
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_6_1,,284,347,410,473,536"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_blue_right_6_3",
+      "tier_ids": [
+        285,
+        348,
+        411,
+        474,
+        537
+      ],
+      "tree": "blue_right",
+      "csv_row": "404,C4SH,Skill_blue_right_6_3,,285,348,411,474,537"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_1_1",
+      "tier_ids": [
+        205,
+        173,
+        141,
+        109,
+        77
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_1_1,,205,173,141,109,77"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "DebtsToPay",
+      "tier_ids": [
+        45,
+        44,
+        43,
+        42,
+        41
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,DebtsToPay,,45,44,43,42,41"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_1_3",
+      "tier_ids": [
+        204,
+        172,
+        140,
+        108,
+        76
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_1_3,,204,172,140,108,76"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_1_4",
+      "tier_ids": [
+        203,
+        171,
+        139,
+        107,
+        75
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_1_4,,203,171,139,107,75"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_1_5",
+      "tier_ids": [
+        202,
+        170,
+        138,
+        106,
+        74
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_1_5,,202,170,138,106,74"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_2_1",
+      "tier_ids": [
+        201,
+        169,
+        137,
+        105,
+        73
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_2_1,,201,169,137,105,73"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_2_3",
+      "tier_ids": [
+        200,
+        168,
+        136,
+        104,
+        72
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_2_3,,200,168,136,104,72"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_2_5",
+      "tier_ids": [
+        199,
+        167,
+        135,
+        103,
+        71
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_2_5,,199,167,135,103,71"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_3_1",
+      "tier_ids": [
+        195,
+        163,
+        131,
+        99,
+        67
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_3_1,,195,163,131,99,67"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_3_2",
+      "tier_ids": [
+        196,
+        164,
+        132,
+        100,
+        68
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_3_2,,196,164,132,100,68"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "WarWagon",
+      "tier_ids": [
+        50,
+        49,
+        48,
+        47,
+        46
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,WarWagon,,50,49,48,47,46"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_3_4",
+      "tier_ids": [
+        197,
+        165,
+        133,
+        101,
+        69
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_3_4,,197,165,133,101,69"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_3_5",
+      "tier_ids": [
+        198,
+        166,
+        134,
+        102,
+        70
+      ],
+      "tree": "green",
+      "csv_row": "404,C4SH,Skill_green_3_5,,198,166,134,102,70"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_4_1",
+      "tier_ids": [
+        223,
+        286,
+        349,
+        412,
+        475
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_4_1,,223,286,349,412,475"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_4_3",
+      "tier_ids": [
+        224,
+        287,
+        350,
+        413,
+        476
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_4_3,,224,287,350,413,476"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_5_1",
+      "tier_ids": [
+        225,
+        288,
+        351,
+        414,
+        477
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_5_1,,225,288,351,414,477"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_5_2",
+      "tier_ids": [
+        226,
+        289,
+        352,
+        415,
+        478
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_5_2,,226,289,352,415,478"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_5_3",
+      "tier_ids": [
+        227,
+        290,
+        353,
+        416,
+        479
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_5_3,,227,290,353,416,479"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_6_1",
+      "tier_ids": [
+        228,
+        291,
+        354,
+        417,
+        480
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_6_1,,228,291,354,417,480"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_left_6_3",
+      "tier_ids": [
+        229,
+        292,
+        355,
+        418,
+        481
+      ],
+      "tree": "green_left",
+      "csv_row": "404,C4SH,Skill_green_left_6_3,,229,292,355,418,481"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_4_1",
+      "tier_ids": [
+        230,
+        293,
+        356,
+        419,
+        482
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_4_1,,230,293,356,419,482"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_4_3",
+      "tier_ids": [
+        231,
+        294,
+        357,
+        420,
+        483
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_4_3,,231,294,357,420,483"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_5_1",
+      "tier_ids": [
+        232,
+        295,
+        358,
+        421,
+        484
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_5_1,,232,295,358,421,484"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_5_2",
+      "tier_ids": [
+        233,
+        296,
+        359,
+        422,
+        485
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_5_2,,233,296,359,422,485"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_5_3",
+      "tier_ids": [
+        234,
+        297,
+        360,
+        423,
+        486
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_5_3,,234,297,360,423,486"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_6_1",
+      "tier_ids": [
+        235,
+        298,
+        361,
+        424,
+        487
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_6_1,,235,298,361,424,487"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_mid_6_3",
+      "tier_ids": [
+        236,
+        299,
+        362,
+        425,
+        488
+      ],
+      "tree": "green_mid",
+      "csv_row": "404,C4SH,Skill_green_mid_6_3,,236,299,362,425,488"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_4_1",
+      "tier_ids": [
+        237,
+        300,
+        363,
+        426,
+        489
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_4_1,,237,300,363,426,489"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_4_3",
+      "tier_ids": [
+        238,
+        301,
+        364,
+        427,
+        490
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_4_3,,238,301,364,427,490"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_5_1",
+      "tier_ids": [
+        239,
+        302,
+        365,
+        428,
+        491
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_5_1,,239,302,365,428,491"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_5_2",
+      "tier_ids": [
+        240,
+        303,
+        366,
+        429,
+        492
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_5_2,,240,303,366,429,492"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_5_3",
+      "tier_ids": [
+        241,
+        304,
+        367,
+        430,
+        493
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_5_3,,241,304,367,430,493"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_6_1",
+      "tier_ids": [
+        242,
+        305,
+        368,
+        431,
+        494
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_6_1,,242,305,368,431,494"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_green_right_6_3",
+      "tier_ids": [
+        243,
+        306,
+        369,
+        432,
+        495
+      ],
+      "tree": "green_right",
+      "csv_row": "404,C4SH,Skill_green_right_6_3,,243,306,369,432,495"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_1_1",
+      "tier_ids": [
+        216,
+        184,
+        152,
+        120,
+        88
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_1_1,,216,184,152,120,88"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_1_2",
+      "tier_ids": [
+        215,
+        183,
+        151,
+        119,
+        87
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_1_2,,215,183,151,119,87"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_1_3",
+      "tier_ids": [
+        214,
+        181,
+        149,
+        117,
+        85
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_1_3,,214,181,149,117,85"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "TheTurn",
+      "tier_ids": [
+        25,
+        24,
+        23,
+        22,
+        21
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,TheTurn,,25,24,23,22,21"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_1_5",
+      "tier_ids": [
+        212,
+        180,
+        148,
+        116,
+        84
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_1_5,,212,180,148,116,84"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_2_1",
+      "tier_ids": [
+        213,
+        182,
+        150,
+        118,
+        86
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_2_1,,213,182,150,118,86"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_2_3",
+      "tier_ids": [
+        211,
+        179,
+        147,
+        115,
+        83
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_2_3,,211,179,147,115,83"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_2_5",
+      "tier_ids": [
+        210,
+        178,
+        146,
+        114,
+        82
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_2_5,,210,178,146,114,82"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_3_1",
+      "tier_ids": [
+        209,
+        177,
+        145,
+        113,
+        81
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_3_1,,209,177,145,113,81"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "AroundTheCorner",
+      "tier_ids": [
+        20,
+        19,
+        18,
+        17,
+        16
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,AroundTheCorner,,20,19,18,17,16"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_3_3",
+      "tier_ids": [
+        208,
+        176,
+        144,
+        112,
+        80
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_3_3,,208,176,144,112,80"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_3_4",
+      "tier_ids": [
+        207,
+        175,
+        143,
+        111,
+        79
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_3_4,,207,175,143,111,79"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_3_5",
+      "tier_ids": [
+        206,
+        174,
+        142,
+        110,
+        78
+      ],
+      "tree": "red",
+      "csv_row": "404,C4SH,Skill_red_3_5,,206,174,142,110,78"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_4_1",
+      "tier_ids": [
+        244,
+        307,
+        370,
+        433,
+        496
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_4_1,,244,307,370,433,496"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_4_3",
+      "tier_ids": [
+        245,
+        308,
+        371,
+        434,
+        497
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_4_3,,245,308,371,434,497"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_5_1",
+      "tier_ids": [
+        246,
+        309,
+        372,
+        435,
+        498
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_5_1,,246,309,372,435,498"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_5_2",
+      "tier_ids": [
+        247,
+        310,
+        373,
+        436,
+        499
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_5_2,,247,310,373,436,499"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_5_3",
+      "tier_ids": [
+        248,
+        311,
+        374,
+        437,
+        500
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_5_3,,248,311,374,437,500"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_6_1",
+      "tier_ids": [
+        249,
+        312,
+        375,
+        438,
+        501
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_6_1,,249,312,375,438,501"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_left_6_3",
+      "tier_ids": [
+        250,
+        313,
+        376,
+        439,
+        502
+      ],
+      "tree": "red_left",
+      "csv_row": "404,C4SH,Skill_red_left_6_3,,250,313,376,439,502"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_4_1",
+      "tier_ids": [
+        251,
+        314,
+        377,
+        440,
+        503
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_4_1,,251,314,377,440,503"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_4_3",
+      "tier_ids": [
+        252,
+        315,
+        378,
+        441,
+        504
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_4_3,,252,315,378,441,504"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_5_1",
+      "tier_ids": [
+        253,
+        316,
+        379,
+        442,
+        505
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_5_1,,253,316,379,442,505"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_5_2",
+      "tier_ids": [
+        254,
+        317,
+        380,
+        443,
+        506
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_5_2,,254,317,380,443,506"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_5_3",
+      "tier_ids": [
+        255,
+        318,
+        381,
+        444,
+        507
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_5_3,,255,318,381,444,507"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_6_1",
+      "tier_ids": [
+        256,
+        319,
+        382,
+        445,
+        508
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_6_1,,256,319,382,445,508"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_mid_6_3",
+      "tier_ids": [
+        257,
+        320,
+        383,
+        446,
+        509
+      ],
+      "tree": "red_mid",
+      "csv_row": "404,C4SH,Skill_red_mid_6_3,,257,320,383,446,509"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_4_1",
+      "tier_ids": [
+        258,
+        321,
+        384,
+        447,
+        510
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_4_1,,258,321,384,447,510"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_4_3",
+      "tier_ids": [
+        259,
+        322,
+        385,
+        448,
+        511
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_4_3,,259,322,385,448,511"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_5_1",
+      "tier_ids": [
+        260,
+        323,
+        386,
+        449,
+        512
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_5_1,,260,323,386,449,512"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_5_2",
+      "tier_ids": [
+        261,
+        324,
+        387,
+        450,
+        513
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_5_2,,261,324,387,450,513"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_5_3",
+      "tier_ids": [
+        262,
+        325,
+        388,
+        451,
+        514
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_5_3,,262,325,388,451,514"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_6_1",
+      "tier_ids": [
+        263,
+        326,
+        389,
+        452,
+        515
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_6_1,,263,326,389,452,515"
+    },
+    {
+      "class_id": 404,
+      "class_name": "C4SH",
+      "skill_name": "Skill_red_right_6_3",
+      "tier_ids": [
+        264,
+        327,
+        390,
+        453,
+        516
+      ],
+      "tree": "red_right",
+      "csv_row": "404,C4SH,Skill_red_right_6_3,,264,327,390,453,516"
+    }
+  ],
+  "icon_reference": [
+    {
+      "icon_file": "06",
+      "skill_internal": "LucksARobot",
+      "skill_number": "58",
+      "tooltip_key": "58_LucksARobot",
+      "description": ""
+    },
+    {
+      "icon_file": "02",
+      "skill_internal": "AllForOne",
+      "skill_number": "59",
+      "tooltip_key": "59_AllForOne",
+      "description": ""
+    },
+    {
+      "icon_file": "03",
+      "skill_internal": "LuckyCharm",
+      "skill_number": "60",
+      "tooltip_key": "60_LuckyCharm",
+      "description": ""
+    },
+    {
+      "icon_file": "04",
+      "skill_internal": "TheLuckyOne",
+      "skill_number": "61",
+      "tooltip_key": "61_TheLuckyOne",
+      "description": ""
+    },
+    {
+      "icon_file": "05",
+      "skill_internal": "RedMoonRising",
+      "skill_number": "62",
+      "tooltip_key": "62_RedMoonRising",
+      "description": ""
+    },
+    {
+      "icon_file": "06",
+      "skill_internal": "RollingTheDeep",
+      "skill_number": "63",
+      "tooltip_key": "63_RollingTheDeep",
+      "description": ""
+    },
+    {
+      "icon_file": "07",
+      "skill_internal": "RidingHigh",
+      "skill_number": "64",
+      "tooltip_key": "64_RidingHigh",
+      "description": ""
+    },
+    {
+      "icon_file": "08",
+      "skill_internal": "GravePact",
+      "skill_number": "65",
+      "tooltip_key": "65_GravePact",
+      "description": ""
+    },
+    {
+      "icon_file": "09",
+      "skill_internal": "devilsTines_CL",
+      "skill_number": "10",
+      "tooltip_key": "10_devilsTines_CL",
+      "description": ""
+    },
+    {
+      "icon_file": "10",
+      "skill_internal": "DoubleTime",
+      "skill_number": "75",
+      "tooltip_key": "75_DoubleTime",
+      "description": ""
+    },
+    {
+      "icon_file": "11",
+      "skill_internal": "Luckless",
+      "skill_number": "67",
+      "tooltip_key": "67_Luckless",
+      "description": ""
+    },
+    {
+      "icon_file": "12",
+      "skill_internal": "CriticalRole",
+      "skill_number": "68",
+      "tooltip_key": "68_CriticalRole",
+      "description": ""
+    },
+    {
+      "icon_file": "13",
+      "skill_internal": "SpinOfFate",
+      "skill_number": "69",
+      "tooltip_key": "69_SpinOfFate",
+      "description": ""
+    },
+    {
+      "icon_file": "14",
+      "skill_internal": "HighStakes",
+      "skill_number": "70",
+      "tooltip_key": "70_HighStakes",
+      "description": ""
+    },
+    {
+      "icon_file": "15",
+      "skill_internal": "FortunesFavor",
+      "skill_number": "71",
+      "tooltip_key": "71_FortunesFavor",
+      "description": ""
+    },
+    {
+      "icon_file": "16",
+      "skill_internal": "LetItRide",
+      "skill_number": "72",
+      "tooltip_key": "72_LetItRide",
+      "description": ""
+    },
+    {
+      "icon_file": "17",
+      "skill_internal": "Wild",
+      "skill_number": "73",
+      "tooltip_key": "73_Wild",
+      "description": ""
+    },
+    {
+      "icon_file": "18",
+      "skill_internal": "PackMentality",
+      "skill_number": "74",
+      "tooltip_key": "74_PackMentality",
+      "description": ""
+    },
+    {
+      "icon_file": "19",
+      "skill_internal": "Undying",
+      "skill_number": "66",
+      "tooltip_key": "66_Undying",
+      "description": ""
+    },
+    {
+      "icon_file": "20",
+      "skill_internal": "LoadedDice",
+      "skill_number": "76",
+      "tooltip_key": "76_LoadedDice",
+      "description": ""
+    },
+    {
+      "icon_file": "21",
+      "skill_internal": "ShadowsEmbrace",
+      "skill_number": "77",
+      "tooltip_key": "77_ShadowsEmbrace",
+      "description": ""
+    },
+    {
+      "icon_file": "22",
+      "skill_internal": "Serendipity",
+      "skill_number": "78",
+      "tooltip_key": "78_Serendipity",
+      "description": ""
+    },
+    {
+      "icon_file": "23",
+      "skill_internal": "SidekicksRevenge",
+      "skill_number": "79",
+      "tooltip_key": "79_SidekicksRevenge",
+      "description": ""
+    },
+    {
+      "icon_file": "24",
+      "skill_internal": "AlphasCall",
+      "skill_number": "80",
+      "tooltip_key": "80_AlphasCall",
+      "description": ""
+    },
+    {
+      "icon_file": "25",
+      "skill_internal": "CursedCall",
+      "skill_number": "81",
+      "tooltip_key": "81_CursedCall",
+      "description": ""
+    },
+    {
+      "icon_file": "26",
+      "skill_internal": "Haunted",
+      "skill_number": "82",
+      "tooltip_key": "82_Haunted",
+      "description": ""
+    },
+    {
+      "icon_file": "27",
+      "skill_internal": "GraveyardShift",
+      "skill_number": "83",
+      "tooltip_key": "83_GraveyardShift",
+      "description": ""
+    },
+    {
+      "icon_file": "28",
+      "skill_internal": "SnakeEyes",
+      "skill_number": "84",
+      "tooltip_key": "84_SnakeEyes",
+      "description": ""
+    },
+    {
+      "icon_file": "29",
+      "skill_internal": "WitchingHour",
+      "skill_number": "85",
+      "tooltip_key": "85_WitchingHour",
+      "description": ""
+    },
+    {
+      "icon_file": "30",
+      "skill_internal": "Unchained",
+      "skill_number": "31",
+      "tooltip_key": "31_Unchained",
+      "description": ""
+    },
+    {
+      "icon_file": "31",
+      "skill_internal": "DeathHunt",
+      "skill_number": "32",
+      "tooltip_key": "32_DeathHunt",
+      "description": ""
+    },
+    {
+      "icon_file": "32",
+      "skill_internal": "Determinator",
+      "skill_number": "33",
+      "tooltip_key": "33_Determinator",
+      "description": ""
+    },
+    {
+      "icon_file": "33",
+      "skill_internal": "HardBoiled",
+      "skill_number": "34",
+      "tooltip_key": "34_HardBoiled",
+      "description": ""
+    },
+    {
+      "icon_file": "34",
+      "skill_internal": "TheShootist",
+      "skill_number": "36",
+      "tooltip_key": "36_TheShootist",
+      "description": ""
+    },
+    {
+      "icon_file": "01",
+      "skill_internal": "StandAndBleed",
+      "skill_number": "37",
+      "tooltip_key": "37_StandAndBleed",
+      "description": ""
+    },
+    {
+      "icon_file": "02",
+      "skill_internal": "TheFuries",
+      "skill_number": "35",
+      "tooltip_key": "35_TheFuries",
+      "description": ""
+    },
+    {
+      "icon_file": "03",
+      "skill_internal": "BoneShrapnel",
+      "skill_number": "39",
+      "tooltip_key": "39_BoneShrapnel",
+      "description": ""
+    },
+    {
+      "icon_file": "04",
+      "skill_internal": "devilsTines_CF",
+      "skill_number": "10",
+      "tooltip_key": "10_devilsTines_CF",
+      "description": ""
+    },
+    {
+      "icon_file": "05",
+      "skill_internal": "RideWithTheDevil",
+      "skill_number": "40",
+      "tooltip_key": "40_RideWithTheDevil",
+      "description": ""
+    },
+    {
+      "icon_file": "06",
+      "skill_internal": "Unchained",
+      "skill_number": "38",
+      "tooltip_key": "38_Unchained",
+      "description": ""
+    },
+    {
+      "icon_file": "07",
+      "skill_internal": "Brimstone",
+      "skill_number": "42",
+      "tooltip_key": "42_Brimstone",
+      "description": ""
+    },
+    {
+      "icon_file": "08",
+      "skill_internal": "TheClaim",
+      "skill_number": "43",
+      "tooltip_key": "43_TheClaim",
+      "description": ""
+    },
+    {
+      "icon_file": "09",
+      "skill_internal": "TheGunfighter",
+      "skill_number": "44",
+      "tooltip_key": "44_TheGunfighter",
+      "description": ""
+    },
+    {
+      "icon_file": "10",
+      "skill_internal": "DebtsToPay",
+      "skill_number": "45",
+      "tooltip_key": "45_DebtsToPay",
+      "description": ""
+    },
+    {
+      "icon_file": "11",
+      "skill_internal": "HellAndBack",
+      "skill_number": "46",
+      "tooltip_key": "46_HellAndBack",
+      "description": ""
+    },
+    {
+      "icon_file": "12",
+      "skill_internal": "BloodOnElpis",
+      "skill_number": "47",
+      "tooltip_key": "47_BloodOnElpis",
+      "description": ""
+    },
+    {
+      "icon_file": "13",
+      "skill_internal": "Lawless",
+      "skill_number": "48",
+      "tooltip_key": "48_Lawless",
+      "description": ""
+    },
+    {
+      "icon_file": "14",
+      "skill_internal": "TNT",
+      "skill_number": "49",
+      "tooltip_key": "49_TNT",
+      "description": ""
+    },
+    {
+      "icon_file": "15",
+      "skill_internal": "WarWagon",
+      "skill_number": "50",
+      "tooltip_key": "50_WarWagon",
+      "description": ""
+    },
+    {
+      "icon_file": "16",
+      "skill_internal": "PaleRider",
+      "skill_number": "51",
+      "tooltip_key": "51_PaleRider",
+      "description": ""
+    },
+    {
+      "icon_file": "17",
+      "skill_internal": "Forsaken",
+      "skill_number": "52",
+      "tooltip_key": "52_Forsaken",
+      "description": ""
+    },
+    {
+      "icon_file": "18",
+      "skill_internal": "TheWind",
+      "skill_number": "53",
+      "tooltip_key": "53_TheWind",
+      "description": ""
+    },
+    {
+      "icon_file": "19",
+      "skill_internal": "Maverick",
+      "skill_number": "54",
+      "tooltip_key": "54_Maverick",
+      "description": ""
+    },
+    {
+      "icon_file": "20",
+      "skill_internal": "Cottonmouth",
+      "skill_number": "55",
+      "tooltip_key": "55_Cottonmouth",
+      "description": ""
+    },
+    {
+      "icon_file": "21",
+      "skill_internal": "BrokenArrow",
+      "skill_number": "56",
+      "tooltip_key": "56_BrokenArrow",
+      "description": ""
+    },
+    {
+      "icon_file": "22",
+      "skill_internal": "BadMenMustBleed",
+      "skill_number": "57",
+      "tooltip_key": "57_BadMenMustBleed",
+      "description": ""
+    },
+    {
+      "icon_file": "23",
+      "skill_internal": "TableFLip",
+      "skill_number": "01",
+      "tooltip_key": "01_TableFLip",
+      "description": ""
+    },
+    {
+      "icon_file": "24",
+      "skill_internal": "HeroCall",
+      "skill_number": "02",
+      "tooltip_key": "02_HeroCall",
+      "description": ""
+    },
+    {
+      "icon_file": "25",
+      "skill_internal": "Steam",
+      "skill_number": "03",
+      "tooltip_key": "03_Steam",
+      "description": ""
+    },
+    {
+      "icon_file": "26",
+      "skill_internal": "alchemy",
+      "skill_number": "04",
+      "tooltip_key": "04_alchemy",
+      "description": "Elemental Effect Chance: {0} {1}"
+    },
+    {
+      "icon_file": "27",
+      "skill_internal": "ReadTheSigns",
+      "skill_number": "24",
+      "tooltip_key": "24_ReadTheSigns",
+      "description": ""
+    },
+    {
+      "icon_file": "28",
+      "skill_internal": "SoundsOfRain",
+      "skill_number": "06",
+      "tooltip_key": "06_SoundsOfRain",
+      "description": ""
+    },
+    {
+      "icon_file": "29",
+      "skill_internal": "TrickTaker",
+      "skill_number": "07",
+      "tooltip_key": "07_TrickTaker",
+      "description": ""
+    },
+    {
+      "icon_file": "30",
+      "skill_internal": "LateScratch",
+      "skill_number": "09",
+      "tooltip_key": "09_LateScratch",
+      "description": ""
+    },
+    {
+      "icon_file": "31",
+      "skill_internal": "devilsTines_SoH",
+      "skill_number": "10",
+      "tooltip_key": "10_devilsTines_SoH",
+      "description": ""
+    },
+    {
+      "icon_file": "32",
+      "skill_internal": "DoubleDown",
+      "skill_number": "11",
+      "tooltip_key": "11_DoubleDown",
+      "description": ""
+    },
+    {
+      "icon_file": "33",
+      "skill_internal": "wretchedShadows",
+      "skill_number": "12",
+      "tooltip_key": "12_wretchedShadows",
+      "description": ""
+    },
+    {
+      "icon_file": "34",
+      "skill_internal": "HighRoller",
+      "skill_number": "13",
+      "tooltip_key": "13_HighRoller",
+      "description": ""
+    },
+    {
+      "icon_file": "01",
+      "skill_internal": "TakeThePot",
+      "skill_number": "14",
+      "tooltip_key": "14_TakeThePot",
+      "description": ""
+    },
+    {
+      "icon_file": "02",
+      "skill_internal": "StackTheDeck",
+      "skill_number": "15",
+      "tooltip_key": "15_StackTheDeck",
+      "description": ""
+    },
+    {
+      "icon_file": "03",
+      "skill_internal": "Legerdemain",
+      "skill_number": "16",
+      "tooltip_key": "16_Legerdemain",
+      "description": ""
+    },
+    {
+      "icon_file": "04",
+      "skill_internal": "Fortuity",
+      "skill_number": "17",
+      "tooltip_key": "17_Fortuity",
+      "description": ""
+    },
+    {
+      "icon_file": "05",
+      "skill_internal": "DealersBluff",
+      "skill_number": "18",
+      "tooltip_key": "18_DealersBluff",
+      "description": ""
+    },
+    {
+      "icon_file": "23",
+      "skill_internal": "AceInTheHole",
+      "skill_number": "19",
+      "tooltip_key": "19_AceInTheHole",
+      "description": ""
+    },
+    {
+      "icon_file": "07",
+      "skill_internal": "AroundTheCorner",
+      "skill_number": "20",
+      "tooltip_key": "20_AroundTheCorner",
+      "description": ""
+    },
+    {
+      "icon_file": "08",
+      "skill_internal": "TheHouse",
+      "skill_number": "22",
+      "tooltip_key": "22_TheHouse",
+      "description": ""
+    },
+    {
+      "icon_file": "09",
+      "skill_internal": "C4SHGame",
+      "skill_number": "21",
+      "tooltip_key": "21_C4SHGame",
+      "description": ""
+    },
+    {
+      "icon_file": "10",
+      "skill_internal": "RiskyBusiness",
+      "skill_number": "23",
+      "tooltip_key": "23_RiskyBusiness",
+      "description": ""
+    },
+    {
+      "icon_file": "11",
+      "skill_internal": "ante",
+      "skill_number": "05",
+      "tooltip_key": "05_ante",
+      "description": "Gun Damage: up to {0} {1}"
+    },
+    {
+      "icon_file": "12",
+      "skill_internal": "TheTurn",
+      "skill_number": "25",
+      "tooltip_key": "25_TheTurn",
+      "description": ""
+    },
+    {
+      "icon_file": "13",
+      "skill_internal": "Payout",
+      "skill_number": "26",
+      "tooltip_key": "26_Payout",
+      "description": ""
+    },
+    {
+      "icon_file": "20",
+      "skill_internal": "BoomOrBus",
+      "skill_number": "27",
+      "tooltip_key": "27_BoomOrBus",
+      "description": ""
+    },
+    {
+      "icon_file": "15",
+      "skill_internal": "HeartOfTheCards",
+      "skill_number": "28",
+      "tooltip_key": "28_HeartOfTheCards",
+      "description": ""
+    },
+    {
+      "icon_file": "16",
+      "skill_internal": "RunningLuck",
+      "skill_number": "29",
+      "tooltip_key": "29_RunningLuck",
+      "description": ""
+    },
+    {
+      "icon_file": "17",
+      "skill_internal": "HotStreak",
+      "skill_number": "30",
+      "tooltip_key": "30_HotStreak",
+      "description": ""
+    }
+  ]
+}

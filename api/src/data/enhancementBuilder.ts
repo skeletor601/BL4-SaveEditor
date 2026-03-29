@@ -1,142 +1,82 @@
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { parseCsv } from "./csvParse.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..", "..");
+function getPath(relative: string): string { return join(repoRoot, relative); }
 
-function getPath(relative: string): string {
-  return join(repoRoot, relative);
-}
-
-function readCsv(path: string): { headers: string[]; rows: Record<string, string>[] } {
-  const content = readFileSync(path, "utf-8");
-  return parseCsv(content);
-}
-
-function trim(s: unknown): string {
-  return String(s ?? "").trim();
-}
-
-export interface EnhancementMfgPerk {
-  index: number;
-  name: string;
-  description?: string;
-}
-
-/** Split combined "Name -Description" or "Name - Description" strings from the CSV. */
-function splitPerkName(combined: string): { name: string; description?: string } {
-  if (!combined) return { name: combined };
-  // "Name - Description" (space-dash-space)
-  const sds = combined.indexOf(" - ");
-  if (sds !== -1) {
-    return { name: combined.slice(0, sds).trim(), description: combined.slice(sds + 3).trim() };
-  }
-  // "Name -Description" (space-dash, no space after)
-  const sd = combined.indexOf(" -");
-  if (sd !== -1) {
-    return { name: combined.slice(0, sd).trim(), description: combined.slice(sd + 2).trim() };
-  }
-  // "Name-Description" (bare dash) — split only if the name part is short
-  const d = combined.indexOf("-");
-  if (d !== -1 && d <= 30) {
-    return { name: combined.slice(0, d).trim(), description: combined.slice(d + 1).trim() };
-  }
-  return { name: combined };
-}
-
+export interface EnhancementMfgPerk { index: number; name: string; description?: string; }
 export interface EnhancementManufacturer {
   code: number;
   name: string;
   perks: EnhancementMfgPerk[];
   rarities: Record<string, number>;
 }
-
-export interface Enhancement247Perk {
-  code: number;
-  name: string;
-  description?: string;
-}
-
 export interface EnhancementBuilderData {
   manufacturers: Record<string, EnhancementManufacturer>;
-  /** Rarity name -> 247 rarity ID */
   rarityMap247: Record<string, number>;
-  /** Builder 247 list (secondary_247) */
-  secondary247: Enhancement247Perk[];
+  secondary247: { code: number; name: string; description?: string }[];
 }
+
+interface UniversalRow { code: string; name: string; manufacturer: string; category: string; partType: string; description: string; rarity: string; perkName: string; perkDescription: string; }
+
+function loadUniversalDb(): UniversalRow[] {
+  const path = getPath("master_search/db/universal_parts_db.json");
+  if (!existsSync(path)) return [];
+  try { const raw = JSON.parse(readFileSync(path, "utf-8")); return (raw?.rows ?? raw ?? []) as UniversalRow[]; } catch { return []; }
+}
+function parseCode(code: string): { typeId: number; partId: number } {
+  const m = code.match(/^\{(\d+):(\d+)\}$/);
+  return m ? { typeId: parseInt(m[1]), partId: parseInt(m[2]) } : { typeId: 0, partId: 0 };
+}
+
+const ENH_MFG_NAMES: Record<number, string> = {
+  284: "Atlas", 286: "COV", 299: "Daedalus", 264: "Hyperion",
+  268: "Jakobs", 271: "Maliwan", 296: "Ripper", 292: "Tediore",
+  281: "The Order", 303: "Torgue", 310: "Vladof",
+};
+const ENH_MFG_IDS = new Set(Object.keys(ENH_MFG_NAMES).map(Number));
 
 let cached: EnhancementBuilderData | null = null;
 
 export function getEnhancementBuilderData(): EnhancementBuilderData {
   if (cached) return cached;
 
-  const mfgPath = getPath("enhancement/Enhancement_manufacturers.csv");
-  const perkPath = getPath("enhancement/Enhancement_perk.csv");
-  const rarityPath = getPath("enhancement/Enhancement_rarity.csv");
-
+  const allRows = loadUniversalDb().filter((r) => r.category === "Enhancement");
   const manufacturers: Record<string, EnhancementManufacturer> = {};
   const rarityMap247: Record<string, number> = {};
-  const secondary247: Enhancement247Perk[] = [];
+  const secondary247: { code: number; name: string; description?: string }[] = [];
 
-  if (existsSync(mfgPath)) {
-    const { rows } = readCsv(mfgPath);
-    for (const r of rows) {
-      const mfgName = trim(r["manufacturers_name"]);
-      const mfgId = parseInt(trim(r["manufacturers_ID"]), 10);
-      const perkId = parseInt(trim(r["perk_ID"]), 10);
-      const perkName = trim(r["perk_name_EN"]);
-      if (!mfgName || !Number.isFinite(mfgId)) continue;
+  for (const row of allRows) {
+    const { typeId, partId } = parseCode(row.code);
+    if (!partId) continue;
+    const pt = (row.partType || "").trim();
+    const name = row.name || row.description || "";
+    const desc = row.description && row.description !== name ? row.description : undefined;
+
+    if (typeId === 247) { // Secondary/stat perks
+      if (pt === "Rarity") {
+        rarityMap247[row.rarity || name] = partId;
+      } else {
+        secondary247.push({ code: partId, name, ...(desc ? { description: desc } : {}) });
+      }
+      continue;
+    }
+
+    if (ENH_MFG_IDS.has(typeId)) {
+      const mfgName = row.manufacturer || ENH_MFG_NAMES[typeId] || `Mfg ${typeId}`;
       if (!manufacturers[mfgName]) {
-        manufacturers[mfgName] = {
-          code: mfgId,
-          name: mfgName,
-          perks: [],
-          rarities: {},
-        };
+        manufacturers[mfgName] = { code: typeId, name: mfgName, perks: [], rarities: {} };
       }
-      if (Number.isFinite(perkId) && perkName) {
-        // perk_name_EN is now a clean name (enriched CSV); perk_description_EN has the full effect text
-        const csvDesc = trim(r["perk_description_EN"]);
-        const { name, description: splitDesc } = splitPerkName(perkName);
-        const description = csvDesc || splitDesc;
-        manufacturers[mfgName].perks.push(description ? { index: perkId, name, description } : { index: perkId, name });
+      if (pt === "Core Perk") {
+        manufacturers[mfgName].perks.push({ index: partId, name, ...(desc ? { description: desc } : {}) });
+      } else if (pt === "Rarity") {
+        manufacturers[mfgName].rarities[row.rarity || name] = partId;
       }
     }
   }
 
-  if (existsSync(rarityPath)) {
-    const { rows } = readCsv(rarityPath);
-    for (const r of rows) {
-      const mfgId = parseInt(trim(r["manufacturers_ID"]), 10);
-      const mfgName = trim(r["manufacturers_name"]);
-      const rarityId = parseInt(trim(r["rarity_ID"]), 10);
-      const rarityName = trim(r["rarity"]);
-      if (!Number.isFinite(rarityId) || !rarityName) continue;
-      if (mfgId === 247) {
-        rarityMap247[rarityName] = rarityId;
-      } else if (mfgName && manufacturers[mfgName]) {
-        manufacturers[mfgName].rarities[rarityName] = rarityId;
-      }
-    }
-  }
-
-  if (existsSync(perkPath)) {
-    const { rows } = readCsv(perkPath);
-    for (const r of rows) {
-      const code = parseInt(trim(r["perk_ID"]), 10);
-      const name = trim(r["perk_name_EN"]);
-      if (!Number.isFinite(code)) continue;
-      const description = trim(r["perk_description_EN"]) || undefined;
-      secondary247.push(description ? { code, name, description } : { code, name });
-    }
-  }
-
-  cached = {
-    manufacturers,
-    rarityMap247,
-    secondary247,
-  };
+  cached = { manufacturers, rarityMap247, secondary247 };
   return cached;
 }

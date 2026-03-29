@@ -1,7 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { parseCsv } from "./csvParse.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..", "..", "..");
@@ -10,23 +9,12 @@ function getPath(relative: string): string {
   return join(repoRoot, relative);
 }
 
-function readCsv(path: string): { headers: string[]; rows: Record<string, string>[] } {
-  const content = readFileSync(path, "utf-8");
-  return parseCsv(content);
-}
-
-/** Grenade manufacturer IDs (same order as desktop). */
 const GRENADE_MFG_IDS = [263, 267, 270, 272, 278, 291, 298, 311] as const;
+const GRENADE_MFG_SET = new Set<number>(GRENADE_MFG_IDS);
 
 const MFG_NAMES: Record<number, string> = {
-  263: "Maliwan",
-  267: "Jakobs",
-  270: "Daedalus",
-  272: "Order",
-  278: "Ripper",
-  291: "Vladof",
-  298: "Torgue",
-  311: "Tediore",
+  263: "Maliwan", 267: "Jakobs", 270: "Daedalus", 272: "Order",
+  278: "Ripper", 291: "Vladof", 298: "Torgue", 311: "Tediore",
 };
 
 export interface GrenadeBuilderPart {
@@ -55,8 +43,33 @@ export interface GrenadeBuilderData {
   mfgPerks: Record<number, GrenadeBuilderPart[]>;
 }
 
-function trim(s: unknown): string {
-  return String(s ?? "").trim();
+interface UniversalRow {
+  code: string;
+  name: string;
+  manufacturer: string;
+  category: string;
+  partType: string;
+  description: string;
+  rarity: string;
+  perkName: string;
+  perkDescription: string;
+  redText: string;
+}
+
+function loadUniversalDb(): UniversalRow[] {
+  const path = getPath("master_search/db/universal_parts_db.json");
+  if (!existsSync(path)) return [];
+  try {
+    const raw = JSON.parse(readFileSync(path, "utf-8"));
+    return (raw?.rows ?? raw ?? []) as UniversalRow[];
+  } catch {
+    return [];
+  }
+}
+
+function parseCode(code: string): { typeId: number; partId: number } {
+  const m = code.match(/^\{(\d+):(\d+)\}$/);
+  return m ? { typeId: parseInt(m[1]), partId: parseInt(m[2]) } : { typeId: 0, partId: 0 };
 }
 
 let cached: GrenadeBuilderData | null = null;
@@ -64,12 +77,8 @@ let cached: GrenadeBuilderData | null = null;
 export function getGrenadeBuilderData(): GrenadeBuilderData {
   if (cached) return cached;
 
-  const mainBase = "grenade/grenade_main_perk";
-  const mfgBase = "grenade/manufacturer_rarity_perk";
-  const mainEn = getPath(`${mainBase}_EN.csv`);
-  const mainPath = existsSync(mainEn) ? mainEn : getPath(`${mainBase}.csv`);
-  const mfgEn = getPath(`${mfgBase}_EN.csv`);
-  const mfgPath = existsSync(mfgEn) ? mfgEn : getPath(`${mfgBase}.csv`);
+  const allRows = loadUniversalDb();
+  const grenadeRows = allRows.filter((r) => r.category === "Grenade");
 
   const mfgs = GRENADE_MFG_IDS.map((id) => ({
     id,
@@ -79,75 +88,55 @@ export function getGrenadeBuilderData(): GrenadeBuilderData {
   const raritiesByMfg: Record<number, GrenadeBuilderRarity[]> = {};
   const mfgPerks: Record<number, GrenadeBuilderPart[]> = {};
   const legendaryPerks: GrenadeBuilderLegendaryPart[] = [];
-
-  if (existsSync(mfgPath)) {
-    const { rows } = readCsv(mfgPath);
-    for (const r of rows) {
-      const mfgId = parseInt(trim(r["Manufacturer ID"]), 10);
-      if (!Number.isFinite(mfgId)) continue;
-      const partId = parseInt(trim(r["Part_ID"]), 10);
-      if (!Number.isFinite(partId)) continue;
-      const partType = trim(r["Part_type"]);
-      const stat = trim(r["Stat"]);
-      const desc = trim(r["Description"]);
-
-      if (partType === "Rarity") {
-        if (!raritiesByMfg[mfgId]) raritiesByMfg[mfgId] = [];
-        raritiesByMfg[mfgId].push({
-          id: partId,
-          label: desc ? `${stat} - ${desc}` : stat,
-        });
-      } else if (partType === "Perk") {
-        if (!mfgPerks[mfgId]) mfgPerks[mfgId] = [];
-        mfgPerks[mfgId].push({
-          partId,
-          stat,
-          ...(desc ? { description: desc } : {}),
-        });
-      } else if (partType === "Legendary Perk") {
-        legendaryPerks.push({
-          partId,
-          mfgId,
-          mfgName: MFG_NAMES[mfgId] ?? `Mfg ${mfgId}`,
-          stat,
-          ...(desc ? { description: desc } : {}),
-        });
-      }
-    }
-  }
-
   const element: GrenadeBuilderPart[] = [];
   const firmware: GrenadeBuilderPart[] = [];
   const universalPerks: GrenadeBuilderPart[] = [];
 
-  if (existsSync(mainPath)) {
-    const { rows } = readCsv(mainPath);
-    for (const r of rows) {
-      const partId = parseInt(trim(r["Part_ID"]), 10);
-      if (!Number.isFinite(partId)) continue;
-      const partType = trim(r["Part_type"]);
-      const stat = trim(r["Stat"]);
-      const description = trim(r["Description"]) || undefined;
-      const base: GrenadeBuilderPart = description ? { partId, stat, description } : { partId, stat };
+  for (const row of grenadeRows) {
+    const { typeId, partId } = parseCode(row.code);
+    if (!partId) continue;
 
-      if (partType === "Element") {
-        element.push(base);
-      } else if (partType === "Firmware") {
-        firmware.push(base);
-      } else if (partType === "Perk") {
-        universalPerks.push(base);
+    const pt = (row.partType || "").trim();
+    const stat = row.name || row.description || "";
+    const desc = row.description && row.description !== stat ? row.description : undefined;
+
+    // Type 245 = universal grenade parts (element, firmware, universal perks)
+    if (typeId === 245) {
+      if (pt === "Element") {
+        element.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      } else if (pt === "Firmware") {
+        firmware.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      } else if (pt === "Perk") {
+        universalPerks.push({ partId, stat, ...(desc ? { description: desc } : {}) });
+      }
+      continue;
+    }
+
+    // Manufacturer-specific parts (type = mfg ID)
+    if (GRENADE_MFG_SET.has(typeId)) {
+      if (pt === "Rarity") {
+        if (!raritiesByMfg[typeId]) raritiesByMfg[typeId] = [];
+        raritiesByMfg[typeId].push({
+          id: partId,
+          label: desc ? `${stat} - ${desc}` : stat,
+        });
+      } else if (pt === "Legendary Perk") {
+        legendaryPerks.push({
+          partId,
+          mfgId: typeId,
+          mfgName: MFG_NAMES[typeId] ?? `Mfg ${typeId}`,
+          stat,
+          ...(desc ? { description: desc } : {}),
+        });
+      } else if (pt === "Perk") {
+        if (!mfgPerks[typeId]) mfgPerks[typeId] = [];
+        mfgPerks[typeId].push({
+          partId, stat, ...(desc ? { description: desc } : {}),
+        });
       }
     }
   }
 
-  cached = {
-    mfgs,
-    raritiesByMfg,
-    element,
-    firmware,
-    universalPerks,
-    legendaryPerks,
-    mfgPerks,
-  };
+  cached = { mfgs, raritiesByMfg, element, firmware, universalPerks, legendaryPerks, mfgPerks };
   return cached;
 }

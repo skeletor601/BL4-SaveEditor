@@ -1,0 +1,175 @@
+{
+  "description": "Expected output from automated NCS extractor for Cowbell DLC items. Each item has enriched data matching our database formats.",
+  "weapons": [
+    {
+      "name": "Crazed Earl",
+      "type_id": 7,
+      "manufacturer": "Ripper",
+      "weapon_type": "Shotgun",
+      "rarity": "Pearlescent",
+      "rarity_part_id": 54,
+      "barrel_part_id": 21,
+      "perk_name": "BOGO",
+      "perk_description": "Fires Shards that stick into enemies. Meleeing enemies with Shards will explode the Shards and send them toward other nearby enemies",
+      "red_text": "Earlescent.",
+      "rarity_csv_row": "7,Ripper,Shotgun,54,Rarity,Pearlescent,Crazed Earl",
+      "barrel_csv_row": "7,Ripper,Shotgun,21,Barrel,BOR_SG.part_barrel_crazedearl,\"BOGO - Fires Shards that stick into enemies. Meleeing enemies with Shards will explode the Shards and send them toward other nearby enemies. Red Text: Earlescent.\""
+    },
+    {
+      "name": "Soul Survivor",
+      "type_id": 2,
+      "manufacturer": "Daedalus",
+      "weapon_type": "Pistol",
+      "rarity": "Pearlescent",
+      "rarity_part_id": 80,
+      "barrel_part_id": 79,
+      "perk_name": "Adrenaline",
+      "perk_description": "Deals increased Damage for each ally in Fight For Your Life",
+      "red_text": "At first I was afraid...",
+      "rarity_csv_row": "2,Daedalus,Pistol,80,Rarity,Pearlescent,Soul Survivor",
+      "barrel_csv_row": "2,Daedalus,Pistol,79,Barrel,DAD_PS.part_barrel_02_soulsurvivor,\"Adrenaline - Deals increased Damage for each ally in Fight For Your Life. Red Text: At first I was afraid...\""
+    },
+    {
+      "name": "Hand Cannon",
+      "type_id": 6,
+      "manufacturer": "Torgue",
+      "weapon_type": "Pistol",
+      "rarity": "Pearlescent",
+      "rarity_part_id": 78,
+      "barrel_part_id": 77,
+      "perk_name": "Click Boom Boom",
+      "perk_description": "Sticky Projectiles deal Damage while attached to targets",
+      "red_text": "Dangerous toys are fun, but you could get hurt.",
+      "rarity_csv_row": "6,Torgue,Pistol,78,Rarity,Pearlescent,Hand Cannon",
+      "barrel_csv_row": "6,Torgue,Pistol,77,Barrel,TOR_PS.part_barrel_02_handcannon,\"Click Boom Boom - Sticky Projectiles deal Damage while attached to targets. Red Text: Dangerous toys are fun, but you could get hurt.\""
+    },
+    {
+      "name": "Follower",
+      "type_id": 20,
+      "manufacturer": "Daedalus",
+      "weapon_type": "SMG",
+      "rarity": "Legendary",
+      "rarity_part_id": 2,
+      "barrel_part_id": 1,
+      "perk_name": "Pounce",
+      "perk_description": "Bullets slowly home in on targets. Reloading accelerates them toward their targets",
+      "red_text": "Nope.",
+      "rarity_csv_row": "20,Daedalus,SMG,2,Rarity,Legendary,Follower",
+      "barrel_csv_row": "20,Daedalus,SMG,1,Barrel,DAD_SM.part_barrel_02_follower,\"Pounce - Bullets slowly home in on targets. Reloading accelerates them toward their targets. Red Text: Nope.\""
+    },
+    {
+      "name": "Flash Cyclone",
+      "type_id": 21,
+      "manufacturer": "Maliwan",
+      "weapon_type": "SMG",
+      "rarity": "Legendary",
+      "rarity_part_id": 85,
+      "barrel_part_id": 84,
+      "perk_name": "Flash Freeze",
+      "perk_description": "Chance on Hit to Explode and Spawn additional projectiles",
+      "red_text": "What cyclone? Its a couple of flakes!",
+      "rarity_csv_row": "21,Maliwan,SMG,85,Rarity,Legendary,Flash Cyclone",
+      "barrel_csv_row": "21,Maliwan,SMG,84,Barrel,MAL_SM.part_barrel_02_flashcyclone,\"Flash Freeze - Chance on Hit to Explode and Spawn additional projectiles. Red Text: What cyclone? Its a couple of flakes!\""
+    },
+    {
+      "name": "Scoot Shoot",
+      "type_id": 6,
+      "manufacturer": "Torgue",
+      "weapon_type": "Pistol",
+      "rarity": "Legendary",
+      "rarity_part_id": 57,
+      "barrel_part_id": 56,
+      "perk_name": "Rollin' Deep",
+      "perk_description": "Phantom Guns fire from the locations of your previous shots. Phantom Guns reset on reload",
+      "red_text": "Move it or lose it!",
+      "rarity_csv_row": "6,Torgue,Pistol,57,Rarity,Legendary,Scoot Shoot",
+      "barrel_csv_row": "6,Torgue,Pistol,56,Barrel,TOR_PS.part_barrel_02_scootshoot,\"Rollin' Deep - Phantom Guns fire from the locations of your previous shots. Phantom Guns reset on reload. Red Text: Move it or lose it!\""
+    },
+    {
+      "name": "Laser Cutter",
+      "type_id": 18,
+      "manufacturer": "Vladof",
+      "weapon_type": "Assault Rifle",
+      "rarity": "Legendary",
+      "rarity_part_id": 103,
+      "barrel_part_id": 102,
+      "underbarrel_part_id": 101,
+      "perk_name": "Bone Saw",
+      "perk_description": "Bone Saw",
+      "red_text": "Isaac's bestie.",
+      "rarity_csv_row": "18,Vladof,Assault Rifle,103,Rarity,Legendary,Laser Cutter",
+      "barrel_csv_row": "18,Vladof,Assault Rifle,102,Barrel,VLA_AR.part_barrel_01_lasercutter,\"Bone Saw. Red Text: Isaac's bestie.\"",
+      "underbarrel_csv_row": "18,Vladof,Assault Rifle,101,Underbarrel,VLA_AR.part_underbarrel_07_secondbarrel_lasercutter,Laser Cutter Underbarrel"
+    }
+  ],
+  "heavy_weapons": [
+    {
+      "name": "DahlFather",
+      "type_id": 273,
+      "manufacturer": "Torgue",
+      "rarity": "Legendary",
+      "perk_name": "Rig",
+      "perk_description": "Fires Dahl soldier heads that attack nearby enemies",
+      "red_text": "In his eternal service.",
+      "stats": "damage_scale=2.0x, fire_rate=0.6, mag=3, cooldown=50s, splash_radius=600"
+    }
+  ],
+  "shields": [
+    {
+      "name": "Elpis Star",
+      "manufacturer_id": 279,
+      "manufacturer": "Maliwan",
+      "shield_type": "Energy",
+      "rarity": "Legendary",
+      "perk_name": "Moonfall",
+      "perk_description": "When dealing Melee Damage, spawn a Meteor Cluster to fall on the damaged enemy",
+      "red_text": "Make a wish.",
+      "stats": "damage_scale=0.175, delay=2.0x, regen=1.0x, capacity=0.75x"
+    },
+    {
+      "name": "Honey Badger",
+      "manufacturer_id": 312,
+      "manufacturer": "Daedalus",
+      "shield_type": "VERIFY - was in unique_shield_armor_cowbell but Daedalus=312=Energy per README",
+      "rarity": "Legendary",
+      "perk_name": "Ferocity",
+      "perk_description": "Reduces self-Damage Dealt while Shield is active",
+      "red_text": "You're saying it in your head, so I don't have to type it.",
+      "stats": "damage_multi=0.1, delay=1.5x, regen=1.5x, capacity=0.9x"
+    }
+  ],
+  "repkits": [
+    {
+      "name": "Paleblood",
+      "manufacturer_id": 285,
+      "manufacturer": "Order",
+      "rarity": "Legendary",
+      "perk_name": "Broken Vial",
+      "perk_description": "Heals for the last 5 instances of Damage taken within the last 4 seconds",
+      "red_text": "Fighting evil by moonlight.",
+      "stats": "damage_instances=5, duration=4s, cooldown_scale=0.25"
+    }
+  ],
+  "internal_code_mapping": {
+    "BOR": "Ripper",
+    "DAD": "Daedalus",
+    "JAK": "Jakobs",
+    "MAL": "Maliwan",
+    "ORD": "Order",
+    "TED": "Tediore",
+    "TOR": "Torgue",
+    "VLA": "Vladof",
+    "RIP": "Ripper"
+  },
+  "notes": [
+    "CrazedEarl, SoulSurvivor, and HandCannon are PEARLESCENT not Legendary - detected via 'pearlescent' in basetags",
+    "Each weapon needs TWO database entries: rarity row (comp_05) + barrel row (part_barrel)",
+    "BOR internal code = Ripper manufacturer (NOT 'Borg')",
+    "Barrel stat numbers (damage, fire rate) are NOT in NCS data - only scale values from init tables",
+    "LaserCutter has 3 entries: rarity + barrel + underbarrel",
+    "DahlFather is a Heavy Weapon (Torgue HW, type 273), not a regular weapon",
+    "Elpis Star is Maliwan Energy Shield (mfg 279), Honey Badger is Daedalus Armor Shield (mfg 312)",
+    "Paleblood is Order Repkit (mfg 285)",
+    "weapon_rarity.csv is SEPARATE from all_weapon_part_EN.csv - legendaries need entries in BOTH"
+  ]
+}
