@@ -198,7 +198,7 @@ for (const r of readCsv("shield/shield_main_perk_EN.csv")) {
   const mainId = r["Shield_perk_main_ID"], partId = r["Part_ID"];
   const partType = r["Part_type"], stat = r["Stat"], desc = r["Description"];
   if (!partId || !mainId) continue;
-  addPart({ code: `{${mainId}:${partId}}`, partName: `Shield.${partType}_${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Shield" });
+  addPart({ code: `{${mainId}:${partId}}`, partName: stat || `Shield ${partType} ${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Shield" });
 }
 
 for (const r of readCsv("shield/manufacturer_perk_EN.csv")) {
@@ -207,11 +207,11 @@ for (const r of readCsv("shield/manufacturer_perk_EN.csv")) {
   if (!partId || !mfgId) continue;
   const mfgName = SHIELD_MFG_NAMES[parseInt(mfgId)] || mfgId;
   if (partType === "Rarity") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Shield.rarity_${partId}`, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Shield" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: desc ? `${stat} - ${desc}` : stat, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Shield" });
   } else if (partType === "Legendary Perk") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Shield.legendary_perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Shield" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: stat || `${mfgName} Legendary Perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Shield" });
   } else if (partType === "Model") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Shield.model`, itemType: `${mfgName} Shield Model`, partType: "Model", manufacturer: mfgName, category: "Shield" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName} Shield Model`, itemType: `${mfgName} Shield Model`, partType: "Model", manufacturer: mfgName, category: "Shield" });
   }
 }
 
@@ -224,7 +224,7 @@ for (const r of readCsv("grenade/grenade_main_perk_EN.csv")) {
   const mainId = r["Grenade_perk_main_ID"], partId = r["Part_ID"];
   const partType = r["Part_type"], stat = r["Stat"];
   if (!partId || !mainId) continue;
-  addPart({ code: `{${mainId}:${partId}}`, partName: `Grenade.${partType}_${partId}`, itemType: stat || partType, partType, category: "Grenade" });
+  addPart({ code: `{${mainId}:${partId}}`, partName: stat || `Grenade ${partType} ${partId}`, itemType: stat || partType, partType, category: "Grenade" });
 }
 
 for (const r of readCsv("grenade/manufacturer_rarity_perk_EN.csv")) {
@@ -233,11 +233,11 @@ for (const r of readCsv("grenade/manufacturer_rarity_perk_EN.csv")) {
   if (!partId || !mfgId) continue;
   const mfgName = GRENADE_MFG_NAMES[parseInt(mfgId)] || mfgId;
   if (partType === "Rarity") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Grenade.rarity_${partId}`, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Grenade" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: desc ? `${stat} - ${desc}` : stat, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Grenade" });
   } else if (partType === "Legendary Perk") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Grenade.legendary_perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Grenade" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: stat || `${mfgName} Legendary Perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Grenade" });
   } else if (partType === "Perk") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Grenade.perk_${partId}`, itemType: stat, partType: "Perk", effect: desc || undefined, manufacturer: mfgName, category: "Grenade" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: stat || `${mfgName} Perk ${partId}`, itemType: stat, partType: "Perk", effect: desc || undefined, manufacturer: mfgName, category: "Grenade" });
   }
 }
 
@@ -250,7 +250,7 @@ for (const r of readCsv("repkit/repkit_main_perk_EN.csv")) {
   const mainId = r["Repkit_perk_main_ID"], partId = r["Part_ID"];
   const partType = r["Part_type"], stat = r["Stat"], desc = r["Description"];
   if (!partId || !mainId) continue;
-  addPart({ code: `{${mainId}:${partId}}`, partName: `Repkit.${partType}_${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Repkit" });
+  addPart({ code: `{${mainId}:${partId}}`, partName: stat || `Repkit ${partType} ${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Repkit" });
 }
 
 for (const r of readCsv("repkit/repkit_manufacturer_perk_EN.csv")) {
@@ -259,11 +259,11 @@ for (const r of readCsv("repkit/repkit_manufacturer_perk_EN.csv")) {
   if (!partId || !mfgId) continue;
   const mfgName = REPKIT_MFG_NAMES[parseInt(mfgId)] || mfgId;
   if (partType === "Rarity") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Repkit.rarity_${partId}`, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Repkit" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: desc ? `${stat} - ${desc}` : stat, itemType: desc ? `${stat} - ${desc}` : stat, partType: "Rarity", manufacturer: mfgName, category: "Repkit" });
   } else if (partType === "Legendary Perk") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Repkit.legendary_perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Repkit" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: stat || `${mfgName} Legendary Perk`, itemType: stat, partType: "Legendary Perk", effect: desc || undefined, manufacturer: mfgName, rarity: "Legendary", category: "Repkit" });
   } else if (partType === "Model") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Repkit.model`, itemType: desc || `${mfgName} Repkit Model`, partType: "Model", manufacturer: mfgName, category: "Repkit" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: desc || `${mfgName} Repkit Model`, itemType: desc || `${mfgName} Repkit Model`, partType: "Model", manufacturer: mfgName, category: "Repkit" });
   }
 }
 
@@ -277,7 +277,7 @@ for (const r of readCsv("enhancement/Enhancement_manufacturers.csv")) {
   const perkId = r["perk_ID"], perkNameEN = r["perk_name_EN"];
   if (!mfgId || !perkId) continue;
   const { name, effect } = splitNameEffect(perkNameEN);
-  addPart({ code: `{${mfgId}:${perkId}}`, partName: `${mfgName || "Unknown"}_Enhancement.part_core_${perkId}`, itemType: name || perkNameEN, partType: "Core Perk", effect: effect || undefined, manufacturer: mfgName || ENH_MFG_NAMES[parseInt(mfgId)], rarity: "Legendary", category: "Enhancement" });
+  addPart({ code: `{${mfgId}:${perkId}}`, partName: name || perkNameEN || `${mfgName} Enhancement ${perkId}`, itemType: name || perkNameEN, partType: "Core Perk", effect: effect || r["perk_description_EN"] || undefined, manufacturer: mfgName || ENH_MFG_NAMES[parseInt(mfgId)], rarity: "Legendary", category: "Enhancement" });
 }
 
 for (const r of readCsv("enhancement/Enhancement_rarity.csv")) {
@@ -285,13 +285,14 @@ for (const r of readCsv("enhancement/Enhancement_rarity.csv")) {
   const rarityId = r["rarity_ID"], rarity = r["rarity"];
   if (!mfgId || !rarityId || !rarity) continue;
   const mfg = mfgName || ENH_MFG_NAMES[parseInt(mfgId)] || mfgId;
-  addPart({ code: `{${mfgId}:${rarityId}}`, partName: `${mfg}_Enhancement.rarity_${rarityId}`, itemType: `${mfg} Enhancement - ${rarity}`, partType: "Rarity", manufacturer: mfg, rarity, category: "Enhancement" });
+  addPart({ code: `{${mfgId}:${rarityId}}`, partName: `${mfg} ${rarity}`, itemType: `${mfg} Enhancement - ${rarity}`, partType: "Rarity", manufacturer: mfg, rarity, category: "Enhancement" });
 }
 
 for (const r of readCsv("enhancement/Enhancement_perk.csv")) {
   const typeId = r["manufacturers_ID"], perkId = r["perk_ID"], perkNameEN = r["perk_name_EN"];
   if (!typeId || !perkId || !perkNameEN) continue;
-  addPart({ code: `{${typeId}:${perkId}}`, partName: `Enhancement.part_stat_${perkId}`, itemType: perkNameEN, partType: "Stat Perk", category: "Enhancement" });
+  const { name: enhStatName, effect: enhStatEffect } = splitNameEffect(perkNameEN);
+  addPart({ code: `{${typeId}:${perkId}}`, partName: enhStatName || perkNameEN, itemType: perkNameEN, partType: "Stat Perk", effect: enhStatEffect || r["perk_description_EN"] || undefined, category: "Enhancement" });
 }
 
 // --- Class Mods ---
@@ -303,13 +304,13 @@ for (const r of readCsv("class_mods/Class_rarity_name.csv")) {
   const classId = r["class_ID"], className = r["class_name"] || CLASS_IDS_MAP[r["class_ID"]] || r["class_ID"];
   const rarity = r["rarity"], nameCode = r["name_code"], nameEN = r["name_EN"];
   if (!classId || !nameCode || !nameEN) continue;
-  addPart({ code: `{${classId}:${nameCode}}`, partName: `${className}_ClassMod.name_${nameCode}`, itemType: nameEN, partType: "Name", rarity: rarity === "legendary" ? "Legendary" : "Normal", manufacturer: className, category: "Class Mod" });
+  addPart({ code: `{${classId}:${nameCode}}`, partName: `${className} - ${nameEN}`, itemType: nameEN, partType: "Name", rarity: rarity === "legendary" ? "Legendary" : "Normal", manufacturer: className, category: "Class Mod" });
 }
 
 for (const r of readCsv("class_mods/Class_perk.csv")) {
   const perkId = r["perk_ID"], perkNameEN = r["perk_name_EN"];
   if (!perkId || !perkNameEN) continue;
-  addPart({ code: `{234:${perkId}}`, partName: `ClassMod.perk_${perkId}`, itemType: perkNameEN, partType: "Perk", category: "Class Mod" });
+  addPart({ code: `{234:${perkId}}`, partName: perkNameEN, itemType: perkNameEN, partType: "Perk", category: "Class Mod" });
 }
 
 for (const r of readCsv("class_mods/Skills.csv")) {
@@ -319,7 +320,7 @@ for (const r of readCsv("class_mods/Skills.csv")) {
   for (let i = 1; i <= 5; i++) {
     const skillId = r[`skill_ID_${i}`];
     if (!skillId) continue;
-    addPart({ code: `{${classId}:${skillId}}`, partName: `${className}_ClassMod.skill_${skillId}`, itemType: skillNameEN, partType: "Skill", manufacturer: className, category: "Class Mod" });
+    addPart({ code: `{${classId}:${skillId}}`, partName: `${className} - ${skillNameEN}`, itemType: skillNameEN, partType: "Skill", manufacturer: className, category: "Class Mod" });
   }
 }
 
@@ -333,7 +334,7 @@ for (const r of readCsv("heavy/heavy_main_perk_EN.csv")) {
   const partType = r["Part_type"], stat = r["Stat"], desc = r["Description"];
   if (!partId) continue;
   const typeId = mainId || "244";
-  addPart({ code: `{${typeId}:${partId}}`, partName: `Heavy.${partType}_${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Heavy" });
+  addPart({ code: `{${typeId}:${partId}}`, partName: stat || `Heavy ${partType} ${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Heavy" });
 }
 
 for (const r of readCsv("heavy/heavy_manufacturer_perk_EN.csv")) {
@@ -343,9 +344,9 @@ for (const r of readCsv("heavy/heavy_manufacturer_perk_EN.csv")) {
   const mfgName = HEAVY_MFG_NAMES[parseInt(mfgId)] || mfgId;
   const displayName = stat || string || desc || `${mfgName} Part ${partId}`;
   if (partType === "Rarity") {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Heavy.rarity_${partId}`, itemType: desc ? `${displayName} - ${desc}` : displayName, partType: "Rarity", manufacturer: mfgName, category: "Heavy" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: desc ? `${displayName} - ${desc}` : displayName, itemType: desc ? `${displayName} - ${desc}` : displayName, partType: "Rarity", manufacturer: mfgName, category: "Heavy" });
   } else {
-    addPart({ code: `{${mfgId}:${partId}}`, partName: `${mfgName}_Heavy.${partType.replace(/\s+/g, "_")}_${partId}`, itemType: displayName, partType, effect: desc || undefined, manufacturer: mfgName, category: "Heavy" });
+    addPart({ code: `{${mfgId}:${partId}}`, partName: displayName, itemType: displayName, partType, effect: desc || undefined, manufacturer: mfgName, category: "Heavy" });
   }
 }
 
@@ -363,7 +364,7 @@ for (const r of readCsv("weapon_edit/all_weapon_part_EN.csv")) {
   const rarity = partType === "Rarity" ? (stat || "").split(" ")[0] || undefined : undefined;
   addPart({
     code: `{${typeId}:${partId}}`,
-    partName: string || `${mfg}_${weaponType}.part_${partId}`,
+    partName: desc || stat || string || `${mfg} ${weaponType} ${partType} ${partId}`,
     itemType: displayName,
     manufacturer: mfg || undefined,
     weaponType: weaponType || undefined,
@@ -374,6 +375,48 @@ for (const r of readCsv("weapon_edit/all_weapon_part_EN.csv")) {
   });
 }
 
+// Enrich weapon entries with legendary effects from NCS-extracted data
+console.log("Enriching with legendary effects ...");
+const effectsPath = path.join(ROOT, "api", "data", "legendary_effects.json");
+if (fs.existsSync(effectsPath)) {
+  try {
+    const effects = JSON.parse(fs.readFileSync(effectsPath, "utf8"));
+    let enriched = 0;
+    const tryLookup = (name) => {
+      if (!name) return null;
+      const key = name.toLowerCase().replace(/['']/g, "").replace(/\s+/g, " ").trim();
+      return effects[key] || effects[key.replace(/ /g, "_")] || effects[key.replace(/_/g, " ")] || null;
+    };
+    for (const [code, entry] of byCode) {
+      if (!entry.category) continue;
+      // Try multiple name sources
+      const candidates = [
+        (entry.itemType || "").replace(/^Legendary:\s*/i, "").replace(/^Pearl:\s*/i, "").replace(/^.*? - /, "").trim(),
+        (entry.itemType || "").replace(/^Legendary:\s*/i, "").replace(/^Pearl:\s*/i, "").trim(),
+        (entry.partName || "").replace(/.*\.part_barrel_\d*_?/i, "").replace(/_/g, " ").trim(),
+        (entry.partName || "").replace(/.*comp_05_legendary_?/i, "").replace(/_/g, " ").trim(),
+        (entry.effect || "").replace(/^.*? - /, "").split(".")[0].trim(),
+      ];
+      let eff = null;
+      for (const c of candidates) {
+        eff = tryLookup(c);
+        if (eff) break;
+      }
+      if (eff && (!entry.effect || entry.effect === entry.itemType || entry.effect.length < 30)) {
+        let desc = eff.perk && eff.desc ? `${eff.perk} - ${eff.desc}` : eff.desc || eff.perk || "";
+        if (eff.red) desc += ` | ${eff.red}`;
+        if (desc && desc.length > (entry.effect || "").length) {
+          entry.effect = desc;
+          enriched++;
+        }
+      }
+    }
+    console.log(`  Enriched ${enriched} entries with legendary effects`);
+  } catch (e) {
+    console.warn("  Could not load legendary_effects.json:", e.message);
+  }
+}
+
 console.log("Processing elemental data ...");
 
 for (const r of readCsv("weapon_edit/elemental.csv")) {
@@ -381,7 +424,7 @@ for (const r of readCsv("weapon_edit/elemental.csv")) {
   if (!typeId || !partId) continue;
   addPart({
     code: `{${typeId}:${partId}}`,
-    partName: `Element.part_${partId}`,
+    partName: stat || `Element ${partId}`,
     itemType: stat || `Element ${partId}`,
     partType: "Element",
     category: "Element",

@@ -27,6 +27,7 @@ import { usePersistedState } from "@/lib/usePersistedState";
 import { useCodeHistory } from "@/lib/useCodeHistory";
 import CodeHistoryPanel from "@/components/CodeHistoryPanel";
 import CleanCodeDialog from "@/components/weapon-toolbox/CleanCodeDialog";
+import { detectTraits, applyLockedTraits, InteractiveBadgeRow, type TraitDefinition } from "@/components/weapon-toolbox/TraitEditorPopover";
 import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
@@ -1473,6 +1474,9 @@ export default function UnifiedItemBuilderPage() {
   const [hoverCardSide, setHoverCardSide] = useState<"left" | "right">("right");
   const hoverCardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Backpack drawer
+  const [backpackOpen, setBackpackOpen] = useState(false);
+
   // Weapon: list-based part selections (no caps), multi-select per category
   const [weaponData, setWeaponData] = useState<WeaponGenData | null>(null);
   const [weaponManufacturer, setWeaponManufacturer] = usePersistedState("uib.weapon.mfg", "");
@@ -1511,6 +1515,12 @@ export default function UnifiedItemBuilderPage() {
   const [rollCount, setRollCount] = useState(0);
   const [rollMilestone, setRollMilestone] = useState<string | null>(null);
   const [lastWeaponTraits, setLastWeaponTraits] = useState<string[]>([]);
+  const [detectedTraits, setDetectedTraits] = useState<TraitDefinition[]>([]);
+  const [lockedTraitIds, setLockedTraitIds] = usePersistedState<string[]>("uib.weapon.lockedTraits", []);
+  const lockedTraitIdSet = useMemo(() => new Set(lockedTraitIds), [lockedTraitIds]);
+  // Ref for lock-on-reroll (avoid stale closure in useCallback)
+  const lockedTraitIdSetRef = useRef(lockedTraitIdSet);
+  lockedTraitIdSetRef.current = lockedTraitIdSet;
   const [lastGrenadeStats, setLastGrenadeStats] = useState<GrenadeStatsEstimate | null>(null);
 
   // Grenade (when category === "grenade")
@@ -3027,7 +3037,12 @@ export default function UnifiedItemBuilderPage() {
         ...(isCustom ? { customMode: true } : {}),
       });
       setLastDps(dps);
-      setLiveDecoded(decoded.trim());
+      // Apply locked traits: splice locked tokens from current code into the new roll
+      let finalDecoded = decoded.trim();
+      if (lockedTraitIdSetRef.current.size > 0 && liveDecodedRef.current) {
+        finalDecoded = applyLockedTraits(liveDecodedRef.current, finalDecoded, lockedTraitIdSetRef.current);
+      }
+      setLiveDecoded(finalDecoded);
       setLastEditedCodecSide("decoded");
       // Track weapon generation
       fetchApi("stats/weapon-generated", { method: "POST", body: "{}" }).catch(() => {});
@@ -3045,8 +3060,8 @@ export default function UnifiedItemBuilderPage() {
       };
       if (milestones[newCount]) setRollMilestone(milestones[newCount]!);
       else if (rollMilestone && newCount > 5) setRollMilestone(null);
-      // Detect weapon traits from the decoded output
-      const d = decoded;
+      // Detect weapon traits from the final decoded output (with locked traits applied)
+      const d = finalDecoded;
       const traits: string[] = [];
       if (/\{1:57\}/.test(d)) traits.push("Radiation");
       else if (/\{1:56\}/.test(d)) traits.push("Shock");
@@ -3062,6 +3077,8 @@ export default function UnifiedItemBuilderPage() {
       if (isClaudeGun) traits.push("Claude's Gun");
       if (/26:77/.test(d)) discoverEgg("weapon-seamstress");
       setLastWeaponTraits(traits);
+      // Build structured trait objects for interactive badges
+      setDetectedTraits(detectTraits(finalDecoded));
 
       // Discover Easter eggs based on what was generated
       discoverEgg("roll-" + newCount);
@@ -3379,6 +3396,25 @@ export default function UnifiedItemBuilderPage() {
     () => new Map(universalParts.filter((p) => p.code).map((p) => [p.code, p.label])),
     [universalParts],
   );
+
+  /** Map typeId → DbPartOption[] for interactive badge part picker + name lookup */
+  const dbPartsMap = useMemo(() => {
+    const map = new Map<number, { partId: number; label: string; effect?: string }[]>();
+    for (const p of universalParts) {
+      if (!p.code) continue;
+      const m = p.code.match(/^\{(\d+):(\d+)\}$/);
+      if (!m) continue;
+      const typeId = Number(m[1]);
+      const partId = Number(m[2]);
+      if (!map.has(typeId)) map.set(typeId, []);
+      // Avoid duplicates
+      const arr = map.get(typeId)!;
+      if (!arr.some((x) => x.partId === partId)) {
+        arr.push({ partId, label: p.label, effect: p.effect });
+      }
+    }
+    return map;
+  }, [universalParts]);
 
   const grenadeExtraLabels = useMemo(() => {
     const map = new Map<string, string>();
@@ -4103,6 +4139,62 @@ export default function UnifiedItemBuilderPage() {
 
   return (
     <div className="space-y-4" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: "22px 22px" }}>
+
+      {/* ── Breadcrumb bar + quick nav ── */}
+      <div className="flex items-center justify-between gap-3 px-1">
+        <nav className="flex items-center gap-1.5 text-xs">
+          <Link to="/" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Home</Link>
+          <span className="text-[var(--color-text-muted)]/40">›</span>
+          <span className="text-[var(--color-accent)] font-medium">Gear Lab</span>
+          <span className="text-[var(--color-text-muted)]/40">›</span>
+          <span className="text-[var(--color-text)]">{CATEGORIES.find(c => c.value === category)?.label ?? "Weapon"}</span>
+        </nav>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setBackpackOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/40 transition-colors text-xs"
+          >
+            <span>▤</span> Backpack
+          </button>
+          <Link
+            to="/master-search"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/40 transition-colors text-xs"
+          >
+            <span>⌕</span> Arsenal
+          </Link>
+          <Link
+            to="/character"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/40 transition-colors text-xs"
+          >
+            <span>◉</span> Character
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Backpack drawer ── */}
+      {backpackOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setBackpackOpen(false)}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="relative w-full max-w-lg h-full flex flex-col border-l border-[var(--color-panel-border)] overflow-hidden"
+            style={{ backgroundColor: "rgba(12, 14, 18, 0.98)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+              <h3 className="text-sm font-semibold text-[var(--color-accent)]">▤ Backpack</h3>
+              <button onClick={() => setBackpackOpen(false)} className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text)]">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <iframe
+                src="/inventory/backpack"
+                className="w-full h-full border-0"
+                title="Backpack"
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <section className="relative rounded-xl border-2 border-[var(--color-accent)]/40 p-4 shadow-xl overflow-hidden" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
         {/* Left accent stripe */}
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)]/20 rounded-l-xl" aria-hidden="true" />
@@ -4364,29 +4456,27 @@ export default function UnifiedItemBuilderPage() {
               <span>+Crit stacks: {lastDps.critStackCount}</span>
               <span>+FR stacks: {lastDps.fireRateStackCount}</span>
             </div>
-            {lastWeaponTraits.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {lastWeaponTraits.map((trait) => {
-                  const colors: Record<string, string> = {
-                    "Radiation": "border-green-400/40 bg-green-400/10 text-green-400",
-                    "Shock": "border-blue-400/40 bg-blue-400/10 text-blue-400",
-                    "Corrosive": "border-lime-400/40 bg-lime-400/10 text-lime-400",
-                    "Cryo": "border-cyan-400/40 bg-cyan-400/10 text-cyan-400",
-                    "Fire": "border-red-400/40 bg-red-400/10 text-red-400",
-                    "Seamstress": "border-pink-400/40 bg-pink-400/10 text-pink-400",
-                    "MIRV": "border-orange-400/40 bg-orange-400/10 text-orange-400",
-                    "Grenade Kit": "border-yellow-400/40 bg-yellow-400/10 text-yellow-400",
-                    "Shield Cross": "border-blue-300/40 bg-blue-300/10 text-blue-300",
-                    "Class Mod Perks": "border-emerald-400/40 bg-emerald-400/10 text-emerald-400",
-                    "Heavy Accessories": "border-amber-400/40 bg-amber-400/10 text-amber-400",
-                    "Claude's Gun": "border-purple-400/40 bg-purple-400/10 text-purple-400",
-                  };
-                  return (
-                    <span key={trait} className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${colors[trait] ?? "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]"}`}>
-                      {trait}
-                    </span>
-                  );
-                })}
+            {/* Interactive trait badges — click to expand, edit, swap, delete, lock */}
+            {detectedTraits.length > 0 && (
+              <div className="mt-2">
+                <InteractiveBadgeRow
+                  traits={detectedTraits}
+                  decoded={liveDecoded}
+                  onDecodedChange={(newDecoded) => {
+                    setLiveDecoded(newDecoded);
+                    setLastEditedCodecSide("decoded");
+                    // Re-detect traits from the updated string
+                    setDetectedTraits(detectTraits(newDecoded));
+                  }}
+                  lockedTraitIds={lockedTraitIdSet}
+                  onToggleLock={(traitId) => {
+                    setLockedTraitIds((prev) => {
+                      if (prev.includes(traitId)) return prev.filter((id) => id !== traitId);
+                      return [...prev, traitId];
+                    });
+                  }}
+                  dbPartsMap={dbPartsMap}
+                />
               </div>
             )}
           </div>

@@ -84,6 +84,7 @@ function AppRoutes() {
         <Route path="/terra" element={<TerraLabPage />} />
         <Route path="/green" element={<GreenLabPage />} />
         <Route path="/drlecter" element={<DrLecterPage />} />
+        <Route path="/testing" element={<UnifiedItemBuilderPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />
         <Route path="/save-tools/*" element={<Navigate to="/character/select-save" replace />} />
       </Routes>

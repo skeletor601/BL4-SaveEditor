@@ -96,7 +96,7 @@ export default function SettingsPage() {
           <strong>YNOT</strong> - for all the help with codes and the DB, plus answering all my other million questions.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
-          <strong>Mattmab</strong> - for the Borderlands Item Editor reference HTML that taught us how items are built, the "Show All Parts" concept, class mod research, and being first to match strings to part numbers. The foundation this editor was built on. Also instrumental in NCS data parsing — helping us extract and update the entire item database for DLC drops including the Cowbell update.
+          <strong>Mattmab</strong> - for the original Borderlands Item Editor that taught us how items are built, the "Show All Parts" concept, class mod research, and being first to match strings to part numbers. The foundation this editor was built on. Also instrumental in NCS data parsing — helping us extract and update the entire item database for DLC drops including the Cowbell update.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
           <strong className="text-cyan-300">Cr4nk</strong> - creator of the Borderlands 4 NCS Parser tool. Without this tool, extracting item codes, skill IDs, and part data from game files would not be possible. The backbone of every database update.

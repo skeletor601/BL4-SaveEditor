@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
 import { CHANGE_LOG } from "@/data/changelog";
 
-type DashboardIconKind = "character" | "inventory" | "gear" | "search" | "tutorial" | "news" | "beta";
+type DashboardIconKind = "character" | "inventory" | "gear" | "search" | "tutorial" | "news" | "beta" | "testing";
 
 const cards: { to: string; title: string; desc: string; icon: DashboardIconKind }[] = [
   { to: "/character",    title: "Character Studio", desc: "Select save, character edits, YAML view",           icon: "character" },
@@ -11,6 +11,7 @@ const cards: { to: string; title: string; desc: string; icon: DashboardIconKind 
   { to: "/gear-forge",   title: "Gear Forge",       desc: "Build + edit command center with live codec",       icon: "gear"      },
   { to: "/master-search",title: "Master Search",    desc: "Deep part lookup across 5,200+ item database entries", icon: "search" },
   { to: "/beta",         title: "Beta Lab",         desc: "Try new experiments and send feedback",             icon: "beta"      },
+  { to: "/testing",      title: "Testing",          desc: "Interactive badge editor — test trait editing live", icon: "testing"   },
 ];
 
 function DashboardIcon({ kind }: { kind: DashboardIconKind }) {
@@ -89,6 +90,18 @@ function DashboardIcon({ kind }: { kind: DashboardIconKind }) {
             <path d="M44 92 L44 36 L84 36 L84 92 L44 92" />
             <path d="M52 52 L76 52" />
             <circle cx="64" cy="72" r="6" />
+          </g>
+        </svg>
+      );
+    case "testing":
+      return (
+        <svg className={common} viewBox="0 0 128 128" aria-hidden>
+          <g stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M48 28 L48 52 L28 92 C24 100 30 108 40 108 L88 108 C98 108 104 100 100 92 L80 52 L80 28" />
+            <path d="M44 28 L84 28" />
+            <circle cx="58" cy="82" r="4" fill="currentColor" />
+            <circle cx="72" cy="90" r="3" fill="currentColor" />
+            <circle cx="64" cy="72" r="2.5" fill="currentColor" />
           </g>
         </svg>
       );

@@ -9,19 +9,68 @@ const nav = [
   { to: "/gear-forge", label: "Gear Forge" },
   { to: "/master-search", label: "Master Search" },
   { to: "/beta", label: "Beta" },
+  { to: "/testing", label: "Testing" },
   { to: "/settings", label: "Settings" },
 ];
 
 // Routes that use the new sidebar layout — show minimal header instead of full nav
 // All routes get the minimal header — the new sidebar homepage is the main nav now
-const MINIMAL_HEADER_ROUTES = ["/beta", "/test-app", "/terra", "/drlecter", "/character", "/inventory", "/gear-forge", "/master-search", "/settings", "/save-compare", "/community", "/god-rolls"];
+const MINIMAL_HEADER_ROUTES = ["/beta", "/test-app", "/terra", "/green", "/drlecter", "/character", "/inventory", "/gear-forge", "/master-search", "/settings", "/save-compare", "/community", "/god-rolls", "/testing"];
+
+// ── Breadcrumb definitions ──────────────────────────────────────────────────
+interface Crumb { label: string; to?: string }
+
+function getBreadcrumbs(pathname: string): Crumb[] {
+  const crumbs: Crumb[] = [{ label: "Home", to: "/" }];
+
+  if (pathname.startsWith("/beta/unified-item-builder")) {
+    crumbs.push({ label: "Gear Lab" });
+  } else if (pathname.startsWith("/beta")) {
+    crumbs.push({ label: "Beta Lab" });
+  } else if (pathname.startsWith("/gear-forge")) {
+    crumbs.push({ label: "Gear Forge" });
+  } else if (pathname.startsWith("/character")) {
+    crumbs.push({ label: "Character", to: "/character" });
+    if (pathname.includes("select-save")) crumbs.push({ label: "Select Save" });
+    else if (pathname.includes("edit")) crumbs.push({ label: "Edit" });
+    else if (pathname.includes("yaml")) crumbs.push({ label: "YAML View" });
+  } else if (pathname.startsWith("/inventory")) {
+    crumbs.push({ label: "Inventory", to: "/inventory" });
+    if (pathname.includes("backpack")) crumbs.push({ label: "Backpack" });
+    else if (pathname.includes("decoder")) crumbs.push({ label: "Decoder" });
+    else if (pathname.includes("code-spawn")) crumbs.push({ label: "Code Spawn" });
+    else if (pathname.includes("parts-translator")) crumbs.push({ label: "Parts Translator" });
+  } else if (pathname.startsWith("/master-search")) {
+    crumbs.push({ label: "Arsenal" });
+  } else if (pathname.startsWith("/save-compare")) {
+    crumbs.push({ label: "Save Comparison" });
+  } else if (pathname.startsWith("/community")) {
+    crumbs.push({ label: "Community Vault" });
+  } else if (pathname.startsWith("/god-rolls")) {
+    crumbs.push({ label: "God Rolls" });
+  } else if (pathname.startsWith("/testing")) {
+    crumbs.push({ label: "Testing" });
+  } else if (pathname.startsWith("/settings")) {
+    crumbs.push({ label: "Settings" });
+  } else if (pathname.startsWith("/terra")) {
+    crumbs.push({ label: "Terra Lab" });
+  } else if (pathname.startsWith("/green")) {
+    crumbs.push({ label: "Green Lab" });
+  } else if (pathname.startsWith("/drlecter")) {
+    crumbs.push({ label: "Dr. Lecter" });
+  }
+
+  return crumbs;
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { theme, setTheme, themeConfig } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [backpackOpen, setBackpackOpen] = useState(false);
   const overlay = themeConfig.bgOverlay;
   const useMinimalHeader = MINIMAL_HEADER_ROUTES.some((r) => location.pathname.startsWith(r));
+  const breadcrumbs = getBreadcrumbs(location.pathname);
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -44,16 +93,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           backgroundColor: "rgba(48, 52, 60, 0.92)",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between min-h-[44px] h-14">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between min-h-[44px] h-14 relative">
           {useMinimalHeader ? (
-            <div className="flex items-center gap-4 w-full">
-              <Link to="/" className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
-                <span>←</span>
-                <span className="font-semibold text-[var(--color-text)]">BL4 AIO</span>
-              </Link>
-              <span className="text-[10px] font-mono tracking-widest text-[var(--color-accent)]/50 hidden sm:inline">
-                {location.pathname.includes("unified") ? "GEAR LAB" : location.pathname.includes("terra") ? "TERRA LAB" : ""}
-              </span>
+            <div className="flex items-center justify-between w-full relative">
+              {/* Breadcrumbs */}
+              <nav className="flex items-center gap-1.5 text-xs min-w-0">
+                {breadcrumbs.map((crumb, i) => (
+                  <span key={i} className="flex items-center gap-1.5 min-w-0">
+                    {i > 0 && <span className="text-[var(--color-text-muted)]/40 shrink-0">›</span>}
+                    {crumb.to && i < breadcrumbs.length - 1 ? (
+                      <Link to={crumb.to} className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors truncate">
+                        {i === 0 ? <><span className="mr-1">←</span><span className="font-semibold text-[var(--color-text)]">{crumb.label}</span></> : crumb.label}
+                      </Link>
+                    ) : i === 0 ? (
+                      <Link to="/" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                        <span className="mr-1">←</span><span className="font-semibold text-[var(--color-text)]">{crumb.label}</span>
+                      </Link>
+                    ) : (
+                      <span className={i === breadcrumbs.length - 1 ? "text-[var(--color-accent)] font-medium truncate" : "text-[var(--color-text)] truncate"}>{crumb.label}</span>
+                    )}
+                  </span>
+                ))}
+              </nav>
             </div>
           ) : (
           <div className="flex items-center gap-4">
@@ -87,6 +148,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          {/* Discord link — centered */}
+          <a
+            href="https://discord.gg/msREs4Qep"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
+            title="Join our Discord"
+          >
+            <span className="hidden md:inline">Need help or on mobile?</span>
+            <svg className="w-6 h-6 drop-shadow-[0_0_1px_rgba(0,0,0,1)]" viewBox="0 0 127.14 96.36" fill="currentColor" stroke="black" strokeWidth="2" aria-hidden>
+              <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z" />
+            </svg>
+          </a>
           <div className="flex items-center gap-3">
             {/* Theme swatch row */}
             <div className="flex items-center gap-1.5" role="group" aria-label="Theme">
@@ -110,12 +184,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 />
               ))}
             </div>
-            <Link
-              to="/settings"
-              className="min-h-[44px] inline-flex items-center px-3 py-2 rounded border border-panel-border text-sm text-[var(--color-text-muted)] hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-            >
-              Credits
-            </Link>
           </div>
         </div>
         {menuOpen && (
@@ -143,6 +211,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
       />
       </div>
+
+      {/* ── Backpack drawer (available on all pages) ── */}
+      {backpackOpen && (
+        <div className="fixed inset-0 z-[100] flex justify-end" onClick={() => setBackpackOpen(false)}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="relative w-full max-w-lg h-full flex flex-col border-l border-[var(--color-panel-border)] overflow-hidden"
+            style={{ backgroundColor: "rgba(12, 14, 18, 0.98)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between shrink-0">
+              <h3 className="text-sm font-semibold text-[var(--color-accent)]">▤ Backpack</h3>
+              <button onClick={() => setBackpackOpen(false)} className="w-8 h-8 flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text)]">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <iframe
+                src="/inventory/backpack"
+                className="w-full h-full border-0"
+                title="Backpack"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
