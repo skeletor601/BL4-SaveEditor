@@ -282,7 +282,7 @@ export function generateModdedShield(
 
   // ── Rarity: Pearl every 10th, otherwise Legendary ──
   const isPearl = Math.floor(Math.random() * 10) === 0;
-  const rarityToken = isPearl ? pick(["{11:82}", "{25:82}"]) : pick(["{11:83}", "{25:83}"]);
+  const rarityToken = isPearl ? pick(["{11:82}", "{25:82}", "{7:54}", "{2:80}", "{6:78}", "{15:77}"]) : pick(["{11:83}", "{25:83}"]);
 
   // ── Bininu extras: class mod perks + Daedalus cross-insert (Terra's pattern) ──
   const bininuExtras: string[] = [];
@@ -297,6 +297,11 @@ export function generateModdedShield(
     bininuExtras.push(`{277:[${Array(50).fill(1).join(" ")}]}`);
   }
 
+  // ── 5% chance: Cowbell DLC shield cross-insert (Elpis Star or Honey Badger perk) ──
+  const cowbellShieldExtras: string[] = Math.random() < 0.05
+    ? [pick(["{279:11}", "{312:12}"])]  // Elpis Star (Maliwan) or Honey Badger (Daedalus)
+    : [];
+
   // ── ASSEMBLY ──
   const allParts = [
     rarityToken,
@@ -308,6 +313,7 @@ export function generateModdedShield(
     ...bininuExtras,
     ...fireworksTokens,
     ...immortalityTokens,
+    ...cowbellShieldExtras,
   ];
 
   const componentStr = allParts.join(" ").replace(/\s{2,}/g, " ").trim();

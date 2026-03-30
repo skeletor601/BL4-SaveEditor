@@ -1,0 +1,539 @@
+{
+  "icon_reference": [],
+  "icon_mapping": [],
+  "classmod_name_descriptions": {
+    "breaker": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "chemist": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "assistant": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "physicist": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "controller": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "compiler": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "specialist": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "bookworm": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "radiologist": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "savant": {
+      "character": "Harlowe",
+      "description": "Harlowe standard class mod."
+    },
+    "bio-robot": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "reactor": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "generator": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "driver": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "skeptic": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "scientist": {
+      "character": "Harlowe",
+      "description": "Harlowe legendary class mod."
+    },
+    "trooper": {
+      "character": "Harlowe",
+      "description": "Critical Hits with Guns partially restore Ordnance Cooldown. On Ordnance Activation, gain Gun Damage and Action Skill Damage for a Duration. Red Text: I'm doing my part!"
+    },
+    "phlebotomist": {
+      "character": "Harlowe",
+      "description": "While Harlowe's Action Skill is active, dealing Gun Damage to an enemy has a chance to cause a Hemorrhage, dealing [kinetic_icon][kinetic]Kinetic Status Effect Damage[/kinetic] based on Damage Dealt. Hemorrhage deals twice as much Damage to Bosses. Red Text: Be the reason someone gets a second death."
+    }
+  },
+  "legendary_descriptions": {
+    "driver": {
+      "description": "Whenever Harlowe fires CHROMA Accelerator, she drains all but 1 of her Health and Amps CHROMA Accelerator. CHROMA Accelerator gains {0} Lifesteal.",
+      "red_text": "Now I am become Death, destroyer of worlds."
+    },
+    "generator": {
+      "description": "Whenever Harlowe activates her Flux Generator, she decreases her remaining Action Skill Duration by {0} and gains  {1} Action Skill Power.",
+      "red_text": "Every lie we tell incurs a debt to the truth."
+    },
+    "gravitar": {
+      "description": "Whenever Harlowe Entangles an enemy, she creates alternating [cryo_icon]Cryo Hazards and [radiation_icon]Radiation Hazards.",
+      "red_text": "This place is not a place of honor."
+    },
+    "reactor": {
+      "description": "Whenever Harlowe Entangles an enemy, she gains a Reactor Stack. For every Stack, she gains {1} Movement Speed. When she gains {0} Stacks, she also gains {2} Gun Damage, {2} Fire Rate, {2} Reload Speed, and {2} Status Effect Damage for {3} seconds, and loses all Stacks once the Duration ends.",
+      "red_text": "Our nature is to fly."
+    },
+    "scientist": {
+      "description": "Whenever Harlowe [shock_icon]Shocks an enemy, she automatically Entangles and [radiation_icon]Irradiates that enemy. Whenever Harlowe Entangles an enemy, [shock_icon]Electric Arcs shoot out from that enemy at other nearby enemies.",
+      "red_text": "Everything is theoretically impossible, until it is done."
+    },
+    "skeptic": {
+      "description": "Whenever Harlowe Slams an enemy in Stasis, she automatically fires [radiation_icon]Radiation Darts and [cryo_icon]Cryo Darts that home in on enemies. Shooting enemies with an active Status Effect restores {0} of Action Skill Cooldown.",
+      "red_text": "One must have a mind of winter."
+    },
+    "raid1": {
+      "description": "Critical Hits with Guns partially restore Ordnance Cooldown. On Ordnance Activation, gain Gun Damage and Action Skill Damage for a Duration.",
+      "red_text": "I'm doing my part!"
+    },
+    "cowbell": {
+      "description": "While Harlowe's Action Skill is active, dealing Gun Damage to an enemy has a chance to cause a Hemorrhage, dealing [kinetic_icon][kinetic]Kinetic Status Effect Damage[/kinetic] based on Damage Dealt. Hemorrhage deals twice as much Damage to Bosses.",
+      "red_text": "Be the reason someone gets a second death."
+    }
+  },
+  "passive_descriptions": {
+    "1": {
+      "stats": [
+        "Maximum Shield Capacity: X X"
+      ]
+    },
+    "2": {
+      "stats": [
+        "Melee Damage: X X"
+      ]
+    },
+    "3": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "4": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "5": {
+      "stats": [
+        "Reload Speed: X X per Entangled enemy"
+      ]
+    },
+    "6": {
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    "7": {
+      "stats": [
+        "Cryo Efficiency: X X"
+      ]
+    },
+    "8": {
+      "stats": [
+        "Nearby Enemies: X X"
+      ]
+    },
+    "9": {
+      "stats": [
+        "Action Skill Damage: X X per Stack"
+      ]
+    },
+    "10": {
+      "stats": [
+        "Action Skill Cooldown: X X per Shot"
+      ]
+    },
+    "11": {
+      "stats": [
+        "Duration: X X seconds"
+      ]
+    },
+    "12": {
+      "stats": [
+        "Bonus Cryo Damage: X X of Damage Dealt"
+      ]
+    },
+    "13": {
+      "stats": [
+        "Entangled Enemies Bonus Damage: X X"
+      ]
+    },
+    "14": {
+      "stats": [
+        "Bonus Damage: up to X X of Damage Dealt"
+      ]
+    },
+    "15": {
+      "stats": [
+        "Action Skill Power: X X per Stack"
+      ]
+    },
+    "16": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "17": {
+      "stats": [
+        "Bonus Radiation Damage: Up to X X of Maximum Shield Capacity"
+      ]
+    },
+    "18": {
+      "stats": [
+        "Gun Handling: X X"
+      ]
+    },
+    "19": {
+      "stats": [
+        "\\"
+      ]
+    },
+    "20": {
+      "stats": [
+        "Ammo Added: X X on Critical Hit"
+      ]
+    },
+    "21": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "22": {
+      "stats": [
+        "Bonus Radiation Damage: X X of Damage Dealt"
+      ]
+    },
+    "23": {
+      "stats": [
+        "Ricochet Chance: X X"
+      ]
+    },
+    "24": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "25": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "26": {
+      "stats": [
+        "Shield Restore: X X of Damage Dealt"
+      ]
+    },
+    "27": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "28": {
+      "stats": [
+        "Grenade Spawn Rate: X seconds"
+      ]
+    },
+    "29": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "30": {
+      "stats": [
+        "Maximum Shield Capacity: X X"
+      ]
+    },
+    "31": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "32": {
+      "stats": [
+        "Action Skill Damage: X X"
+      ]
+    },
+    "33": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "34": {
+      "stats": [
+        "Elemental Damage: X X"
+      ]
+    },
+    "35": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "36": {
+      "stats": [
+        "Movement Speed: X X"
+      ]
+    },
+    "37": {
+      "stats": [
+        "Damage: X X"
+      ]
+    },
+    "38": {
+      "stats": [
+        "Status Effect Duration: X X"
+      ]
+    },
+    "39": {
+      "stats": [
+        "Radiation Damage: X X"
+      ]
+    },
+    "40": {
+      "stats": [
+        "Skill Damage: X X"
+      ]
+    },
+    "41": {
+      "stats": [
+        "Entangle Chance: X X"
+      ]
+    },
+    "42": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "43": {
+      "stats": [
+        "What good is the warmth of summer without the cold of winter?"
+      ]
+    },
+    "44": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "45": {
+      "stats": [
+        "Damage: X X per second"
+      ]
+    },
+    "46": {
+      "stats": [
+        "Radiation Damage: X X"
+      ]
+    },
+    "47": {
+      "stats": [
+        "Critical Hit Chance: X X"
+      ]
+    },
+    "48": {
+      "stats": [
+        "Radiation Dart Damage: X X"
+      ]
+    },
+    "49": {
+      "stats": [
+        "Bonus Radiation Damage: X X of Damage Dealt"
+      ]
+    },
+    "50": {
+      "stats": [
+        "Hazard Damage: X X per second"
+      ]
+    },
+    "51": {
+      "stats": [
+        "Damage: X X of total Irradiated Damage"
+      ]
+    },
+    "52": {
+      "stats": [
+        "Shield Capacity Restored: X X"
+      ]
+    },
+    "53": {
+      "stats": [
+        "Skill Damage: X X per Stack"
+      ]
+    },
+    "54": {
+      "stats": [
+        "Damage: X X"
+      ]
+    },
+    "55": {
+      "stats": [
+        "Gun Damage: X X per enemy damaged"
+      ]
+    },
+    "56": {
+      "stats": [
+        "Shield Drained: X X"
+      ]
+    },
+    "57": {
+      "stats": [
+        "Damage: X X"
+      ]
+    },
+    "58": {
+      "stats": [
+        "Health Regeneration: X X"
+      ]
+    },
+    "59": {
+      "stats": [
+        "Critical Hit Chance: X X"
+      ]
+    },
+    "60": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "61": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "62": {
+      "stats": [
+        "Elemental Damage: X X"
+      ]
+    },
+    "63": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "64": {
+      "stats": [
+        "Gun Handling: X X"
+      ]
+    },
+    "65": {
+      "stats": [
+        "Cryo Damage: X X"
+      ]
+    },
+    "66": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "67": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "68": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "69": {
+      "stats": [
+        "Action Skill Duration: X X per Entangled enemy"
+      ]
+    },
+    "70": {
+      "stats": [
+        "Movement Speed: X X"
+      ]
+    },
+    "71": {
+      "stats": [
+        "Action Skill Cooldown: X X on kill"
+      ]
+    },
+    "72": {
+      "stats": [
+        "Enemy Speed Reduction: X X"
+      ]
+    },
+    "73": {
+      "stats": [
+        "Bonus Cryo Damage: X X of Damage Dealt"
+      ]
+    },
+    "74": {
+      "stats": [
+        "Duration: X X seconds"
+      ]
+    },
+    "75": {
+      "stats": [
+        "Bonus Cryo Damage: X X of Damage Dealt"
+      ]
+    },
+    "76": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "77": {
+      "stats": [
+        "Damage: X X per second"
+      ]
+    },
+    "78": {
+      "stats": [
+        "Freeze Chance: X X"
+      ]
+    },
+    "79": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "80": {
+      "stats": [
+        "Bonus Cryo Damage: X X of non-Cryo Damage Dealt"
+      ]
+    },
+    "81": {
+      "stats": [
+        "Splash Damage: X X"
+      ]
+    },
+    "82": {
+      "stats": [
+        "Elemental Explosion Damage: X X"
+      ]
+    },
+    "83": {
+      "stats": [
+        "Retrigger Chance: X X"
+      ]
+    },
+    "84": {
+      "stats": [
+        "Action Skill Duration: X X"
+      ]
+    },
+    "85": {
+      "stats": [
+        "Restoration Chance: X X"
+      ]
+    }
+  }
+}

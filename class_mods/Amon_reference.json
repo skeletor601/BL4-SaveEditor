@@ -1,0 +1,113 @@
+{
+  "icon_reference": [],
+  "icon_mapping": [],
+  "classmod_name_descriptions": {
+    "guardian": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "brawler": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "grenadier": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "icebringer": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "torchbearer": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "stormcaller": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "soldier": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "commando": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "cyborg": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "outlaw": {
+      "character": "Amon",
+      "description": "Amon standard class mod."
+    },
+    "furnace": {
+      "character": "Amon",
+      "description": "Damage from Fellfrost, Hoarcleave, Fulminating Fist, and Stormcutter is converted to Incendiary Damage. Red Text: I'm burnin', I'm burnin', I'm burnin' for you."
+    },
+    "elementalist": {
+      "character": "Amon",
+      "description": "Whenever an Affinity Skill gains a Stack, all unlocked Affinity Skills also gain a Stack. For each Stack of Affinity from all Affinity Skills, Amon gains increased Movement Speed and  Damage Dealt. Red Text: Do you remember. The 21st night of September?"
+    },
+    "blacksmith": {
+      "character": "Amon",
+      "description": "Kill Skill. Partially restores all active Forgedrone's Duration. For each active Forgedrone, Amon gains increased Gun Damage and Forgedrone Damage. Red Text: The lord of the blacksmiths keeps forging on."
+    },
+    "shatterwight": {
+      "character": "Amon",
+      "description": "Forgewaves now deal Melee Damage in addition to their other types. Melee Attacks while Scourge is active gain increased Cryo Efficiency and Radius. Red Text: Time marches on, for whom the bell tolls."
+    },
+    "viking": {
+      "character": "Amon",
+      "description": "Crucible gains +2 Charges, increased Duration, and grants Amon increased Damage Reduction while active. Red Text: Once you’re hardened in battle, there’s no coming back"
+    },
+    "forge master": {
+      "character": "Amon",
+      "description": "All Forgeskills can now be used once while on Cooldown. Red Text: I'm a rollin' thunder, pourin' rain."
+    },
+    "lamplighter": {
+      "character": "Amon",
+      "description": "Whenever Amon Critically Hits with Guns, he partially restores Action Skill Duration. While Action Skill is active, he gains increased Gun and Melee Damage every second until Action Skill ends. Red Text: No need of sun to light the way."
+    },
+    "tempest": {
+      "character": "Amon",
+      "description": "Dealing Gun Damage grants Storm for 20 seconds, increasing [shock_icon]Shock Damage, stacking up to 50 times.Activating a Forgeskill causes Elemental Bolts to strike random nearby enemies for 10 seconds, dealing [shock_icon]Shock Skill Damage based on Maximum Shield Capacity. Red Text: Hell is empty and all the devils are here."
+    }
+  },
+  "legendary_descriptions": {
+    "l01": {
+      "description": "Damage from Fellfrost, Hoarcleave, Fulminating Fist, and Stormcutter is converted to Incendiary Damage.",
+      "red_text": "I'm burnin', I'm burnin', I'm burnin' for you."
+    },
+    "l02": {
+      "description": "Whenever an Affinity Skill gains a Stack, all unlocked Affinity Skills also gain a Stack. For each Stack of Affinity from all Affinity Skills, Amon gains increased Movement Speed and  Damage Dealt.",
+      "red_text": "Do you remember. The 21st night of September?"
+    },
+    "l03": {
+      "description": "Kill Skill. Partially restores all active Forgedrone's Duration. For each active Forgedrone, Amon gains increased Gun Damage and Forgedrone Damage.",
+      "red_text": "The lord of the blacksmiths keeps forging on."
+    },
+    "l04": {
+      "description": "Forgewaves now deal Melee Damage in addition to their other types. Melee Attacks while Scourge is active gain increased Cryo Efficiency and Radius.",
+      "red_text": "Time marches on, for whom the bell tolls."
+    },
+    "l05": {
+      "description": "Crucible gains +2 Charges, increased Duration, and grants Amon increased Damage Reduction while active.",
+      "red_text": "Once you’re hardened in battle, there’s no coming back"
+    },
+    "l06": {
+      "description": "All Forgeskills can now be used once while on Cooldown.",
+      "red_text": "I'm a rollin' thunder, pourin' rain."
+    },
+    "raid1": {
+      "description": "Whenever Amon Critically Hits with Guns, he partially restores Action Skill Duration. While Action Skill is active, he gains increased Gun and Melee Damage every second until Action Skill ends.",
+      "red_text": "No need of sun to light the way."
+    },
+    "cowbell": {
+      "description": "Dealing Gun Damage grants Storm for 20 seconds, increasing [shock_icon]Shock Damage, stacking up to 50 times.Activating a Forgeskill causes Elemental Bolts to strike random nearby enemies for 10 seconds, dealing [shock_icon]Shock Skill Damage based on Maximum Shield Capacity.",
+      "red_text": "Hell is empty and all the devils are here."
+    }
+  },
+  "passive_descriptions": {}
+}

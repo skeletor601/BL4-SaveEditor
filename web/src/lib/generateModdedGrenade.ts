@@ -315,11 +315,11 @@ export function generateModdedGrenade(
 
   // ── Pearl rarity — 33% chance ──────────────────────────────────────────────
   const isPearl = Math.random() < 0.33;
-  const pearlToken = isPearl ? pick(["{11:82}", "{25:82}"]) : "";
+  const pearlToken = isPearl ? pick(["{11:82}", "{25:82}", "{7:54}", "{2:80}", "{6:78}", "{15:77}"]) : "";
 
   // ── Grenade anchors ─────────────────────────────────────────────────────────
   const torgueAnchor = "{298:11}";
-  const vladofWaterfall = "{291:8}";
+  const vladofWaterfall = pick(["{291:8}", "{291:8}", "{291:11}"]); // 2/3 Waterfall, 1/3 Barb'ara
 
   // ── ASSEMBLY — clean: stock base + ONE combined perk block. NO cross-inserts. ──
   const allParts = [
@@ -340,6 +340,8 @@ export function generateModdedGrenade(
     ...(Math.random() < 0.3 ? ["{255:21}"] : []),
     // 30% chance: Vladof Covering Fire legendary cross
     ...(Math.random() < 0.3 ? ["{291:6}"] : []),
+    // 10% chance: Cowbell DLC grenade cross-insert (Bismuth-Tipped Daggers or Barb'ara perk)
+    ...(Math.random() < 0.10 ? [pick(["{267:19}", "{291:11}"])] : []),
 
     // Grenade anchors + ONE combined perk block (visual recipe + power stacking)
     torgueAnchor,

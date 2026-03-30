@@ -797,7 +797,7 @@ export function generateModdedWeapon(
   // Rule: first barrel MUST be from a visual-only pool. Never use entries that don't have visual: true.
   // Priority: (1) entries with visual:true from JSON, (2) hardcoded fallback. Never use the full JSON list
   // when it contains non-visual barrels (e.g. AI-generated list with mixed visual/non-visual).
-  const FALLBACK_VISUAL_BARRELS: VisualBarrelEntry[] = [
+  const BASE_VISUAL_BARRELS: VisualBarrelEntry[] = [
     { name: "BottledLightning", code: "{289:26}", visual: true },
     { name: "DiscJockey",       code: "{275:30}", visual: true },
     { name: "GammaVoid",        code: "{289:24}", visual: true },
@@ -810,13 +810,34 @@ export function generateModdedWeapon(
     { name: "Ravenfire",        code: "{273:40}", visual: true },
     { name: "Streamer",         code: "{275:1}",  visual: true },
   ];
+  const COWBELL_VISUAL_BARRELS: VisualBarrelEntry[] = [
+    { name: "CrazedEarl",       code: "{7:21}",   visual: true },
+    { name: "SoulSurvivor",     code: "{2:79}",   visual: true },
+    { name: "HandCannon",       code: "{6:77}",   visual: true },
+    { name: "ScootShoot",       code: "{6:56}",   visual: true },
+    { name: "Sunspot",          code: "{4:82}",   visual: true },
+    { name: "CrowSourced",      code: "{15:78}",  visual: true },
+    { name: "LaserCutter",      code: "{18:102}", visual: true },
+    { name: "Follower",         code: "{20:1}",   visual: true },
+    { name: "FlashCyclone",     code: "{21:84}",  visual: true },
+    { name: "Falk",             code: "{19:58}",  visual: true },
+    { name: "Reminisce",        code: "{10:60}",  visual: true },
+    { name: "Hemorrhage",       code: "{16:87}",  visual: true },
+    { name: "Fearstalker",      code: "{24:77}",  visual: true },
+    { name: "DahlFather",       code: "{273:42}", visual: true },
+  ];
+  const FALLBACK_VISUAL_BARRELS = [...BASE_VISUAL_BARRELS, ...COWBELL_VISUAL_BARRELS];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
   const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
+  // 20% chance to roll a Cowbell DLC barrel
+  const useCowbell = Math.random() < 0.20;
   const chosenVisualBarrel = isClaudeGun
     ? "{7:64}"
     : options.customMode
-      ? "" // Custom mode: no visual barrel injection — user's auto-filled barrel is the only barrel
-      : pick(visualBarrelPool).code.trim();
+      ? ""
+      : useCowbell
+        ? pick(COWBELL_VISUAL_BARRELS).code.trim()
+        : pick(visualBarrelPool).code.trim();
   // Stack the visual barrel 2-4× (Terra stacks Bod 3×) to reinforce the visual identity.
   const visualBarrelStackCount = isClaudeGun ? 4 : { stable: randInt(2, 3), op: 3, insane: randInt(3, 4) }[modPowerMode];
   const uniqueFirstBarrelToken = options.customMode ? "" : (() => {
@@ -1486,8 +1507,9 @@ export function generateModdedWeapon(
   }
   // {298:11} = Torgue grenade anchor — Terra's perfect gun uses this (not {291:8}).
   // {291:8} = Vladof Waterfall grenade — wraps {245:[...]} on both sides for grenade reload.
+  // {291:11} = Barb'ara (Cowbell DLC) — alternate grenade wrap with unique behavior.
   const torgueGrenadeAnchor = "{298:11}";
-  const vladofGrenadeAnchor = "{291:8}";
+  const vladofGrenadeAnchor = pick(["{291:8}", "{291:8}", "{291:11}"]); // 2/3 Waterfall, 1/3 Barb'ara
 
   // Grenade system: {298:11} Torgue anchor + {291:8} Vladof waterfall wrap the {245:[...]} perk block.
   // No extra legendary grenade wrapper — Torgue + Vladof anchors are sufficient.
@@ -1552,12 +1574,27 @@ export function generateModdedWeapon(
     "{25:60}": "{25:61}",  // Katagawas Revenge
     "{25:81}": "{25:82}",  // Conflux
     "{27:73}": "{27:1}",   // Bonnie and Clyde
+    // ── Cowbell DLC barrel→rarity (Pearls + Legendaries) ──
+    "{7:21}":  "{7:54}",   // Crazed Earl (Pearl)
+    "{2:79}":  "{2:80}",   // Soul Survivor (Pearl)
+    "{6:77}":  "{6:78}",   // Hand Cannon (Pearl)
+    "{15:78}": "{15:77}",  // Crow-Sourced (Pearl)
+    "{6:56}":  "{6:55}",   // Scoot'n'Shoot
+    "{4:82}":  "{4:83}",   // Sunspot
+    "{18:102}": "{18:103}", // Laser-Cutter
+    "{20:1}":  "{20:2}",   // Follower / Prowler
+    "{21:84}": "{21:1}",   // Flash Cyclone
+    "{19:58}": "{19:59}",  // Falk
+    "{10:60}": "{10:61}",  // Reminisce
+    "{16:87}": "{16:88}",  // Hemorrhage
+    "{24:77}": "{24:78}",  // Fearstalker
+    "{273:42}": "{273:43}", // DahlFather / Heimdahl
   };
   const isPearl = options.customMode && options.forcedRarityToken
     ? true
     : Math.random() < 0.33;
   const pearlRarityToken = isPearl
-    ? (options.forcedRarityToken ?? VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}"]))
+    ? (options.forcedRarityToken ?? VISUAL_BARREL_RARITY[chosenVisualBarrel] ?? pick(["{11:82}", "{25:82}", "{7:54}", "{2:80}", "{6:78}", "{15:77}"]))
     : "";
 
   // Removed: extreme same-prefix stacking and body ×10 repeats (bloat without synergy).

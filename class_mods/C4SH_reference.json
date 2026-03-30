@@ -1,0 +1,1632 @@
+{
+  "icon_reference": [
+    {
+      "icon_file": "c4sh_passive_blue_06",
+      "passive_number": 58,
+      "internal_name": "LucksARobot",
+      "display_name": "Luck Be a Robot",
+      "description": "Action Skill Cooldown Rate: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_02",
+      "passive_number": 59,
+      "internal_name": "AllForOne",
+      "display_name": "Sweet Roll",
+      "description": "Max Health: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_03",
+      "passive_number": 60,
+      "internal_name": "LuckyCharm",
+      "display_name": "Charm Bracelet",
+      "description": "Skill Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_04",
+      "passive_number": 61,
+      "internal_name": "TheLuckyOne",
+      "display_name": "O Fortuna",
+      "description": "Windfall Chance: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_green_05",
+      "passive_number": 62,
+      "internal_name": "RedMoonRising",
+      "display_name": "Red Moon Rising",
+      "description": "Bonus Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_06",
+      "passive_number": 63,
+      "internal_name": "RollingTheDeep",
+      "display_name": "Ready to Roll",
+      "description": "Action Skill Cooldown Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_07",
+      "passive_number": 64,
+      "internal_name": "RidingHigh",
+      "display_name": "Riding High",
+      "description": "Windfall Duration: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_08",
+      "passive_number": 65,
+      "internal_name": "GravePact",
+      "display_name": "Bonemeal Ticket",
+      "description": "Action Skill Duration: X X on kill"
+    },
+    {
+      "icon_file": "c4sh_passive_green_09",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CL",
+      "display_name": "devilsTines_CL",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_green_10",
+      "passive_number": 75,
+      "internal_name": "DoubleTime",
+      "display_name": "Before She Knows You're Dead",
+      "description": "Movement Speed: X X per active Bone Totem"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 67,
+      "internal_name": "Luckless",
+      "display_name": "Luckless",
+      "description": "Jinxed Enemy Damage Dealt: X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_12",
+      "passive_number": 68,
+      "internal_name": "CriticalRole",
+      "display_name": "Can't Stop Winning",
+      "description": "Gun Critical Hit Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_13",
+      "passive_number": 69,
+      "internal_name": "SpinOfFate",
+      "display_name": "Turn of Fate",
+      "description": "Lifesteal: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_14",
+      "passive_number": 70,
+      "internal_name": "HighStakes",
+      "display_name": "High Stakes",
+      "description": "Fire Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_15",
+      "passive_number": 71,
+      "internal_name": "FortunesFavor",
+      "display_name": "Fortune's Favor",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_16",
+      "passive_number": 72,
+      "internal_name": "LetItRide",
+      "display_name": "Let it Ride",
+      "description": "Gun Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_17",
+      "passive_number": 73,
+      "internal_name": "Wild",
+      "display_name": "The Wilds",
+      "description": "Bonus Elemental Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_green_18",
+      "passive_number": 74,
+      "internal_name": "PackMentality",
+      "display_name": "Potent Posse",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_19",
+      "passive_number": 66,
+      "internal_name": "Undying",
+      "display_name": "Restless Remains",
+      "description": "Respawn Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_20",
+      "passive_number": 76,
+      "internal_name": "LoadedDice",
+      "display_name": "Sorcerer",
+      "description": "Fire Nova Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_21",
+      "passive_number": 77,
+      "internal_name": "ShadowsEmbrace",
+      "display_name": "Tooth and Nail",
+      "description": "Melee Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_22",
+      "passive_number": 78,
+      "internal_name": "Serendipity",
+      "display_name": "Serendipity",
+      "description": "Health Restored: X X per missile"
+    },
+    {
+      "icon_file": "c4sh_passive_green_23",
+      "passive_number": 79,
+      "internal_name": "SidekicksRevenge",
+      "display_name": "Sidekick's Revenge",
+      "description": "Health Converted: X of Current Health"
+    },
+    {
+      "icon_file": "c4sh_passive_green_24",
+      "passive_number": 80,
+      "internal_name": "AlphasCall",
+      "display_name": "Dead Friend Redemption",
+      "description": "Gun Damage: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_green_25",
+      "passive_number": 81,
+      "internal_name": "CursedCall",
+      "display_name": "Accursed Bones",
+      "description": "Lifesteal: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_26",
+      "passive_number": 82,
+      "internal_name": "Haunted",
+      "display_name": "Tormented",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_27",
+      "passive_number": 83,
+      "internal_name": "GraveyardShift",
+      "display_name": "Graveyard Shift",
+      "description": "Action Skill Cooldown Rate: X X per Jinxed enemy"
+    },
+    {
+      "icon_file": "c4sh_passive_green_28",
+      "passive_number": 84,
+      "internal_name": "SnakeEyes",
+      "display_name": "Snake Eyes",
+      "description": "Damage Taken: X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_29",
+      "passive_number": 85,
+      "internal_name": "WitchingHour",
+      "display_name": "Call",
+      "description": "Duration: X seconds"
+    },
+    {
+      "icon_file": "c4sh_passive_green_30",
+      "passive_number": 31,
+      "internal_name": "Unchained",
+      "display_name": "Gunslinger",
+      "description": "Fire Rate: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_31",
+      "passive_number": 32,
+      "internal_name": "DeathHunt",
+      "display_name": "Huckleberry",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_32",
+      "passive_number": 33,
+      "internal_name": "Determinator",
+      "display_name": "The Determinator",
+      "description": "Health Regeneration: up to X X of missing Health per second"
+    },
+    {
+      "icon_file": "c4sh_passive_green_33",
+      "passive_number": 34,
+      "internal_name": "HardBoiled",
+      "display_name": "Hard Boiled",
+      "description": "Action Skill Duration Restored: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_green_34",
+      "passive_number": 36,
+      "internal_name": "TheShootist",
+      "display_name": "Shootist",
+      "description": "Gun Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_01",
+      "passive_number": 37,
+      "internal_name": "StandAndBleed",
+      "display_name": "Stand and Bleed",
+      "description": "Critical Hit Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_02",
+      "passive_number": 35,
+      "internal_name": "TheFuries",
+      "display_name": "Hot Hand",
+      "description": "Bonus Fire Damage: up to X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_03",
+      "passive_number": 39,
+      "internal_name": "BoneShrapnel",
+      "display_name": "Trick Shot",
+      "description": "Ricochet Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_04",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CF",
+      "display_name": "devilsTines_CF",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_red_05",
+      "passive_number": 40,
+      "internal_name": "RideWithTheDevil",
+      "display_name": "RideWithTheDevil",
+      "description": "Reload Speed: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_06",
+      "passive_number": 38,
+      "internal_name": "Unchained",
+      "display_name": "A Blur of Fingers and Brass",
+      "description": "Reload Speed: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_red_07",
+      "passive_number": 42,
+      "internal_name": "Brimstone",
+      "display_name": "Brimstone",
+      "description": ""
+    },
+    {
+      "icon_file": "c4sh_passive_red_08",
+      "passive_number": 43,
+      "internal_name": "TheClaim",
+      "display_name": "Fast C4SH",
+      "description": "Movement Speed: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_09",
+      "passive_number": 44,
+      "internal_name": "TheGunfighter",
+      "display_name": "Firestorm",
+      "description": "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed"
+    },
+    {
+      "icon_file": "c4sh_passive_red_10",
+      "passive_number": 45,
+      "internal_name": "DebtsToPay",
+      "display_name": "Burn Down the House",
+      "description": "Fire Mortar Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 46,
+      "internal_name": "HellAndBack",
+      "display_name": "High Noon",
+      "description": "Fire Nova Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_12",
+      "passive_number": 47,
+      "internal_name": "BloodOnElpis",
+      "display_name": "Bloodstained Moon",
+      "description": "Elemental Effect Chance: X X per Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_red_13",
+      "passive_number": 48,
+      "internal_name": "Lawless",
+      "display_name": "Lawless",
+      "description": "Kinetic Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_14",
+      "passive_number": 49,
+      "internal_name": "TNT",
+      "display_name": "Truck Full of Nitro",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_15",
+      "passive_number": 50,
+      "internal_name": "WarWagon",
+      "display_name": "War Wagon",
+      "description": "Ammo Refill Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_16",
+      "passive_number": 51,
+      "internal_name": "PaleRider",
+      "display_name": "Pale Rider",
+      "description": "Bonus Kinetic Damage: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_17",
+      "passive_number": 52,
+      "internal_name": "Forsaken",
+      "display_name": "Nothing Beats Lead",
+      "description": "Elemental Damage Converted: X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_18",
+      "passive_number": 53,
+      "internal_name": "TheWind",
+      "display_name": "Mr Pocket",
+      "description": "Duration Freeze: X X second(s)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_19",
+      "passive_number": 54,
+      "internal_name": "Maverick",
+      "display_name": "Unshaken",
+      "description": "Damage: X X per Fortune Stack lost"
+    },
+    {
+      "icon_file": "c4sh_passive_red_20",
+      "passive_number": 55,
+      "internal_name": "Cottonmouth",
+      "display_name": "From Glaom Till Glow",
+      "description": "Overshield: X X of Damage Taken"
+    },
+    {
+      "icon_file": "c4sh_passive_red_21",
+      "passive_number": 56,
+      "internal_name": "BrokenArrow",
+      "display_name": "Dusty Trail",
+      "description": "Gun Damage: X X per Fortune Stack lost"
+    },
+    {
+      "icon_file": "c4sh_passive_red_22",
+      "passive_number": 57,
+      "internal_name": "BadMenMustBleed",
+      "display_name": "Bleed the Bad",
+      "description": "Action Skill Duration Rate: X per failed attempt"
+    },
+    {
+      "icon_file": "c4sh_passive_red_23",
+      "passive_number": 1,
+      "internal_name": "TableFLip",
+      "display_name": "Fast Hands",
+      "description": "Reload Speed: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_24",
+      "passive_number": 2,
+      "internal_name": "HeroCall",
+      "display_name": "Insurance",
+      "description": "Shield Capacity: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_25",
+      "passive_number": 3,
+      "internal_name": "Steam",
+      "display_name": "Splash the Pot",
+      "description": "Ordnance Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_26",
+      "passive_number": 4,
+      "internal_name": "alchemy",
+      "display_name": "Alchemy",
+      "description": "Elemental Effect Chance: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_27",
+      "passive_number": 24,
+      "internal_name": "ReadTheSigns",
+      "display_name": "Go For Broke",
+      "description": "Additional Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_28",
+      "passive_number": 6,
+      "internal_name": "SoundsOfRain",
+      "display_name": "Sounds of Rain (Lucky Strike)",
+      "description": "Critical Hit Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_29",
+      "passive_number": 7,
+      "internal_name": "TrickTaker",
+      "display_name": "Trick-Taker (Full Spread)",
+      "description": "Elemental Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_30",
+      "passive_number": 9,
+      "internal_name": "LateScratch",
+      "display_name": "LateScratch",
+      "description": "I bring a fork."
+    },
+    {
+      "icon_file": "c4sh_passive_red_31",
+      "passive_number": 10,
+      "internal_name": "devilsTines_SoH",
+      "display_name": "devilsTines_SoH",
+      "description": "The Devil sends cookies.. God sends meat."
+    },
+    {
+      "icon_file": "c4sh_passive_red_32",
+      "passive_number": 11,
+      "internal_name": "DoubleDown",
+      "display_name": "Double-Down (Double or Nothing)",
+      "description": "Double Damage Chance: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_red_33",
+      "passive_number": 12,
+      "internal_name": "wretchedShadows",
+      "display_name": "Wretched Shadows",
+      "description": "Damage: up to X per second"
+    },
+    {
+      "icon_file": "c4sh_passive_red_34",
+      "passive_number": 13,
+      "internal_name": "HighRoller",
+      "display_name": "High Roller (Ace in the Hole)",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_01",
+      "passive_number": 14,
+      "internal_name": "TakeThePot",
+      "display_name": "Take the Pot",
+      "description": "Health Restored: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_02",
+      "passive_number": 15,
+      "internal_name": "StackTheDeck",
+      "display_name": "Stack the Deck (Full House)",
+      "description": "Skill Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_03",
+      "passive_number": 16,
+      "internal_name": "Legerdemain",
+      "display_name": "Legerdemain (Wild Card)",
+      "description": "Reload Speed: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_04",
+      "passive_number": 17,
+      "internal_name": "Fortuity",
+      "display_name": "Vigorish",
+      "description": "Bonus Damage: up to X X of Damage Dealt"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_05",
+      "passive_number": 18,
+      "internal_name": "DealersBluff",
+      "display_name": "Dealer's Bluff",
+      "description": "Action Skill Cooldown Restored: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_23",
+      "passive_number": 19,
+      "internal_name": "AceInTheHole",
+      "display_name": "Ace in the Hole",
+      "description": "Gun Damage: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_07",
+      "passive_number": 20,
+      "internal_name": "AroundTheCorner",
+      "display_name": "Around the Corner",
+      "description": "Action Skill Cooldown Rate: X X per Fortune Stack"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_08",
+      "passive_number": 22,
+      "internal_name": "TheHouse",
+      "display_name": "TheHouse",
+      "description": "Truth is... the game was rigged from the start."
+    },
+    {
+      "icon_file": "c4sh_passive_blue_09",
+      "passive_number": 21,
+      "internal_name": "C4SHGame",
+      "display_name": "C4SH Game",
+      "description": "Minimum Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_10",
+      "passive_number": 23,
+      "internal_name": "RiskyBusiness",
+      "display_name": "No Limit",
+      "description": "Max Fortune Stacks: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 5,
+      "internal_name": "ante",
+      "display_name": "Ante Up",
+      "description": "Gun Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_12",
+      "passive_number": 25,
+      "internal_name": "TheTurn",
+      "display_name": "Kill Button",
+      "description": "Ordnance Damage: up to X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_13",
+      "passive_number": 26,
+      "internal_name": "Payout",
+      "display_name": "Payout",
+      "description": "Fortune Skills: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_20",
+      "passive_number": 27,
+      "internal_name": "BoomOrBus",
+      "display_name": "Boom or Bust",
+      "description": "Grenade Damage: X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_15",
+      "passive_number": 28,
+      "internal_name": "HeartOfTheCards",
+      "display_name": "Tender Hearts",
+      "description": "Critical Hit Damage: X X"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_16",
+      "passive_number": 29,
+      "internal_name": "RunningLuck",
+      "display_name": "Card Sharp",
+      "description": "Duration: X X second(s)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_17",
+      "passive_number": 30,
+      "internal_name": "HotStreak",
+      "display_name": "Hot Streak",
+      "description": "Critical Hit Damage: X X"
+    }
+  ],
+  "icon_mapping": [
+    {
+      "icon_file": "c4sh_passive_blue_06",
+      "passive_number": 58,
+      "internal_name": "LucksARobot",
+      "display_name": "Luck Be a Robot"
+    },
+    {
+      "icon_file": "c4sh_passive_green_02",
+      "passive_number": 59,
+      "internal_name": "AllForOne",
+      "display_name": "Sweet Roll"
+    },
+    {
+      "icon_file": "c4sh_passive_green_03",
+      "passive_number": 60,
+      "internal_name": "LuckyCharm",
+      "display_name": "Charm Bracelet"
+    },
+    {
+      "icon_file": "c4sh_passive_green_04",
+      "passive_number": 61,
+      "internal_name": "TheLuckyOne",
+      "display_name": "O Fortuna"
+    },
+    {
+      "icon_file": "c4sh_passive_green_05",
+      "passive_number": 62,
+      "internal_name": "RedMoonRising",
+      "display_name": "Red Moon Rising"
+    },
+    {
+      "icon_file": "c4sh_passive_green_06",
+      "passive_number": 63,
+      "internal_name": "RollingTheDeep",
+      "display_name": "Ready to Roll"
+    },
+    {
+      "icon_file": "c4sh_passive_green_07",
+      "passive_number": 64,
+      "internal_name": "RidingHigh",
+      "display_name": "Riding High"
+    },
+    {
+      "icon_file": "c4sh_passive_green_08",
+      "passive_number": 65,
+      "internal_name": "GravePact",
+      "display_name": "Bonemeal Ticket"
+    },
+    {
+      "icon_file": "c4sh_passive_green_09",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CL",
+      "display_name": "devilsTines_CL"
+    },
+    {
+      "icon_file": "c4sh_passive_green_10",
+      "passive_number": 75,
+      "internal_name": "DoubleTime",
+      "display_name": "Before She Knows You're Dead"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 67,
+      "internal_name": "Luckless",
+      "display_name": "Luckless"
+    },
+    {
+      "icon_file": "c4sh_passive_green_12",
+      "passive_number": 68,
+      "internal_name": "CriticalRole",
+      "display_name": "Can't Stop Winning"
+    },
+    {
+      "icon_file": "c4sh_passive_green_13",
+      "passive_number": 69,
+      "internal_name": "SpinOfFate",
+      "display_name": "Turn of Fate"
+    },
+    {
+      "icon_file": "c4sh_passive_green_14",
+      "passive_number": 70,
+      "internal_name": "HighStakes",
+      "display_name": "High Stakes"
+    },
+    {
+      "icon_file": "c4sh_passive_green_15",
+      "passive_number": 71,
+      "internal_name": "FortunesFavor",
+      "display_name": "Fortune's Favor"
+    },
+    {
+      "icon_file": "c4sh_passive_green_16",
+      "passive_number": 72,
+      "internal_name": "LetItRide",
+      "display_name": "Let it Ride"
+    },
+    {
+      "icon_file": "c4sh_passive_green_17",
+      "passive_number": 73,
+      "internal_name": "Wild",
+      "display_name": "The Wilds"
+    },
+    {
+      "icon_file": "c4sh_passive_green_18",
+      "passive_number": 74,
+      "internal_name": "PackMentality",
+      "display_name": "Potent Posse"
+    },
+    {
+      "icon_file": "c4sh_passive_green_19",
+      "passive_number": 66,
+      "internal_name": "Undying",
+      "display_name": "Restless Remains"
+    },
+    {
+      "icon_file": "c4sh_passive_green_20",
+      "passive_number": 76,
+      "internal_name": "LoadedDice",
+      "display_name": "Sorcerer"
+    },
+    {
+      "icon_file": "c4sh_passive_green_21",
+      "passive_number": 77,
+      "internal_name": "ShadowsEmbrace",
+      "display_name": "Tooth and Nail"
+    },
+    {
+      "icon_file": "c4sh_passive_green_22",
+      "passive_number": 78,
+      "internal_name": "Serendipity",
+      "display_name": "Serendipity"
+    },
+    {
+      "icon_file": "c4sh_passive_green_23",
+      "passive_number": 79,
+      "internal_name": "SidekicksRevenge",
+      "display_name": "Sidekick's Revenge"
+    },
+    {
+      "icon_file": "c4sh_passive_green_24",
+      "passive_number": 80,
+      "internal_name": "AlphasCall",
+      "display_name": "Dead Friend Redemption"
+    },
+    {
+      "icon_file": "c4sh_passive_green_25",
+      "passive_number": 81,
+      "internal_name": "CursedCall",
+      "display_name": "Accursed Bones"
+    },
+    {
+      "icon_file": "c4sh_passive_green_26",
+      "passive_number": 82,
+      "internal_name": "Haunted",
+      "display_name": "Tormented"
+    },
+    {
+      "icon_file": "c4sh_passive_green_27",
+      "passive_number": 83,
+      "internal_name": "GraveyardShift",
+      "display_name": "Graveyard Shift"
+    },
+    {
+      "icon_file": "c4sh_passive_green_28",
+      "passive_number": 84,
+      "internal_name": "SnakeEyes",
+      "display_name": "Snake Eyes"
+    },
+    {
+      "icon_file": "c4sh_passive_green_29",
+      "passive_number": 85,
+      "internal_name": "WitchingHour",
+      "display_name": "Call"
+    },
+    {
+      "icon_file": "c4sh_passive_green_30",
+      "passive_number": 31,
+      "internal_name": "Unchained",
+      "display_name": "Gunslinger"
+    },
+    {
+      "icon_file": "c4sh_passive_green_31",
+      "passive_number": 32,
+      "internal_name": "DeathHunt",
+      "display_name": "Huckleberry"
+    },
+    {
+      "icon_file": "c4sh_passive_green_32",
+      "passive_number": 33,
+      "internal_name": "Determinator",
+      "display_name": "The Determinator"
+    },
+    {
+      "icon_file": "c4sh_passive_green_33",
+      "passive_number": 34,
+      "internal_name": "HardBoiled",
+      "display_name": "Hard Boiled"
+    },
+    {
+      "icon_file": "c4sh_passive_green_34",
+      "passive_number": 36,
+      "internal_name": "TheShootist",
+      "display_name": "Shootist"
+    },
+    {
+      "icon_file": "c4sh_passive_red_01",
+      "passive_number": 37,
+      "internal_name": "StandAndBleed",
+      "display_name": "Stand and Bleed"
+    },
+    {
+      "icon_file": "c4sh_passive_red_02",
+      "passive_number": 35,
+      "internal_name": "TheFuries",
+      "display_name": "Hot Hand"
+    },
+    {
+      "icon_file": "c4sh_passive_red_03",
+      "passive_number": 39,
+      "internal_name": "BoneShrapnel",
+      "display_name": "Trick Shot"
+    },
+    {
+      "icon_file": "c4sh_passive_red_04",
+      "passive_number": 10,
+      "internal_name": "devilsTines_CF",
+      "display_name": "devilsTines_CF"
+    },
+    {
+      "icon_file": "c4sh_passive_red_05",
+      "passive_number": 40,
+      "internal_name": "RideWithTheDevil",
+      "display_name": "RideWithTheDevil"
+    },
+    {
+      "icon_file": "c4sh_passive_red_06",
+      "passive_number": 38,
+      "internal_name": "Unchained",
+      "display_name": "A Blur of Fingers and Brass"
+    },
+    {
+      "icon_file": "c4sh_passive_red_07",
+      "passive_number": 42,
+      "internal_name": "Brimstone",
+      "display_name": "Brimstone"
+    },
+    {
+      "icon_file": "c4sh_passive_red_08",
+      "passive_number": 43,
+      "internal_name": "TheClaim",
+      "display_name": "Fast C4SH"
+    },
+    {
+      "icon_file": "c4sh_passive_red_09",
+      "passive_number": 44,
+      "internal_name": "TheGunfighter",
+      "display_name": "Firestorm"
+    },
+    {
+      "icon_file": "c4sh_passive_red_10",
+      "passive_number": 45,
+      "internal_name": "DebtsToPay",
+      "display_name": "Burn Down the House"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 46,
+      "internal_name": "HellAndBack",
+      "display_name": "High Noon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_12",
+      "passive_number": 47,
+      "internal_name": "BloodOnElpis",
+      "display_name": "Bloodstained Moon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_13",
+      "passive_number": 48,
+      "internal_name": "Lawless",
+      "display_name": "Lawless"
+    },
+    {
+      "icon_file": "c4sh_passive_red_14",
+      "passive_number": 49,
+      "internal_name": "TNT",
+      "display_name": "Truck Full of Nitro"
+    },
+    {
+      "icon_file": "c4sh_passive_red_15",
+      "passive_number": 50,
+      "internal_name": "WarWagon",
+      "display_name": "War Wagon"
+    },
+    {
+      "icon_file": "c4sh_passive_red_16",
+      "passive_number": 51,
+      "internal_name": "PaleRider",
+      "display_name": "Pale Rider"
+    },
+    {
+      "icon_file": "c4sh_passive_red_17",
+      "passive_number": 52,
+      "internal_name": "Forsaken",
+      "display_name": "Nothing Beats Lead"
+    },
+    {
+      "icon_file": "c4sh_passive_red_18",
+      "passive_number": 53,
+      "internal_name": "TheWind",
+      "display_name": "Mr Pocket"
+    },
+    {
+      "icon_file": "c4sh_passive_red_19",
+      "passive_number": 54,
+      "internal_name": "Maverick",
+      "display_name": "Unshaken"
+    },
+    {
+      "icon_file": "c4sh_passive_red_20",
+      "passive_number": 55,
+      "internal_name": "Cottonmouth",
+      "display_name": "From Glaom Till Glow"
+    },
+    {
+      "icon_file": "c4sh_passive_red_21",
+      "passive_number": 56,
+      "internal_name": "BrokenArrow",
+      "display_name": "Dusty Trail"
+    },
+    {
+      "icon_file": "c4sh_passive_red_22",
+      "passive_number": 57,
+      "internal_name": "BadMenMustBleed",
+      "display_name": "Bleed the Bad"
+    },
+    {
+      "icon_file": "c4sh_passive_red_23",
+      "passive_number": 1,
+      "internal_name": "TableFLip",
+      "display_name": "Fast Hands"
+    },
+    {
+      "icon_file": "c4sh_passive_red_24",
+      "passive_number": 2,
+      "internal_name": "HeroCall",
+      "display_name": "Insurance"
+    },
+    {
+      "icon_file": "c4sh_passive_red_25",
+      "passive_number": 3,
+      "internal_name": "Steam",
+      "display_name": "Splash the Pot"
+    },
+    {
+      "icon_file": "c4sh_passive_red_26",
+      "passive_number": 4,
+      "internal_name": "alchemy",
+      "display_name": "Alchemy"
+    },
+    {
+      "icon_file": "c4sh_passive_red_27",
+      "passive_number": 24,
+      "internal_name": "ReadTheSigns",
+      "display_name": "Go For Broke"
+    },
+    {
+      "icon_file": "c4sh_passive_red_28",
+      "passive_number": 6,
+      "internal_name": "SoundsOfRain",
+      "display_name": "Sounds of Rain (Lucky Strike)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_29",
+      "passive_number": 7,
+      "internal_name": "TrickTaker",
+      "display_name": "Trick-Taker (Full Spread)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_30",
+      "passive_number": 9,
+      "internal_name": "LateScratch",
+      "display_name": "LateScratch"
+    },
+    {
+      "icon_file": "c4sh_passive_red_31",
+      "passive_number": 10,
+      "internal_name": "devilsTines_SoH",
+      "display_name": "devilsTines_SoH"
+    },
+    {
+      "icon_file": "c4sh_passive_red_32",
+      "passive_number": 11,
+      "internal_name": "DoubleDown",
+      "display_name": "Double-Down (Double or Nothing)"
+    },
+    {
+      "icon_file": "c4sh_passive_red_33",
+      "passive_number": 12,
+      "internal_name": "wretchedShadows",
+      "display_name": "Wretched Shadows"
+    },
+    {
+      "icon_file": "c4sh_passive_red_34",
+      "passive_number": 13,
+      "internal_name": "HighRoller",
+      "display_name": "High Roller (Ace in the Hole)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_01",
+      "passive_number": 14,
+      "internal_name": "TakeThePot",
+      "display_name": "Take the Pot"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_02",
+      "passive_number": 15,
+      "internal_name": "StackTheDeck",
+      "display_name": "Stack the Deck (Full House)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_03",
+      "passive_number": 16,
+      "internal_name": "Legerdemain",
+      "display_name": "Legerdemain (Wild Card)"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_04",
+      "passive_number": 17,
+      "internal_name": "Fortuity",
+      "display_name": "Vigorish"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_05",
+      "passive_number": 18,
+      "internal_name": "DealersBluff",
+      "display_name": "Dealer's Bluff"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_23",
+      "passive_number": 19,
+      "internal_name": "AceInTheHole",
+      "display_name": "Ace in the Hole"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_07",
+      "passive_number": 20,
+      "internal_name": "AroundTheCorner",
+      "display_name": "Around the Corner"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_08",
+      "passive_number": 22,
+      "internal_name": "TheHouse",
+      "display_name": "TheHouse"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_09",
+      "passive_number": 21,
+      "internal_name": "C4SHGame",
+      "display_name": "C4SH Game"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_10",
+      "passive_number": 23,
+      "internal_name": "RiskyBusiness",
+      "display_name": "No Limit"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_11",
+      "passive_number": 5,
+      "internal_name": "ante",
+      "display_name": "Ante Up"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_12",
+      "passive_number": 25,
+      "internal_name": "TheTurn",
+      "display_name": "Kill Button"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_13",
+      "passive_number": 26,
+      "internal_name": "Payout",
+      "display_name": "Payout"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_20",
+      "passive_number": 27,
+      "internal_name": "BoomOrBus",
+      "display_name": "Boom or Bust"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_15",
+      "passive_number": 28,
+      "internal_name": "HeartOfTheCards",
+      "display_name": "Tender Hearts"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_16",
+      "passive_number": 29,
+      "internal_name": "RunningLuck",
+      "display_name": "Card Sharp"
+    },
+    {
+      "icon_file": "c4sh_passive_blue_17",
+      "passive_number": 30,
+      "internal_name": "HotStreak",
+      "display_name": "Hot Streak"
+    }
+  ],
+  "classmod_name_descriptions": {
+    "pistoleer": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "bane": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "gambler": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "puppeteer": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "swindler": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "antagonist": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "powderbot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "triggerbot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "crack shot": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "pack leader": {
+      "character": "C4SH",
+      "description": "C4SH standard class mod."
+    },
+    "rounder": {
+      "character": "C4SH",
+      "description": "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains {0} Charges and resets his Action Skill Duration. Red Text: And for my next trick..."
+    },
+    "ludopath": {
+      "character": "C4SH",
+      "description": "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains {2} Fire Rate and {4} Movement Speed for every Ludopath Stack. C4SH has a Max of {0} Ludopath Stacks and each Stack lasts for {1} seconds. Red Text: They see me rollin'"
+    },
+    "hotshot": {
+      "character": "C4SH",
+      "description": "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals Fire Damage. If [wfll_icon]Windfall is active, these Beams always Critically Hit enemies. Red Text: Spin to win"
+    },
+    "cooler": {
+      "character": "C4SH",
+      "description": "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains {0} Ordnance Cooldown Rate for {1} seconds. This effect stacks up to {2} times. Red Text: Do do that voodoo that you do so well."
+    },
+    "whale": {
+      "character": "C4SH",
+      "description": "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. Whenever he gains a Stack of [frtn_icon]Fortune, he restores {0} of his Action Skill Cooldown, gains {1} Fire Rate, and {2} Reload Speed for {3} seconds. Red Text: I have not yet begun to defile myself."
+    },
+    "windrider": {
+      "character": "C4SH",
+      "description": "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his [frtn_icon]Fortune Stacks, otherwise killing an enemy with a Gun drains half of C4SH's [frtn_icon]Fortune Stacks. Whenever C4SH gains [frtn_icon]Fortune, he restores {0} of his Maximum Health. Whenever C4SH loses [frtn_icon]Fortune, he gains {1} of his Max Overshield. Red Text: Play to win. Never play to not lose."
+    },
+    "gamer": {
+      "character": "C4SH",
+      "description": "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critically Hit, he gains a 7% Chance to spawn a [roll_icon]Chaos Totem. While [wfll_icon]Windfall is active, double that Chance. Red Text: Luck is what happens when preparation meets opportunity."
+    },
+    "hooligan": {
+      "character": "C4SH",
+      "description": "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal {0} Bonus Fire Damage per Stack. If [wfll_icon]Windfall is active, only consume half of the Stacks. C4SH can have up to {1} Hooligan Stacks. Red Text: Here we go, here we go, here we go!"
+    }
+  },
+  "legendary_descriptions": {
+    "dlc1": {
+      "description": "Whenever C4SH Critically Hits an enemy with a Gun, Bleed that enemy. Whenever C4SH kills an enemy with Bleed with a Critically Hit, he gains a 7% Chance to spawn a [roll_icon]Chaos Totem. While [wfll_icon]Windfall is active, double that Chance.",
+      "red_text": "Luck is what happens when preparation meets opportunity."
+    },
+    "l01": {
+      "description": "Sleight of Hand gains Reduced Charges. Whenever C4SH kills an enemy with a Card, he gains {0} Charges and resets his Action Skill Duration.",
+      "red_text": "And for my next trick..."
+    },
+    "l02": {
+      "description": "Whenever C4SH rolls his Bone Dice, he gains Ludopath Stacks equal to the roll. C4SH gains {2} Fire Rate and {4} Movement Speed for every Ludopath Stack. C4SH has a Max of {0} Ludopath Stacks and each Stack lasts for {1} seconds.",
+      "red_text": "They see me rollin'"
+    },
+    "l03": {
+      "description": "Cross-Fire's Burst Fire is replaced with a Beam Spin Attack that deals Fire Damage. If [wfll_icon]Windfall is active, these Beams always Critically Hit enemies.",
+      "red_text": "Spin to win"
+    },
+    "l04": {
+      "description": "Whenever C4SH deals Ordnance Damage to an enemy, that enemy becomes Jinxed. Whenever C4SH kills a Jinxed enemy, he gains {0} Ordnance Cooldown Rate for {1} seconds. This effect stacks up to {2} times.",
+      "red_text": "Do do that voodoo that you do so well."
+    },
+    "l05": {
+      "description": "C4SH's Action Skill Cooldown Rate is reduced to 0 and all Action Skill Cooldown Rate bonuses are converted into Action Skill Damage. Whenever he gains a Stack of [frtn_icon]Fortune, he restores {0} of his Action Skill Cooldown, gains {1} Fire Rate, and {2} Reload Speed for {3} seconds.",
+      "red_text": "I have not yet begun to defile myself."
+    },
+    "l06": {
+      "description": "Whenever C4SH kills an enemy with a Critical Hit from a Gun, he doubles his [frtn_icon]Fortune Stacks, otherwise killing an enemy with a Gun drains half of C4SH's [frtn_icon]Fortune Stacks. Whenever C4SH gains [frtn_icon]Fortune, he restores {0} of his Maximum Health. Whenever C4SH loses [frtn_icon]Fortune, he gains {1} of his Max Overshield.",
+      "red_text": "Play to win. Never play to not lose."
+    },
+    "raid1": {
+      "description": "Whenever C4SH kills an enemy, gain a stack of Hooligan. Whenever C4SH deals Grenade Damage, consume all Hooligan Stacks and deal {0} Bonus Fire Damage per Stack. If [wfll_icon]Windfall is active, only consume half of the Stacks. C4SH can have up to {1} Hooligan Stacks.",
+      "red_text": "Here we go, here we go, here we go!"
+    }
+  },
+  "passive_descriptions": {
+    "1": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "2": {
+      "stats": [
+        "Shield Capacity: X X"
+      ]
+    },
+    "3": {
+      "stats": [
+        "Ordnance Damage: X X"
+      ]
+    },
+    "4": {
+      "stats": [
+        "Elemental Effect Chance: X X"
+      ]
+    },
+    "5": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "6": {
+      "stats": [
+        "Critical Hit Chance: up to X X"
+      ]
+    },
+    "7": {
+      "stats": [
+        "Elemental Damage: up to X X"
+      ]
+    },
+    "9": {
+      "stats": [
+        "I bring a fork."
+      ]
+    },
+    "10": {
+      "stats": [
+        "The Devil sends cookies.",
+        "God sends meat."
+      ]
+    },
+    "11": {
+      "stats": [
+        "Double Damage Chance: up to X X"
+      ]
+    },
+    "12": {
+      "stats": [
+        "Damage: up to X per second"
+      ]
+    },
+    "13": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "14": {
+      "stats": [
+        "Health Restored: up to X X"
+      ]
+    },
+    "15": {
+      "stats": [
+        "Skill Damage: up to X X"
+      ]
+    },
+    "16": {
+      "stats": [
+        "Reload Speed: up to X X"
+      ]
+    },
+    "17": {
+      "stats": [
+        "Bonus Damage: up to X X of Damage Dealt"
+      ]
+    },
+    "18": {
+      "stats": [
+        "Action Skill Cooldown Restored: X X"
+      ]
+    },
+    "19": {
+      "stats": [
+        "Gun Damage: X X per Fortune Stack"
+      ]
+    },
+    "20": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Fortune Stack"
+      ]
+    },
+    "21": {
+      "stats": [
+        "Minimum Fortune Stacks: X X"
+      ]
+    },
+    "22": {
+      "stats": [
+        "Truth is... the game was rigged from the start."
+      ]
+    },
+    "23": {
+      "stats": [
+        "Max Fortune Stacks: X X"
+      ]
+    },
+    "24": {
+      "stats": [
+        "Additional Fortune Stacks: X X"
+      ]
+    },
+    "25": {
+      "stats": [
+        "Ordnance Damage: up to X X"
+      ]
+    },
+    "26": {
+      "stats": [
+        "Fortune Skills: X X"
+      ]
+    },
+    "27": {
+      "stats": [
+        "Grenade Damage: X"
+      ]
+    },
+    "28": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "29": {
+      "stats": [
+        "Duration: X X second(s)"
+      ]
+    },
+    "30": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "31": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "32": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "33": {
+      "stats": [
+        "Health Regeneration: up to X X of missing Health per second"
+      ]
+    },
+    "34": {
+      "stats": [
+        "Action Skill Duration Restored: up to X X"
+      ]
+    },
+    "35": {
+      "stats": [
+        "Bonus Fire Damage: up to X X of Damage Dealt"
+      ]
+    },
+    "36": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "37": {
+      "stats": [
+        "Critical Hit Chance: X X"
+      ]
+    },
+    "38": {
+      "stats": [
+        "Reload Speed: X X per Stack"
+      ]
+    },
+    "39": {
+      "stats": [
+        "Ricochet Chance: up to X X"
+      ]
+    },
+    "40": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "43": {
+      "stats": [
+        "Movement Speed: up to X X"
+      ]
+    },
+    "44": {
+      "stats": [
+        "Bonus Fire Damage: X X of Damage Dealt at default Sprint speed"
+      ]
+    },
+    "45": {
+      "stats": [
+        "Fire Mortar Damage: X X"
+      ]
+    },
+    "46": {
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    "47": {
+      "stats": [
+        "Elemental Effect Chance: X X per Stack"
+      ]
+    },
+    "48": {
+      "stats": [
+        "Kinetic Damage: X X"
+      ]
+    },
+    "49": {
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    "50": {
+      "stats": [
+        "Ammo Refill Chance: X X"
+      ]
+    },
+    "51": {
+      "stats": [
+        "Bonus Kinetic Damage: X X of Damage Dealt"
+      ]
+    },
+    "52": {
+      "stats": [
+        "Elemental Damage Converted: X X of Damage Dealt"
+      ]
+    },
+    "53": {
+      "stats": [
+        "Duration Freeze: X X second(s)"
+      ]
+    },
+    "54": {
+      "stats": [
+        "Damage: X X per Fortune Stack lost"
+      ]
+    },
+    "55": {
+      "stats": [
+        "Overshield: X X of Damage Taken"
+      ]
+    },
+    "56": {
+      "stats": [
+        "Gun Damage: X X per Fortune Stack lost"
+      ]
+    },
+    "57": {
+      "stats": [
+        "Action Skill Duration Rate: X per failed attempt"
+      ]
+    },
+    "58": {
+      "stats": [
+        "Action Skill Cooldown Rate: up to X X"
+      ]
+    },
+    "59": {
+      "stats": [
+        "Max Health: X X"
+      ]
+    },
+    "60": {
+      "stats": [
+        "Skill Damage: X X"
+      ]
+    },
+    "61": {
+      "stats": [
+        "Windfall Chance: X X per Fortune Stack"
+      ]
+    },
+    "62": {
+      "stats": [
+        "Bonus Damage: X X of Damage Dealt"
+      ]
+    },
+    "63": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "64": {
+      "stats": [
+        "Windfall Duration: X X"
+      ]
+    },
+    "65": {
+      "stats": [
+        "Action Skill Duration: X X on kill"
+      ]
+    },
+    "66": {
+      "stats": [
+        "Respawn Chance: up to X X"
+      ]
+    },
+    "67": {
+      "stats": [
+        "Jinxed Enemy Damage Dealt: X"
+      ]
+    },
+    "68": {
+      "stats": [
+        "Gun Critical Hit Chance: X X"
+      ]
+    },
+    "69": {
+      "stats": [
+        "Lifesteal: X X of Damage Dealt"
+      ]
+    },
+    "70": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "71": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "72": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "73": {
+      "stats": [
+        "Bonus Elemental Damage: X X of Damage Dealt"
+      ]
+    },
+    "74": {
+      "stats": [
+        "Gun Damage: up to X X"
+      ]
+    },
+    "75": {
+      "stats": [
+        "Movement Speed: X X per active Bone Totem"
+      ]
+    },
+    "76": {
+      "stats": [
+        "Fire Nova Damage: X X"
+      ]
+    },
+    "77": {
+      "stats": [
+        "Melee Damage: X X"
+      ]
+    },
+    "78": {
+      "stats": [
+        "Health Restored: X X per missile"
+      ]
+    },
+    "79": {
+      "stats": [
+        "Health Converted: X of Current Health"
+      ]
+    },
+    "80": {
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    "81": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "82": {
+      "stats": [
+        "Critical Hit Damage: X X"
+      ]
+    },
+    "83": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Jinxed enemy"
+      ]
+    },
+    "84": {
+      "stats": [
+        "Damage Taken: X"
+      ]
+    },
+    "85": {
+      "stats": [
+        "Duration: X seconds"
+      ]
+    }
+  }
+}

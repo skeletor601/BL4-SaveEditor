@@ -1,0 +1,425 @@
+{
+  "icon_reference": [],
+  "icon_mapping": [],
+  "classmod_name_descriptions": {},
+  "legendary_descriptions": {
+    "l01": {
+      "description": "Overdrive bonuses are increased by {0}. Overdrive ends whenever Rafa's Action Skill ends.",
+      "red_text": "Ya está vencido."
+    },
+    "l02": {
+      "description": "Whenever Rafa retriggers his Action Skill, he spawns a free Grenade. If he has a Grenade equipped, he spawns one based on that. This Skill has a {0} second cooldown.",
+      "red_text": "Plata y plomo."
+    },
+    "l03": {
+      "description": "Whenever Peacebreaker Cannons fire at an enemy, gain a Stack of Instigator and lose all Stacks when Peacebreaker Cannons fire at a new enemy. Rafa gains {0} Gun Damage for every Stack of Instigator.",
+      "red_text": "El muerto al pozo, y el vivo al destrozo."
+    },
+    "l04": {
+      "description": "APOPHIS Lance gains a {0} Chance to not consume Charges. The more Charges used at once, the greater the Chance.",
+      "red_text": "Es un acto de amor."
+    },
+    "l05": {
+      "description": "Rafa's Melee Attacks gain a {0} Critical Hit Chance. Critical Hits with Melee Attacks restore {1} of Action Skill Duration.",
+      "red_text": "Quien no arriesga, no gana."
+    },
+    "l06": {
+      "description": "Whenever Rafa throws a Grenade or Tediore Gun, he throws an additional one.",
+      "red_text": "Hay tres categorías humanas: el hombre mudo, el hombre de letras, y el hombre explosivo."
+    },
+    "raid1": {
+      "description": "Rafa deals increased Ordnance and Gun Damage the faster he moves. While Overdrive is active, this bonus is doubled.",
+      "red_text": "Rapido corren los carros cargados."
+    },
+    "cowbell": {
+      "description": "Melee Damage has a chance to cause a Blade Storm for 5 seconds, dealing [kinetic_icon][kinetic]Kinetic Melee Damage[/kinetic] based on Damage Dealt. Action Skill Melee Damage have double the chance. Up to 3 Blade Storm's can be active at a time.",
+      "red_text": "Cada quien tiene la muerte que se busca."
+    },
+    "filantropo": {
+      "description": "On Action Skill Retrigger spawn a free grenade. If you have a Grenade equipped, spawn a copy of that grenade instead.",
+      "red_text": "Mientras doy, recibo."
+    }
+  },
+  "passive_descriptions": {
+    "1": {
+      "stats": [
+        "Reload Speed: X X"
+      ]
+    },
+    "2": {
+      "stats": [
+        "Ammo Regeneration: X X"
+      ]
+    },
+    "3": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "4": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X per Stack"
+      ]
+    },
+    "5": {
+      "stats": [
+        "Health Regeneration: X X"
+      ]
+    },
+    "6": {
+      "stats": [
+        "Ordnance Cooldown Rate: X X"
+      ]
+    },
+    "7": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "8": {
+      "stats": [
+        "Gun Handling: X X per second"
+      ]
+    },
+    "9": {
+      "stats": [
+        "Duration: X X seconds"
+      ]
+    },
+    "10": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "11": {
+      "stats": [
+        "Critical Hit Chance:X X"
+      ]
+    },
+    "12": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "13": {
+      "stats": [
+        "Bonus Shock Damage: X X"
+      ]
+    },
+    "14": {
+      "stats": [
+        "Duration: X seconds"
+      ]
+    },
+    "15": {
+      "stats": [
+        "Duration: X X seconds"
+      ]
+    },
+    "16": {
+      "stats": [
+        "STRM Glider Health: XX"
+      ]
+    },
+    "17": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "18": {
+      "stats": [
+        "Ordnance Damage: X X"
+      ]
+    },
+    "19": {
+      "stats": [
+        "Detonator Damage: X X"
+      ]
+    },
+    "20": {
+      "stats": [
+        "Overdrive Bonuses: X X"
+      ]
+    },
+    "22": {
+      "stats": [
+        "Gun Handling: X X"
+      ]
+    },
+    "23": {
+      "stats": [
+        "Cooldown Rate: X X per Stack"
+      ]
+    },
+    "24": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "25": {
+      "stats": [
+        "Double Damage Chance: X X"
+      ]
+    },
+    "26": {
+      "stats": [
+        "Gun Damage:X X"
+      ]
+    },
+    "27": {
+      "stats": [
+        "Fire Rate: X X"
+      ]
+    },
+    "28": {
+      "stats": [
+        "Shield Recharge Rate: X X"
+      ]
+    },
+    "29": {
+      "stats": [
+        "Action Skill Duration Restore: X X"
+      ]
+    },
+    "30": {
+      "stats": [
+        "Shields Restored: X X"
+      ]
+    },
+    "31": {
+      "stats": [
+        "Shields Restored: X X of Maximum Health"
+      ]
+    },
+    "32": {
+      "stats": [
+        "Damage Reduction: X X"
+      ]
+    },
+    "33": {
+      "stats": [
+        "Skill Damage: X X"
+      ]
+    },
+    "34": {
+      "stats": [
+        "Damage Dealt: Up to X X"
+      ]
+    },
+    "36": {
+      "stats": [
+        "Indirect Projectile Damage: X X"
+      ]
+    },
+    "37": {
+      "stats": [
+        "Bonus Incendiary Damage: X X of Damage Dealt"
+      ]
+    },
+    "38": {
+      "stats": [
+        "Lifesteal: X X"
+      ]
+    },
+    "39": {
+      "stats": [
+        "Ricochet Chance: X X"
+      ]
+    },
+    "40": {
+      "stats": [
+        "STRM Glider Damage: up to X X"
+      ]
+    },
+    "41": {
+      "stats": [
+        "Ricochet Chance: X X"
+      ]
+    },
+    "42": {
+      "stats": [
+        "Bonus Damage: X X"
+      ]
+    },
+    "43": {
+      "stats": [
+        "Bonus Corrosive Damage: X X"
+      ]
+    },
+    "44": {
+      "stats": [
+        "Ricochet Chance: X X per Status Effect"
+      ]
+    },
+    "45": {
+      "stats": [
+        "Bonus Shock Damage: X X of Damage Dealt"
+      ]
+    },
+    "46": {
+      "stats": [
+        "Status Effect Chance: X X"
+      ]
+    },
+    "47": {
+      "stats": [
+        "Action Skill Cooldown Rate: X X"
+      ]
+    },
+    "48": {
+      "stats": [
+        "Splash Damage: X X"
+      ]
+    },
+    "49": {
+      "stats": [
+        "Overdrive Duration: X X"
+      ]
+    },
+    "50": {
+      "stats": [
+        "Movement Speed: X X"
+      ]
+    },
+    "51": {
+      "stats": [
+        "Gun Damage: X X per second"
+      ]
+    },
+    "52": {
+      "stats": [
+        "Duration: X seconds"
+      ]
+    },
+    "53": {
+      "stats": [
+        "Gun Damage: X X"
+      ]
+    },
+    "54": {
+      "stats": [
+        "Bonus Corrosive Damage: X X per second"
+      ]
+    },
+    "55": {
+      "stats": [
+        "Movement Speed: X X"
+      ]
+    },
+    "56": {
+      "stats": [
+        "Critical Hit Chance: XX per Stack"
+      ]
+    },
+    "57": {
+      "stats": [
+        "Maximum Health Capacity Converted: X X"
+      ]
+    },
+    "58": {
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    "59": {
+      "stats": [
+        "Health Restoration: X X of Damage Dealt"
+      ]
+    },
+    "60": {
+      "stats": [
+        "Overdrive Duration Freeze: X X seconds"
+      ]
+    },
+    "61": {
+      "stats": [
+        "Skill Damage: Up to X X"
+      ]
+    },
+    "62": {
+      "stats": [
+        "Overshield: X X of Maximum Shield Capacity"
+      ]
+    },
+    "63": {
+      "stats": [
+        "Projectile Damage: X X"
+      ]
+    },
+    "64": {
+      "stats": [
+        "Splash  Damage: X X"
+      ]
+    },
+    "65": {
+      "stats": [
+        "Shields Drained: up to X X of Max Shields"
+      ]
+    },
+    "66": {
+      "stats": [
+        "Bonus Shock Damage: X X of Damage Dealt"
+      ]
+    },
+    "67": {
+      "stats": [
+        "Hazard Damage: X X per second"
+      ]
+    },
+    "68": {
+      "stats": [
+        "Ordnance Cooldown Rate: X X"
+      ]
+    },
+    "69": {
+      "stats": [
+        "Bonus Damage: XX"
+      ]
+    },
+    "70": {
+      "stats": [
+        "Grenade Chance:  X X"
+      ]
+    },
+    "71": {
+      "stats": [
+        "Gun Damage: X X per Stack"
+      ]
+    },
+    "72": {
+      "stats": [
+        "Health Cost: X{stat} of current Health"
+      ]
+    },
+    "73": {
+      "stats": [
+        "Bonus Incendiary Ordnance Damage: X X of Damage Dealt"
+      ]
+    },
+    "74": {
+      "stats": [
+        "Corrosive Damage: X X per second"
+      ]
+    },
+    "75": {
+      "stats": [
+        "Action Skill Duration: X X"
+      ]
+    },
+    "76": {
+      "stats": [
+        "Health Regeneration: Up to X X Max Health per second"
+      ]
+    },
+    "77": {
+      "stats": [
+        "Overdrive Duration: X X"
+      ]
+    },
+    "78": {
+      "stats": [
+        "Skill Damage: X X per second"
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "icon_reference": [],
+  "icon_mapping": [],
+  "classmod_name_descriptions": {},
+  "legendary_descriptions": {
+    "raid1": {
+      "description": "Phase Daggers gain a chance to Ricochet. Critical Hits grant a stack of Misery for a duration, increasing Skill Damage. Misery can stack up to 50 times.",
+      "red_text": "May thy knife chip and shatter."
+    },
+    "dlc1": {
+      "description": "When Vex activates an Action Skill or Command Skill open a Blood Rift for a duration. Maximum of 2 active Blood Rifts at a time.Blood Rifts rapidly fire Remnant Minions, dealing [kinetic_icon][kinetic]Kinetic Gun Damage[/kinetic] based on  her Current Weapon when spawned.",
+      "red_text": "No need to waste such sweet suffering."
+    }
+  },
+  "passive_descriptions": {}
+}
