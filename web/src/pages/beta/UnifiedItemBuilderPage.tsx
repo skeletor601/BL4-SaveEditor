@@ -91,7 +91,7 @@ const WEAPON_MULTI_SLOTS: Record<string, number> = {
   "Body Accessory": 4,
   "Barrel Accessory": 4,
   "Manufacturer Part": 4,
-  "Scope Accessory": 4,
+  "Scope Accessory": 5,
   "Underbarrel Accessory": 3,
 };
 
@@ -9810,11 +9810,9 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
-      <section className="grid gap-4 xl:grid-cols-[1fr_340px]">
-        <div />
-
-        {/* Side: Current build parts (collapsible on small screens) */}
-        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0" open>
+      <section>
+        {/* Current build parts */}
+        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0 max-w-sm" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none shrink-0 font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">◈</span> Current build parts</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>

@@ -111,7 +111,19 @@ export default function PartsTranslatorView() {
       return;
     }
     setStatus("loading");
-    const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+    // Join continuation lines: if a line doesn't start with @ and doesn't contain ||,
+    // it's a continuation of the previous decoded line (textarea wrapping).
+    const rawLines = raw.split(/\r?\n/).filter((l) => l.trim());
+    const lines: string[] = [];
+    for (const line of rawLines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("@") || trimmed.includes("||") || lines.length === 0) {
+        lines.push(trimmed);
+      } else {
+        // Continuation of previous line
+        lines[lines.length - 1] += " " + trimmed;
+      }
+    }
     const decodedLines: string[] = Array(lines.length).fill("");
     const serials: string[] = [];
     const serialLineIndexes: number[] = [];
