@@ -64,6 +64,18 @@ select option:hover {
   color: var(--color-text);
 }
 
+/* Poppy buttons: slightly brighter borders + subtle glow on interactive elements */
+button, [role="button"], a.btn, select, input[type="checkbox"] {
+  border-color: rgba(0, 255, 255, 0.3);
+}
+button:hover, [role="button"]:hover, a.btn:hover, select:hover {
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
+}
+/* Panels: slightly more opaque so content reads clearly over blurred BG */
+details, section > .rounded-xl, .rounded-lg[class*="border-[var(--color-panel-border)]"] {
+  backdrop-filter: blur(4px);
+}
+
 /* Master Search: legendary row – orange text only, no background */
 tbody tr.legendary-row td {
   color: var(--color-legendary) !important;
