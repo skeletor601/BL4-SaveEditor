@@ -129,6 +129,10 @@ export default function BackpackView() {
   const [dupeAllDialog, setDupeAllDialog] = useState<{ qty: string } | null>(null);
   const [dupeAllLoading, setDupeAllLoading] = useState(false);
   const [showClearBackpackConfirm, setShowClearBackpackConfirm] = useState(false);
+  const [showBulkAdd, setShowBulkAdd] = useState(false);
+  const [bulkText, setBulkText] = useState("");
+  const [bulkAdding, setBulkAdding] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState<string | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [compareItemA, setCompareItemA] = useState<TreeItem | null>(null);
   const [compareItemB, setCompareItemB] = useState<TreeItem | null>(null);
@@ -298,6 +302,40 @@ export default function BackpackView() {
       setIsAdding(false);
     }
   }, [saveData, itemSerial, flagValue, getYamlText, updateSaveData]);
+
+  const handleBulkAdd = useCallback(async () => {
+    if (!saveData || !bulkText.trim()) return;
+    setBulkAdding(true);
+    setBulkMessage(null);
+    const lines = bulkText.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (!lines.length) { setBulkAdding(false); return; }
+    let currentYaml = getYamlText();
+    if (!currentYaml?.trim()) { setBulkMessage("No save YAML loaded."); setBulkAdding(false); return; }
+    let ok = 0;
+    let fail = 0;
+    for (const line of lines) {
+      try {
+        let serial = line;
+        if (!serial.startsWith("@")) {
+          const encRes = await fetchApi("save/encode-serial", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decoded_string: serial }) });
+          const encData = await encRes.json().catch(() => ({}));
+          if (!encRes.ok || !encData?.success || typeof encData?.serial !== "string") { fail++; continue; }
+          serial = encData.serial;
+        }
+        const res = await fetchApi("save/add-item", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ yaml_content: currentYaml, serial, flag: String(flagValue) }) });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success && typeof data.yaml_content === "string") { currentYaml = data.yaml_content; ok++; }
+        else fail++;
+      } catch { fail++; }
+    }
+    if (ok > 0) {
+      const parsed = yamlParse(currentYaml) as Record<string, unknown>;
+      updateSaveData(parsed);
+    }
+    setBulkMessage(`Added ${ok} item${ok !== 1 ? "s" : ""}${fail > 0 ? `, ${fail} failed` : ""}. Use "Overwrite save" on Select Save to export.`);
+    if (ok > 0 && fail === 0) setBulkText("");
+    setBulkAdding(false);
+  }, [saveData, bulkText, flagValue, getYamlText, updateSaveData]);
 
   const handleUpdateFlag = useCallback(async () => {
     if (!selected || !saveData) return;
@@ -654,7 +692,44 @@ export default function BackpackView() {
         >
           {compareMode ? `Compare${compareItemA ? " (A set)" : ""}${compareItemB ? " (B set)" : ""}` : "Compare"}
         </button>
+        <button
+          type="button"
+          onClick={() => setShowBulkAdd((v) => !v)}
+          className={`px-4 py-2 rounded-lg border text-sm font-medium min-h-[44px] transition-colors ${
+            showBulkAdd
+              ? "border-[var(--color-accent)]/60 bg-[var(--color-accent)]/15 text-[var(--color-accent)]"
+              : "border-[var(--color-accent)]/40 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10"
+          }`}
+        >
+          Add in Bulk
+        </button>
       </div>
+
+      {/* Bulk add panel */}
+      {showBulkAdd && (
+        <div className="border border-[var(--color-accent)]/30 rounded-lg p-4 bg-[rgba(24,28,34,0.7)] space-y-3">
+          <h3 className="text-sm font-semibold text-[var(--color-accent)]">Add in Bulk</h3>
+          <p className="text-xs text-[var(--color-text-muted)]">Paste one code per line. Base85 (@U...) and decoded strings both supported.</p>
+          <textarea
+            rows={6}
+            value={bulkText}
+            onChange={(e) => setBulkText(e.target.value)}
+            placeholder={"@U...\n@U...\n255, 0, 1, 50| 2, 82|| {12} {4:7}"}
+            className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm font-mono focus:outline-none focus:border-[var(--color-accent)] resize-y"
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleBulkAdd}
+              disabled={!bulkText.trim() || bulkAdding}
+              className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black text-sm font-medium hover:opacity-90 disabled:opacity-50 min-h-[44px]"
+            >
+              {bulkAdding ? "Adding…" : `Add ${bulkText.split("\n").filter((l) => l.trim()).length} Items`}
+            </button>
+            {bulkMessage && <p className="text-xs text-[var(--color-text-muted)]">{bulkMessage}</p>}
+          </div>
+        </div>
+      )}
       {showClearBackpackConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowClearBackpackConfirm(false)}>
           <div className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.98)] shadow-xl w-full max-w-md p-4" onClick={(e) => e.stopPropagation()}>

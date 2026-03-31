@@ -107,7 +107,7 @@ export default function CodeSpawnView() {
   if (!saveData) {
     return (
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[var(--color-accent)]">Code spawn</h2>
+        <h2 className="text-lg font-semibold text-[var(--color-accent)]">Add in Bulk</h2>
         <p className="text-[var(--color-text-muted)]">
           Load a save first (Character to Select Save) to spawn codes into backpack.
         </p>
@@ -120,7 +120,7 @@ export default function CodeSpawnView() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-[var(--color-accent)]">Code spawn</h2>
+      <h2 className="text-lg font-semibold text-[var(--color-accent)]">Add in Bulk</h2>
       <p className="text-sm text-[var(--color-text-muted)]">
         Paste one code per line. Base85 (`@...`) and deserialized strings are both supported.
       </p>

@@ -24,7 +24,7 @@ function getBreadcrumbs(pathname: string): Crumb[] {
   const crumbs: Crumb[] = [{ label: "Home", to: "/" }];
 
   if (pathname.startsWith("/beta/unified-item-builder")) {
-    crumbs.push({ label: "Gear Lab" });
+    crumbs.push({ label: "Build & Edit Items" });
   } else if (pathname.startsWith("/beta")) {
     crumbs.push({ label: "Beta Lab" });
   } else if (pathname.startsWith("/gear-forge")) {
@@ -38,10 +38,10 @@ function getBreadcrumbs(pathname: string): Crumb[] {
     crumbs.push({ label: "Inventory", to: "/inventory" });
     if (pathname.includes("backpack")) crumbs.push({ label: "Backpack" });
     else if (pathname.includes("decoder")) crumbs.push({ label: "Decoder" });
-    else if (pathname.includes("code-spawn")) crumbs.push({ label: "Code Spawn" });
+    else if (pathname.includes("code-spawn")) crumbs.push({ label: "Add in Bulk" });
     else if (pathname.includes("parts-translator")) crumbs.push({ label: "Parts Translator" });
   } else if (pathname.startsWith("/master-search")) {
-    crumbs.push({ label: "Arsenal" });
+    crumbs.push({ label: "Parts Search" });
   } else if (pathname.startsWith("/save-compare")) {
     crumbs.push({ label: "Save Comparison" });
   } else if (pathname.startsWith("/community")) {

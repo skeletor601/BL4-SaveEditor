@@ -9,7 +9,7 @@ const branches = [
   { path: "decoder", label: "Decoder" },
   { path: "parts-translator", label: "Parts Translator" },
   { path: "backpack", label: "Backpack" },
-  { path: "code-spawn", label: "Code spawn" },
+  { path: "code-spawn", label: "Add in Bulk" },
   { path: "validator", label: "Code Inspector" },
 ];
 

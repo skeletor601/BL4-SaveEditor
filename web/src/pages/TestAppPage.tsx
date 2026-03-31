@@ -1,6 +1,6 @@
 /**
  * Test App — Future main layout mockup.
- * Gear Lab as the centerpiece, sidebar nav, modern dark UI.
+ * Build & Edit Items as the centerpiece, sidebar nav, modern dark UI.
  */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -21,9 +21,9 @@ interface TabDef {
 
 const TABS: TabDef[] = [
   { id: "command",  label: "Command Center", sublabel: "Dashboard & Updates", icon: "◈" },
-  { id: "gear-lab", label: "Gear Lab",       sublabel: "Build & Mod Anything", icon: "⚙" },
-  { id: "arsenal",  label: "Arsenal",        sublabel: "5,200+ Parts Database", icon: "⌕" },
-  { id: "save-ops", label: "Save Ops",       sublabel: "Characters & Backpack", icon: "◉" },
+  { id: "gear-lab", label: "Build & Edit Items", sublabel: "Build & Mod Anything", icon: "⚙" },
+  { id: "arsenal",  label: "Parts Search",       sublabel: "6,100+ Parts Database", icon: "⌕" },
+  { id: "save-ops", label: "Inventory Ops",      sublabel: "Characters & Backpack", icon: "◉" },
   { id: "vault",    label: "The Vault",      sublabel: "Community & Recipes",   icon: "◎" },
   { id: "workbench", label: "Workbench",    sublabel: "Classic Item Editors",   icon: "⚒" },
 ];
@@ -307,9 +307,9 @@ function CommandCenterTab({ onNavigate, siteStats }: { onNavigate: (tab: TabId) 
 
       {/* Quick action cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <QuickCard icon="⚙" title="Gear Lab" desc="Build modded weapons & grenades" accent onClick={() => onNavigate("gear-lab")} />
-        <QuickCard icon="⌕" title="Arsenal" desc="Search the parts database" onClick={() => onNavigate("arsenal")} />
-        <QuickCard icon="◉" title="Save Ops" desc="Character edits & backpack" onClick={() => onNavigate("save-ops")} />
+        <QuickCard icon="⚙" title="Build & Edit Items" desc="Build modded weapons & grenades" accent onClick={() => onNavigate("gear-lab")} />
+        <QuickCard icon="⌕" title="Parts Search" desc="Search the parts database" onClick={() => onNavigate("arsenal")} />
+        <QuickCard icon="◉" title="Inventory Ops" desc="Character edits & backpack" onClick={() => onNavigate("save-ops")} />
         <QuickCard icon="◎" title="The Vault" desc="Community recipes & codes" onClick={() => onNavigate("vault")} />
       </div>
 
@@ -359,7 +359,7 @@ function CommandCenterTab({ onNavigate, siteStats }: { onNavigate: (tab: TabId) 
   );
 }
 
-// ── Tab: Gear Lab ─────────────────────────────────────────────────────────────
+// ── Tab: Build & Edit Items ─────────────────────────────────────────────────────────────
 function GearLabTab() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -367,7 +367,7 @@ function GearLabTab() {
         style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
         <div className="px-5 py-4 border-b border-[var(--color-panel-border)] flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-[var(--color-accent)]">Gear Lab</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-accent)]">Build & Edit Items</h3>
             <p className="text-xs text-[var(--color-text-muted)]">Build, mod, and generate any item in the game</p>
           </div>
           <Link
@@ -430,7 +430,7 @@ function ArsenalTab() {
         style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
         <div className="px-5 py-4 border-b border-[var(--color-panel-border)] flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-[var(--color-accent)]">Arsenal</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-accent)]">Parts Search</h3>
             <p className="text-xs text-[var(--color-text-muted)]">Search across 5,200+ parts, weapons, grenades, shields, and more</p>
           </div>
           <Link
@@ -598,7 +598,7 @@ function WorkbenchTab() {
       </div>
 
       <div className="text-center text-[10px] font-mono text-[var(--color-text-muted)]/40 select-none">
-        These editors predate the Gear Lab. They still work great — use whatever feels right.
+        These editors predate the Build & Edit Items. They still work great — use whatever feels right.
       </div>
     </div>
   );

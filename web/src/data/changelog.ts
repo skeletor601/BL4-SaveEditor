@@ -5,6 +5,47 @@ export interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    date: "2026-03-31",
+    items: [
+      "UNIVERSAL DATABASE ENRICHMENT — 92% of all actionable parts now have descriptions, perk names, and red text. Data extracted from NCS Cowbell DLC game files (ui_stat4.json). Enhancement perks, firmware, shields, grenades, repkits, heavies, and weapons all enriched.",
+      "Background selector — choose between Stock (themed hex backgrounds), Dark Studio, or Light Studio. Swatches in the header next to theme picker. Persisted across sessions. Settings page also has the full selector.",
+      "UI overhaul — deeper background blur, shadow depth on all panels/cards/buttons, stronger button contrast with cyan glow on hover, inset shadows on inputs.",
+      "Parts list 'Show Info' button — full-width cyan button on every part card. Click to see perk name, description, manufacturer, rarity, and red text from the enriched database.",
+      "Hover card deduplication — no longer shows duplicate text when the effect matches the name or item type.",
+      "Class mod universal perks renamed — '+20% Movement Speed' is now 'Movement Speed Class Mod Perk' with the stat as the effect description. Part type is 'Universal Class Mod Perk'.",
+      "Parts list right-aligned with ml-auto for better screen usage.",
+      "Firmware descriptions added across all gear types (22 firmwares: God Killer, Airstrike, Lifeblood, etc.).",
+      "Element descriptions added (Fire, Shock, Cryo, Corrosive, Radiation, Dark, Kinetic, Explosive).",
+      "NCS enrichment pipeline — new script (enrich_universal_db.js) reads parsed NCS game data and fills in missing perk descriptions + red text.",
+    ],
+  },
+  {
+    date: "2026-03-30",
+    items: [
+      "Community vault data persistence fix — recipes and profiles now correctly read/write to Render's persistent disk instead of ephemeral storage. All community submissions survive deploys.",
+      "Grenade description fix — build_parts_db.js was not reading the Description column from grenade_main_perk_EN.csv. Fixed, grenades went from 43 to 103 entries with effects.",
+      "Discord links removed from header and sidebar.",
+      "Background image blur and brightness tweaks for better readability.",
+    ],
+  },
+  {
+    date: "2026-03-29",
+    items: [
+      "NCS Data Tool — full binary parser, comparison engine, and automated extractor all passing tests. 599 weapons, 112 shields, 63 repkits, 69 heavies extracted from post-DLC data.",
+      "Universal DB conversion complete — all 8 API builders (weapon, grenade, shield, repkit, heavy, enhancement, class mod, accessory edit) now read from universal_parts_db.json.",
+      "ncs_pipeline.py writes directly to universal_parts_db.json — no more feeder CSVs in the pipeline.",
+      "parts.ts normalizes all 15 fields with smart itemType resolution (rarity tiers, barrel names from descriptions).",
+    ],
+  },
+  {
+    date: "2026-03-28",
+    items: [
+      "Interactive badge editor for weapon builder — all 6 badge features live (manufacturer, weapon type, rarity, element, DPS estimate, barrel name).",
+      "Translator multi-line parsing fix and rarity dropdown cleanup.",
+      "Element category labels added to Master Search filters.",
+    ],
+  },
+  {
     date: "2026-03-27",
     items: [
       "DLC COWBELL UPDATE — New playable character C4SH (Rogue) fully integrated into the class mod builder. 100 skills across 3 trees (Sleight of Hand, Crossfire, Cleromancy) with all 5-tier skill IDs, descriptions, and color-tinted icons.",

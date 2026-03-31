@@ -4192,7 +4192,7 @@ export default function UnifiedItemBuilderPage() {
         <nav className="flex items-center gap-1.5 text-xs">
           <Link to="/" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Home</Link>
           <span className="text-[var(--color-text-muted)]/40">›</span>
-          <span className="text-[var(--color-accent)] font-medium">Gear Lab</span>
+          <span className="text-[var(--color-accent)] font-medium">Build & Edit Items</span>
           <span className="text-[var(--color-text-muted)]/40">›</span>
           <span className="text-[var(--color-text)]">{CATEGORIES.find(c => c.value === category)?.label ?? "Weapon"}</span>
         </nav>
@@ -4208,7 +4208,7 @@ export default function UnifiedItemBuilderPage() {
             to="/master-search"
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/40 transition-colors text-xs"
           >
-            <span>⌕</span> Arsenal
+            <span>⌕</span> Parts Search
           </Link>
           <Link
             to="/character"
@@ -4255,7 +4255,7 @@ export default function UnifiedItemBuilderPage() {
               </span>
             </div>
             <h1 className="text-2xl font-semibold text-[var(--color-accent)] mt-1">
-              Gear Lab
+              Build & Edit Items
             </h1>
             <p className="text-sm text-[var(--color-text-muted)]">
               Build, mod, and generate any item. Parts database + encode/decode + modded generators.
