@@ -18,6 +18,7 @@ interface CommunityRecipe {
   upvotes: number;
   seed?: number;
   authorName?: string;
+  imageFilename?: string;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -80,6 +81,9 @@ export default function CommunityVaultPage() {
   const [submitForm, setSubmitForm] = useState({ itemType: "grenade", title: "", description: "", code: "", decoded: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [submitImage, setSubmitImage] = useState<string | null>(null); // base64 data URL
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [addingImageId, setAddingImageId] = useState<string | null>(null);
   const { addEntry } = useCodeHistory();
 
   // Community profile state
@@ -146,12 +150,14 @@ export default function CommunityVaultPage() {
     setSubmitMessage(null);
     try {
       const seedNum = Number(profileSeed);
-      const payload = { ...submitForm, ...(seedNum >= 1 && seedNum <= 9999 ? { seed: seedNum } : {}) };
+      const payload: Record<string, unknown> = { ...submitForm, ...(seedNum >= 1 && seedNum <= 9999 ? { seed: seedNum } : {}) };
+      if (submitImage) payload.image = submitImage;
       const res = await fetchApi("community/recipes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json().catch(() => ({})) as { success?: boolean; error?: string };
       if (data.success) {
         setSubmitMessage("Submitted! Thanks for sharing.");
         setSubmitForm({ itemType: "grenade", title: "", description: "", code: "", decoded: "" });
+        setSubmitImage(null);
         void loadRecipes();
         setTimeout(() => setShowSubmit(false), 2000);
       } else { setSubmitMessage(data.error ?? "Submit failed."); }
@@ -236,6 +242,28 @@ export default function CommunityVaultPage() {
             <label className="block text-xs opacity-60 mb-1">Decoded string (optional)</label>
             <input type="text" value={submitForm.decoded} onChange={(e) => setSubmitForm((f) => ({ ...f, decoded: e.target.value }))} placeholder="263, 0, 1, 50| 2, 305|| ..." className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono" />
           </div>
+          <div>
+            <label className="block text-xs opacity-60 mb-1">Screenshot (optional, max 2MB)</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) { setSubmitImage(null); return; }
+                if (file.size > 2 * 1024 * 1024) { setSubmitMessage("Image must be under 2MB."); e.target.value = ""; return; }
+                const reader = new FileReader();
+                reader.onload = () => setSubmitImage(reader.result as string);
+                reader.readAsDataURL(file);
+              }}
+              className="w-full text-sm text-[var(--color-text-muted)] file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-[var(--color-panel-border)] file:bg-[rgba(24,28,34,0.9)] file:text-[var(--color-text)] file:text-xs file:cursor-pointer"
+            />
+            {submitImage && (
+              <div className="mt-2 relative inline-block">
+                <img src={submitImage} alt="Preview" className="max-h-32 rounded border border-[var(--color-panel-border)]" />
+                <button type="button" onClick={() => setSubmitImage(null)} className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">x</button>
+              </div>
+            )}
+          </div>
           <div className="flex gap-2 items-center">
             <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-black font-medium text-sm hover:opacity-90 disabled:opacity-50 min-h-[44px]">
               {submitting ? "Submitting…" : "Submit"}
@@ -275,18 +303,55 @@ export default function CommunityVaultPage() {
                   <span className="text-[10px] opacity-40 shrink-0">{timeAgo(recipe.submittedAt)}</span>
                 </div>
                 {recipe.description && <p className="text-xs opacity-70">{recipe.description}</p>}
+                {recipe.imageFilename && (
+                  <button type="button" onClick={() => setLightboxSrc(`/api/community/images/${recipe.imageFilename}`)} className="block">
+                    <img src={`/api/community/images/${recipe.imageFilename}`} alt={recipe.title} loading="lazy" className="max-h-48 rounded border border-[var(--color-panel-border)] hover:border-[var(--color-accent)]/50 transition-colors cursor-pointer" />
+                  </button>
+                )}
                 <div className="font-mono text-[11px] opacity-50 truncate">{recipe.code.slice(0, 60)}{recipe.code.length > 60 ? "…" : ""}</div>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
                   <button type="button" onClick={() => handleCopy(recipe)} className="text-xs px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors">
                     {copiedId === recipe.id ? "Copied" : "Copy"}
                   </button>
                   <button type="button" onClick={() => void handleUpvote(recipe.id)} disabled={upvotedIds.has(recipe.id)} className={`text-xs px-2.5 py-1 rounded transition-colors ${upvotedIds.has(recipe.id) ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30" : "bg-white/5 hover:bg-white/15 border border-white/10"}`}>
                     {recipe.upvotes}
                   </button>
+                  {!recipe.imageFilename && (
+                    <label className="text-xs px-2.5 py-1 rounded bg-white/5 hover:bg-white/15 border border-white/10 cursor-pointer transition-colors">
+                      {addingImageId === recipe.id ? "Uploading…" : "Add Image"}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || file.size > 2 * 1024 * 1024) return;
+                          setAddingImageId(recipe.id);
+                          const reader = new FileReader();
+                          reader.onload = async () => {
+                            try {
+                              const res = await fetchApi(`community/recipes/${recipe.id}/image`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: reader.result }) });
+                              const data = await res.json().catch(() => ({})) as { success?: boolean };
+                              if (data.success) void loadRecipes();
+                            } catch {}
+                            setAddingImageId(null);
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+      {/* Lightbox */}
+      {lightboxSrc && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4" onClick={() => setLightboxSrc(null)}>
+          <img src={lightboxSrc} alt="Full size" className="max-w-full max-h-[90vh] rounded-lg shadow-2xl" />
         </div>
       )}
     </div>
