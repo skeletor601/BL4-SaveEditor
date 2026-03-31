@@ -1,5 +1,25 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { getManifest, getAllParts, searchParts, getPartByCode, getPartsByCodes } from "../data/parts.js";
+import { existsSync, readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function loadNpcParts(): unknown[] {
+  const paths = [
+    join(__dirname, "../../../master_search/db/npc_parts_db.json"),
+    join(__dirname, "../../data/npc_parts_db.json"),
+  ];
+  for (const p of paths) {
+    if (!existsSync(p)) continue;
+    try {
+      const data = JSON.parse(readFileSync(p, "utf-8"));
+      return (data?.rows ?? data?.items ?? []) as unknown[];
+    } catch { /* skip */ }
+  }
+  return [];
+}
 
 export async function partsRoutes(
   fastify: FastifyInstance,
@@ -38,6 +58,12 @@ export async function partsRoutes(
     const category = request.query.category;
     const limit = Math.min(Number(request.query.limit) || 10000, 50000);
     const items = searchParts(q, category, limit);
+    return reply.send({ items });
+  });
+
+  /** NPC weapons database — turrets, NPC character guns, action skill weapons */
+  fastify.get("/npc", async (_request, reply) => {
+    const items = loadNpcParts();
     return reply.send({ items });
   });
 }

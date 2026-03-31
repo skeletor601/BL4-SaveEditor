@@ -418,6 +418,18 @@ export default function MasterSearch() {
     );
   }, [bulkQty, filteredAndSorted, selectedRows, showToast]);
 
+  // NPC weapons
+  const [npcItems, setNpcItems] = useState<Record<string, unknown>[]>([]);
+  const [npcOpen, setNpcOpen] = useState(false);
+  const [npcLoaded, setNpcLoaded] = useState(false);
+  const loadNpc = useCallback(() => {
+    if (npcLoaded) return;
+    fetchApi("parts/npc").then((r) => r.json()).then((d: { items?: unknown[] }) => {
+      setNpcItems((d?.items ?? []) as Record<string, unknown>[]);
+      setNpcLoaded(true);
+    }).catch(() => {});
+  }, [npcLoaded]);
+
   const handleSort = useCallback((col: SortCol) => {
     setSortCol((prev) => {
       if (prev === col) {
@@ -461,6 +473,60 @@ export default function MasterSearch() {
         <span className="mr-3">Unknown manufacturer: {health.unknownMfg}</span>
         <span>Duplicate code entries: {health.duplicateCode}</span>
       </div>
+
+      {/* NPC Weapons section */}
+      <details
+        className="mx-4 mt-3 rounded-lg border border-purple-500/40 bg-[rgba(48,52,60,0.35)] overflow-hidden"
+        open={npcOpen}
+        onToggle={(e) => {
+          const open = (e.target as HTMLDetailsElement).open;
+          setNpcOpen(open);
+          if (open) loadNpc();
+        }}
+      >
+        <summary className="px-4 py-3 cursor-pointer list-none flex items-center justify-between select-none hover:bg-purple-500/5 transition-colors">
+          <div className="flex items-center gap-2">
+            <span className="text-purple-400 text-sm">&#9876;</span>
+            <span className="text-sm font-semibold text-purple-300">NPC Weapons & Turrets</span>
+            <span className="text-[10px] text-purple-400/60 font-mono">{npcLoaded ? `${npcItems.length} items` : "click to load"}</span>
+          </div>
+          <span className="text-purple-400/60 text-xs">{npcOpen ? "&#9650;" : "&#9660;"}</span>
+        </summary>
+        {npcLoaded && npcItems.length > 0 && (
+          <div className="px-4 pb-3 space-y-1">
+            <p className="text-[10px] text-[var(--color-text-muted)] mb-2">NPC character weapons, turrets, and action skill weapons. These can be serialized into player items using the parent weapon type ID.</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="text-left text-[10px] text-purple-300 uppercase tracking-wider border-b border-purple-500/30">
+                    <th className="py-1.5 px-2">Code</th>
+                    <th className="py-1.5 px-2">Name</th>
+                    <th className="py-1.5 px-2">Category</th>
+                    <th className="py-1.5 px-2">Manufacturer</th>
+                    <th className="py-1.5 px-2">Weapon Type</th>
+                    <th className="py-1.5 px-2">Parent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {npcItems.map((item, i) => (
+                    <tr key={i} className="border-b border-purple-500/10 hover:bg-purple-500/5 transition-colors">
+                      <td className="py-1.5 px-2 font-mono text-purple-300 cursor-pointer hover:text-white" onClick={() => { navigator.clipboard.writeText(String(item.code || "")); showToast("Copied " + item.code); }} title="Click to copy">{String(item.code || "")}</td>
+                      <td className="py-1.5 px-2 text-[var(--color-text)] font-medium">{String(item.partName || item.itemType || "")}</td>
+                      <td className="py-1.5 px-2 text-[var(--color-text-muted)]">{String(item.category || "")}</td>
+                      <td className="py-1.5 px-2 text-[var(--color-text-muted)]">{String(item.manufacturer || "")}</td>
+                      <td className="py-1.5 px-2 text-[var(--color-text-muted)]">{String(item.weaponType || "")}</td>
+                      <td className="py-1.5 px-2 text-[var(--color-text-muted)] font-mono text-[10px]">{String(item.parentWeapon || "")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {npcLoaded && npcItems.length === 0 && (
+          <p className="px-4 pb-3 text-xs text-[var(--color-text-muted)]">No NPC weapons found.</p>
+        )}
+      </details>
 
       <div className="mx-4 mt-3 flex flex-wrap items-center gap-3 p-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(48,52,60,0.35)]">
         <span className="text-xs text-[var(--color-text-muted)]">
