@@ -9810,9 +9810,31 @@ export default function UnifiedItemBuilderPage() {
         </details>
       )}
 
+      {/* Build reference (tips, collapsed by default) */}
+      <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.5)] overflow-hidden group">
+        <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
+          <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⊞</span> Build Reference</span>
+          <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
+        </summary>
+        <div className="px-3 pb-3 pt-2 border-t border-[var(--color-panel-border)] space-y-2">
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <strong className="text-[var(--color-text)]">Part checklist:</strong> {"✓"} = required part present · {"☐"} = required part missing. Fill all required slots before adding bonus parts for best results.
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <strong className="text-[var(--color-text)]">Rarity &amp; skin:</strong> The item{"'"}s base skin is driven by rarity. Swapping rarity will change the skin — further cosmetic changes can be applied separately.
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <strong className="text-[var(--color-text)]">Manufacturer parts:</strong> In-game models only render parts from the item{"'"}s own manufacturer. Fill required slots with matching manufacturer parts first; cross-manufacturer parts are secondary.
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)]">
+            <strong className="text-[var(--color-text)]">Show Info</strong> — toggles rich descriptions in part pickers. <strong className="text-[var(--color-text)]">All Parts</strong> — expands part lists beyond the selected manufacturer (use with care).
+          </p>
+        </div>
+      </details>
+
       <section>
         {/* Current build parts */}
-        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0 max-w-sm" open>
+        <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0 max-w-sm ml-auto" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none shrink-0 font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">◈</span> Current build parts</span>
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
@@ -9831,11 +9853,6 @@ export default function UnifiedItemBuilderPage() {
               <div
                 key={`${i}-${part.raw}`}
                 className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.75)] p-2 flex flex-col gap-2"
-                onMouseEnter={(e) => {
-                  const data = hoverDataByCode(part.raw) ?? (part.prefix != null && part.partId != null ? hoverDataByCode(`{${part.prefix}:${part.partId}}`) : null);
-                  if (data) startHover(data, e.currentTarget.getBoundingClientRect().top, "left");
-                }}
-                onMouseLeave={endHover}
               >
                 <div className="flex items-start gap-1">
                   <div className="flex flex-col gap-1 shrink-0">
@@ -9843,7 +9860,7 @@ export default function UnifiedItemBuilderPage() {
                       type="button"
                       onClick={() => movePart(i, "up")}
                       disabled={i === 0}
-                      className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
+                      className="p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
                       title="Move up"
                     >
                       ↑
@@ -9852,7 +9869,7 @@ export default function UnifiedItemBuilderPage() {
                       type="button"
                       onClick={() => movePart(i, "down")}
                       disabled={i === currentBuildParts.length - 1}
-                      className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
+                      className="p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
                       title="Move down"
                     >
                       ↓
@@ -9977,12 +9994,27 @@ export default function UnifiedItemBuilderPage() {
                   <button
                     type="button"
                     onClick={() => removePart(i)}
-                    className="shrink-0 p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 text-xs touch-manipulation flex items-center justify-center"
+                    className="shrink-0 p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 text-xs touch-manipulation flex items-center justify-center"
                     title="Remove"
                   >
                     ×
                   </button>
                 </div>
+                {/* Show Info button — centered, prominent */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const data = hoverDataByCode(part.raw) ?? (part.prefix != null && part.partId != null ? hoverDataByCode(`{${part.prefix}:${part.partId}}`) : null);
+                    if (data) {
+                      if (hoverCard && hoverCard.code === data.code) { endHover(); }
+                      else { startHover(data, e.currentTarget.getBoundingClientRect().top, "left"); }
+                    }
+                  }}
+                  className="w-full py-1.5 rounded border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 hover:border-[var(--color-accent)]/70 text-xs font-bold tracking-wide touch-manipulation flex items-center justify-center gap-1.5 transition-colors min-h-[36px]"
+                  title="Show part info"
+                >
+                  Show Info
+                </button>
                 {/* Quantity and Edit qty at bottom of card (with type label directly above the line) */}
                 {editQtyIndex === i ? (
                 <div className="flex items-center gap-2 pt-1 border-t border-[var(--color-panel-border)]">
@@ -10065,28 +10097,6 @@ export default function UnifiedItemBuilderPage() {
           </div>
         </details>
       </section>
-
-      {/* Build reference (tips, collapsed by default) */}
-      <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.5)] overflow-hidden group">
-        <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
-          <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⊞</span> Build Reference</span>
-          <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
-        </summary>
-        <div className="px-3 pb-3 pt-2 border-t border-[var(--color-panel-border)] space-y-2">
-          <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Part checklist:</strong> ✓ = required part present · ☐ = required part missing. Fill all required slots before adding bonus parts for best results.
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Rarity &amp; skin:</strong> The item's base skin is driven by rarity. Swapping rarity will change the skin — further cosmetic changes can be applied separately.
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Manufacturer parts:</strong> In-game models only render parts from the item's own manufacturer. Fill required slots with matching manufacturer parts first; cross-manufacturer parts are secondary.
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)]">
-            <strong className="text-[var(--color-text)]">Show Info</strong> — toggles rich descriptions in part pickers. <strong className="text-[var(--color-text)]">All Parts</strong> — expands part lists beyond the selected manufacturer (use with care).
-          </p>
-        </div>
-      </details>
 
       {/* Add other parts modal */}
       {showAddPartsModal && (

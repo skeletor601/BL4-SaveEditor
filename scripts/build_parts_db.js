@@ -222,9 +222,9 @@ const GRENADE_MFG_NAMES = { 263: "Maliwan", 267: "Jakobs", 270: "Daedalus", 272:
 
 for (const r of readCsv("grenade/grenade_main_perk_EN.csv")) {
   const mainId = r["Grenade_perk_main_ID"], partId = r["Part_ID"];
-  const partType = r["Part_type"], stat = r["Stat"];
+  const partType = r["Part_type"], stat = r["Stat"], desc = r["Description"];
   if (!partId || !mainId) continue;
-  addPart({ code: `{${mainId}:${partId}}`, partName: stat || `Grenade ${partType} ${partId}`, itemType: stat || partType, partType, category: "Grenade" });
+  addPart({ code: `{${mainId}:${partId}}`, partName: stat || `Grenade ${partType} ${partId}`, itemType: stat || partType, partType, effect: desc || undefined, category: "Grenade" });
 }
 
 for (const r of readCsv("grenade/manufacturer_rarity_perk_EN.csv")) {
@@ -310,7 +310,10 @@ for (const r of readCsv("class_mods/Class_rarity_name.csv")) {
 for (const r of readCsv("class_mods/Class_perk.csv")) {
   const perkId = r["perk_ID"], perkNameEN = r["perk_name_EN"];
   if (!perkId || !perkNameEN) continue;
-  addPart({ code: `{234:${perkId}}`, partName: perkNameEN, itemType: perkNameEN, partType: "Perk", category: "Class Mod" });
+  // Derive a readable name: "+20% Movement Speed" → "Movement Speed Class Mod Perk"
+  const cleanName = perkNameEN.replace(/^[+\-.\d%]+\s*/, "").trim() || perkNameEN;
+  const displayName = `${cleanName} Class Mod Perk`;
+  addPart({ code: `{234:${perkId}}`, partName: displayName, itemType: displayName, partType: "Universal Class Mod Perk", effect: perkNameEN, category: "Class Mod" });
 }
 
 // Class mod rarity part IDs (Common/Uncommon/Rare/Epic per class)

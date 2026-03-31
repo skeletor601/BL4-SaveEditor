@@ -15,6 +15,16 @@ export type ThemeId = (typeof THEMES)[number];
 
 const STORAGE_KEY = "bl4-theme";
 const FONT_SIZE_KEY = "bl4-font-size";
+const BG_MODE_KEY = "bl4-bg-mode";
+
+export const BG_MODES = ["stock", "dark", "light"] as const;
+export type BgMode = (typeof BG_MODES)[number];
+
+export const BG_MODE_META: Record<BgMode, { label: string; swatch: string; border?: string }> = {
+  stock: { label: "Stock", swatch: "conic-gradient(#00BFFF 0deg, #FF6600 90deg, #BF00FF 180deg, #00D4AA 270deg)" },
+  dark:  { label: "Dark Studio", swatch: "linear-gradient(180deg, #5a5e6a, #2a2c34)", border: "rgba(255,255,255,0.4)" },
+  light: { label: "Light Studio", swatch: "linear-gradient(180deg, #f0f0f0, #c8c8c8)" },
+};
 
 export const FONT_SIZES = [
   { label: "S",    value: 13 },
@@ -74,6 +84,8 @@ interface ThemeContextValue {
   themeConfig: ThemeConfig;
   fontSize: FontSizeValue;
   setFontSize: (size: FontSizeValue) => void;
+  bgMode: BgMode;
+  setBgMode: (mode: BgMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -87,6 +99,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return "Ion";
   });
 
+  const [bgMode, setBgModeState] = useState<BgMode>(() => {
+    try {
+      const s = localStorage.getItem(BG_MODE_KEY);
+      if (s && BG_MODES.includes(s as BgMode)) return s as BgMode;
+    } catch {}
+    return "stock";
+  });
+
   const [fontSize, setFontSizeState] = useState<FontSizeValue>(() => {
     try {
       const s = localStorage.getItem(FONT_SIZE_KEY);
@@ -98,17 +118,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, theme);
+    localStorage.setItem(BG_MODE_KEY, bgMode);
     const c = themeConfig[theme];
     document.documentElement.style.setProperty("--color-accent", c.accent);
     document.documentElement.style.setProperty("--color-accent-muted", c.accentMuted);
     document.documentElement.style.setProperty("--color-accent-dim", c.accentDim);
     document.documentElement.style.setProperty("--color-panel-border", c.panelBorder);
     document.documentElement.style.setProperty("--color-bg-overlay", c.bgOverlay);
-    const bgName = THEME_BG_FILENAMES[theme];
-    const encoded = encodeURIComponent(bgName);
-    document.documentElement.style.setProperty("--theme-bg-url", `url("/BG_Themes/${encoded}.png")`);
+    // Background image: stock uses per-theme hex BG, dark/light use studio images
+    if (bgMode === "stock") {
+      const bgName = THEME_BG_FILENAMES[theme];
+      const encoded = encodeURIComponent(bgName);
+      document.documentElement.style.setProperty("--theme-bg-url", `url("/BG_Themes/${encoded}.png")`);
+    } else if (bgMode === "dark") {
+      document.documentElement.style.setProperty("--theme-bg-url", `url("/BG_Themes/Studio_Dark.png")`);
+    } else {
+      document.documentElement.style.setProperty("--theme-bg-url", `url("/BG_Themes/Studio_Light.png")`);
+    }
     document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    document.documentElement.setAttribute("data-bg", bgMode);
+  }, [theme, bgMode]);
 
   useEffect(() => {
     localStorage.setItem(FONT_SIZE_KEY, String(fontSize));
@@ -116,6 +145,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [fontSize]);
 
   const setFontSize = (size: FontSizeValue) => setFontSizeState(size);
+  const setBgMode = (mode: BgMode) => setBgModeState(mode);
 
   const value = useMemo(
     () => ({
@@ -124,8 +154,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       themeConfig: themeConfig[theme],
       fontSize,
       setFontSize,
+      bgMode,
+      setBgMode,
     }),
-    [theme, fontSize]
+    [theme, fontSize, bgMode]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

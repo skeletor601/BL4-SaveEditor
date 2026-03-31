@@ -64,16 +64,66 @@ select option:hover {
   color: var(--color-text);
 }
 
-/* Poppy buttons: slightly brighter borders + subtle glow on interactive elements */
+/* ── Buttons: high-contrast borders, shadow depth, strong hover glow ────────── */
 button, [role="button"], a.btn, select, input[type="checkbox"] {
-  border-color: rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.45);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 0 1px rgba(0, 255, 255, 0.15);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 button:hover, [role="button"]:hover, a.btn:hover, select:hover {
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
+  border-color: rgba(0, 255, 255, 0.7);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(0, 255, 255, 0.25);
 }
-/* Panels: slightly more opaque so content reads clearly over blurred BG */
-details, section > .rounded-xl, .rounded-lg[class*="border-[var(--color-panel-border)]"] {
-  backdrop-filter: blur(4px);
+button:active, [role="button"]:active {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.7),
+    0 0 6px rgba(0, 255, 255, 0.2);
+}
+/* Primary (solid accent) buttons: dark text needs no glow override */
+button[class*="bg-[var(--color-accent)]"] {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(0, 255, 255, 0.2);
+}
+button[class*="bg-[var(--color-accent)]"]:hover {
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.6),
+    0 0 18px rgba(0, 255, 255, 0.35);
+}
+
+/* ── Inputs & selects: visible borders on dark BG ──────────────────────────── */
+input[type="text"], input[type="number"], input[type="search"], textarea, select {
+  border-color: rgba(0, 255, 255, 0.35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) inset;
+}
+
+/* ── Panels, cards, containers: shadow + blur behind all UI ────────────────── */
+/* Match any rounded container with a theme border */
+[class*="rounded"][class*="border"][class*="border-[var(--color-panel-border)"],
+[class*="rounded"][class*="border"][class*="bg-[rgba(24,28,34"],
+[class*="rounded"][class*="bg-[rgba(24,28,34"],
+details, aside {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.55),
+    0 0 1px rgba(0, 255, 255, 0.08);
+}
+/* Heavier shadow on bigger panels (modals, main sections) */
+[class*="rounded-xl"][class*="border"][class*="bg-[rgba(24,28,34"],
+[class*="rounded-2xl"][class*="border"] {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.65),
+    0 0 1px rgba(0, 255, 255, 0.1);
+}
+/* Nested panels inside panels: lighter shadow so they don't double-stack */
+[class*="rounded"][class*="bg-[rgba(24,28,34"] [class*="rounded"][class*="bg-[rgba(24,28,34"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: none;
 }
 
 /* Master Search: legendary row – orange text only, no background */

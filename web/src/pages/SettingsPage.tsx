@@ -1,9 +1,9 @@
-import { useTheme, THEMES, THEME_META, FONT_SIZES, type ThemeId, type FontSizeValue } from "@/contexts/ThemeContext";
+import { useTheme, THEMES, THEME_META, FONT_SIZES, BG_MODES, BG_MODE_META, type ThemeId, type FontSizeValue } from "@/contexts/ThemeContext";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/apiClient";
 
 export default function SettingsPage() {
-  const { theme, setTheme, fontSize, setFontSize } = useTheme();
+  const { theme, setTheme, fontSize, setFontSize, bgMode, setBgMode } = useTheme();
   const [version, setVersion] = useState<{ version?: string; downloadUrl?: string }>({});
 
   useEffect(() => {
@@ -49,6 +49,34 @@ export default function SettingsPage() {
                     boxShadow: active ? `0 0 8px ${meta.accent}` : undefined,
                   }}
                 />
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Background */}
+      <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
+        <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-1 pl-1">⊞ Background</h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-4 pl-1">Choose a background style. Stock uses themed hex backgrounds.</p>
+        <div className="flex gap-2 flex-wrap">
+          {BG_MODES.map((m) => {
+            const meta = BG_MODE_META[m];
+            const active = bgMode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setBgMode(m)}
+                className={`flex items-center gap-2 min-h-[44px] px-3 py-2 rounded-lg border text-sm font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-all ${
+                  active
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/15 text-[var(--color-accent)]"
+                    : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                }`}
+              >
+                <span className="w-5 h-3 rounded flex-shrink-0 border border-white/20" style={{ background: meta.swatch }} />
                 {meta.label}
               </button>
             );

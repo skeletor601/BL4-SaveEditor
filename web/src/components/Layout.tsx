@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme, THEMES, THEME_META, type ThemeId } from "@/contexts/ThemeContext";
+import { useTheme, THEMES, THEME_META, BG_MODES, BG_MODE_META, type ThemeId } from "@/contexts/ThemeContext";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -65,7 +65,7 @@ function getBreadcrumbs(pathname: string): Crumb[] {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { theme, setTheme, themeConfig } = useTheme();
+  const { theme, setTheme, themeConfig, bgMode, setBgMode } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [backpackOpen, setBackpackOpen] = useState(false);
   const overlay = themeConfig.bgOverlay;
@@ -82,7 +82,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "blur(2px) brightness(0.85)",
+          filter: "blur(2px) brightness(0.55)",
           transform: "scale(1.02)",
         }}
       />
@@ -169,6 +169,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   style={{
                     backgroundColor: THEME_META[t as ThemeId].accent,
                     boxShadow: theme === t ? `0 0 10px ${THEME_META[t as ThemeId].accent}` : undefined,
+                  }}
+                />
+              ))}
+            </div>
+            {/* Background swatch row */}
+            <div className="flex items-center gap-1.5" role="group" aria-label="Background">
+              <span className="text-[10px] font-mono tracking-widest text-[var(--color-text-muted)] hidden sm:inline mr-0.5">BG</span>
+              {BG_MODES.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setBgMode(m)}
+                  title={BG_MODE_META[m].label}
+                  aria-label={`Background: ${BG_MODE_META[m].label}`}
+                  className={`w-5 h-5 rounded border-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                    bgMode === m
+                      ? "border-white scale-125"
+                      : "opacity-60 hover:opacity-100 hover:scale-110"
+                  }`}
+                  style={{
+                    background: BG_MODE_META[m].swatch,
+                    borderColor: bgMode === m ? undefined : (BG_MODE_META[m].border || "transparent"),
                   }}
                 />
               ))}

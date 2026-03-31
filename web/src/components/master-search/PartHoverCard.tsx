@@ -134,7 +134,7 @@ export default function PartHoverCard({ data, cardTop, side = "right" }: PartHov
                 <p className="text-xs text-[var(--color-text)] font-mono leading-snug">{data.partType}</p>
               </div>
             )}
-            {data.modelName && (
+            {data.modelName && data.modelName !== data.name && (
               <div>
                 <p className="text-[9px] uppercase tracking-widest text-[var(--color-text-muted)]">Item type</p>
                 <p className="text-xs text-[var(--color-text)] font-mono leading-snug">{data.modelName}</p>
@@ -143,8 +143,8 @@ export default function PartHoverCard({ data, cardTop, side = "right" }: PartHov
           </div>
         )}
 
-        {/* Effect */}
-        {data.effect && data.effect !== "—" && (
+        {/* Effect — skip if it just duplicates the name */}
+        {data.effect && data.effect !== "—" && data.effect !== data.name && (
           <div>
             <p className="text-[9px] uppercase tracking-widest text-[var(--color-text-muted)] mb-1">Effect / Stats</p>
             <div className="rounded-lg border border-[var(--color-panel-border)] bg-[rgba(0,0,0,0.25)] px-3 py-2">
