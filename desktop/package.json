@@ -1,0 +1,64 @@
+{
+  "name": "bl4-aio-editor",
+  "version": "4.0.0",
+  "description": "BL4 AIO Save Editor — Desktop Edition",
+  "main": "main.js",
+  "author": "skeletor601",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:all": "electron-builder --win --mac --linux"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.0"
+  },
+  "build": {
+    "appId": "com.bl4editor.desktop",
+    "productName": "BL4 AIO Editor",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "web-dist/**/*",
+      "api-dist/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../codec",
+        "to": "codec",
+        "filter": ["**/*.py", "**/*.pyd", "**/*.so"]
+      }
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "shortcutName": "BL4 AIO Editor"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "icon.icns"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "icon.png"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "skeletor601",
+      "repo": "BL4-SaveEditor"
+    }
+  }
+}
