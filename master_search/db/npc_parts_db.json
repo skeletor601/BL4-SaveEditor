@@ -1,0 +1,165 @@
+{
+  "generated_at_utc": "2026-03-31T19:15:31.209483Z",
+  "source": "NCS inv4.json Cowbell DLC",
+  "description": "NPC weapons, turrets, action skill weapons. Can be serialized into player items using the parent weapon type ID.",
+  "rows": [
+    {
+      "code": "{254:999}",
+      "partName": "Vex Specter Weapon (Phase Shard)",
+      "itemType": "Vex Specter Weapon (Phase Shard)",
+      "category": "Action Skill Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Maliwan",
+      "weaponType": "SMG",
+      "parentWeapon": "Dark Siren Action Skill"
+    },
+    {
+      "code": "{21:64}",
+      "partName": "Amara's Gun",
+      "itemType": "Amara's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Maliwan",
+      "weaponType": "SMG",
+      "parentWeapon": "Maliwan SMG"
+    },
+    {
+      "code": "{17:53}",
+      "partName": "Brenda's Gun",
+      "itemType": "Brenda's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Torgue",
+      "weaponType": "Assault Rifle",
+      "parentWeapon": "Torgue Assault Rifle"
+    },
+    {
+      "code": "{3:73}",
+      "partName": "Cine's Gun",
+      "itemType": "Cine's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Jakobs",
+      "weaponType": "Pistol",
+      "parentWeapon": "Jakobs Pistol",
+      "nameParts": [
+        "np_absolution"
+      ]
+    },
+    {
+      "code": "{13:19}",
+      "partName": "Gnpc's Gun",
+      "itemType": "Gnpc's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Daedalus",
+      "weaponType": "Assault Rifle",
+      "parentWeapon": "Daedalus Assault Rifle"
+    },
+    {
+      "code": "{3:1}",
+      "partName": "Moxxi's Gun",
+      "itemType": "Moxxi's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Jakobs",
+      "weaponType": "Pistol",
+      "parentWeapon": "Jakobs Pistol"
+    },
+    {
+      "code": "{14:38}",
+      "partName": "Nudge's Gun",
+      "itemType": "Nudge's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Tediore",
+      "weaponType": "Assault Rifle",
+      "parentWeapon": "Tediore Assault Rifle"
+    },
+    {
+      "code": "{4:73}",
+      "partName": "Tkhuman's Gun",
+      "itemType": "Tkhuman's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Order",
+      "weaponType": "Pistol",
+      "parentWeapon": "Order Pistol"
+    },
+    {
+      "code": "{4:74}",
+      "partName": "Zadra's Gun",
+      "itemType": "Zadra's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Order",
+      "weaponType": "Pistol",
+      "parentWeapon": "Order Pistol",
+      "redText": "uistat_redtext_zadra",
+      "nameParts": [
+        "np_zadra_weapon",
+        "np_zadra_weapon_prefix"
+      ]
+    },
+    {
+      "code": "{3:71}",
+      "partName": "Zane's Gun",
+      "itemType": "Zane's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Jakobs",
+      "weaponType": "Pistol",
+      "parentWeapon": "Jakobs Pistol"
+    },
+    {
+      "code": "{27:70}",
+      "partName": "Zane's Gun",
+      "itemType": "Zane's Gun",
+      "category": "NPC Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Jakobs",
+      "weaponType": "Assault Rifle",
+      "parentWeapon": "Jakobs Assault Rifle"
+    },
+    {
+      "code": "{304:6}",
+      "partName": "Exosoldier Turret Base",
+      "itemType": "Exosoldier Turret Base",
+      "category": "Turret Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Universal",
+      "weaponType": "Turret",
+      "parentWeapon": "turret_weapon_chaingun"
+    },
+    {
+      "code": "{320:6}",
+      "partName": "Exosoldier Turret Rocket",
+      "itemType": "Exosoldier Turret Rocket",
+      "category": "Turret Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Universal",
+      "weaponType": "Turret",
+      "parentWeapon": "turret_weapon_rocketlauncher"
+    },
+    {
+      "code": "{324:6}",
+      "partName": "Exosoldier Turret Shotgun",
+      "itemType": "Exosoldier Turret Shotgun",
+      "category": "Turret Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Universal",
+      "weaponType": "Turret",
+      "parentWeapon": "turret_weapon_shotgun"
+    },
+    {
+      "code": "{379:3}",
+      "partName": "Turret Beam Anchor",
+      "itemType": "Turret Beam Anchor",
+      "category": "Turret Weapon",
+      "partType": "NPC Weapon Comp",
+      "manufacturer": "Universal",
+      "weaponType": "Turret Beam",
+      "parentWeapon": "turret_weapon_beam"
+    }
+  ]
+}
