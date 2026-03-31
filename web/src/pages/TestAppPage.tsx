@@ -623,7 +623,7 @@ function WorkbenchCard({ to, title, desc, badge, color }: { to: string; title: s
 
 // ── Top Community Code spotlight ─────────────────────────────────────────────
 function TopCommunityCode() {
-  const [topCode, setTopCode] = useState<{ title: string; code: string; upvotes: number; itemType: string; submittedAt: number; authorName?: string; seed?: number } | null>(null);
+  const [topCode, setTopCode] = useState<{ title: string; code: string; upvotes: number; itemType: string; submittedAt: number; authorName?: string; seed?: number; imageFilename?: string } | null>(null);
   useEffect(() => {
     fetchApi("community/recipes").then((r) => r.json()).then((data) => {
       const recipes = data?.recipes;
@@ -633,7 +633,7 @@ function TopCommunityCode() {
         const thisWeek = recipes.filter((r: { submittedAt: number }) => r.submittedAt > weekAgo);
         const pool = thisWeek.length > 0 ? thisWeek : recipes;
         const top = pool.sort((a: { upvotes: number }, b: { upvotes: number }) => b.upvotes - a.upvotes)[0];
-        if (top) setTopCode({ title: top.title, code: top.code, upvotes: top.upvotes, itemType: top.itemType, submittedAt: top.submittedAt, authorName: top.authorName, seed: top.seed });
+        if (top) setTopCode({ title: top.title, code: top.code, upvotes: top.upvotes, itemType: top.itemType, submittedAt: top.submittedAt, authorName: top.authorName, seed: top.seed, imageFilename: top.imageFilename });
       }
     }).catch(() => {});
   }, []);
@@ -682,6 +682,9 @@ function TopCommunityCode() {
           </div>
         )}
         <p className="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{topCode.code.slice(0, 60)}...</p>
+        {topCode.imageFilename && (
+          <img src={`/api/community/images/${topCode.imageFilename}`} alt={topCode.title} loading="lazy" className="max-h-40 rounded border border-amber-500/20" />
+        )}
         <div className="flex items-center gap-2 pt-1">
           <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10">
             <span className="text-amber-400 text-sm">▲</span>
