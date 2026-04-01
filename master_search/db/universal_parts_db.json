@@ -1,6 +1,4 @@
 {
-  "generated_at_utc": "2026-03-31T15:16:26.577793Z",
-  "source": "rebuild_db_from_ncs.py (full rebuild from CSVs + NCS enrichment)",
   "rows": [
     {
       "code": "{10:100}",
@@ -23595,8 +23593,9 @@
       "partName": "Configuration",
       "itemType": "Configuration",
       "category": "Class Mod",
-      "partType": "Configuration",
-      "manufacturer": "Siren"
+      "partType": "Name",
+      "manufacturer": "Siren",
+      "rarity": "Legendary"
     },
     {
       "code": "{254:53}",
@@ -27962,17 +27961,19 @@
       "partName": "Tempest",
       "itemType": "Tempest",
       "category": "Class Mod",
-      "partType": "Tempest",
-      "manufacturer": "Paladin"
+      "partType": "Name",
+      "manufacturer": "Paladin",
+      "rarity": "Legendary"
     },
     {
       "code": "{255:541}",
-      "partName": "Legendary",
-      "itemType": "Legendary",
+      "partName": "Tempest",
+      "itemType": "Tempest",
       "category": "Class Mod",
       "partType": "Rarity",
       "manufacturer": "Amon",
-      "rarity": "Legendary"
+      "rarity": "Legendary",
+      "effect": "Tempest Skin"
     },
     {
       "code": "{255:54}",
@@ -32324,8 +32325,9 @@
       "partName": "Reaparicion",
       "itemType": "Reaparicion",
       "category": "Class Mod",
-      "partType": "Reaparicion",
-      "manufacturer": "Exo Soldier"
+      "partType": "Name",
+      "manufacturer": "Exo Soldier",
+      "rarity": "Legendary"
     },
     {
       "code": "{256:54}",
@@ -36694,17 +36696,19 @@
       "partName": "Phlebotomist",
       "itemType": "Phlebotomist",
       "category": "Class Mod",
-      "partType": "Phlebotomist",
-      "manufacturer": "Gravitar"
+      "partType": "Name",
+      "manufacturer": "Gravitar",
+      "rarity": "Legendary"
     },
     {
       "code": "{259:543}",
-      "partName": "Legendary",
-      "itemType": "Legendary",
+      "partName": "Phlebotomist",
+      "itemType": "Phlebotomist",
       "category": "Class Mod",
       "partType": "Rarity",
       "manufacturer": "Harlowe",
-      "rarity": "Legendary"
+      "rarity": "Legendary",
+      "effect": "Phlebotomist Skin"
     },
     {
       "code": "{259:54}",
@@ -55597,6 +55601,83 @@
       "manufacturer": "Jakobs",
       "effect": "Hyperion Shield",
       "weaponType": "Shotgun"
+    },
+    {
+      "code": "{256:541}",
+      "partName": "Reaparicion",
+      "itemType": "Reaparicion",
+      "category": "Class Mod",
+      "partType": "Rarity",
+      "manufacturer": "Rafa",
+      "rarity": "Legendary",
+      "effect": "Reaparicion",
+      "weaponType": ""
+    },
+    {
+      "code": "{254:540}",
+      "partName": "Configuration",
+      "itemType": "Configuration",
+      "category": "Class Mod",
+      "partType": "Rarity",
+      "manufacturer": "Vex",
+      "rarity": "Legendary",
+      "effect": "Configuration",
+      "weaponType": ""
+    },
+    {
+      "code": "{243:119}",
+      "partName": "Geiger-Roid (Corrosive)",
+      "itemType": "Geiger-Roid",
+      "category": "Repkit",
+      "partType": "Legendary Perk",
+      "manufacturer": "Universal",
+      "rarity": "Legendary",
+      "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
+      "weaponType": ""
+    },
+    {
+      "code": "{243:118}",
+      "partName": "Geiger-Roid (Cryo)",
+      "itemType": "Geiger-Roid",
+      "category": "Repkit",
+      "partType": "Legendary Perk",
+      "manufacturer": "Universal",
+      "rarity": "Legendary",
+      "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
+      "weaponType": ""
+    },
+    {
+      "code": "{243:117}",
+      "partName": "Geiger-Roid (Fire)",
+      "itemType": "Geiger-Roid",
+      "category": "Repkit",
+      "partType": "Legendary Perk",
+      "manufacturer": "Universal",
+      "rarity": "Legendary",
+      "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
+      "weaponType": ""
+    },
+    {
+      "code": "{243:116}",
+      "partName": "Geiger-Roid (Radiation)",
+      "itemType": "Geiger-Roid",
+      "category": "Repkit",
+      "partType": "Legendary Perk",
+      "manufacturer": "Universal",
+      "rarity": "Legendary",
+      "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
+      "weaponType": ""
+    },
+    {
+      "code": "{243:115}",
+      "partName": "Geiger-Roid (Shock)",
+      "itemType": "Geiger-Roid",
+      "category": "Repkit",
+      "partType": "Legendary Perk",
+      "manufacturer": "Universal",
+      "rarity": "Legendary",
+      "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
+      "weaponType": ""
     }
   ]
 }
