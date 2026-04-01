@@ -33,7 +33,6 @@ import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
 import ClassModNameHoverCard, { type ClassModNameCardData } from "@/components/ClassModNameHoverCard";
 import { getClassModNameInfo } from "@/data/classModNameDescriptions";
-import BuildFromUrlModal from "@/components/BuildFromUrlModal";
 import PartDetailModal from "@/components/master-search/PartDetailModal";
 import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
 import { apiItemToPartRow, getCode, getPartName } from "@/data/partsData";
@@ -1405,6 +1404,8 @@ export default function UnifiedItemBuilderPage() {
   useEffect(() => {
     const state = location.state as {
       editFromBackpack?: boolean;
+      loadDecoded?: string;
+      loadLabel?: string;
       decoded?: string;
       serial?: string;
       category?: string;
@@ -1412,6 +1413,18 @@ export default function UnifiedItemBuilderPage() {
       container?: string;
       path?: string[];
     } | null;
+    // Build from URL — load decoded string
+    if (state?.loadDecoded) {
+      prevFreshDecodedRef.current = "";
+      setTimeout(() => {
+        setLiveDecoded(state.loadDecoded!.trim());
+        setLastEditedCodecSide("decoded");
+        setCodecStatus(`Build URL loaded: ${state.loadLabel || "item"}`);
+        prevFreshDecodedRef.current = state.loadDecoded!.trim();
+      }, 100);
+      window.history.replaceState({}, "");
+      return;
+    }
     if (state?.editFromBackpack && (state.decoded || state.serial)) {
       // Set the category
       if (state.category) setCategory(state.category as ItemCategory);
@@ -1506,7 +1519,6 @@ export default function UnifiedItemBuilderPage() {
   const [weaponPartSelections, setWeaponPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.weapon.selections", {});
   const [extraTokens, setExtraTokens] = usePersistedState<string[]>("uib.weapon.extraTokens", []);
   const [showGodRollModal, setShowGodRollModal] = useState(false);
-  const [showBuildFromUrl, setShowBuildFromUrl] = useState(false);
   const [autoFillWarning, setAutoFillWarning] = useState<string | null>(null);
   const [weaponPartPickerPartType, setWeaponPartPickerPartType] = useState<string | null>(null);
   const [weaponPartPickerChecked, setWeaponPartPickerChecked] = useState<Set<string>>(new Set());
@@ -4297,15 +4309,6 @@ export default function UnifiedItemBuilderPage() {
               </button>
             );
           })}
-          <span className="w-px h-6 bg-[var(--color-panel-border)]/50 self-center mx-1" />
-          <button
-            type="button"
-            onClick={() => setShowBuildFromUrl(true)}
-            className="px-3 py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-400 text-sm font-medium min-h-[44px] touch-manipulation hover:bg-purple-500/20 hover:border-purple-500/60 transition-colors"
-            title="Paste a Mobalytics build URL to auto-generate stock gear"
-          >
-            Build from URL
-          </button>
         </div>
         {/* Display toggles */}
         <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-[var(--color-panel-border)]/50 flex-wrap">
@@ -10312,18 +10315,6 @@ export default function UnifiedItemBuilderPage() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Build from URL modal */}
-      {showBuildFromUrl && (
-        <BuildFromUrlModal
-          onClose={() => setShowBuildFromUrl(false)}
-          onLoadDecoded={(decoded, label) => {
-            setLiveDecoded(decoded.trim());
-            setLastEditedCodecSide("decoded");
-            setCodecStatus(`Build URL loaded: ${label}`);
-          }}
-        />
       )}
 
       {/* Code history */}

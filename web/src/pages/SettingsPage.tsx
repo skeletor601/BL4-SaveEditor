@@ -1,4 +1,5 @@
 import { useTheme, THEMES, THEME_META, FONT_SIZES, BG_MODES, BG_MODE_META, type ThemeId, type FontSizeValue } from "@/contexts/ThemeContext";
+import { useLayout, LAYOUTS, LAYOUT_META, PAGE_GROUPS, type PageGroupKey } from "@/contexts/LayoutContext";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/apiClient";
 
@@ -110,6 +111,9 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* Layout */}
+      <LayoutSettings />
+
       {/* Credits */}
       <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
@@ -154,5 +158,84 @@ export default function SettingsPage() {
         </p>
       </section>
     </div>
+  );
+}
+
+// ── Layout Settings Section ─────────────────────────────────────────────────
+
+function LayoutSettings() {
+  const { globalLayout, setGlobalLayout, getPageLayout, setPageLayout } = useLayout();
+
+  return (
+    <section className="relative rounded-xl border border-[var(--color-panel-border)] p-4 sm:p-6 bg-[rgba(24,28,34,0.75)] backdrop-blur-sm overflow-hidden">
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-accent)]/40 rounded-l-xl" aria-hidden="true" />
+      <h2 className="text-[var(--color-accent)] font-mono text-xs tracking-widest uppercase mb-1 pl-1">
+        {"<>"} Layout
+      </h2>
+      <p className="text-sm text-[var(--color-text-muted)] mb-4 pl-1">
+        Choose a layout for each page. The global default applies to all pages without a specific override.
+      </p>
+
+      {/* Global default */}
+      <div className="mb-4">
+        <p className="text-xs font-mono text-[var(--color-text-muted)] mb-2 pl-1 uppercase tracking-wide">Global Default</p>
+        <div className="flex gap-2 flex-wrap">
+          {LAYOUTS.map(id => {
+            const meta = LAYOUT_META[id];
+            const active = globalLayout === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setGlobalLayout(id)}
+                className={`min-h-[44px] px-3 py-2 rounded-lg border font-mono text-sm transition-all ${
+                  active
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/15 text-[var(--color-accent)]"
+                    : "border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]/50 hover:text-[var(--color-text)]"
+                }`}
+                title={meta.description}
+              >
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Per-page overrides */}
+      <div>
+        <p className="text-xs font-mono text-[var(--color-text-muted)] mb-3 pl-1 uppercase tracking-wide">Per-Page Overrides</p>
+        <div className="space-y-2">
+          {PAGE_GROUPS.map(pg => {
+            const currentLayout = getPageLayout(pg.key as PageGroupKey);
+            return (
+              <div key={pg.key} className="flex items-center gap-3">
+                <span className="text-xs text-[var(--color-text)] w-28 shrink-0 font-mono">{pg.label}</span>
+                <div className="flex gap-1.5 flex-wrap">
+                  {LAYOUTS.map(id => {
+                    const active = currentLayout === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setPageLayout(pg.key as PageGroupKey, id)}
+                        className={`px-2 py-1 text-[10px] font-bold tracking-wide border transition-all ${
+                          active
+                            ? "border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
+                            : "border-[var(--color-panel-border)]/50 text-[var(--color-text-muted)]/60 hover:text-[var(--color-text)] hover:border-[var(--color-panel-border)]"
+                        }`}
+                        style={{ borderRadius: "var(--layout-panel-radius, 0.375rem)" }}
+                      >
+                        {LAYOUT_META[id].label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
