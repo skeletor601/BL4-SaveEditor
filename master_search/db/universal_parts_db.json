@@ -8759,7 +8759,7 @@
       "code": "{1:10}",
       "partName": "Corrosive",
       "itemType": "Corrosive",
-      "category": "Heavy",
+      "category": "Element",
       "partType": "Element",
       "effect": "Deals bonus corrosive damage. Effective against armor.",
       "element": "Corrosive"
@@ -8768,7 +8768,7 @@
       "code": "{1:11}",
       "partName": "Cryo",
       "itemType": "Cryo",
-      "category": "Heavy",
+      "category": "Element",
       "partType": "Element",
       "effect": "Deals bonus cryo damage. Slows and freezes enemies.",
       "element": "Cryo"
@@ -8777,7 +8777,7 @@
       "code": "{1:12}",
       "partName": "Fire",
       "itemType": "Fire",
-      "category": "Heavy",
+      "category": "Element",
       "partType": "Element",
       "effect": "Deals bonus fire damage. Effective against flesh.",
       "element": "Fire"
@@ -8786,7 +8786,7 @@
       "code": "{1:13}",
       "partName": "Radiation",
       "itemType": "Radiation",
-      "category": "Heavy",
+      "category": "Element",
       "partType": "Element",
       "effect": "Deals bonus radiation damage. Irradiated enemies explode on death.",
       "element": "Radiation"
@@ -8795,7 +8795,7 @@
       "code": "{1:14}",
       "partName": "Shock",
       "itemType": "Shock",
-      "category": "Heavy",
+      "category": "Element",
       "partType": "Element",
       "effect": "Deals bonus shock damage. Effective against shields.",
       "element": "Shock"

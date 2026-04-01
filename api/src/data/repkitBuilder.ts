@@ -27,7 +27,7 @@ export interface RepkitBuilderData {
   modelsByMfg: Record<number, number | null>;
 }
 
-interface UniversalRow { code: string; name: string; manufacturer: string; category: string; partType: string; description: string; rarity: string; }
+interface UniversalRow { code: string; name: string; partName: string; manufacturer: string; category: string; partType: string; description: string; effect: string; rarity: string; }
 
 function loadUniversalDb(): UniversalRow[] {
   const path = getPath("master_search/db/universal_parts_db.json");
@@ -59,8 +59,8 @@ export function getRepkitBuilderData(): RepkitBuilderData {
     const { typeId, partId } = parseCode(row.code);
     if (!partId) continue;
     const pt = (row.partType || "").trim();
-    const stat = row.name || row.description || "";
-    const desc = row.description && row.description !== stat ? row.description : undefined;
+    const stat = row.partName || row.name || row.effect || row.description || "";
+    const desc = (row.effect || row.description) && (row.effect || row.description) !== stat ? (row.effect || row.description) : undefined;
 
     if (typeId === 243) {
       const ptLower = pt.toLowerCase();

@@ -46,10 +46,13 @@ export interface GrenadeBuilderData {
 interface UniversalRow {
   code: string;
   name: string;
+  partName: string;
+  itemType: string;
   manufacturer: string;
   category: string;
   partType: string;
   description: string;
+  effect: string;
   rarity: string;
   perkName: string;
   perkDescription: string;
@@ -97,8 +100,8 @@ export function getGrenadeBuilderData(): GrenadeBuilderData {
     if (!partId) continue;
 
     const pt = (row.partType || "").trim();
-    const stat = row.name || row.description || "";
-    const desc = row.description && row.description !== stat ? row.description : undefined;
+    const stat = row.partName || row.name || row.effect || row.description || "";
+    const desc = (row.effect || row.description) && (row.effect || row.description) !== stat ? (row.effect || row.description) : undefined;
 
     // Type 245 = universal grenade parts (element, firmware, universal perks)
     if (typeId === 245) {

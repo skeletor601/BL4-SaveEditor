@@ -25,7 +25,7 @@ export interface HeavyBuilderData {
   bodiesByMfg: Record<number, number | null>;
 }
 
-interface UniversalRow { code: string; name: string; manufacturer: string; category: string; partType: string; description: string; rarity: string; }
+interface UniversalRow { code: string; name: string; partName: string; manufacturer: string; category: string; partType: string; description: string; effect: string; rarity: string; }
 
 function loadUniversalDb(): UniversalRow[] {
   const path = getPath("master_search/db/universal_parts_db.json");
@@ -42,7 +42,9 @@ let cached: HeavyBuilderData | null = null;
 export function getHeavyBuilderData(): HeavyBuilderData {
   if (cached) return cached;
 
-  const allRows = loadUniversalDb().filter((r) => r.category === "Heavy");
+  const db = loadUniversalDb();
+  const allRows = db.filter((r) => r.category === "Heavy");
+  const elementRows = db.filter((r) => r.category === "Element");
   const mfgs = HEAVY_MFG_IDS.map((id) => ({ id, name: HEAVY_MFG_NAMES[id] ?? `Manufacturer ${id}` }));
 
   const raritiesByMfg: Record<number, HeavyBuilderRarity[]> = {};
@@ -57,8 +59,8 @@ export function getHeavyBuilderData(): HeavyBuilderData {
     const { typeId, partId } = parseCode(row.code);
     if (!partId) continue;
     const pt = (row.partType || "").trim();
-    const stat = row.name || row.description || "";
-    const desc = row.description && row.description !== stat ? row.description : undefined;
+    const stat = row.partName || row.name || row.effect || row.description || "";
+    const desc = (row.effect || row.description) && (row.effect || row.description) !== stat ? (row.effect || row.description) : undefined;
 
     // Element and Firmware can come from any typeId (244 or 1)
     if (pt === "Element") {
@@ -75,7 +77,7 @@ export function getHeavyBuilderData(): HeavyBuilderData {
         // Determine rarity tier from the rarity field, or infer from spawn code name
         let rarityLabel = row.rarity || '';
         if (!rarityLabel) {
-          const nameLower = (row.name || '').toLowerCase();
+          const nameLower = (row.partName || row.name || '').toLowerCase();
           if (nameLower.includes('common') && !nameLower.includes('uncommon')) rarityLabel = 'Common';
           else if (nameLower.includes('uncommon')) rarityLabel = 'Uncommon';
           else if (nameLower.includes('rare') && !nameLower.includes('legendary')) rarityLabel = 'Rare';
@@ -99,6 +101,18 @@ export function getHeavyBuilderData(): HeavyBuilderData {
       }
     }
   }
+
+  // Pull single-element codes from the Element category, put them first
+  const extraElements: HeavyBuilderPart[] = [];
+  const seenElIds = new Set(element.map((e) => e.partId));
+  for (const row of elementRows) {
+    const { partId } = parseCode(row.code);
+    if (!partId || seenElIds.has(partId)) continue;
+    seenElIds.add(partId);
+    const stat = row.partName || row.name || row.effect || row.description || "";
+    extraElements.push({ partId, stat });
+  }
+  element.unshift(...extraElements);
 
   cached = { mfgs, raritiesByMfg, barrel, element, firmware, barrelAccPerks, bodyAccPerks, bodiesByMfg };
   return cached;

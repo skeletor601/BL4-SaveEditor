@@ -68,6 +68,8 @@ function getPath(relative: string): string {
 interface UniversalRow {
   code: string;
   name: string;
+  partName: string;
+  itemType: string;
   manufacturer: string;
   category: string;
   partType: string;
@@ -75,6 +77,7 @@ interface UniversalRow {
   description: string;
   rarity: string;
   element: string;
+  effect: string;
   character: string;
   perkName: string;
   perkDescription: string;
@@ -198,7 +201,15 @@ export function getWeaponGenData(): WeaponGenData {
 
     if (!partsByMfgTypeId[typeId]) partsByMfgTypeId[typeId] = {};
     if (!partsByMfgTypeId[typeId][pt]) partsByMfgTypeId[typeId][pt] = [];
-    const label = row.description ? `${partId} - ${row.description}` : partId;
+    // Use effect for stat descriptions (+Damage, +Reload Speed); only use partName if it's a real name (not just a letter code)
+    const nameIsUseful = row.partName && row.partName.length > 2 && !/^[A-Z]\s?[A-Z]?$/.test(row.partName);
+    let displayText: string;
+    if (nameIsUseful && row.effect && row.partName !== row.effect) {
+      displayText = `${row.partName}, ${row.effect}`;
+    } else {
+      displayText = (nameIsUseful ? row.partName : null) || row.effect || row.partName || row.description || "";
+    }
+    const label = displayText ? `${partId} - ${displayText}` : partId;
     const exists = partsByMfgTypeId[typeId][pt].some((p) => p.partId === partId);
     if (!exists) partsByMfgTypeId[typeId][pt].push({ partId, label });
   }
@@ -206,7 +217,7 @@ export function getWeaponGenData(): WeaponGenData {
   // ── Elemental ──
   const elemental: { partId: string; stat: string }[] = elementRows.map((r) => {
     const { partId } = parseCodeParts(r.code);
-    return { partId, stat: r.name || r.description || `Element ${partId}` };
+    return { partId, stat: r.partName || r.name || r.effect || `Element ${partId}` };
   }).filter((e) => e.partId);
 
   // ── Load legendary effects for enrichment ──
@@ -249,7 +260,7 @@ export function getWeaponGenData(): WeaponGenData {
     if (!typeId || !partId) continue;
 
     const rarityLower = (row.rarity || "").toLowerCase();
-    const descName = row.perkName || row.name || partId;
+    const descName = row.partName || row.perkName || row.name || partId;
 
     if (rarityLower === "legendary") {
       if (!legendaryByMfgTypeId[typeId]) legendaryByMfgTypeId[typeId] = [];
@@ -278,8 +289,8 @@ export function getWeaponGenData(): WeaponGenData {
       if (!rarityByMfgTypeId[typeId]) rarityByMfgTypeId[typeId] = [];
       rarityByMfgTypeId[typeId].push({
         partId,
-        stat: row.rarity || row.name || "",
-        description: row.description || undefined,
+        stat: row.rarity || row.partName || row.name || "",
+        description: row.effect || row.description || undefined,
       });
     }
   }

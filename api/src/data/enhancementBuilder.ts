@@ -13,13 +13,15 @@ export interface EnhancementManufacturer {
   perks: EnhancementMfgPerk[];
   rarities: Record<string, number>;
 }
+export interface EnhancementFirmware { code: number; name: string; description?: string; }
 export interface EnhancementBuilderData {
   manufacturers: Record<string, EnhancementManufacturer>;
   rarityMap247: Record<string, number>;
   secondary247: { code: number; name: string; description?: string }[];
+  firmware247: EnhancementFirmware[];
 }
 
-interface UniversalRow { code: string; name: string; manufacturer: string; category: string; partType: string; description: string; rarity: string; perkName: string; perkDescription: string; }
+interface UniversalRow { code: string; name: string; partName: string; manufacturer: string; category: string; partType: string; description: string; effect: string; rarity: string; perkName: string; perkDescription: string; }
 
 function loadUniversalDb(): UniversalRow[] {
   const path = getPath("master_search/db/universal_parts_db.json");
@@ -47,17 +49,32 @@ export function getEnhancementBuilderData(): EnhancementBuilderData {
   const manufacturers: Record<string, EnhancementManufacturer> = {};
   const rarityMap247: Record<string, number> = {};
   const secondary247: { code: number; name: string; description?: string }[] = [];
+  const firmware247: EnhancementFirmware[] = [];
+
+  // Known firmware names (to separate from stat perks in typeId 247)
+  const FIRMWARE_NAMES = new Set([
+    "skillcraft", "reel big fist", "high caliber", "goojfc", "action fist",
+    "deadeye", "heating up", "risky boots", "god killer", "airstrike",
+    "atlas e.x.", "atlas infinum", "trickshot", "jacked", "get throwin'",
+    "bullets to spare", "daed-dy o'", "baker", "oscar mike", "osacar mike",
+    "rubberband man", "lifeblood", "gadget ahoy",
+  ]);
 
   for (const row of allRows) {
     const { typeId, partId } = parseCode(row.code);
     if (!partId) continue;
     const pt = (row.partType || "").trim();
-    const name = row.name || row.description || "";
-    const desc = row.description && row.description !== name ? row.description : undefined;
+    // Prefer effect for display — partName often has " Stat Perk" / " Core Perk" suffix appended
+    const rawName = row.partName || row.name || "";
+    const cleanEffect = row.effect || row.description || "";
+    const name = cleanEffect || rawName;
+    const desc = rawName && rawName !== name ? rawName : undefined;
 
-    if (typeId === 247) { // Secondary/stat perks
+    if (typeId === 247) { // Secondary/stat perks + firmware
       if (pt === "Rarity") {
         rarityMap247[row.rarity || name] = partId;
+      } else if (FIRMWARE_NAMES.has(name.toLowerCase())) {
+        firmware247.push({ code: partId, name, ...(desc ? { description: desc } : {}) });
       } else {
         secondary247.push({ code: partId, name, ...(desc ? { description: desc } : {}) });
       }
@@ -77,6 +94,6 @@ export function getEnhancementBuilderData(): EnhancementBuilderData {
     }
   }
 
-  cached = { manufacturers, rarityMap247, secondary247 };
+  cached = { manufacturers, rarityMap247, secondary247, firmware247 };
   return cached;
 }

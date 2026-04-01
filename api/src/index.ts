@@ -20,6 +20,7 @@ import { feedbackRoutes } from "./routes/feedback.js";
 import { terraVaultRoutes } from "./routes/terraVault.js";
 import { greenVaultRoutes } from "./routes/greenVault.js";
 import { statsRoutes } from "./routes/stats.js";
+import { buildFromUrlRoutes } from "./routes/buildFromUrl.js";
 import { getAllParts } from "./data/parts.js";
 
 const SOCKET_ERROR_LISTENER_FLAG = Symbol("bl4_socket_error_listener_attached");
@@ -88,6 +89,7 @@ await fastify.register(feedbackRoutes, { prefix: "/api" });
 await fastify.register(terraVaultRoutes, { prefix: "/api" });
 await fastify.register(greenVaultRoutes, { prefix: "/api" });
 await fastify.register(statsRoutes, { prefix: "/api" });
+await fastify.register(buildFromUrlRoutes, { prefix: "/api" });
 
 // Optional: serve web app from same process (for Render single-service deploy)
 const webDist = path.join(process.cwd(), "web", "dist");

@@ -52,6 +52,12 @@ export interface ClassModPerk {
   perkNameEN: string;
 }
 
+export interface ClassModFirmware {
+  partId: number;
+  name: string;
+  description?: string;
+}
+
 export interface ClassModBuilderData {
   classNames: string[];
   rarities: string[];
@@ -60,6 +66,7 @@ export interface ClassModBuilderData {
   /** classId -> skills */
   skillsByClass: Record<string, ClassModSkill[]>;
   perks: ClassModPerk[];
+  firmware: ClassModFirmware[];
   /** (classId, L_name_ID) -> item_card_ID for legendary rarity chunk */
   legendaryMap: Record<string, number>;
   /** (classId, rarity) -> rarity part ID for non-legendary */
@@ -67,8 +74,8 @@ export interface ClassModBuilderData {
 }
 
 interface UniversalRow {
-  code: string; name: string; manufacturer: string; category: string;
-  partType: string; description: string; rarity: string; character: string;
+  code: string; name: string; partName: string; manufacturer: string; category: string;
+  partType: string; description: string; effect: string; rarity: string; character: string;
 }
 
 function loadUniversalDb(): UniversalRow[] {
@@ -96,6 +103,7 @@ export function getClassModBuilderData(): ClassModBuilderData {
   const skillsByClass: Record<string, ClassModSkill[]> = {};
   const legendaryMap: Record<string, number> = {};
   const perks: ClassModPerk[] = [];
+  const firmware: ClassModFirmware[] = [];
   const seenPerks = new Set<number>();
 
   // --- Names from universal DB ---
@@ -108,7 +116,7 @@ export function getClassModBuilderData(): ClassModBuilderData {
     const classId = CLASS_IDS[className];
     if (!classId) continue;
     const rarity = (row.rarity || "").toLowerCase().includes("legendary") ? "legendary" : "normal";
-    const nameEN = trim(row.description) || trim(row.name).split(" - ").pop() || "";
+    const nameEN = trim(row.effect || row.description) || trim(row.partName || row.name).split(" - ").pop() || "";
     const key = `${classId},${rarity}`;
     if (!namesByClassRarity[key]) namesByClassRarity[key] = [];
     namesByClassRarity[key].push({ nameCode: partId, nameEN });
@@ -125,7 +133,7 @@ export function getClassModBuilderData(): ClassModBuilderData {
     if (!className) continue;
     const classId = CLASS_IDS[className];
     if (!classId) continue;
-    const skillName = trim(row.description) || trim(row.name).split(" - ").pop() || "";
+    const skillName = trim(row.effect || row.description) || trim(row.partName || row.name).split(" - ").pop() || "";
     if (!skillName) continue;
     const groupKey = `${classId}|${skillName}`;
     if (!skillGroups.has(groupKey)) {
@@ -147,15 +155,31 @@ export function getClassModBuilderData(): ClassModBuilderData {
     skillsByClass[classId].sort((a, b) => a.skillNameEN.localeCompare(b.skillNameEN));
   }
 
-  // --- Perks from universal DB ---
+  // --- Perks + Firmware from universal DB (typeId 234) ---
+  // Firmware entries have "-Firmware" in their partName; the rest are regular perks.
+  const seenFw = new Set<number>();
   for (const row of allRows) {
-    if (row.partType !== "Perk") continue;
+    if (row.partType !== "Perk" && row.partType !== "Universal Class Mod Perk") continue;
     const { partId } = parseCode(row.code);
-    if (!partId || seenPerks.has(partId)) continue;
-    seenPerks.add(partId);
-    const perkNameEN = trim(row.name) || trim(row.description) || "";
-    perks.push({ perkId: partId, perkNameEN });
+    if (!partId) continue;
+
+    const rawName = trim(row.partName || row.name) || trim(row.effect || row.description) || "";
+    const isFirmware = rawName.toLowerCase().includes("-firmware") || rawName.toLowerCase().includes("firmware");
+
+    if (isFirmware) {
+      if (seenFw.has(partId)) continue;
+      seenFw.add(partId);
+      // Strip "-Firmware Class Mod Perk" suffix for clean display
+      const cleanName = rawName.replace(/-?Firmware\s*(Class Mod Perk)?/i, "").trim();
+      firmware.push({ partId, name: cleanName || rawName, description: row.effect || row.description || undefined });
+    } else {
+      if (seenPerks.has(partId)) continue;
+      seenPerks.add(partId);
+      perks.push({ perkId: partId, perkNameEN: rawName });
+    }
   }
+
+  // --- Firmware from typeId 234 (names contain "-Firmware") — populated in perks loop below ---
 
   // --- Legendary map from CSV (cross-reference not in universal DB) ---
   const legendaryMapPath = getPath("class_mods/Class_legendary_map.csv");
@@ -184,6 +208,7 @@ export function getClassModBuilderData(): ClassModBuilderData {
     namesByClassRarity,
     skillsByClass,
     perks,
+    firmware,
     legendaryMap,
     rarityCode,
   };

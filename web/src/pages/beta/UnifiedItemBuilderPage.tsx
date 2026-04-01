@@ -33,6 +33,7 @@ import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
 import ClassModNameHoverCard, { type ClassModNameCardData } from "@/components/ClassModNameHoverCard";
 import { getClassModNameInfo } from "@/data/classModNameDescriptions";
+import BuildFromUrlModal from "@/components/BuildFromUrlModal";
 import PartDetailModal from "@/components/master-search/PartDetailModal";
 import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
 import { apiItemToPartRow, getCode, getPartName } from "@/data/partsData";
@@ -342,11 +343,12 @@ const ENHANCEMENT_PART_ORDER: { key: string; slots: number }[] = [
   { key: "Manufacturer perks", slots: 1 },
   { key: "Stacked perks", slots: 1 }, // shown as "Legendary Perks"
   { key: "Builder 247", slots: 1 }, // shown as "Universal Perks"
+  { key: "Enhancement Firmware", slots: 1 },
 ];
 
 const CLASS_MOD_PART_ORDER: { key: string; slots: number }[] = [
   { key: "Name", slots: 1 },
-  { key: "Legendary names", slots: 1 },
+  { key: "Firmware", slots: 1 },
   { key: "Perks", slots: 1 },
 ];
 
@@ -1173,8 +1175,16 @@ function buildDecodedFromEnhancementSelections(
   }
 
   const statsSel = selections["Builder 247"] ?? [];
+  const fwSel = selections["Enhancement Firmware"] ?? [];
   const stats247: number[] = [];
   for (const s of statsSel) {
+    const first = s.label.split(" - ")[0]?.trim() ?? "";
+    const code = parseInt(first, 10);
+    const qty = Math.max(1, Math.min(99, parseInt(s.qty.trim() || "1", 10) || 1));
+    if (!Number.isFinite(code)) continue;
+    for (let i = 0; i < qty; i++) stats247.push(code);
+  }
+  for (const s of fwSel) {
     const first = s.label.split(" - ")[0]?.trim() ?? "";
     const code = parseInt(first, 10);
     const qty = Math.max(1, Math.min(99, parseInt(s.qty.trim() || "1", 10) || 1));
@@ -1243,13 +1253,13 @@ function buildDecodedFromClassModSelections(
     parts.push(`{${nameCode}}`);
   }
 
-  // Legendary extra names (other legendary titles)
-  (selections["Legendary names"] ?? []).forEach((s) => {
+  // Firmware (typeId 234 — class mod firmware substats)
+  (selections["Firmware"] ?? []).forEach((s) => {
     const first = (s.label ?? "").split(" - ")[0]?.trim() ?? "";
     const code = parseInt(first, 10);
     if (!Number.isFinite(code)) return;
     const qty = qtyNum(s.qty);
-    for (let i = 0; i < qty; i++) parts.push(`{${code}}`);
+    for (let i = 0; i < qty; i++) parts.push(`{234:${code}}`);
   });
 
   // Skills: each entry label is the skillNameEN; qty = points (0–5)
@@ -1496,6 +1506,7 @@ export default function UnifiedItemBuilderPage() {
   const [weaponPartSelections, setWeaponPartSelections] = usePersistedState<Record<string, { label: string; qty: string }[]>>("uib.weapon.selections", {});
   const [extraTokens, setExtraTokens] = usePersistedState<string[]>("uib.weapon.extraTokens", []);
   const [showGodRollModal, setShowGodRollModal] = useState(false);
+  const [showBuildFromUrl, setShowBuildFromUrl] = useState(false);
   const [autoFillWarning, setAutoFillWarning] = useState<string | null>(null);
   const [weaponPartPickerPartType, setWeaponPartPickerPartType] = useState<string | null>(null);
   const [weaponPartPickerChecked, setWeaponPartPickerChecked] = useState<Set<string>>(new Set());
@@ -4286,6 +4297,15 @@ export default function UnifiedItemBuilderPage() {
               </button>
             );
           })}
+          <span className="w-px h-6 bg-[var(--color-panel-border)]/50 self-center mx-1" />
+          <button
+            type="button"
+            onClick={() => setShowBuildFromUrl(true)}
+            className="px-3 py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-purple-400 text-sm font-medium min-h-[44px] touch-manipulation hover:bg-purple-500/20 hover:border-purple-500/60 transition-colors"
+            title="Paste a Mobalytics build URL to auto-generate stock gear"
+          >
+            Build from URL
+          </button>
         </div>
         {/* Display toggles */}
         <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-[var(--color-panel-border)]/50 flex-wrap">
@@ -8515,7 +8535,7 @@ export default function UnifiedItemBuilderPage() {
                                     key={idx}
                                     className={`rounded-lg border ${border} ${bg} p-2`}
                                     onMouseEnter={(e) => {
-                                      if (partType === "Name" || partType === "Legendary names") {
+                                      if (partType === "Name" || partType === "Firmware") {
                                         const nameEN = item.label.includes(" - ") ? item.label.split(" - ").slice(1).join(" - ").trim() : item.label;
                                         const info = getClassModNameInfo(nameEN);
                                         if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
@@ -8529,7 +8549,7 @@ export default function UnifiedItemBuilderPage() {
                                       <div className={`min-w-0 flex-1 text-sm font-medium break-words truncate ${nameColor}`}>{item.label}</div>
                                       <input
                                         type="number"
-                                        min={partType === "Legendary names" || partType === "Name" ? 1 : 0}
+                                        min={partType === "Firmware" || partType === "Name" ? 1 : 0}
                                         max={partType === "Skills" ? 5 : 99}
                                         value={item.qty}
                                         onChange={(e) => {
@@ -8575,19 +8595,9 @@ export default function UnifiedItemBuilderPage() {
                       nameOptions.forEach((opt) => {
                         opts.push({ id: String(opt.nameCode), label: `${opt.nameCode} - ${opt.nameEN}` });
                       });
-                    } else if (classModPartPickerKey === "Legendary names") {
-                      const rarityKey = "legendary";
-                      const namesKey = `${classIdStr},${rarityKey}`;
-                      const nameOptions = classModData.namesByClassRarity[namesKey] ?? [];
-                      const primaryNameCode = (() => {
-                        const first = list("Name")?.[0]?.label;
-                        if (!first) return null;
-                        const code = parseInt(first.split(" - ")[0]?.trim() ?? "", 10);
-                        return Number.isFinite(code) ? code : null;
-                      })();
-                      nameOptions.forEach((opt) => {
-                        if (opt.nameCode === primaryNameCode) return;
-                        opts.push({ id: String(opt.nameCode), label: `${opt.nameCode} - ${opt.nameEN}` });
+                    } else if (classModPartPickerKey === "Firmware") {
+                      (classModData.firmware ?? []).forEach((fw: { partId: number; name: string; description?: string }) => {
+                        opts.push({ id: String(fw.partId), label: `${fw.partId} - ${fw.name}` });
                       });
                     } else if (classModPartPickerKey === "Skills") {
                       skills.forEach((s) => {
@@ -8640,7 +8650,7 @@ export default function UnifiedItemBuilderPage() {
                                   key={o.id + o.label}
                                   className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-accent)]/10"
                                   onMouseEnter={(e) => {
-                                    if (classModPartPickerKey === "Name" || classModPartPickerKey === "Legendary names") {
+                                    if (classModPartPickerKey === "Name") {
                                       const nameEN = o.label.includes(" - ") ? o.label.split(" - ").slice(1).join(" - ").trim() : o.label;
                                       const info = getClassModNameInfo(nameEN);
                                       if (info) setClassModNameCard({ name: nameEN, character: info.character, description: info.description, cardTop: e.currentTarget.getBoundingClientRect().top });
@@ -8681,9 +8691,9 @@ export default function UnifiedItemBuilderPage() {
                                   setEntries("Skills", [...list("Skills"), ...toAdd]);
                                   setClassModPartPickerKey(null);
                                   setClassModPartPickerChecked(new Set());
-                                } else if (classModPartPickerKey === "Legendary names") {
+                                } else if (classModPartPickerKey === "Firmware") {
                                   const toAdd = Array.from(classModPartPickerChecked).map((label) => ({ label, qty: "1" }));
-                                  setEntries("Legendary names", [...list("Legendary names"), ...toAdd]);
+                                  setEntries("Firmware", [...list("Firmware"), ...toAdd]);
                                   setClassModPartPickerKey(null);
                                   setClassModPartPickerChecked(new Set());
                                 } else {
@@ -9579,6 +9589,8 @@ export default function UnifiedItemBuilderPage() {
                     ? "Legendary Perks"
                     : partType === "Builder 247"
                     ? "Universal Perks"
+                    : partType === "Enhancement Firmware"
+                    ? "Firmware"
                     : partType;
                 const list = enhancementPartSelections[partType] ?? [];
                 return (
@@ -9659,6 +9671,8 @@ export default function UnifiedItemBuilderPage() {
                   ? "Legendary Perks"
                   : enhancementPartPickerPartType === "Builder 247"
                   ? "Universal Perks"
+                  : enhancementPartPickerPartType === "Enhancement Firmware"
+                  ? "Firmware"
                   : enhancementPartPickerPartType;
               let opts: { partId: string; label: string; description?: string }[] = [];
               if (mfg && enhancementPartPickerPartType === "Rarity") {
@@ -9688,6 +9702,8 @@ export default function UnifiedItemBuilderPage() {
                 }
               } else if (enhancementPartPickerPartType === "Builder 247") {
                 opts = (enhancementData.secondary247 || []).map((s) => ({ partId: String(s.code), label: `${s.code} - ${s.name}`, description: s.description }));
+              } else if (enhancementPartPickerPartType === "Enhancement Firmware") {
+                opts = (enhancementData.firmware247 || []).map((f: { code: number; name: string; description?: string }) => ({ partId: String(f.code), label: `${f.code} - ${f.name}`, description: f.description }));
               }
               return (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4" onClick={() => setEnhancementPartPickerPartType(null)}>
@@ -10296,6 +10312,18 @@ export default function UnifiedItemBuilderPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Build from URL modal */}
+      {showBuildFromUrl && (
+        <BuildFromUrlModal
+          onClose={() => setShowBuildFromUrl(false)}
+          onLoadDecoded={(decoded, label) => {
+            setLiveDecoded(decoded.trim());
+            setLastEditedCodecSide("decoded");
+            setCodecStatus(`Build URL loaded: ${label}`);
+          }}
+        />
       )}
 
       {/* Code history */}
