@@ -3,13 +3,11 @@
  * Build & Edit Items as the centerpiece, sidebar nav, modern dark UI.
  */
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTheme, THEMES, THEME_META } from "@/contexts/ThemeContext";
 import { getEggCount, discoverEgg } from "@/lib/easterEggs";
 import { fetchApi } from "@/lib/apiClient";
 import { CHANGE_LOG } from "@/data/changelog";
-import BuildFromUrlModal from "@/components/BuildFromUrlModal";
-import { useLayout } from "@/contexts/LayoutContext";
 
 // ── Tab definitions ──────────────────────────────────────────────────────────
 type TabId = "gear-lab" | "arsenal" | "command" | "vault" | "save-ops" | "workbench";
@@ -66,209 +64,11 @@ function useQuickStats() {
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function TestAppPage() {
   const { theme, setTheme, themeConfig } = useTheme();
-  const { layout } = useLayout();
   const [activeTab, setActiveTab] = useState<TabId>("command");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const stats = useQuickStats();
   const overlay = themeConfig.bgOverlay;
-
-  // ── Layout 2: Top Nav — horizontal tabs at top, no sidebar ──
-  if (layout === "topnav") {
-    return (
-      <div className="fixed inset-0 z-[200] flex flex-col">
-        <div className="absolute inset-0 z-0" style={{ backgroundImage: `linear-gradient(${overlay}, ${overlay}), var(--theme-bg-url)`, backgroundSize: "cover", backgroundPosition: "center" }} />
-        <header className="relative z-10 border-b border-[var(--color-panel-border)] px-4" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
-          <div className="flex items-center justify-between h-12">
-            <div className="flex items-center gap-3">
-              <span className="text-[var(--color-accent)] font-bold text-sm">BL4 AIO</span>
-              <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none">
-                {TABS.map(tab => (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                      activeTab === tab.id
-                        ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/40"
-                        : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-white/5 border border-transparent"
-                    }`}>
-                    <span>{tab.icon}</span> {tab.label}
-                  </button>
-                ))}
-              </nav>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Layout switcher removed — available in Settings */}
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400">v2.0</span>
-            </div>
-          </div>
-        </header>
-        <main className="relative z-10 flex-1 overflow-y-auto">
-          {activeTab === "command" && <CommandCenterTab onNavigate={setActiveTab} siteStats={stats ? { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors, weaponsGenerated: stats.weaponsGenerated, grenadesGenerated: stats.grenadesGenerated } : null} />}
-          {activeTab === "gear-lab" && <GearLabTab />}
-          {activeTab === "arsenal" && <ArsenalTab />}
-          {activeTab === "save-ops" && <SaveOpsTab />}
-          {activeTab === "vault" && <VaultTab />}
-          {activeTab === "workbench" && <WorkbenchTab />}
-        </main>
-      </div>
-    );
-  }
-
-  // ── Layout 3: Compact — all sections visible, no tabs, dense grid ──
-  if (layout === "compact") {
-    return (
-      <div className="fixed inset-0 z-[200] flex flex-col">
-        <div className="absolute inset-0 z-0" style={{ backgroundImage: `linear-gradient(${overlay}, ${overlay}), var(--theme-bg-url)`, backgroundSize: "cover", backgroundPosition: "center" }} />
-        <header className="relative z-10 border-b border-[var(--color-panel-border)] px-3 flex items-center justify-between h-10" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
-          <span className="text-[var(--color-accent)] font-bold text-xs">BL4 AIO SAVE EDITOR</span>
-          <div className="flex items-center gap-3">
-            {/* Layout switcher removed — available in Settings */}
-            {stats && <span className="text-[9px] font-mono text-[var(--color-text-muted)]">{stats.parts.toLocaleString()}+ parts</span>}
-          </div>
-        </header>
-        <main className="relative z-10 flex-1 overflow-y-auto p-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-w-[1600px] mx-auto">
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[0].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[0].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><CommandCenterTab onNavigate={setActiveTab} siteStats={stats ? { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors, weaponsGenerated: stats.weaponsGenerated, grenadesGenerated: stats.grenadesGenerated } : null} /></div>
-            </div>
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[1].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[1].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><GearLabTab /></div>
-            </div>
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[2].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[2].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><ArsenalTab /></div>
-            </div>
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[3].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[3].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><SaveOpsTab /></div>
-            </div>
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[4].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[4].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><VaultTab /></div>
-            </div>
-            <div className="rounded-lg border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.8)" }}>
-              <div className="px-3 py-2 border-b border-[var(--color-panel-border)] flex items-center gap-2">
-                <span className="text-sm">{TABS[5].icon}</span>
-                <span className="text-xs font-bold text-[var(--color-accent)]">{TABS[5].label}</span>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto"><WorkbenchTab /></div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // ── Layout 4: Cinema — centered hero cards, one section at a time, large ──
-  if (layout === "cinema") {
-    return (
-      <div className="fixed inset-0 z-[200] flex flex-col">
-        <div className="absolute inset-0 z-0" style={{ backgroundImage: `linear-gradient(${overlay}, ${overlay}), var(--theme-bg-url)`, backgroundSize: "cover", backgroundPosition: "center" }} />
-        <header className="relative z-10 border-b border-[var(--color-panel-border)] px-6 flex items-center justify-between h-16" style={{ backgroundColor: "rgba(12, 14, 18, 0.9)" }}>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center text-[var(--color-accent)] font-bold">BL4</div>
-            <div>
-              <div className="text-base font-bold text-[var(--color-text)]">BL4 AIO Save Editor</div>
-              <div className="text-[10px] font-mono text-[var(--color-text-muted)]">Borderlands 4 Modding Suite</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Layout switcher removed — available in Settings */}
-            <span className="px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400">v2.0</span>
-          </div>
-        </header>
-        <main className="relative z-10 flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto py-8 px-6 space-y-6">
-            {/* Tab selector as large cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {TABS.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 shadow-lg shadow-[var(--color-accent)]/10 scale-[1.02]"
-                      : "border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.6)] hover:border-[var(--color-accent)]/30 hover:bg-[rgba(12,14,18,0.8)]"
-                  }`}>
-                  <span className={`text-3xl block mb-3 ${activeTab === tab.id ? "" : "opacity-60"}`}>{tab.icon}</span>
-                  <h3 className={`text-base font-bold mb-1 ${activeTab === tab.id ? "text-[var(--color-accent)]" : "text-[var(--color-text)]"}`}>{tab.label}</h3>
-                  <p className="text-xs text-[var(--color-text-muted)]">{tab.sublabel}</p>
-                </button>
-              ))}
-            </div>
-            {/* Active content */}
-            <div className="rounded-2xl border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(12,14,18,0.7)" }}>
-              {activeTab === "command" && <CommandCenterTab onNavigate={setActiveTab} siteStats={stats ? { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors, weaponsGenerated: stats.weaponsGenerated, grenadesGenerated: stats.grenadesGenerated } : null} />}
-              {activeTab === "gear-lab" && <GearLabTab />}
-              {activeTab === "arsenal" && <ArsenalTab />}
-              {activeTab === "save-ops" && <SaveOpsTab />}
-              {activeTab === "vault" && <VaultTab />}
-              {activeTab === "workbench" && <WorkbenchTab />}
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // ── Layout 5: Terminal — monospace, green-on-black, command-line feel ──
-  if (layout === "terminal") {
-    return (
-      <div className="fixed inset-0 z-[200] flex flex-col terminal-scanlines" style={{ backgroundColor: "#0a0a0a" }}>
-        <header className="relative z-10 border-b border-[var(--color-accent)]/20 px-4 flex items-center justify-between h-10" style={{ backgroundColor: "rgba(0, 10, 0, 0.95)" }}>
-          <div className="flex items-center gap-4 font-mono">
-            <span className="text-[var(--color-accent)] text-xs" style={{ textShadow: "0 0 8px var(--color-accent)" }}>&gt; BL4_AIO_WEB</span>
-            <nav className="flex items-center gap-1">
-              {TABS.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`px-2 py-1 text-[10px] font-mono transition-all ${
-                    activeTab === tab.id
-                      ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/40"
-                      : "text-[var(--color-accent)]/40 hover:text-[var(--color-accent)] border border-transparent"
-                  }`}
-                  style={activeTab === tab.id ? { textShadow: "0 0 6px var(--color-accent)" } : undefined}>
-                  [{tab.label.toUpperCase()}]
-                </button>
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Layout switcher removed — available in Settings */}
-            <span className="text-[9px] font-mono text-[var(--color-accent)]/50">{new Date().toLocaleTimeString()}</span>
-          </div>
-        </header>
-        <main className="relative z-10 flex-1 overflow-y-auto font-mono" style={{ textShadow: "0 0 4px var(--color-accent)" }}>
-          <div className="p-4 max-w-[1200px] mx-auto">
-            <div className="mb-2 text-[10px] text-[var(--color-accent)]/40">// {TABS.find(t => t.id === activeTab)?.label} — {TABS.find(t => t.id === activeTab)?.sublabel}</div>
-            {activeTab === "command" && <CommandCenterTab onNavigate={setActiveTab} siteStats={stats ? { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors, weaponsGenerated: stats.weaponsGenerated, grenadesGenerated: stats.grenadesGenerated } : null} />}
-            {activeTab === "gear-lab" && <GearLabTab />}
-            {activeTab === "arsenal" && <ArsenalTab />}
-            {activeTab === "save-ops" && <SaveOpsTab />}
-            {activeTab === "vault" && <VaultTab />}
-            {activeTab === "workbench" && <WorkbenchTab />}
-          </div>
-        </main>
-        <footer className="relative z-10 border-t border-[var(--color-accent)]/10 px-4 py-1 flex items-center justify-between font-mono" style={{ backgroundColor: "rgba(0, 10, 0, 0.95)" }}>
-          <span className="text-[8px] text-[var(--color-accent)]/30">[SYSTEM READY]</span>
-          {stats && <span className="text-[8px] text-[var(--color-accent)]/30">{stats.parts}+ parts | {stats.uniqueVisitors} visitors</span>}
-        </footer>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed inset-0 z-[200] flex">
@@ -447,7 +247,6 @@ export default function TestAppPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            {/* Layout switcher removed — available in Settings */}
             {stats && (
               <div className="hidden lg:flex items-center gap-4 text-[10px] font-mono text-[var(--color-text-muted)]">
                 <span>{stats.parts.toLocaleString()}+ parts</span>
@@ -681,8 +480,6 @@ function SaveOpsTab() {
 
 // ── Tab: The Vault (Community) ────────────────────────────────────────────────
 function VaultTab() {
-  const [showBuildFromUrl, setShowBuildFromUrl] = useState(false);
-  const navigate = useNavigate();
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-4">
       <div className="rounded-xl border border-[var(--color-panel-border)] overflow-hidden"
@@ -704,26 +501,12 @@ function VaultTab() {
             <h4 className="text-sm font-bold text-[var(--color-text)] mb-1">God Rolls (Non-Modded)</h4>
             <p className="text-xs text-[var(--color-text-muted)]">Pre-built optimal configurations for each item type</p>
           </Link>
-          <button
-            type="button"
-            onClick={() => setShowBuildFromUrl(true)}
-            className="rounded-lg border border-purple-500/40 bg-purple-500/5 p-4 hover:border-purple-500/60 hover:bg-purple-500/10 transition-colors text-left"
-          >
-            <h4 className="text-sm font-bold text-purple-400 mb-1">Build from URL</h4>
-            <p className="text-xs text-[var(--color-text-muted)]">Paste a Mobalytics build guide URL to auto-generate full gear sets with recommended parts, elements, and skills</p>
-          </button>
+          <div className="rounded-lg border border-dashed border-[var(--color-panel-border)]/50 p-4">
+            <h4 className="text-sm font-bold text-[var(--color-text-muted)]/50 mb-1">Named Builds</h4>
+            <p className="text-xs text-[var(--color-text-muted)]/40">Paste Mobalytics URL, auto-generate full gear set (coming soon)</p>
+          </div>
         </div>
       </div>
-      {showBuildFromUrl && (
-        <BuildFromUrlModal
-          onClose={() => setShowBuildFromUrl(false)}
-          onLoadDecoded={(decoded, label) => {
-            setShowBuildFromUrl(false);
-            // Navigate to builder and load the decoded string via URL state
-            navigate("/beta/unified-item-builder", { state: { loadDecoded: decoded, loadLabel: label } });
-          }}
-        />
-      )}
     </div>
   );
 }

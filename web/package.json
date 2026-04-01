@@ -13,9 +13,13 @@
     "copy-skin-images": "node -e \"const fs=require('fs');const path=require('path');const src=path.join(process.cwd(),'..','..','master_search','skin_images');const dest=path.join(process.cwd(),'public','skin_images');if(!fs.existsSync(src)){console.log('No master_search/skin_images found. Copy PNGs from desktop master_search/skin_images into web/public/skin_images');process.exit(0);}if(!fs.existsSync(dest))fs.mkdirSync(dest,{recursive:true});const files=fs.readdirSync(src).filter(f=>/\\.png$/i.test(f));files.forEach(f=>fs.copyFileSync(path.join(src,f),path.join(dest,f)));console.log('Copied '+files.length+' skin images to public/skin_images');\""
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
+    "tailwind-merge": "^3.5.0",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
