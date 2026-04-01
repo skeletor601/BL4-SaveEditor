@@ -266,6 +266,102 @@ The 5 tier IDs for one skill go into `Skills.csv` as `skill_ID_1,skill_ID_2,skil
 | 259 | Harlowe | Gravitar |
 | 404 | C4SH | RoboDealer |
 
+### DLC Class Mod Legendaries (CRITICAL — Easy to Miss)
+
+DLC class mods use **different naming patterns** than base game legendaries. This is the #1 reason DLC class mods get missed by automated extraction.
+
+**Base game pattern:** `comp_05_legendary_technomancer`, `comp_05_legendary_avatar`
+**DLC pattern:** `comp_05_legendary_dlc1`, `comp_05_legendary_cowbell`, or just `comp_05_legendary_01`
+
+The DLC entries use **numbered suffixes** (`_01`, `_02`, etc.) or **DLC tag suffixes** (`_dlc1`, `_cowbell`) instead of the item name. This means:
+- DO NOT skip entries that end in just numbers (`01`, `02`, etc.)
+- DO NOT require `legendary` in the key — DLC entries may use `comp_05_dlc1` without "legendary"
+- ALWAYS check `_12_P` and `_13_P` pakchunk variants for DLC content
+
+**DLC class mod body names** also follow different patterns:
+- Base game: `body_01` through `body_10` (normal), `body_11`+ (legendary)
+- DLC: `body_leg_cowbell`, `body_leg_dlc1`, `np_cm_ds_leg_dlc1`, `np_cm_pld_leg_cowbell`
+
+**Internal key mapping for class mod names in inv_name_part4.json:**
+
+| Internal Key | Character | Mod Name |
+|---|---|---|
+| `np_cm_ds_leg_dlc1` | Vex | Configuration |
+| `np_cm_pld_leg_cowbell` | Amon | Tempest |
+| `np_cm_exo_leg_cowbell` | Rafa | Reaparicion |
+| `np_cm_grav_leg_cowbell` | Harlowe | Phlebotomist |
+
+**Finding DLC legendary descriptions in ui_stat4.json:**
+
+DLC class mod descriptions use character-specific prefixes with DLC tags:
+
+```
+uistat_cm_ds_legendary_dlc1        → Configuration (Vex) perk description
+uistat_cm_ds_legendary_dlc1_redtext → Configuration red text
+uistat_cm_pld_legendary_cowbell     → Tempest (Amon) perk description
+uistat_cm_pld_legendary_cowbell_redtext → Tempest red text
+uistat_cm_exo_legendary_cowbell     → Reaparicion (Rafa) perk description
+uistat_cm_exo_legendary_cowbell_redtext → Reaparicion red text
+uistat_cm_grav_legendary_cowbell    → Phlebotomist (Harlowe) perk description
+uistat_cm_grav_legendary_cowbell_redtext → Phlebotomist red text
+```
+
+Character internal prefixes: `ds` = DarkSiren (Vex), `pld` = Paladin (Amon), `exo` = ExoSoldier (Rafa), `grav` = Gravitar (Harlowe), `robo` = RoboDealer (C4SH)
+
+**Class mod root entry naming** — internal keys use underscores differently than you'd expect:
+- `classmod_dark_siren` (NOT `classmod_darksiren`)
+- `classmod_exo_soldier` (NOT `classmod_exosoldier`)
+- `classmod_paladin` (no underscore — single word)
+- `classmod_gravitar` (no underscore — single word)
+- `classmod_robodealer` (no underscore — single word)
+
+### Class Mod Database Fields
+
+Each class mod legendary needs entries in the universal DB:
+
+1. **Name entry** (`partType: "Name"`) — the body code with the mod's display name
+   - Code: `{typeId:bodyPartId}`, e.g. `{254:539}` for Configuration
+   - `partName`: the display name (e.g. "Configuration")
+   - `rarity`: "Legendary"
+   - `manufacturer`: character name (e.g. "Vex")
+
+2. **Rarity entry** (`partType: "Rarity"`) — the comp_05 code
+   - Code: `{typeId:rarityPartId}`, e.g. `{254:540}` for Configuration
+   - `partName`: the display name
+   - `rarity`: "Legendary"
+
+3. **Description** in `web/src/data/classModNameDescriptions.ts`
+   - Key: lowercase mod name (e.g. `"configuration"`)
+   - Value: `{ character: "Vex", description: "perk effect text + red text" }`
+
+### Mad Ellie DLC (Story Pack 1) Class Mods — Reference
+
+| Character | Mod Name | Name Code | Rarity Code | Red Text |
+|---|---|---|---|---|
+| Vex | Configuration | {254:539} | {254:540} | "No need to waste such sweet suffering." |
+| Amon | Tempest | {255:540} | {255:541} | "Hell is empty and all the devils are here." |
+| Rafa | Reaparicion | {256:540} | {256:541} | "Cada quien tiene la muerte que se busca." |
+| Harlowe | Phlebotomist | {259:542} | {259:543} | "Be the reason someone gets a second death." |
+
+### Class Mod Firmware (TypeId 234)
+
+Class mod firmware is SEPARATE from weapon/grenade/shield firmware. It uses typeId 234 with partIds 74-103+:
+
+| Code | Name |
+|---|---|
+| {234:103} | Skillcraft |
+| {234:76} | Reel Big Fist |
+| {234:79} | High Caliber |
+| {234:86} | GOOJFC |
+| {234:84} | Deadeye |
+| {234:85} | Action Fist |
+| {234:92} | Heating Up |
+| {234:93} | Bullets to Spare |
+| {234:74} | Risky Boots |
+| {234:75} | God Killer |
+
+These are stored in the DB as `partType: "Universal Class Mod Perk"` with "-Firmware" in the partName. The class mod builder separates them from regular perks by checking for "Firmware" in the name.
+
 ---
 
 ## Extracting Gear Codes (Shields, Grenades, Repkits, etc.)
