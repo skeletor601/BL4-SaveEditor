@@ -1324,18 +1324,27 @@ function dedupeByPartId<T extends { partId: string | number }>(opts: T[]): T[] {
  * Descriptive IDs ON  → ID badge · stat/name · extra description · part-type tag
  * Descriptive IDs OFF → compact "ID  stat" single line
  */
+/** Small star badge for DLC parts. pointer-events:none so it never eats taps on mobile Safari. */
+function NewBadge() {
+  return (
+    <span className="text-emerald-400 text-xs leading-none align-middle ml-1 pointer-events-none" aria-hidden="true">✦</span>
+  );
+}
+
 function PartLabel({
   partId,
   label,
   description,
   pickerPartType,
   detailed,
+  isDlc,
 }: {
   partId: string;
   label: string;
   description?: string;
   pickerPartType?: string | null;
   detailed: boolean;
+  isDlc?: boolean;
 }) {
   // Strip leading numeric ID prefix from label: "13 - +Accuracy" → "+Accuracy"
   const stat = label.replace(/^\d+\s*[-–]\s*/, "").trim() || label;
@@ -1349,6 +1358,7 @@ function PartLabel({
         <span className="block text-sm text-[var(--color-text)]">
           <span className="font-mono text-[var(--color-text-muted)] text-xs mr-2">{partId}</span>
           {stat}
+          {isDlc && <NewBadge />}
         </span>
       </span>
     );
@@ -1362,6 +1372,7 @@ function PartLabel({
           {partId}
         </span>
         <span className="text-sm text-[var(--color-text)] leading-snug">{stat}</span>
+        {isDlc && <NewBadge />}
       </span>
       {/* Extra description if it adds info */}
       {extraDesc && (
@@ -3429,6 +3440,50 @@ export default function UnifiedItemBuilderPage() {
     };
   }, []);
 
+  /** Set of part codes that are DLC-only (e.g. Cowbell). Used to badge NEW parts across all builders. */
+  const dlcCodes = useMemo(
+    () => new Set(universalParts.filter((p) => p.code && p.dlc).map((p) => p.code)),
+    [universalParts],
+  );
+
+  /** Check if a {typeId:partId} code is DLC. Works with both numeric and string args.
+   *  For composite partId like "263:8", splits into typeId=263 partId=8 automatically. */
+  const isDlcPart = useCallback((typeId: string | number, partId: string | number): boolean => {
+    const pid = String(partId);
+    if (pid.includes(":")) {
+      // Composite like "263:8" — use directly
+      return dlcCodes.has(`{${pid}}`);
+    }
+    return dlcCodes.has(`{${typeId}:${pid}}`);
+  }, [dlcCodes]);
+
+  /** Set of manufacturers that have at least one DLC part. */
+  const dlcManufacturers = useMemo(() => {
+    const mfgs = new Set<string>();
+    for (const p of universalParts) {
+      if (p.dlc && p.manufacturer) mfgs.add(p.manufacturer);
+    }
+    return mfgs;
+  }, [universalParts]);
+
+  /** Set of weapon types that have at least one DLC part. */
+  const dlcWeaponTypes = useMemo(() => {
+    const types = new Set<string>();
+    for (const p of universalParts) {
+      if (p.dlc && p.weaponType) types.add(p.weaponType);
+    }
+    return types;
+  }, [universalParts]);
+
+  /** Set of categories that have at least one DLC part. */
+  const dlcCategories = useMemo(() => {
+    const cats = new Set<string>();
+    for (const p of universalParts) {
+      if (p.dlc && p.category) cats.add(p.category);
+    }
+    return cats;
+  }, [universalParts]);
+
   /** Map part code → label for Current build parts list. Uses itemType (human name) when available. */
   const partsByCode = useMemo(
     () => new Map(universalParts.filter((p) => p.code).map((p) => [p.code, p.itemType || p.label])),
@@ -4567,6 +4622,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Weapon build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -4892,6 +4948,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="text-sm text-[var(--color-text)]">{m}</span>
+                            {dlcManufacturers.has(m) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -4923,6 +4980,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="text-sm text-[var(--color-text)]">{w}</span>
+                            {dlcWeaponTypes.has(w) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -4987,7 +5045,7 @@ export default function UnifiedItemBuilderPage() {
                     if (hasAnyMfgInName) return label;
                     return `${label} (${mfg})`;
                   };
-                  type PartOpt = { partId: string; label: string; description?: string; isStock: boolean };
+                  type PartOpt = { partId: string; label: string; description?: string; isStock: boolean; typeId?: string };
                   const makeLegPearlOpt = (r: { partId: string; description: string; effect?: string; perk?: string; perkDesc?: string; redText?: string }, mfg: string, isStock: boolean): PartOpt => {
                     const parts: string[] = [];
                     if (r.perk) parts.push(`Perk: ${r.perk}`);
@@ -5024,7 +5082,7 @@ export default function UnifiedItemBuilderPage() {
                         return [...stock, ...extra];
                       })()
                     : (weaponData.pearlByMfgTypeId[weaponMfgWtId] ?? []).map((r) => makeLegPearlOpt(r, weaponManufacturer, true));
-                  const elementalOptions: PartOpt[] = weaponData.elemental.map((e) => ({ partId: e.partId, label: `${e.partId} - ${e.stat}`, isStock: true }));
+                  const elementalOptions: PartOpt[] = weaponData.elemental.map((e) => ({ partId: e.partId, label: `${e.partId} - ${e.stat}`, isStock: true, typeId: "1" }));
                   const getOpts = (partType: string): PartOpt[] => {
                     if (partType === "Rarity") return rarityOptions.map((o) => ({ partId: o, label: o, isStock: true }));
                     if (partType === "Legendary Type") return legendaryOptions;
@@ -5037,7 +5095,7 @@ export default function UnifiedItemBuilderPage() {
                       const seenIds = new Set<string>();
                       // Stock parts first (from selected weapon)
                       (weaponData.partsByMfgTypeId[weaponMfgWtId]?.[partType] ?? []).forEach((p) => {
-                        stock.push({ partId: p.partId, label: p.label, isStock: true });
+                        stock.push({ partId: p.partId, label: p.label, isStock: true, typeId: weaponMfgWtId });
                         seenIds.add(p.partId);
                       });
                       // Then ALL parts of this type from universal DB
@@ -5054,12 +5112,12 @@ export default function UnifiedItemBuilderPage() {
                         if (seenIds.has(pid)) continue;
                         seenIds.add(pid);
                         const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
-                        extra.push({ partId: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}`, description: up.effect, isStock: false });
+                        extra.push({ partId: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}`, description: up.effect, isStock: false, typeId: m[1] });
                       }
                       return [...stock, ...extra];
                     }
                     const parts = weaponData.partsByMfgTypeId[weaponMfgWtId]?.[partType] ?? [];
-                    return parts.map((p) => ({ partId: p.partId, label: withMfgIfNeeded(p.label, weaponManufacturer), isStock: true }));
+                    return parts.map((p) => ({ partId: p.partId, label: withMfgIfNeeded(p.label, weaponManufacturer), isStock: true, typeId: weaponMfgWtId }));
                   };
                   const list = (partType: string) => weaponPartSelections[partType] ?? [];
                   const removePartAt = (partType: string, index: number) => {
@@ -5222,7 +5280,7 @@ export default function UnifiedItemBuilderPage() {
                                       {showAllMfgs && !o.isStock && (
                                         <span className="inline-flex items-center mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-amber-300 bg-amber-400/15 border border-amber-400/30 leading-none align-middle">X-MFG</span>
                                       )}
-                                      <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={weaponPartPickerPartType} detailed={richDetailView} />
+                                      <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={weaponPartPickerPartType} detailed={richDetailView} isDlc={isDlcPart(o.typeId ?? weaponMfgWtId, o.partId)} />
                                     </span>
                                   </label>
                                 ))}
@@ -5388,6 +5446,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Grenade build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -5631,6 +5690,7 @@ export default function UnifiedItemBuilderPage() {
                               className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`}
                             />
                             <span className="text-sm text-[var(--color-text)]">{m.name}</span>
+                            {dlcManufacturers.has(m.name) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -5821,7 +5881,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={grenadePartPickerPartType || undefined} detailed={richDetailView} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={grenadePartPickerPartType || undefined} detailed={richDetailView} isDlc={isDlcPart(o.partId.includes(":") ? o.partId.split(":")[0] : (grenadePartPickerPartType === "Rarity" ? String(grenadeMfgId) : "245"), o.partId.includes(":") ? o.partId.split(":")[1] : o.partId)} />
                               </label>
                             ))}
                           </div>
@@ -5915,6 +5975,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Shield build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -6125,7 +6186,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="min-w-0">
-                              <span className="block text-sm text-[var(--color-text)]">{m.name}</span>
+                              <span className="block text-sm text-[var(--color-text)]">{m.name}{dlcManufacturers.has(m.name) && <NewBadge />}</span>
                               <span className="block text-xs text-[var(--color-text-muted)]">{typeLabel}</span>
                             </span>
                           </button>
@@ -6325,7 +6386,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={shieldPartPickerPartType || undefined} detailed={richDetailView} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={shieldPartPickerPartType || undefined} detailed={richDetailView} isDlc={isDlcPart(o.partId.includes(":") ? o.partId.split(":")[0] : (shieldPartPickerPartType === "Rarity" ? String(shieldMfgId) : "246"), o.partId.includes(":") ? o.partId.split(":")[1] : o.partId)} />
                               </label>
                             ))}
                           </div>
@@ -6397,6 +6458,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Shield build (dropdowns)</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -6517,7 +6579,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="min-w-0">
-                              <span className="block text-sm text-[var(--color-text)]">{m.name}</span>
+                              <span className="block text-sm text-[var(--color-text)]">{m.name}{dlcManufacturers.has(m.name) && <NewBadge />}</span>
                               <span className="block text-xs text-[var(--color-text-muted)]">{typeLabel}</span>
                             </span>
                           </button>
@@ -7351,6 +7413,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> RepKit build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -7516,6 +7579,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="text-sm text-[var(--color-text)]">{m.name}</span>
+                            {dlcManufacturers.has(m.name) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -7730,7 +7794,7 @@ export default function UnifiedItemBuilderPage() {
                                   }}
                                   className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                 />
-                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={repkitPartPickerPartType || undefined} detailed={richDetailView} />
+                                <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={repkitPartPickerPartType || undefined} detailed={richDetailView} isDlc={isDlcPart(o.partId.includes(":") ? o.partId.split(":")[0] : (repkitPartPickerPartType === "Rarity" ? String(repkitMfgId) : "243"), o.partId.includes(":") ? o.partId.split(":")[1] : o.partId)} />
                               </label>
                             ))}
                           </div>
@@ -7822,6 +7886,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Heavy build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -7913,6 +7978,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="text-sm text-[var(--color-text)]">{m.name}</span>
+                            {dlcManufacturers.has(m.name) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -8124,7 +8190,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={heavyPartPickerPartType || undefined} detailed={richDetailView} />
+                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={heavyPartPickerPartType || undefined} detailed={richDetailView} isDlc={isDlcPart(o.partId.includes(":") ? o.partId.split(":")[0] : (heavyPartPickerPartType === "Rarity" ? String(heavyMfgId) : "244"), o.partId.includes(":") ? o.partId.split(":")[1] : o.partId)} />
                           </label>
                         ))}
                       </div>
@@ -8237,6 +8303,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Class Mod build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -8676,7 +8743,7 @@ export default function UnifiedItemBuilderPage() {
                                     }}
                                     className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-2 focus:ring-offset-[rgba(24,28,34,0.98)] checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                                   />
-                                  <PartLabel partId={o.id} label={o.label} description={undefined} pickerPartType={classModPartPickerKey || undefined} detailed={richDetailView} />
+                                  <PartLabel partId={o.id} label={o.label} description={undefined} pickerPartType={classModPartPickerKey || undefined} detailed={richDetailView} isDlc={isDlcPart(classModPartPickerKey === "Perk" ? "234" : String(CLASS_MOD_CLASS_IDS[classModClassName] ?? 255), o.id)} />
                                 </label>
                               ))}
                             </div>
@@ -8806,6 +8873,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> RepKit build (dropdowns)</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -8938,6 +9006,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span className="text-sm text-[var(--color-text)]">{m.name}</span>
+                            {dlcManufacturers.has(m.name) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -9463,6 +9532,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.6)] overflow-hidden group" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">⬡</span> Enhancement build</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 pt-0">
@@ -9553,6 +9623,7 @@ export default function UnifiedItemBuilderPage() {
                           >
                             <span className={`weapon-part-radio w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 flex-shrink-0 ${active ? "border-[var(--color-accent)] bg-[var(--color-accent)]" : "border-[var(--color-panel-border)] bg-transparent"}`} />
                             <span>{enhancementData.manufacturers[name].name}</span>
+                            {dlcManufacturers.has(enhancementData.manufacturers[name].name) && <NewBadge />}
                           </button>
                         );
                       })}
@@ -9738,7 +9809,7 @@ export default function UnifiedItemBuilderPage() {
                               }}
                               className="weapon-part-radio appearance-none w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-[var(--color-panel-border)] bg-transparent cursor-pointer checked:bg-[var(--color-accent)] checked:border-[var(--color-accent)]"
                             />
-                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={enhancementPartPickerPartType || undefined} detailed={richDetailView} />
+                            <PartLabel partId={o.partId} label={o.label} description={o.description} pickerPartType={enhancementPartPickerPartType || undefined} detailed={richDetailView} isDlc={isDlcPart(o.partId.includes(":") ? o.partId.split(":")[0] : "247", o.partId.includes(":") ? o.partId.split(":")[1] : o.partId)} />
                           </label>
                         ))}
                       </div>
@@ -9856,6 +9927,7 @@ export default function UnifiedItemBuilderPage() {
         <details className="rounded-xl border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.55)] overflow-hidden group flex flex-col min-h-0 max-w-sm ml-auto" open>
           <summary className="px-3 py-2.5 text-xs uppercase tracking-wide text-[var(--color-text-muted)] cursor-pointer list-none flex items-center justify-between min-h-[44px] touch-manipulation select-none shrink-0 font-mono">
             <span className="flex items-center gap-2"><span className="text-[var(--color-accent)]/60" aria-hidden="true">◈</span> Current build parts</span>
+            {dlcCodes.size > 0 && <span className="text-emerald-400 text-[10px] font-normal normal-case tracking-normal pointer-events-none">✦ = new items</span>}
             <span className="text-[var(--color-panel-border)] group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="p-3 pt-0 flex flex-col min-h-0 flex-1 overflow-hidden">

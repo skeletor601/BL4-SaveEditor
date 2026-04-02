@@ -66,4 +66,16 @@ export async function partsRoutes(
     const items = loadNpcParts();
     return reply.send({ items });
   });
+
+  /** DLC codes — set of codes that are DLC-only, keyed by content pack name */
+  fastify.get("/dlc-codes", async (_request, reply) => {
+    const dlcPath = join(__dirname, "../../data/dlc_codes.json");
+    if (!existsSync(dlcPath)) return reply.send({});
+    try {
+      const data = JSON.parse(readFileSync(dlcPath, "utf-8"));
+      return reply.send(data);
+    } catch {
+      return reply.send({});
+    }
+  });
 }

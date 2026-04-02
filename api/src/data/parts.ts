@@ -111,7 +111,7 @@ function normalizeToPartItem(raw: Record<string, unknown>): PartItem {
     redText: pickStr(raw, "redText", "RedText", "Red Text") || undefined,
     spawnCode: spawnCode || undefined,
     element: pickStr(raw, "element", "Element") || undefined,
-    dlc: pickStr(raw, "dlc", "DLC") || undefined,
+    dlc: pickStr(raw, "contentPack", "dlc", "DLC") || undefined,
     id: typeof raw.id === "number" ? raw.id : typeof raw.ID === "number" ? raw.ID : undefined,
   };
 }
