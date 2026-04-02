@@ -55781,6 +55781,28 @@
       "rarity": "Legendary",
       "effect": "Roid Rage: On Use applies stacks that decay over time spawning elemental Novas. This is the part where you run.",
       "weaponType": ""
+    },
+    {
+      "code": "{259:219}",
+      "partName": "",
+      "itemType": "",
+      "category": "Class Mod",
+      "partType": "",
+      "manufacturer": "Harlowe",
+      "rarity": "",
+      "effect": "",
+      "weaponType": ""
+    },
+    {
+      "code": "{259:27}",
+      "partName": "",
+      "itemType": "",
+      "category": "Class Mod",
+      "partType": "",
+      "manufacturer": "Harlowe",
+      "rarity": "",
+      "effect": "",
+      "weaponType": ""
     }
   ]
 }
