@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import StagingGate from "@/components/StagingGate";
+
+const MobileApp = lazy(() => import("@/mobile/MobileApp"));
 import Dashboard from "@/pages/Dashboard";
 import MasterSearch from "@/pages/MasterSearch";
 import MasterSearchPage from "@/pages/MasterSearchPage";
@@ -116,7 +118,10 @@ export default function App() {
 
   return (
     <StagingGate>
-      <AppRoutes />
+      <Routes>
+        <Route path="/mobile/*" element={<Suspense fallback={<div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", color: "var(--color-accent)" }}>Loading…</div>}><MobileApp /></Suspense>} />
+        <Route path="/*" element={<AppRoutes />} />
+      </Routes>
     </StagingGate>
   );
 }
