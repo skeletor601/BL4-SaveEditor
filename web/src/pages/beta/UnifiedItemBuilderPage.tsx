@@ -5203,14 +5203,14 @@ export default function UnifiedItemBuilderPage() {
                                               max={99}
                                               value={item.qty}
                                               onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                              className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                              className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                               title="Quantity"
                                             />
                                           )}
                                           <button
                                             type="button"
                                             onClick={() => removePartAt(partType, idx)}
-                                            className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                            className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                                             title="Remove"
                                           >
                                             ×
@@ -5820,14 +5820,14 @@ export default function UnifiedItemBuilderPage() {
                                           max={99}
                                           value={item.qty}
                                           onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                          className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                          className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                           title="Quantity"
                                         />
                                       )}
                                       <button
                                         type="button"
                                         onClick={() => removePartAt(partType, idx)}
-                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                        className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                                         title="Remove"
                                       >
                                         ×
@@ -6326,14 +6326,14 @@ export default function UnifiedItemBuilderPage() {
                                             max={99}
                                             value={item.qty}
                                             onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                             title="Quantity"
                                           />
                                         )}
                                         <button
                                           type="button"
                                           onClick={() => removePartAt(partType, idx)}
-                                          className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                          className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                                           title="Remove"
                                         >
                                           ×
@@ -7732,14 +7732,14 @@ export default function UnifiedItemBuilderPage() {
                                             max={99}
                                             value={item.qty}
                                             onChange={(e) => setPartQty(partType, idx, e.target.value)}
-                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                            className="w-14 px-2 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                             title="Quantity"
                                           />
                                         )}
                                         <button
                                           type="button"
                                           onClick={() => removePartAt(partType, idx)}
-                                          className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                          className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                                           title="Remove"
                                         >
                                           ×
@@ -8061,7 +8061,7 @@ export default function UnifiedItemBuilderPage() {
                                       return { ...prev, [partType]: arr };
                                     });
                                   }}
-                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                 />
                               )}
                               <button
@@ -8072,7 +8072,7 @@ export default function UnifiedItemBuilderPage() {
                                     return { ...prev, [partType]: arr };
                                   });
                                 }}
-                                className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                               >
                                 ×
                               </button>
@@ -8629,7 +8629,7 @@ export default function UnifiedItemBuilderPage() {
                                             entries.map((e2, i2) => (i2 === idx ? { ...e2, qty: v } : e2)),
                                           );
                                         }}
-                                        className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                        className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                       />
                                       <button
                                         type="button"
@@ -8639,7 +8639,7 @@ export default function UnifiedItemBuilderPage() {
                                             entries.filter((_, i2) => i2 !== idx),
                                           );
                                         }}
-                                        className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                        className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                                       >
                                         ×
                                       </button>
@@ -9709,7 +9709,7 @@ export default function UnifiedItemBuilderPage() {
                                       return { ...prev, [partType]: arr };
                                     });
                                   }}
-                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[36px]"
+                                  className="w-14 px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
                                 />
                               )}
                               <button
@@ -9720,7 +9720,7 @@ export default function UnifiedItemBuilderPage() {
                                     return { ...prev, [partType]: arr };
                                   });
                                 }}
-                                className="p-2 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
+                                className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 flex items-center justify-center"
                               >
                                 ×
                               </button>
@@ -9951,7 +9951,7 @@ export default function UnifiedItemBuilderPage() {
                       type="button"
                       onClick={() => movePart(i, "up")}
                       disabled={i === 0}
-                      className="p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
+                      className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
                       title="Move up"
                     >
                       ↑
@@ -9960,7 +9960,7 @@ export default function UnifiedItemBuilderPage() {
                       type="button"
                       onClick={() => movePart(i, "down")}
                       disabled={i === currentBuildParts.length - 1}
-                      className="p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
+                      className="p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] disabled:opacity-40 text-xs touch-manipulation flex items-center justify-center"
                       title="Move down"
                     >
                       ↓
@@ -10085,7 +10085,7 @@ export default function UnifiedItemBuilderPage() {
                   <button
                     type="button"
                     onClick={() => removePart(i)}
-                    className="shrink-0 p-1.5 min-h-[36px] min-w-[36px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 text-xs touch-manipulation flex items-center justify-center"
+                    className="shrink-0 p-2 min-h-[44px] min-w-[44px] rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] hover:text-red-400 hover:border-red-400/50 text-xs touch-manipulation flex items-center justify-center"
                     title="Remove"
                   >
                     ×
@@ -10101,7 +10101,7 @@ export default function UnifiedItemBuilderPage() {
                       else { startHover(data, e.currentTarget.getBoundingClientRect().top, "left"); }
                     }
                   }}
-                  className="w-full py-1.5 rounded border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 hover:border-[var(--color-accent)]/70 text-xs font-bold tracking-wide touch-manipulation flex items-center justify-center gap-1.5 transition-colors min-h-[36px]"
+                  className="w-full py-2 rounded border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 hover:border-[var(--color-accent)]/70 text-xs font-bold tracking-wide touch-manipulation flex items-center justify-center gap-1.5 transition-colors min-h-[44px]"
                   title="Show part info"
                 >
                   Show Info
