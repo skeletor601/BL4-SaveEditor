@@ -6511,13 +6511,14 @@
     },
     {
       "code": "{17:53}",
-      "partName": "Unknown DLC Legendary",
-      "itemType": "Unknown Rarity",
+      "partName": "Brenda",
+      "itemType": "Brenda",
       "category": "Weapon",
       "partType": "Rarity",
       "manufacturer": "Torgue",
       "rarity": "Legendary",
-      "weaponType": "Assault Rifle"
+      "weaponType": "Assault Rifle",
+      "effect": ""
     },
     {
       "code": "{17:54}",
@@ -32482,12 +32483,12 @@
     },
     {
       "code": "{256:70}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "Legendary",
+      "itemType": "Legendary",
       "category": "Class Mod",
       "partType": "Rarity",
       "manufacturer": "Rafa",
-      "rarity": "Unknown"
+      "rarity": "Legendary"
     },
     {
       "code": "{256:71}",
@@ -33805,14 +33806,6 @@
       "manufacturer": "Harlowe"
     },
     {
-      "code": "{259:219}",
-      "partName": "Unknown",
-      "itemType": "Unknown",
-      "category": "Class Mod",
-      "partType": "Unknown",
-      "manufacturer": "Harlowe"
-    },
-    {
       "code": "{259:21}",
       "partName": "Legendary",
       "itemType": "Legendary",
@@ -34349,14 +34342,6 @@
       "itemType": "Triple Point",
       "category": "Class Mod",
       "partType": "Skill",
-      "manufacturer": "Harlowe"
-    },
-    {
-      "code": "{259:27}",
-      "partName": "Unknown",
-      "itemType": "Unknown",
-      "category": "Class Mod",
-      "partType": "Unknown",
       "manufacturer": "Harlowe"
     },
     {
@@ -45194,52 +45179,52 @@
     },
     {
       "code": "{35:11}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "Sho Kunai",
+      "itemType": "Sho Kunai",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
+      "manufacturer": "Jakobs",
+      "rarity": "Legendary",
       "effect": "Sho Kunai Skin"
     },
     {
       "code": "{35:6}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "Faulty Detonator",
+      "itemType": "Faulty Detonator",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
+      "manufacturer": "Tediore",
+      "rarity": "Legendary",
       "effect": "Faulty Detonator Skin"
     },
     {
       "code": "{35:7}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "Swarm",
+      "itemType": "Swarm",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
+      "manufacturer": "Order",
+      "rarity": "Legendary",
       "effect": "Swarm Skin"
     },
     {
       "code": "{35:8}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "UAV",
+      "itemType": "UAV",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
+      "manufacturer": "Tediore",
+      "rarity": "Legendary",
       "effect": "UAV Skin"
     },
     {
       "code": "{35:9}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
+      "partName": "Chaumurky",
+      "itemType": "Chaumurky",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
+      "manufacturer": "Order",
+      "rarity": "Legendary",
       "effect": "Chaumurky Skin"
     },
     {
@@ -51136,13 +51121,14 @@
     },
     {
       "code": "{4:74}",
-      "partName": "Unknown DLC Legendary",
-      "itemType": "Unknown Rarity",
+      "partName": "Zadra",
+      "itemType": "Zadra",
       "category": "Weapon",
       "partType": "Rarity",
       "manufacturer": "Order",
       "rarity": "Legendary",
-      "weaponType": "Pistol"
+      "weaponType": "Pistol",
+      "effect": ""
     },
     {
       "code": "{4:75}",
