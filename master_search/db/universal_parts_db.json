@@ -6511,12 +6511,12 @@
     },
     {
       "code": "{17:53}",
-      "partName": "Unknown Rarity",
+      "partName": "Unknown DLC Legendary",
       "itemType": "Unknown Rarity",
       "category": "Weapon",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "rarity": "Unknown",
+      "rarity": "Legendary",
       "weaponType": "Assault Rifle"
     },
     {
@@ -6921,12 +6921,13 @@
     },
     {
       "code": "{18:101}",
-      "partName": "Underbarrel",
-      "itemType": "Underbarrel",
+      "partName": "Laser-Cutter Underbarrel",
+      "itemType": "Laser-Cutter Underbarrel",
       "category": "Weapon",
       "partType": "Underbarrel",
       "manufacturer": "Vladof",
-      "weaponType": "Assault Rifle"
+      "weaponType": "Assault Rifle",
+      "effect": "Laser-Cutter Underbarrel"
     },
     {
       "code": "{18:102}",
@@ -37980,7 +37981,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Common"
     },
     {
       "code": "{261:2}",
@@ -37988,7 +37990,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Uncommon"
     },
     {
       "code": "{261:3}",
@@ -37996,7 +37999,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Rare"
     },
     {
       "code": "{261:4}",
@@ -38004,7 +38008,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Epic"
     },
     {
       "code": "{261:5}",
@@ -38107,7 +38112,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Common"
     },
     {
       "code": "{263:5}",
@@ -38115,7 +38121,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Uncommon"
     },
     {
       "code": "{263:6}",
@@ -38123,7 +38130,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Rare"
     },
     {
       "code": "{263:7}",
@@ -38131,7 +38139,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Epic"
     },
     {
       "code": "{263:8}",
@@ -38244,7 +38253,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Common"
     },
     {
       "code": "{265:2}",
@@ -38252,7 +38262,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Uncommon"
     },
     {
       "code": "{265:3}",
@@ -38260,7 +38271,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Rare"
     },
     {
       "code": "{265:4}",
@@ -38268,7 +38280,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Epic"
     },
     {
       "code": "{265:5}",
@@ -38345,7 +38358,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Common"
     },
     {
       "code": "{266:2}",
@@ -38353,7 +38367,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Uncommon"
     },
     {
       "code": "{266:3}",
@@ -38361,7 +38376,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Rare"
     },
     {
       "code": "{266:4}",
@@ -38369,7 +38385,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Epic"
     },
     {
       "code": "{266:5}",
@@ -38552,7 +38569,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Common"
     },
     {
       "code": "{267:5}",
@@ -38560,7 +38578,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Uncommon"
     },
     {
       "code": "{267:6}",
@@ -38568,7 +38587,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Rare"
     },
     {
       "code": "{267:7}",
@@ -38576,7 +38596,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Epic"
     },
     {
       "code": "{267:8}",
@@ -38689,7 +38710,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Common"
     },
     {
       "code": "{269:2}",
@@ -38697,7 +38719,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Uncommon"
     },
     {
       "code": "{269:3}",
@@ -38705,7 +38728,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Rare"
     },
     {
       "code": "{269:4}",
@@ -38713,7 +38737,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Epic"
     },
     {
       "code": "{269:5}",
@@ -39581,7 +39606,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Common"
     },
     {
       "code": "{270:2}",
@@ -39589,7 +39615,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Uncommon"
     },
     {
       "code": "{270:3}",
@@ -39597,7 +39624,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Rare"
     },
     {
       "code": "{270:4}",
@@ -39605,7 +39633,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Epic"
     },
     {
       "code": "{270:5}",
@@ -39787,7 +39816,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Common"
     },
     {
       "code": "{272:3}",
@@ -39795,7 +39825,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Uncommon"
     },
     {
       "code": "{272:4}",
@@ -39803,7 +39834,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Rare"
     },
     {
       "code": "{272:5}",
@@ -39811,7 +39843,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Epic"
     },
     {
       "code": "{272:6}",
@@ -39890,7 +39923,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "effect": "Gold Skin"
+      "effect": "Gold Skin",
+      "rarity": "Legendary"
     },
     {
       "code": "{273:14}",
@@ -40069,7 +40103,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Common"
     },
     {
       "code": "{273:31}",
@@ -40078,7 +40113,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Uncommon"
     },
     {
       "code": "{273:32}",
@@ -40087,7 +40123,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Rare"
     },
     {
       "code": "{273:33}",
@@ -40096,7 +40133,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Epic"
     },
     {
       "code": "{273:34}",
@@ -40158,7 +40196,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Torgue",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Uncommon"
     },
     {
       "code": "{273:3}",
@@ -40285,7 +40324,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Common"
     },
     {
       "code": "{274:4}",
@@ -40293,7 +40333,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Uncommon"
     },
     {
       "code": "{274:5}",
@@ -40301,7 +40342,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Rare"
     },
     {
       "code": "{274:6}",
@@ -40309,7 +40351,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Epic"
     },
     {
       "code": "{274:7}",
@@ -40498,7 +40541,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Ripper",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Common"
     },
     {
       "code": "{275:27}",
@@ -40507,7 +40551,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Ripper",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Uncommon"
     },
     {
       "code": "{275:28}",
@@ -40516,7 +40561,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Ripper",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Rare"
     },
     {
       "code": "{275:29}",
@@ -40525,7 +40571,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Ripper",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Epic"
     },
     {
       "code": "{275:2}",
@@ -40684,7 +40731,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Common"
     },
     {
       "code": "{277:4}",
@@ -40692,7 +40740,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Uncommon"
     },
     {
       "code": "{277:5}",
@@ -40700,7 +40749,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Rare"
     },
     {
       "code": "{277:6}",
@@ -40708,7 +40758,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Epic"
     },
     {
       "code": "{277:7}",
@@ -40832,7 +40883,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Common"
     },
     {
       "code": "{278:5}",
@@ -40840,7 +40892,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Uncommon"
     },
     {
       "code": "{278:6}",
@@ -40848,7 +40901,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Rare"
     },
     {
       "code": "{278:7}",
@@ -40856,7 +40910,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Epic"
     },
     {
       "code": "{278:8}",
@@ -40933,7 +40988,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Common"
     },
     {
       "code": "{279:4}",
@@ -40941,7 +40997,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Uncommon"
     },
     {
       "code": "{279:5}",
@@ -40949,7 +41006,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Rare"
     },
     {
       "code": "{279:6}",
@@ -40957,7 +41015,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Maliwan"
+      "manufacturer": "Maliwan",
+      "rarity": "Epic"
     },
     {
       "code": "{279:7}",
@@ -42013,7 +42072,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Vladof",
-      "weaponType": "Vladof Heavy Weapon"
+      "weaponType": "Vladof Heavy Weapon",
+      "rarity": "Common"
     },
     {
       "code": "{282:22}",
@@ -42022,7 +42082,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Vladof",
-      "weaponType": "Vladof Heavy Weapon"
+      "weaponType": "Vladof Heavy Weapon",
+      "rarity": "Uncommon"
     },
     {
       "code": "{282:23}",
@@ -42031,7 +42092,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Vladof",
-      "weaponType": "Vladof Heavy Weapon"
+      "weaponType": "Vladof Heavy Weapon",
+      "rarity": "Rare"
     },
     {
       "code": "{282:24}",
@@ -42040,7 +42102,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Vladof",
-      "weaponType": "Vladof Heavy Weapon"
+      "weaponType": "Vladof Heavy Weapon",
+      "rarity": "Epic"
     },
     {
       "code": "{282:25}",
@@ -42110,7 +42173,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Vladof",
-      "effect": "Gold Skin"
+      "effect": "Gold Skin",
+      "rarity": "Legendary"
     },
     {
       "code": "{282:4}",
@@ -42207,7 +42271,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Common"
     },
     {
       "code": "{283:2}",
@@ -42215,7 +42280,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Uncommon"
     },
     {
       "code": "{283:3}",
@@ -42223,7 +42289,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Rare"
     },
     {
       "code": "{283:4}",
@@ -42231,7 +42298,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Epic"
     },
     {
       "code": "{283:5}",
@@ -42393,7 +42461,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Common"
     },
     {
       "code": "{285:4}",
@@ -42401,7 +42470,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Uncommon"
     },
     {
       "code": "{285:5}",
@@ -42409,7 +42479,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Rare"
     },
     {
       "code": "{285:6}",
@@ -42417,7 +42488,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Epic"
     },
     {
       "code": "{285:7}",
@@ -42569,7 +42641,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Common"
     },
     {
       "code": "{287:2}",
@@ -42577,7 +42650,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Uncommon"
     },
     {
       "code": "{287:3}",
@@ -42585,7 +42659,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Rare"
     },
     {
       "code": "{287:4}",
@@ -42593,7 +42668,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Epic"
     },
     {
       "code": "{287:5}",
@@ -42763,7 +42839,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Maliwan",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Common"
     },
     {
       "code": "{289:21}",
@@ -42772,7 +42849,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Maliwan",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Uncommon"
     },
     {
       "code": "{289:22}",
@@ -42781,7 +42859,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Maliwan",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Rare"
     },
     {
       "code": "{289:23}",
@@ -42790,7 +42869,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Maliwan",
-      "weaponType": "Heavy Weapon"
+      "weaponType": "Heavy Weapon",
+      "rarity": "Epic"
     },
     {
       "code": "{289:24}",
@@ -42870,7 +42950,8 @@
       "category": "Heavy",
       "partType": "Rarity",
       "manufacturer": "Maliwan",
-      "effect": "Gold Skin"
+      "effect": "Gold Skin",
+      "rarity": "Legendary"
     },
     {
       "code": "{289:5}",
@@ -42947,7 +43028,8 @@
       "itemType": "Common",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Common"
     },
     {
       "code": "{290:4}",
@@ -42955,7 +43037,8 @@
       "itemType": "Uncommon",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Uncommon"
     },
     {
       "code": "{290:5}",
@@ -42963,7 +43046,8 @@
       "itemType": "Rare",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Rare"
     },
     {
       "code": "{290:6}",
@@ -42971,7 +43055,8 @@
       "itemType": "Epic",
       "category": "Repkit",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Epic"
     },
     {
       "code": "{290:7}",
@@ -43018,7 +43103,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Common"
     },
     {
       "code": "{291:2}",
@@ -43026,7 +43112,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Uncommon"
     },
     {
       "code": "{291:3}",
@@ -43034,7 +43121,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Rare"
     },
     {
       "code": "{291:4}",
@@ -43042,7 +43130,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Vladof"
+      "manufacturer": "Vladof",
+      "rarity": "Epic"
     },
     {
       "code": "{291:5}",
@@ -43234,7 +43323,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Common"
     },
     {
       "code": "{293:6}",
@@ -43242,7 +43332,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Uncommon"
     },
     {
       "code": "{293:7}",
@@ -43250,7 +43341,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Rare"
     },
     {
       "code": "{293:8}",
@@ -43258,7 +43350,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Order"
+      "manufacturer": "Order",
+      "rarity": "Epic"
     },
     {
       "code": "{293:9}",
@@ -43390,7 +43483,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Common"
     },
     {
       "code": "{298:2}",
@@ -43398,7 +43492,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Uncommon"
     },
     {
       "code": "{298:3}",
@@ -43406,7 +43501,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Rare"
     },
     {
       "code": "{298:4}",
@@ -43414,7 +43510,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Epic"
     },
     {
       "code": "{298:5}",
@@ -44426,7 +44523,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Common"
     },
     {
       "code": "{300:2}",
@@ -44434,7 +44532,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Uncommon"
     },
     {
       "code": "{300:3}",
@@ -44442,7 +44541,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Rare"
     },
     {
       "code": "{300:4}",
@@ -44450,7 +44550,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Ripper"
+      "manufacturer": "Ripper",
+      "rarity": "Epic"
     },
     {
       "code": "{300:5}",
@@ -44602,7 +44703,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Common"
     },
     {
       "code": "{306:2}",
@@ -44610,7 +44712,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Uncommon"
     },
     {
       "code": "{306:3}",
@@ -44618,7 +44721,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Rare"
     },
     {
       "code": "{306:4}",
@@ -44626,7 +44730,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Jakobs"
+      "manufacturer": "Jakobs",
+      "rarity": "Epic"
     },
     {
       "code": "{306:5}",
@@ -44797,7 +44902,8 @@
       "itemType": "Common",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Common"
     },
     {
       "code": "{311:2}",
@@ -44805,7 +44911,8 @@
       "itemType": "Uncommon",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Uncommon"
     },
     {
       "code": "{311:3}",
@@ -44813,7 +44920,8 @@
       "itemType": "Rare",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Rare"
     },
     {
       "code": "{311:4}",
@@ -44821,7 +44929,8 @@
       "itemType": "Epic",
       "category": "Grenade",
       "partType": "Rarity",
-      "manufacturer": "Tediore"
+      "manufacturer": "Tediore",
+      "rarity": "Epic"
     },
     {
       "code": "{311:5}",
@@ -44908,7 +45017,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Common"
     },
     {
       "code": "{312:2}",
@@ -44916,7 +45026,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Uncommon"
     },
     {
       "code": "{312:3}",
@@ -44924,7 +45035,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Rare"
     },
     {
       "code": "{312:4}",
@@ -44932,7 +45044,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Daedalus"
+      "manufacturer": "Daedalus",
+      "rarity": "Epic"
     },
     {
       "code": "{312:5}",
@@ -44999,7 +45112,8 @@
       "itemType": "Common",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Common"
     },
     {
       "code": "{321:2}",
@@ -45007,7 +45121,8 @@
       "itemType": "Uncommon",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Uncommon"
     },
     {
       "code": "{321:3}",
@@ -45015,7 +45130,8 @@
       "itemType": "Rare",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Rare"
     },
     {
       "code": "{321:4}",
@@ -45023,7 +45139,8 @@
       "itemType": "Epic",
       "category": "Shield",
       "partType": "Rarity",
-      "manufacturer": "Torgue"
+      "manufacturer": "Torgue",
+      "rarity": "Epic"
     },
     {
       "code": "{321:5}",
@@ -51019,12 +51136,12 @@
     },
     {
       "code": "{4:74}",
-      "partName": "Unknown Rarity",
+      "partName": "Unknown DLC Legendary",
       "itemType": "Unknown Rarity",
       "category": "Weapon",
       "partType": "Rarity",
       "manufacturer": "Order",
-      "rarity": "Unknown",
+      "rarity": "Legendary",
       "weaponType": "Pistol"
     },
     {
