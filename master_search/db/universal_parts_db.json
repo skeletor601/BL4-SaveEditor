@@ -6510,16 +6510,6 @@
       "weaponType": "Assault Rifle"
     },
     {
-      "code": "{17:53}",
-      "partName": "Unknown DLC Legendary",
-      "itemType": "Unknown Rarity",
-      "category": "Weapon",
-      "partType": "Rarity",
-      "manufacturer": "Torgue",
-      "rarity": "Legendary",
-      "weaponType": "Assault Rifle"
-    },
-    {
       "code": "{17:54}",
       "partName": "Bugbear",
       "itemType": "Bugbear",
@@ -32481,15 +32471,6 @@
       "rarity": "Normal"
     },
     {
-      "code": "{256:70}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Class Mod",
-      "partType": "Rarity",
-      "manufacturer": "Rafa",
-      "rarity": "Unknown"
-    },
-    {
       "code": "{256:71}",
       "partName": "Saldar",
       "itemType": "Saldar",
@@ -33805,14 +33786,6 @@
       "manufacturer": "Harlowe"
     },
     {
-      "code": "{259:219}",
-      "partName": "Unknown",
-      "itemType": "Unknown",
-      "category": "Class Mod",
-      "partType": "Unknown",
-      "manufacturer": "Harlowe"
-    },
-    {
       "code": "{259:21}",
       "partName": "Legendary",
       "itemType": "Legendary",
@@ -34349,14 +34322,6 @@
       "itemType": "Triple Point",
       "category": "Class Mod",
       "partType": "Skill",
-      "manufacturer": "Harlowe"
-    },
-    {
-      "code": "{259:27}",
-      "partName": "Unknown",
-      "itemType": "Unknown",
-      "category": "Class Mod",
-      "partType": "Unknown",
       "manufacturer": "Harlowe"
     },
     {
@@ -45193,56 +45158,6 @@
       "effect": "Immediately lose an Armor Segment when Armor Shield becomes full"
     },
     {
-      "code": "{35:11}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Grenade",
-      "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
-      "effect": "Sho Kunai Skin"
-    },
-    {
-      "code": "{35:6}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Grenade",
-      "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
-      "effect": "Faulty Detonator Skin"
-    },
-    {
-      "code": "{35:7}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Grenade",
-      "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
-      "effect": "Swarm Skin"
-    },
-    {
-      "code": "{35:8}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Grenade",
-      "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
-      "effect": "UAV Skin"
-    },
-    {
-      "code": "{35:9}",
-      "partName": "Unknown Rarity",
-      "itemType": "Unknown Rarity",
-      "category": "Grenade",
-      "partType": "Rarity",
-      "manufacturer": "35",
-      "rarity": "Unknown",
-      "effect": "Chaumurky Skin"
-    },
-    {
       "code": "{3:10}",
       "partName": "Hyperion Ricochet Shield",
       "itemType": "Hyperion Ricochet Shield",
@@ -51132,16 +51047,6 @@
       "partType": "Underbarrel",
       "manufacturer": "Order",
       "effect": "Alt Fire - Gravity Well",
-      "weaponType": "Pistol"
-    },
-    {
-      "code": "{4:74}",
-      "partName": "Unknown DLC Legendary",
-      "itemType": "Unknown Rarity",
-      "category": "Weapon",
-      "partType": "Rarity",
-      "manufacturer": "Order",
-      "rarity": "Legendary",
       "weaponType": "Pistol"
     },
     {
