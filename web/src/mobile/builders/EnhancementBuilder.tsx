@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -42,6 +42,7 @@ export default function EnhancementBuilder() {
   const mfgPerks = usePartList();
   const stats247 = usePartList();
   const fw247 = usePartList();
+  const extras = useExtraTokens();
 
   const mfgNames = useMemo(() => Object.keys(data?.manufacturers ?? {}).sort(), [data]);
   if (data && !mfgName && mfgNames.length) setMfgName(mfgNames[0]);
@@ -113,12 +114,15 @@ export default function EnhancementBuilder() {
     for (const f of fw247.parts) { const c = parseInt(f.id, 10); if (Number.isFinite(c)) for (let i = 0; i < f.qty; i++) s.push(c); }
     if (s.length > 0) p.push(`{247:[${s.join(" ")}]}`);
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
-  }, [data, mfg, level, seed, rarity, mfgPerks.parts, stats247.parts, fw247.parts, skinValue]);
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, skinValue);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfg, level, seed, rarity, mfgPerks.parts, stats247.parts, fw247.parts, skinValue, extras.tokens]);
 
   const clearAll = useCallback(() => {
-    setRarity(""); setSkinValue(""); mfgPerks.clear(); stats247.clear(); fw247.clear(); setCode("");
-  }, [mfgPerks, stats247, fw247]);
+    setRarity(""); setSkinValue(""); mfgPerks.clear(); stats247.clear(); fw247.clear(); extras.clear(); setCode("");
+  }, [mfgPerks, stats247, fw247, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading enhancement data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -136,6 +140,10 @@ export default function EnhancementBuilder() {
       <PartChecklist label="Stat Perks (247)" options={statOpts} selected={stats247.parts} onToggle={stats247.toggle} onQtyChange={stats247.setQty} showInfo={showInfo} />
       <PartChecklist label="Firmware (247)" options={fwOpts} selected={fw247.parts} onToggle={fw247.toggle} onQtyChange={fw247.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
+
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />

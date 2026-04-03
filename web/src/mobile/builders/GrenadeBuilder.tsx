@@ -5,8 +5,9 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedGrenade, type GenerateModdedGrenadeResult } from "@/lib/generateModdedGrenade";
 import type { GrenadeVisualRecipe } from "@/lib/generateModdedWeapon";
 import {
-  type SelectedPart, usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+  type SelectedPart, usePartList, useExtraTokens, NumberField, PartChecklist, CodeOutput,
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase,
+  ExtraTokensList, extraTokensToString, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -90,6 +91,7 @@ export default function GrenadeBuilder() {
   const fw = usePartList();
   const mfgPerks = usePartList();
   const uniPerks = usePartList();
+  const extras = useExtraTokens();
 
   if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
@@ -138,8 +140,11 @@ export default function GrenadeBuilder() {
 
   const handleGenerate = useCallback(() => {
     if (!data || mfgId == null) return;
-    setCode(buildDecodedString(mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, data));
-  }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue]);
+    let decoded = buildDecodedString(mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, data);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, extras.tokens]);
 
   const handleGenerateModded = useCallback(async () => {
     if (!data || mfgId == null) return;
@@ -178,8 +183,8 @@ export default function GrenadeBuilder() {
   }, [data, mfgId, level, seed, modPower, skins]);
 
   const handleClear = useCallback(() => {
-    setRarity(""); setSkinValue(""); legends.clear(); elements.clear(); fw.clear(); mfgPerks.clear(); uniPerks.clear(); setCode("");
-  }, [legends, elements, fw, mfgPerks, uniPerks]);
+    setRarity(""); setSkinValue(""); legends.clear(); elements.clear(); fw.clear(); mfgPerks.clear(); uniPerks.clear(); extras.clear(); setCode("");
+  }, [legends, elements, fw, mfgPerks, uniPerks, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading grenade data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error: {error}</div>;
@@ -199,6 +204,9 @@ export default function GrenadeBuilder() {
       {mfgPerkOptions.length > 0 && <PartChecklist label="Manufacturer Perks" options={mfgPerkOptions} selected={mfgPerks.parts} onToggle={mfgPerks.toggle} onQtyChange={mfgPerks.setQty} showInfo={showInfo} />}
       <PartChecklist label="Universal Perks" options={universalPerkOptions} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
 
       {/* Mod Power Mode */}
       <MobileSelect label="Mod Power" options={[

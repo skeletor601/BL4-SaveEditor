@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedWeapon } from "@/lib/generateModdedWeapon";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -68,6 +68,7 @@ export default function WeaponBuilder() {
   const scopeAcc = usePartList(); partLists["Scope Accessory"] = scopeAcc;
   const underbarrel = usePartList(); partLists["Underbarrel"] = underbarrel;
   const underbarrelAcc = usePartList(); partLists["Underbarrel Accessory"] = underbarrelAcc;
+  const extras = useExtraTokens();
 
   // Load universal parts for "All Parts" mode
   useEffect(() => {
@@ -185,8 +186,11 @@ export default function WeaponBuilder() {
       }
     }
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, skin));
-  }, [data, mfgWtId, level, seed, rarity, legendary.parts, pearl.parts, element1.parts, element2.parts, skin,
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, skin);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfgWtId, level, seed, rarity, legendary.parts, pearl.parts, element1.parts, element2.parts, skin, extras.tokens,
       body.parts, bodyAcc.parts, barrel.parts, barrelAcc.parts, mag.parts, statMod.parts,
       grip.parts, foregrip.parts, mfgPart.parts, scope.parts, scopeAcc.parts, underbarrel.parts, underbarrelAcc.parts]);
 
@@ -301,8 +305,9 @@ export default function WeaponBuilder() {
   const clearAll = useCallback(() => {
     setRarity(""); setSkin(""); legendary.clear(); pearl.clear(); element1.clear(); element2.clear();
     Object.values(partLists).forEach((l) => l.clear());
+    extras.clear();
     setCode("");
-  }, [legendary, pearl, element1, element2, body, bodyAcc, barrel, barrelAcc, mag, statMod, grip, foregrip, mfgPart, scope, scopeAcc, underbarrel, underbarrelAcc]);
+  }, [legendary, pearl, element1, element2, body, bodyAcc, barrel, barrelAcc, mag, statMod, grip, foregrip, mfgPart, scope, scopeAcc, underbarrel, underbarrelAcc, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading weapon data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -342,6 +347,10 @@ export default function WeaponBuilder() {
       })}
 
       <SkinSelector skins={data.skins ?? []} value={skin} onChange={setSkin} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
+
       <MobileSelect label="Mod Power" options={[
         { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />

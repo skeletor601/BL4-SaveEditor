@@ -254,9 +254,14 @@ export function SkinSelector({ skins, value, onChange }: {
 }
 
 function SkinPickerButton({ opts, value, onChange }: { opts: PickerOption[]; value: string; onChange: (v: string) => void }) {
-  // Reuse MobileSelect inline to avoid circular import
   const [open, setOpen] = useState(false);
   const selectedLabel = opts.find((o) => o.value === value)?.label ?? "-- No Skin --";
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   return (
     <>
@@ -455,6 +460,190 @@ export function BuildPartsList({ code, universalParts }: {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ── Add from Database ─────────────────────────────────────────────────────────
+
+interface DbPart {
+  code: string;
+  label: string;
+  partType?: string;
+  rarity?: string;
+  category?: string;
+  manufacturer?: string;
+}
+
+export interface ExtraToken {
+  code: string;   // e.g. "{10:60}"
+  label: string;  // display name
+  qty: number;
+}
+
+export function useExtraTokens() {
+  const [tokens, setTokens] = useState<ExtraToken[]>([]);
+  const add = useCallback((code: string, label: string, qty: number) => {
+    setTokens((prev) => {
+      const existing = prev.find((t) => t.code === code);
+      if (existing) return prev.map((t) => t.code === code ? { ...t, qty: t.qty + qty } : t);
+      return [...prev, { code, label, qty }];
+    });
+  }, []);
+  const remove = useCallback((code: string) => {
+    setTokens((prev) => prev.filter((t) => t.code !== code));
+  }, []);
+  const clear = useCallback(() => setTokens([]), []);
+  return { tokens, add, remove, clear };
+}
+
+/** Builds token strings from extra tokens for insertion into decoded string. */
+export function extraTokensToString(tokens: ExtraToken[]): string {
+  if (tokens.length === 0) return "";
+  // Group by prefix (typeId)
+  const byPrefix: Record<string, number[]> = {};
+  for (const t of tokens) {
+    const m = t.code.match(/^\{(\d+):(\d+)\}$/);
+    if (!m) continue;
+    const prefix = m[1];
+    const partId = Number(m[2]);
+    if (!byPrefix[prefix]) byPrefix[prefix] = [];
+    for (let i = 0; i < t.qty; i++) byPrefix[prefix].push(partId);
+  }
+  const parts: string[] = [];
+  for (const [prefix, ids] of Object.entries(byPrefix)) {
+    if (ids.length === 1) parts.push(`{${prefix}:${ids[0]}}`);
+    else {
+      const sorted = [...ids].sort((a, b) => a - b);
+      parts.push(`{${prefix}:[${sorted.join(" ")}]}`);
+    }
+  }
+  return parts.join(" ");
+}
+
+export function AddFromDatabase({ universalParts, onAdd }: {
+  universalParts: DbPart[];
+  onAdd: (code: string, label: string, qty: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [qty, setQtyText] = useState("1");
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const results = search.trim().length < 2 ? [] : (() => {
+    const q = search.trim().toLowerCase();
+    return universalParts
+      .filter((p) => [p.code, p.label, p.partType ?? "", p.manufacturer ?? "", p.category ?? ""].join(" ").toLowerCase().includes(q))
+      .slice(0, 50);
+  })();
+
+  const handleAdd = (part: DbPart) => {
+    const n = Math.max(1, Math.min(99, Number(qty) || 1));
+    onAdd(part.code, part.label, n);
+    showToast(`Added ${part.label} x${n}`);
+  };
+
+  const rarityColor = (r?: string) => {
+    const rl = (r ?? "").toLowerCase();
+    if (rl === "pearl" || rl === "pearlescent") return "#38bdf8";
+    if (rl === "legendary") return "#fbbf24";
+    if (rl === "epic") return "#a78bfa";
+    if (rl === "rare") return "#60a5fa";
+    if (rl === "uncommon") return "#4ade80";
+    return "var(--color-text)";
+  };
+
+  return (
+    <>
+      <button type="button" className="mobile-btn" onClick={() => setOpen(true)} style={{ marginBottom: 14 }}>
+        + Add Parts from Database
+      </button>
+      {open && (
+        <div className="mobile-picker-overlay" onClick={() => setOpen(false)}>
+          <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-picker-header">
+              <h3>Add from Database</h3>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Done</button>
+            </div>
+            <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                className="mobile-input"
+                placeholder="Search parts…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+                style={{ flex: 1, minHeight: 40 }}
+              />
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>Qty:</span>
+                <input
+                  type="number"
+                  className="qty-input"
+                  value={qty}
+                  min={1}
+                  max={99}
+                  onChange={(e) => setQtyText(e.target.value)}
+                  onBlur={() => { const n = Math.max(1, Math.min(99, Number(qty) || 1)); setQtyText(String(n)); }}
+                  style={{ width: 44 }}
+                />
+              </div>
+            </div>
+            <div className="mobile-picker-list">
+              {search.trim().length < 2 && (
+                <p style={{ padding: "20px 16px", fontSize: 12, color: "var(--color-text-muted)", textAlign: "center" }}>Type at least 2 characters to search</p>
+              )}
+              {results.map((part) => (
+                <button
+                  key={part.code}
+                  type="button"
+                  className="mobile-picker-item"
+                  onClick={() => handleAdd(part)}
+                  style={{ flexWrap: "wrap" }}
+                >
+                  <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", opacity: 0.6, flexShrink: 0 }}>
+                    {part.code}
+                  </span>
+                  <span style={{ flex: 1, color: rarityColor(part.rarity), minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {part.label}
+                  </span>
+                  {part.partType && (
+                    <span style={{ fontSize: 9, color: "var(--color-text-muted)", background: "rgba(255,255,255,0.05)", padding: "2px 5px", borderRadius: 3 }}>
+                      {part.partType}
+                    </span>
+                  )}
+                </button>
+              ))}
+              {search.trim().length >= 2 && results.length === 0 && (
+                <p style={{ padding: "20px 16px", fontSize: 12, color: "var(--color-text-muted)", textAlign: "center" }}>No parts found</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Shows extra tokens that were added from database, with remove buttons. */
+export function ExtraTokensList({ tokens, onRemove }: { tokens: ExtraToken[]; onRemove: (code: string) => void }) {
+  if (tokens.length === 0) return null;
+  return (
+    <div className="mobile-card">
+      <div className="mobile-label">Extra Parts ({tokens.length})</div>
+      {tokens.map((t) => (
+        <div key={t.code} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: 12 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", opacity: 0.6 }}>{t.code}</span>
+          <span style={{ flex: 1, color: "var(--color-text)" }}>{t.label}</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-accent)", background: "var(--color-accent-dim)", padding: "1px 6px", borderRadius: 8 }}>x{t.qty}</span>
+          <button type="button" onClick={() => onRemove(t.code)} style={{ background: "none", border: "none", color: "#ef4444", fontSize: 14, cursor: "pointer", padding: "4px 8px", touchAction: "manipulation" }}>×</button>
+        </div>
+      ))}
     </div>
   );
 }

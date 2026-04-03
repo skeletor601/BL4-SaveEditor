@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -44,6 +44,7 @@ export default function HeavyBuilder() {
 
   const barrelAcc = usePartList();
   const bodyAcc = usePartList();
+  const extras = useExtraTokens();
 
   if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
@@ -107,12 +108,15 @@ export default function HeavyBuilder() {
     for (const a of barrelAcc.parts) { for (let i = 0; i < a.qty; i++) p.push(`{${a.id}}`); }
     for (const a of bodyAcc.parts) { for (let i = 0; i < a.qty; i++) p.push(`{${a.id}}`); }
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
-  }, [data, mfgId, level, seed, rarity, barrel, element, fwParts.parts, barrelAcc.parts, bodyAcc.parts, skinValue]);
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, skinValue);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfgId, level, seed, rarity, barrel, element, fwParts.parts, barrelAcc.parts, bodyAcc.parts, skinValue, extras.tokens]);
 
   const clearAll = useCallback(() => {
-    setRarity(""); setBarrel(""); setElement(""); fwParts.clear(); setSkinValue(""); barrelAcc.clear(); bodyAcc.clear(); setCode("");
-  }, [fwParts, barrelAcc, bodyAcc]);
+    setRarity(""); setBarrel(""); setElement(""); fwParts.clear(); setSkinValue(""); barrelAcc.clear(); bodyAcc.clear(); extras.clear(); setCode("");
+  }, [fwParts, barrelAcc, bodyAcc, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading heavy data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -132,6 +136,10 @@ export default function HeavyBuilder() {
       <PartChecklist label="Barrel Accessories" options={baOpts} selected={barrelAcc.parts} onToggle={barrelAcc.toggle} onQtyChange={barrelAcc.setQty} showInfo={showInfo} />
       <PartChecklist label="Body Accessories" options={boOpts} selected={bodyAcc.parts} onToggle={bodyAcc.toggle} onQtyChange={bodyAcc.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
+
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />

@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedRepkit, type RepkitStatEstimate } from "@/lib/generateModdedRepkit";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector,
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -57,6 +57,7 @@ export default function RepkitBuilder() {
   const legends = usePartList();
   const resistance = usePartList();
   const uniPerks = usePartList();
+  const extras = useExtraTokens();
 
   if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
@@ -142,8 +143,11 @@ export default function RepkitBuilder() {
     const t = buildTypeToken(REPKIT_TYPE_ID, s243);
     if (t) p.push(t);
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
-  }, [data, mfgId, level, seed, rarity, prefixParts.parts, fwParts.parts, legends.parts, resistance.parts, uniPerks.parts, skinValue]);
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, skinValue);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfgId, level, seed, rarity, prefixParts.parts, fwParts.parts, legends.parts, resistance.parts, uniPerks.parts, skinValue, extras.tokens]);
 
   const handleGenerateModded = useCallback(() => {
     if (!data?.mfgs?.length) return;
@@ -155,8 +159,8 @@ export default function RepkitBuilder() {
   }, [data, level, modPower, mfgId]);
 
   const clearAll = useCallback(() => {
-    setRarity(""); prefixParts.clear(); fwParts.clear(); setSkinValue(""); setRepkitStats(null); legends.clear(); resistance.clear(); uniPerks.clear(); setCode("");
-  }, [prefixParts, fwParts, legends, resistance, uniPerks]);
+    setRarity(""); prefixParts.clear(); fwParts.clear(); setSkinValue(""); setRepkitStats(null); legends.clear(); resistance.clear(); uniPerks.clear(); extras.clear(); setCode("");
+  }, [prefixParts, fwParts, legends, resistance, uniPerks, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading repkit data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -176,6 +180,10 @@ export default function RepkitBuilder() {
       <PartChecklist label="Legendary Perks" options={legOpts} selected={legends.parts} onToggle={legends.toggle} onQtyChange={legends.setQty} showInfo={showInfo} />
       <PartChecklist label="Universal Perks" options={uniOpts} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
+
       <MobileSelect label="Mod Power" options={[
         { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />

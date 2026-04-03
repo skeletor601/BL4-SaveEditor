@@ -1,7 +1,11 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
-import { usePartList, NumberField, PartChecklist, CodeOutput, GenerateBar, applySkin } from "./shared";
+import { fetchApi } from "@/lib/apiClient";
+import {
+  usePartList, useExtraTokens, NumberField, PartChecklist, CodeOutput,
+  BuildPartsList, GenerateBar, AddFromDatabase, ExtraTokensList, extraTokensToString, applySkin
+} from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
 interface ClassModNameOption { nameCode: number; nameEN: string; }
@@ -16,6 +20,11 @@ interface ClassModBuilderData {
   perks: ClassModPerk[];
   firmware: ClassModFirmware[];
   legendaryMap: Record<string, number>;
+}
+
+interface UniversalPartRow {
+  code: string; label: string; effect?: string; partType?: string;
+  category?: string; manufacturer?: string;
 }
 
 const CLASS_IDS: Record<string, number> = { Amon: 255, Harlowe: 259, Rafa: 256, Vex: 254, C4SH: 404 };
@@ -37,8 +46,21 @@ export default function ClassModBuilder() {
   const [skillPoints, setSkillPoints] = useState<Record<string, number>>({});
   const [code, setCode] = useState("");
 
+  const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
+
   const perks = usePartList();
   const fw = usePartList();
+  const extras = useExtraTokens();
+
+  useEffect(() => {
+    fetchApi("parts/data").then((r) => r.json()).then((d) => {
+      if (d?.items) setUniversalParts(d.items.map((i: Record<string, unknown>) => ({
+        code: String(i.code ?? ""), label: String(i.partName ?? i.itemType ?? ""),
+        effect: String(i.effect ?? ""), partType: String(i.partType ?? ""),
+        category: String(i.category ?? ""), manufacturer: String(i.manufacturer ?? ""),
+      })));
+    }).catch(() => {});
+  }, []);
 
   const classId = CLASS_IDS[className] ?? 255;
   const classIdStr = String(classId);
@@ -108,12 +130,15 @@ export default function ClassModBuilder() {
     }
     if (perkIds.length > 0) p.push(`{234:[${perkIds.join(" ")}]}`);
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, ""));
-  }, [data, classId, classIdStr, className, rarity, level, seed, nameCode, skillPoints, skills, fw.parts, perks.parts]);
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, "");
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, classId, classIdStr, className, rarity, level, seed, nameCode, skillPoints, skills, fw.parts, perks.parts, extras.tokens]);
 
   const clearAll = useCallback(() => {
-    setRarity("Legendary"); setNameCode(""); setSkillPoints({}); perks.clear(); fw.clear(); setCode("");
-  }, [perks, fw]);
+    setRarity("Legendary"); setNameCode(""); setSkillPoints({}); perks.clear(); fw.clear(); extras.clear(); setCode("");
+  }, [perks, fw, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading class mod data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -165,8 +190,13 @@ export default function ClassModBuilder() {
 
       <PartChecklist label="Firmware" options={fwOpts} selected={fw.parts} onToggle={fw.toggle} onQtyChange={fw.setQty} />
       <PartChecklist label="Perks" options={perkOpts} selected={perks.parts} onToggle={perks.toggle} onQtyChange={perks.setQty} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
+
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }

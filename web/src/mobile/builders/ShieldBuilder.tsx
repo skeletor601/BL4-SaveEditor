@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector,
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -56,6 +56,7 @@ export default function ShieldBuilder() {
   const uniPerks = usePartList();
   const energyPerks = usePartList();
   const armorPerks = usePartList();
+  const extras = useExtraTokens();
 
   if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
@@ -139,8 +140,11 @@ export default function ShieldBuilder() {
     const t237 = buildTypeToken(237, s237);
     if (t237) p.push(t237);
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
-  }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, uniPerks.parts, energyPerks.parts, armorPerks.parts, skinValue]);
+    let decoded = applySkin(`${header} ${p.join(" ")} |`, skinValue);
+    const extra = extraTokensToString(extras.tokens);
+    if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
+    setCode(decoded);
+  }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, uniPerks.parts, energyPerks.parts, armorPerks.parts, skinValue, extras.tokens]);
 
   const handleGenerateModded = useCallback(() => {
     if (!data?.mfgs?.length) return;
@@ -150,8 +154,8 @@ export default function ShieldBuilder() {
   }, [data, level, modPower, ammoRegen, movementSpeed, fireworks, immortality]);
 
   const clearAll = useCallback(() => {
-    setRarity(""); setSkinValue(""); setShieldStats(null); legends.clear(); elements.clear(); fw.clear(); uniPerks.clear(); energyPerks.clear(); armorPerks.clear(); setCode("");
-  }, [legends, elements, fw, uniPerks, energyPerks, armorPerks]);
+    setRarity(""); setSkinValue(""); setShieldStats(null); legends.clear(); elements.clear(); fw.clear(); uniPerks.clear(); energyPerks.clear(); armorPerks.clear(); extras.clear(); setCode("");
+  }, [legends, elements, fw, uniPerks, energyPerks, armorPerks, extras]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading shield data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
@@ -172,6 +176,9 @@ export default function ShieldBuilder() {
       {shieldType === "Energy" && <PartChecklist label="Energy Perks" options={enOpts} selected={energyPerks.parts} onToggle={energyPerks.toggle} onQtyChange={energyPerks.setQty} showInfo={showInfo} />}
       {shieldType === "Armor" && <PartChecklist label="Armor Perks" options={arOpts} selected={armorPerks.parts} onToggle={armorPerks.toggle} onQtyChange={armorPerks.setQty} showInfo={showInfo} />}
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
+      <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
 
       {/* Mod Power + Glow Toggles */}
       <MobileSelect label="Mod Power" options={[
