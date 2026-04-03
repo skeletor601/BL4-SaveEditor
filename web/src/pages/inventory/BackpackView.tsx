@@ -440,21 +440,15 @@ export default function BackpackView() {
   );
 
   const handleDupeAll = useCallback(
-    async (qty: number) => {
+    (qty: number) => {
       if (!saveData || qty < 1) return;
       setDupeAllDialog(null);
       setDupeAllLoading(true);
       setAddMessage(null);
-      const yamlContent = getYamlText();
-      if (!yamlContent?.trim()) {
-        setAddMessage("No save YAML loaded.");
-        setDupeAllLoading(false);
-        return;
-      }
       const num = Math.min(99, Math.max(1, qty));
       // Collect all backpack item serials
       const backpackSerials = slots.backpack
-        .map((s) => ({ serial: s.serial?.trim(), flags: String(s.stateFlags ?? s.flags ?? 1) }))
+        .map((s) => ({ serial: s.serial?.trim(), flags: s.stateFlags ?? s.flags ?? 1 }))
         .filter((s) => s.serial && s.serial.startsWith("@U"));
       if (backpackSerials.length === 0) {
         setAddMessage("No items in backpack to duplicate.");
@@ -462,38 +456,62 @@ export default function BackpackView() {
         return;
       }
       try {
-        let currentYaml = yamlContent;
+        // Client-side dupe: directly insert slots into the parsed save data.
+        // No API calls — instant, regardless of item count.
+        const cloned = JSON.parse(JSON.stringify(saveData)) as Record<string, unknown>;
+        // Find backpack node in the cloned data
+        const findBackpack = (obj: Record<string, unknown>): Record<string, unknown> | null => {
+          for (const path of [
+            ["state", "inventory", "items", "backpack"],
+            ["state", "inventory", "backpack"],
+            ["State", "Inventory", "Backpack"],
+            ["inventory", "items", "backpack"],
+            ["inventory", "backpack"],
+            ["data", "state", "inventory", "items", "backpack"],
+          ]) {
+            let node: unknown = obj;
+            for (const key of path) {
+              if (node == null || typeof node !== "object") { node = null; break; }
+              const record = node as Record<string, unknown>;
+              // Case-insensitive key lookup
+              const found = Object.keys(record).find((k) => k.toLowerCase() === key.toLowerCase());
+              node = found ? record[found] : null;
+            }
+            if (node != null && typeof node === "object") return node as Record<string, unknown>;
+          }
+          return null;
+        };
+        const backpack = findBackpack(cloned);
+        if (!backpack) {
+          setAddMessage("Could not find backpack in save data.");
+          setDupeAllLoading(false);
+          return;
+        }
+        // Find highest existing slot number
+        let maxSlot = -1;
+        for (const key of Object.keys(backpack)) {
+          if (typeof key === "string" && key.startsWith("slot_")) {
+            const n = parseInt(key.split("_")[1], 10);
+            if (Number.isFinite(n) && n > maxSlot) maxSlot = n;
+          }
+        }
+        // Insert duplicates
         let totalAdded = 0;
         for (let round = 0; round < num; round++) {
           for (const { serial, flags } of backpackSerials) {
-            const res = await fetchApi("save/add-item", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                yaml_content: currentYaml,
-                serial,
-                flag: flags,
-              }),
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok || !data.success || typeof data.yaml_content !== "string") {
-              setAddMessage(data?.error ?? `Failed at item ${totalAdded + 1}.`);
-              setDupeAllLoading(false);
-              return;
-            }
-            currentYaml = data.yaml_content;
+            maxSlot++;
+            backpack[`slot_${maxSlot}`] = { serial, state_flags: Number(flags) };
             totalAdded++;
           }
         }
-        const parsed = yamlParse(currentYaml) as Record<string, unknown>;
-        updateSaveData(parsed);
+        updateSaveData(cloned);
         setAddMessage(`Duplicated ${backpackSerials.length} items x${num} (${totalAdded} copies added).`);
       } catch {
-        setAddMessage(getApiUnavailableError());
+        setAddMessage("Dupe failed unexpectedly.");
       }
       setDupeAllLoading(false);
     },
-    [saveData, getYamlText, updateSaveData, slots.backpack]
+    [saveData, updateSaveData, slots.backpack]
   );
 
   const handleSetGearLevel = useCallback(async () => {
