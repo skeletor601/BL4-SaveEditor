@@ -194,6 +194,67 @@ export default function WeaponBuilder() {
       body.parts, bodyAcc.parts, barrel.parts, barrelAcc.parts, mag.parts, statMod.parts,
       grip.parts, foregrip.parts, mfgPart.parts, scope.parts, scopeAcc.parts, underbarrel.parts, underbarrelAcc.parts]);
 
+  const [autoFillMsg, setAutoFillMsg] = useState<string | null>(null);
+
+  const handleAutoFill = useCallback(() => {
+    if (!data || !mfgWtId) return;
+    setAutoFillMsg(null);
+
+    if (!rarity) { setAutoFillMsg("Select rarity first."); return; }
+    if (rarity === "Legendary" && legendary.parts.length === 0) { setAutoFillMsg("Select a Legendary type first."); return; }
+    if (rarity === "Pearl" && pearl.parts.length === 0) { setAutoFillMsg("Select a Pearl type first."); return; }
+
+    const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+
+    // Get the weapon name from the selected legendary/pearl to match the barrel
+    let weaponName = "";
+    if (rarity === "Legendary" && legendary.parts.length > 0) {
+      // Label is like "83 - Hellwalker" or just "Hellwalker"
+      const label = legendary.parts[0].label;
+      weaponName = label.replace(/^\d+\s*[-–]\s*/, "").trim().toLowerCase();
+    } else if (rarity === "Pearl" && pearl.parts.length > 0) {
+      const label = pearl.parts[0].label;
+      weaponName = label.replace(/^\d+\s*[-–]\s*/, "").trim().toLowerCase();
+    }
+
+    // Auto-fill elements
+    const nonKinetic = (data.elemental ?? []).filter((e) => !/kinetic/i.test(e.stat));
+    if (nonKinetic.length) {
+      const el1 = pick(nonKinetic);
+      element1.setParts([{ id: el1.partId, label: `${el1.partId} - ${el1.stat}`, qty: 1 }]);
+      const el2 = pick(nonKinetic);
+      element2.setParts([{ id: el2.partId, label: `${el2.partId} - ${el2.stat}`, qty: 1 }]);
+    }
+
+    // Auto-fill each part type
+    const partsByType = data.partsByMfgTypeId[mfgWtId] ?? {};
+    for (const pt of PART_TYPES) {
+      const opts = partsByType[pt];
+      const list = partLists[pt];
+      if (!opts?.length || !list) continue;
+
+      if (pt === "Barrel" && weaponName) {
+        // Try to match the barrel to the legendary/pearl name
+        const match = opts.find((o) => {
+          const barrelName = o.label.replace(/^\d+\s*[-–]\s*/, "").split(",")[0].trim().toLowerCase();
+          return barrelName === weaponName || barrelName.includes(weaponName) || weaponName.includes(barrelName);
+        });
+        if (match) {
+          list.setParts([{ id: match.partId, label: match.label, qty: 1 }]);
+          continue;
+        }
+      }
+
+      // Random pick for everything else
+      const chosen = pick(opts);
+      list.setParts([{ id: chosen.partId, label: chosen.label, qty: 1 }]);
+    }
+
+    setAutoFillMsg("Auto-filled! Hit Generate Code.");
+    setTimeout(() => setAutoFillMsg(null), 2000);
+  }, [data, mfgWtId, rarity, legendary.parts, pearl.parts, element1, element2,
+      body, bodyAcc, barrel, barrelAcc, mag, statMod, grip, foregrip, mfgPart, scope, scopeAcc, underbarrel, underbarrelAcc]);
+
   const handleGenerateModded = useCallback(async () => {
     if (!data || !mfgWtId) return;
     setModGenerating(true);
@@ -334,6 +395,12 @@ export default function WeaponBuilder() {
       {rarity === "Pearl" && pearlOpts.length > 0 && (
         <PartChecklist label="Pearl Type" options={pearlOpts} selected={pearl.parts} onToggle={pearl.toggle} onQtyChange={pearl.setQty} showInfo={showInfo} />
       )}
+
+      {/* Auto Fill */}
+      <button type="button" className="mobile-btn" onClick={handleAutoFill} style={{ marginBottom: 8, background: "rgba(34,197,94,0.12)", borderColor: "#22c55e", color: "#22c55e" }}>
+        Auto Fill Parts
+      </button>
+      {autoFillMsg && <p style={{ fontSize: 12, color: autoFillMsg.includes("!") ? "#4ade80" : "#facc15", marginBottom: 10, textAlign: "center" }}>{autoFillMsg}</p>}
 
       <PartChecklist label="Element 1" options={elemOpts} selected={element1.parts} onToggle={element1.toggle} onQtyChange={element1.setQty} showInfo={showInfo} />
       <PartChecklist label="Element 2" options={elemOpts} selected={element2.parts} onToggle={element2.toggle} onQtyChange={element2.setQty} showInfo={showInfo} />
