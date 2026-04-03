@@ -286,6 +286,10 @@ export function getWeaponGenData(): WeaponGenData {
         redText: detail?.redText || row.redText || undefined,
       });
     } else {
+      // Skip entries with no valid rarity tier (junk entries with manufacturer names)
+      const validTiers = ["common", "uncommon", "rare", "epic"];
+      const tier = validTiers.find((t) => t === rarityLower);
+      if (!tier && !rarityLower) continue;
       if (!rarityByMfgTypeId[typeId]) rarityByMfgTypeId[typeId] = [];
       rarityByMfgTypeId[typeId].push({
         partId,

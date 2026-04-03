@@ -424,7 +424,7 @@ export default function WeaponBuilder() {
 
   return (
     <div>
-      <BuilderToggles showInfo={showInfo} setShowInfo={setShowInfo} allParts={allParts} setAllParts={setAllParts} />
+      <BuilderToggles showInfo={showInfo} setShowInfo={setShowInfo} allParts={allParts} setAllParts={setAllParts} onAutoFill={handleAutoFill} autoFillMsg={autoFillMsg} />
       <MobileSelect label="Manufacturer" required options={mfgOpts} value={manufacturer} onChange={(v) => {
         setManufacturer(v);
         const firstType = data.mfgWtIdList.find((e) => e.manufacturer === v);
@@ -444,12 +444,6 @@ export default function WeaponBuilder() {
       {rarity === "Pearl" && pearlOpts.length > 0 && (
         <PartChecklist label="Pearl Type" options={pearlOpts} selected={pearl.parts} onToggle={pearl.toggle} onQtyChange={pearl.setQty} showInfo={showInfo} />
       )}
-
-      {/* Auto Fill */}
-      <button type="button" className="mobile-btn" onClick={handleAutoFill} style={{ marginBottom: 8, background: "rgba(34,197,94,0.12)", borderColor: "#22c55e", color: "#22c55e" }}>
-        Auto Fill Parts
-      </button>
-      {autoFillMsg && <p style={{ fontSize: 12, color: autoFillMsg.includes("!") ? "#4ade80" : "#facc15", marginBottom: 10, textAlign: "center" }}>{autoFillMsg}</p>}
 
       <PartChecklist label="Element 1" options={elemOpts} selected={element1.parts} onToggle={element1.toggle} onQtyChange={element1.setQty} showInfo={showInfo} />
       <PartChecklist label="Element 2" options={elemOpts} selected={element2.parts} onToggle={element2.toggle} onQtyChange={element2.setQty} showInfo={showInfo} />
@@ -481,7 +475,7 @@ export default function WeaponBuilder() {
           <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
             <div className="mobile-picker-header">
               <h3>Modded Weapon</h3>
-              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Cancel</button>
+              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
               {/* Random */}

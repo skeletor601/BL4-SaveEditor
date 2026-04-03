@@ -30,9 +30,9 @@ export default function MobilePicker({ title, options, value, onChange, onClose 
           <button
             type="button"
             onClick={onClose}
-            style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}
           >
-            Done
+            ✕ Close
           </button>
         </div>
         <div className="mobile-picker-list">

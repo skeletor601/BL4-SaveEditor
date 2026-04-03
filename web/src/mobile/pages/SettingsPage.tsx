@@ -1,7 +1,18 @@
+import { useState } from "react";
+import { fetchApi } from "@/lib/apiClient";
 import { useTheme, THEMES, THEME_META, BG_MODES, BG_MODE_META, FONT_SIZES } from "@/contexts/ThemeContext";
+import { showToast } from "../components/Toast";
+
+const PROFILE_SEED_KEY = "bl4-community-seed";
+const PROFILE_NAME_KEY = "bl4-community-name";
+const BADGE_COLORS = ["#a855f7", "#06b6d4", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#84cc16", "#ec4899", "#0ea5e9", "#eab308"];
 
 export default function MobileSettingsPage() {
   const { theme, setTheme, bgMode, setBgMode, fontSize, setFontSize } = useTheme();
+  const [profileSeed, setProfileSeed] = useState(() => localStorage.getItem(PROFILE_SEED_KEY) ?? "");
+  const [profileName, setProfileName] = useState(() => localStorage.getItem(PROFILE_NAME_KEY) ?? "");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const isRegistered = !!profileSeed && !!profileName;
 
   return (
     <div>
@@ -102,6 +113,76 @@ export default function MobileSettingsPage() {
             );
           })}
         </div>
+      </div>
+
+      {/* Community Profile */}
+      <div className="mobile-card">
+        <div className="mobile-label">Community Profile</div>
+        <p style={{ fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.5, marginBottom: 12 }}>
+          Set a seed number and nickname. When you share codes in the Community tab,
+          your nickname will appear as a colored badge so others know who made it.
+          Use the same seed as your in-game item seed to link your identity.
+        </p>
+
+        {isRegistered && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)" }}>
+            <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>Your badge:</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5,
+              padding: "3px 10px", borderRadius: 10, color: "#fff",
+              background: BADGE_COLORS[Number(profileSeed) % BADGE_COLORS.length],
+            }}>
+              #{profileName}
+            </span>
+          </div>
+        )}
+
+        <div className="mobile-field">
+          <div className="mobile-label">Seed (1–9999)</div>
+          <input
+            type="number"
+            className="mobile-input"
+            value={profileSeed}
+            min={1}
+            max={9999}
+            onChange={(e) => setProfileSeed(e.target.value)}
+            placeholder="e.g. 1234"
+          />
+        </div>
+        <div className="mobile-field">
+          <div className="mobile-label">Nickname</div>
+          <input
+            type="text"
+            className="mobile-input"
+            value={profileName}
+            maxLength={30}
+            onChange={(e) => setProfileName(e.target.value)}
+            placeholder="Your name"
+          />
+        </div>
+        <button
+          type="button"
+          className="mobile-btn primary"
+          disabled={profileSaving}
+          onClick={async () => {
+            const seedNum = Number(profileSeed);
+            if (!seedNum || seedNum < 1 || seedNum > 9999) { showToast("Seed must be 1–9999"); return; }
+            if (!profileName.trim() || profileName.trim().length > 30) { showToast("Name required (max 30 chars)"); return; }
+            setProfileSaving(true);
+            try {
+              const res = await fetchApi("community/profiles", { method: "POST", body: JSON.stringify({ seed: seedNum, name: profileName.trim() }) });
+              const data = await res.json().catch(() => ({})) as { success?: boolean; error?: string };
+              if (data.success) {
+                localStorage.setItem(PROFILE_SEED_KEY, String(seedNum));
+                localStorage.setItem(PROFILE_NAME_KEY, profileName.trim());
+                showToast("Profile saved!");
+              } else { showToast(data.error ?? "Save failed"); }
+            } catch { showToast("API unavailable"); }
+            setProfileSaving(false);
+          }}
+        >
+          {profileSaving ? "Saving…" : isRegistered ? "Update Profile" : "Save Profile"}
+        </button>
       </div>
 
       {/* Switch to desktop */}

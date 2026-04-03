@@ -70,34 +70,45 @@ export function NumberField({ label, value, onChange, min, max }: {
 
 // ── Builder toggles bar (Show Info + All Parts) ──────────────────────────────
 
-export function BuilderToggles({ showInfo, setShowInfo, allParts, setAllParts }: {
+export function BuilderToggles({ showInfo, setShowInfo, allParts, setAllParts, onAutoFill, autoFillMsg }: {
   showInfo: boolean;
   setShowInfo: (v: boolean) => void;
   allParts: boolean;
   setAllParts: (v: boolean) => void;
+  onAutoFill?: () => void;
+  autoFillMsg?: string | null;
 }) {
-  const pill = (active: boolean) => ({
-    padding: "6px 14px",
-    borderRadius: 20,
-    border: `1px solid ${active ? "var(--color-accent)" : "var(--color-panel-border)"}`,
-    background: active ? "var(--color-accent-dim)" : "transparent",
-    color: active ? "var(--color-accent)" : "var(--color-text-muted)",
-    fontSize: 12,
+  const pill = (active: boolean, color?: string) => ({
+    padding: "8px 14px",
+    borderRadius: 10,
+    border: `1px solid ${active ? (color ?? "var(--color-accent)") : "rgba(255,255,255,0.12)"}`,
+    background: active ? `${color ?? "var(--color-accent)"}22` : "rgba(14,16,20,0.7)",
+    color: active ? (color ?? "var(--color-accent)") : "var(--color-text-muted)",
+    fontSize: 11,
     fontWeight: 700 as const,
     cursor: "pointer",
     touchAction: "manipulation" as const,
     WebkitTapHighlightColor: "transparent",
-    minHeight: 36,
+    minHeight: 40,
+    backdropFilter: "blur(4px)",
   });
 
   return (
-    <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-      <button type="button" style={pill(showInfo)} onClick={() => setShowInfo(!showInfo)}>
-        {showInfo ? "✓ " : ""}Show Info
-      </button>
-      <button type="button" style={pill(allParts)} onClick={() => setAllParts(!allParts)}>
-        {allParts ? "✓ " : ""}All Parts
-      </button>
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        <button type="button" style={pill(showInfo)} onClick={() => setShowInfo(!showInfo)}>
+          {showInfo ? "✓ " : ""}Show Info
+        </button>
+        <button type="button" style={pill(allParts)} onClick={() => setAllParts(!allParts)}>
+          {allParts ? "✓ " : ""}All Parts
+        </button>
+        {onAutoFill && (
+          <button type="button" style={pill(false, "#22c55e")} onClick={onAutoFill}>
+            Auto Fill
+          </button>
+        )}
+      </div>
+      {autoFillMsg && <p style={{ fontSize: 11, color: autoFillMsg.includes("!") ? "#4ade80" : "#facc15", marginTop: 6, textAlign: "center" }}>{autoFillMsg}</p>}
     </div>
   );
 }
@@ -274,7 +285,7 @@ function SkinPickerButton({ opts, value, onChange }: { opts: PickerOption[]; val
           <div className="mobile-picker-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-picker-header">
               <h3>Select Skin</h3>
-              <button type="button" onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Done</button>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div className="mobile-picker-list">
               {opts.map((opt) => (
@@ -568,7 +579,7 @@ export function AddFromDatabase({ universalParts, onAdd }: {
           <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
             <div className="mobile-picker-header">
               <h3>Add from Database</h3>
-              <button type="button" onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Done</button>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 8 }}>
               <input

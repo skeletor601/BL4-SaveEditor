@@ -252,7 +252,7 @@ export default function GrenadeBuilder() {
           <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
             <div className="mobile-picker-header">
               <h3>Modded Grenade</h3>
-              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Cancel</button>
+              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
               <button type="button" className="mobile-btn primary" onClick={() => handleGenerateModded()} style={{ marginBottom: 16 }}>

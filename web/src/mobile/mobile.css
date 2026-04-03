@@ -83,27 +83,31 @@
 
 /* ── Full-screen picker overlay ────────────────────────────────────────────── */
 
+/* Centered fullscreen modal picker */
 .mobile-picker-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-picker-sheet {
-  background: rgba(20, 22, 28, 0.98);
-  border-top: 1px solid var(--color-panel-border, #333);
-  border-radius: 16px 16px 0 0;
-  max-height: 70vh;
-  max-height: 70dvh;
+  background: rgba(18, 20, 26, 0.97);
+  border: 1px solid var(--color-panel-border, #333);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 380px;
+  max-height: 80vh;
+  max-height: 80dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
 }
 
 .mobile-picker-header {
@@ -127,7 +131,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 4px 0 8px;
+  padding: 4px 0 12px;
   overscroll-behavior: contain;
 }
 
@@ -146,7 +150,7 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   border-bottom: 1px solid rgba(255,255,255,0.04);
-  min-height: 48px;
+  min-height: 52px;
 }
 
 .mobile-picker-item:active {
@@ -243,8 +247,10 @@
   min-height: 48px;
   padding: 12px 16px;
   border-radius: 10px;
-  border: 1px solid var(--color-accent, #00BFFF);
-  background: rgba(var(--color-accent-rgb, 0,191,255), 0.12);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(14, 16, 20, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   color: var(--color-accent, #00BFFF);
   font-size: 14px;
   font-weight: 700;
@@ -257,18 +263,20 @@
 }
 
 .mobile-btn:active {
-  background: rgba(var(--color-accent-rgb, 0,191,255), 0.25);
+  background: rgba(14, 16, 20, 0.9);
+  border-color: var(--color-accent, #00BFFF);
 }
 
 .mobile-btn.primary {
   background: var(--color-accent, #00BFFF);
+  border-color: var(--color-accent, #00BFFF);
   color: #000;
 }
 
 .mobile-btn.danger {
-  border-color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
   color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(14, 16, 20, 0.75);
 }
 
 .mobile-input {
