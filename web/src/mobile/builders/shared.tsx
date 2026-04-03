@@ -396,8 +396,9 @@ export function CodeOutput({ code, onClear }: { code: string; onClear: () => voi
         </button>
       </div>
 
-      {/* Inject to Game — requires BL4_Injector.exe running locally */}
-      {base85 && (
+      {/* Inject to Game — disabled: injected items crash game on drop/interact
+         TODO: need to populate Type/Info pointers correctly for stable injection */}
+      {false && base85 && (
         <button
           type="button"
           disabled={injecting || !base85}

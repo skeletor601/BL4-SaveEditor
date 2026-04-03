@@ -4460,34 +4460,8 @@ export default function UnifiedItemBuilderPage() {
           >
             Reset
           </button>
-          <button
-            type="button"
-            onClick={async () => {
-              if (localStorage.getItem("bl4-injector-setup-done") !== "1") {
-                const { default: Modal } = await import("@/components/InjectorSetupModal");
-                // Show setup modal by setting state
-                setCodecStatus("__show_injector_setup__");
-                return;
-              }
-              let serial = liveBase85.split(/\r?\n/)[0]?.trim() ?? "";
-              if (!serial.startsWith("@U")) {
-                setCodecStatus("Generate a Base85 code first.");
-                return;
-              }
-              setCodecStatus("Injecting...");
-              try {
-                const { injectItem } = await import("@/lib/injectorBridge");
-                const resp = await injectItem(serial);
-                setCodecStatus(resp.ok ? "Injected to game!" : (resp.error ?? "Injection failed"));
-              } catch {
-                setCodecStatus("Bridge not running. Download & run BL4_Injector.exe");
-              }
-            }}
-            className="px-4 py-2 rounded-lg border border-green-500/40 text-green-400 hover:bg-green-500/10 hover:border-green-500/60 text-sm min-h-[44px] touch-manipulation"
-            title="Inject item into running Borderlands 4 — requires BL4_Injector running"
-          >
-            Inject to Game
-          </button>
+          {/* Inject to Game — disabled: injected items crash game on drop/interact
+              TODO: need to populate Type/Info pointers correctly for stable injection */}
           <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
             <span>Flag</span>
             <select
