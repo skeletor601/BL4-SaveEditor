@@ -94,7 +94,26 @@ function AppRoutes() {
   );
 }
 
+const MOBILE_OPTOUT_KEY = "bl4-prefer-desktop";
+
+function isMobileDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 0 && window.innerWidth < 900);
+}
+
 export default function App() {
+  useEffect(() => {
+    // Auto-redirect mobile users to /mobile (unless they opted out)
+    if (
+      isMobileDevice() &&
+      !window.location.pathname.startsWith("/mobile") &&
+      localStorage.getItem(MOBILE_OPTOUT_KEY) !== "1"
+    ) {
+      window.location.replace("/mobile");
+    }
+  }, []);
+
   useEffect(() => {
     const envKey = (() => {
       try {

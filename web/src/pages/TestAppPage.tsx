@@ -70,8 +70,20 @@ export default function TestAppPage() {
   const stats = useQuickStats();
   const overlay = themeConfig.bgOverlay;
 
+  const showMobileBanner = typeof navigator !== "undefined" &&
+    /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+    localStorage.getItem("bl4-prefer-desktop") === "1";
+
   return (
     <div className="fixed inset-0 z-[200] flex">
+      {/* Mobile switch banner */}
+      {showMobileBanner && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 999, background: "var(--color-accent)", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "8px 16px", fontSize: 13, fontWeight: 700 }}>
+          <span>Mobile version available</span>
+          <button onClick={() => { localStorage.removeItem("bl4-prefer-desktop"); window.location.href = "/mobile"; }} style={{ background: "#000", color: "var(--color-accent)", border: "none", borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Switch</button>
+          <button onClick={(e) => { (e.currentTarget.parentElement as HTMLElement).remove(); }} style={{ background: "none", border: "none", color: "#000", fontSize: 16, cursor: "pointer", padding: "2px 6px" }}>×</button>
+        </div>
+      )}
       {/* Full-screen background */}
       <div
         className="absolute inset-0 z-0"

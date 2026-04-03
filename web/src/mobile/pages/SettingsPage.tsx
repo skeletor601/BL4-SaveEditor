@@ -104,6 +104,23 @@ export default function MobileSettingsPage() {
         </div>
       </div>
 
+      {/* Switch to desktop */}
+      <div className="mobile-card" style={{ textAlign: "center" }}>
+        <p style={{ fontSize: 12, color: "var(--color-text-muted)", marginBottom: 10 }}>
+          Prefer the full desktop layout on this device?
+        </p>
+        <button
+          type="button"
+          className="mobile-btn"
+          onClick={() => {
+            localStorage.setItem("bl4-prefer-desktop", "1");
+            window.location.href = "/";
+          }}
+        >
+          Switch to Desktop Site
+        </button>
+      </div>
+
       <div className="mobile-card" style={{ textAlign: "center", color: "var(--color-text-muted)", fontSize: 12 }}>
         <p>bl4editor.com — Mobile Edition</p>
       </div>
