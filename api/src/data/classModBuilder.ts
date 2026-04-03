@@ -111,7 +111,7 @@ export function getClassModBuilderData(): ClassModBuilderData {
     if (row.partType !== "Name") continue;
     const { typeId, partId } = parseCode(row.code);
     if (!partId) continue;
-    const className = row.character || CLASS_ID_TO_NAME[typeId] || "";
+    const className = row.character || row.manufacturer || CLASS_ID_TO_NAME[typeId] || "";
     if (!className) continue;
     const classId = CLASS_IDS[className];
     if (!classId) continue;
@@ -129,11 +129,11 @@ export function getClassModBuilderData(): ClassModBuilderData {
     if (row.partType !== "Skill") continue;
     const { partId } = parseCode(row.code);
     if (!partId) continue;
-    const className = row.character || "";
+    const className = row.character || row.manufacturer || "";
     if (!className) continue;
     const classId = CLASS_IDS[className];
     if (!classId) continue;
-    const skillName = trim(row.effect || row.description) || trim(row.partName || row.name).split(" - ").pop() || "";
+    const skillName = trim(row.effect || row.description || row.partName || row.name).split(" - ").pop()?.trim() || "";
     if (!skillName) continue;
     const groupKey = `${classId}|${skillName}`;
     if (!skillGroups.has(groupKey)) {
