@@ -95,14 +95,26 @@ export default function RepkitBuilder() {
   const mfgOpts = useMemo<PickerOption[]>(() => data?.mfgs.map((m) => ({ value: String(m.id), label: m.name })) ?? [], [data]);
   const rarityOpts = useMemo<PickerOption[]>(() => (data && mfgId != null ? (data.raritiesByMfg[mfgId] ?? []) : []).map((r) => ({ value: r.label, label: r.label })), [data, mfgId]);
   const prefixOpts = useMemo(() => expandOpts(
-    (data?.prefix ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Prefix"), [data, expandOpts]);
+    (data?.prefix ?? []).map((p) => {
+      const desc = p.description && p.description !== p.stat ? `, ${p.description}` : "";
+      return { value: String(p.partId), label: `${p.partId} - ${p.stat}${desc}` };
+    }), "Prefix"), [data, expandOpts]);
   const fwOpts = useMemo(() => expandOpts(
-    (data?.firmware ?? []).map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` })), "Firmware"), [data, expandOpts]);
+    (data?.firmware ?? []).map((f) => {
+      const desc = f.description && f.description !== f.stat ? `, ${f.description}` : "";
+      return { value: String(f.partId), label: `${f.partId} - ${f.stat}${desc}` };
+    }), "Firmware"), [data, expandOpts]);
   const resOpts = useMemo(() => expandOpts(
-    (data?.resistance ?? []).map((r) => ({ value: String(r.partId), label: `${r.partId} - ${r.stat}` })), "Resistance"), [data, expandOpts]);
+    (data?.resistance ?? []).map((r) => {
+      const desc = r.description && r.description !== r.stat ? `, ${r.description}` : "";
+      return { value: String(r.partId), label: `${r.partId} - ${r.stat}${desc}` };
+    }), "Resistance"), [data, expandOpts]);
   const legOpts = useMemo<PickerOption[]>(() => (data?.legendaryPerks ?? []).map((l) => ({ value: `${l.mfgId}:${l.partId}`, label: `${l.mfgName}: ${l.stat}` })), [data]);
   const uniOpts = useMemo(() => expandOpts(
-    (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, expandOpts]);
+    (data?.universalPerks ?? []).map((p) => {
+      const desc = p.description && p.description !== p.stat ? `, ${p.description}` : "";
+      return { value: String(p.partId), label: `${p.partId} - ${p.stat}${desc}` };
+    }), "Perk"), [data, expandOpts]);
 
   useEffect(() => {
     if (!data || mfgId == null) return;

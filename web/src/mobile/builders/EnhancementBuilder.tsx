@@ -88,9 +88,15 @@ export default function EnhancementBuilder() {
     mfg ? mfg.perks.map((p) => ({ value: String(p.code), label: `[${p.code}] ${p.name}${p.description ? ` - ${p.description}` : ""}` })) : [],
     "Perk"), [mfg, expandOpts]);
   const statOpts = useMemo(() => expandOpts(
-    (data?.secondary247 ?? []).map((s) => ({ value: String(s.code), label: `${s.code} - ${s.name}` })), "Stat"), [data, expandOpts]);
+    (data?.secondary247 ?? []).map((s) => {
+      const desc = s.description ? `, ${s.description}` : "";
+      return { value: String(s.code), label: `${s.code} - ${s.name}${desc}` };
+    }), "Stat"), [data, expandOpts]);
   const fwOpts = useMemo(() => expandOpts(
-    (data?.firmware247 ?? []).map((f) => ({ value: String(f.code), label: `${f.code} - ${f.name}` })), "Firmware"), [data, expandOpts]);
+    (data?.firmware247 ?? []).map((f) => {
+      const desc = f.description ? `, ${f.description}` : "";
+      return { value: String(f.code), label: `${f.code} - ${f.name}${desc}` };
+    }), "Firmware"), [data, expandOpts]);
 
   useEffect(() => {
     if (!data || !mfg) return;

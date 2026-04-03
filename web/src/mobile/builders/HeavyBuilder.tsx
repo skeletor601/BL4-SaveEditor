@@ -81,19 +81,38 @@ export default function HeavyBuilder() {
 
   const mfgOpts = useMemo<PickerOption[]>(() => data?.mfgs.map((m) => ({ value: String(m.id), label: m.name })) ?? [], [data]);
   const rarityOpts = useMemo<PickerOption[]>(() => (data && mfgId != null ? (data.raritiesByMfg[mfgId] ?? []) : []).map((r) => ({ value: r.label, label: r.label })), [data, mfgId]);
-  const barrelOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- None --" }, ...(data?.barrel ?? []).map((b) => ({ value: String(b.partId), label: `${b.partId} - ${b.stat}` }))], [data]);
-  const elemOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- None --" }, ...(data?.element ?? []).map((e) => ({ value: String(e.partId), label: `${e.partId} - ${e.stat}` }))], [data]);
+  const barrelOpts = useMemo<PickerOption[]>(() => {
+    const barrels = (data?.barrel ?? []).filter((b) => !b.mfgId || b.mfgId === mfgId || allParts);
+    return [{ value: "", label: "-- None --" }, ...barrels.map((b) => {
+      const desc = b.description && b.description !== b.stat ? `, ${b.description}` : "";
+      const mfgLabel = allParts && b.mfgId && b.mfgId !== mfgId ? " (other mfg)" : "";
+      return { value: String(b.partId), label: `${b.partId} - ${b.stat}${desc}${mfgLabel}` };
+    })];
+  }, [data, mfgId, allParts]);
+  const elemOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- None --" }, ...(data?.element ?? []).map((e) => {
+    const desc = e.description && e.description !== e.stat ? `, ${e.description}` : "";
+    return { value: String(e.partId), label: `${e.partId} - ${e.stat}${desc}` };
+  })], [data]);
   const fwOpts = useMemo(() => expandOpts(
-    (data?.firmware ?? []).map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` })), "Firmware"), [data, expandOpts]);
+    (data?.firmware ?? []).map((f) => {
+      const desc = f.description && f.description !== f.stat ? `, ${f.description}` : "";
+      return { value: String(f.partId), label: `${f.partId} - ${f.stat}${desc}` };
+    }), "Firmware"), [data, expandOpts]);
   const baOpts = useMemo(() => expandOpts(
-    (data?.barrelAccPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Barrel Accessory"), [data, expandOpts]);
+    (data?.barrelAccPerks ?? []).map((p) => {
+      const desc = p.description && p.description !== p.stat ? `, ${p.description}` : "";
+      return { value: String(p.partId), label: `${p.partId} - ${p.stat}${desc}` };
+    }), "Barrel Accessory"), [data, expandOpts]);
   const boOpts = useMemo(() => expandOpts(
-    (data?.bodyAccPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Body Accessory"), [data, expandOpts]);
+    (data?.bodyAccPerks ?? []).map((p) => {
+      const desc = p.description && p.description !== p.stat ? `, ${p.description}` : "";
+      return { value: String(p.partId), label: `${p.partId} - ${p.stat}${desc}` };
+    }), "Body Accessory"), [data, expandOpts]);
 
   useEffect(() => {
     if (!data || mfgId == null) return;
     if (!rarity && !barrel && !element && fwParts.parts.length === 0 && barrelAcc.parts.length === 0 && bodyAcc.parts.length === 0) { setCode(""); return; }
-    const header = `${mfgId}, 0, 1, ${level}| 2, ${244}||`;
+    const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
     const r = (data.raritiesByMfg[mfgId] ?? []).find((x) => x.label === rarity);
