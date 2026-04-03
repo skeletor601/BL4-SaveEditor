@@ -113,6 +113,14 @@ const host = process.env.HOST || "0.0.0.0";
 
 try {
   await fastify.listen({ port, host });
+
+  // Self-ping keepalive: prevent Render Starter from spinning down the instance.
+  // Pings /api/health every 10 minutes to keep the process alive.
+  const KEEPALIVE_INTERVAL = 10 * 60 * 1000; // 10 minutes
+  setInterval(() => {
+    fetch(`http://localhost:${port}/api/health`).catch(() => {});
+  }, KEEPALIVE_INTERVAL);
+  fastify.log.info(`Keepalive ping every ${KEEPALIVE_INTERVAL / 60000}m`);
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);
