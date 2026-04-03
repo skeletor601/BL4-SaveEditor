@@ -2,7 +2,9 @@
  * Shared mobile builder components and utilities.
  * Reused across all 7 builders to keep them DRY.
  */
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { fetchApi } from "@/lib/apiClient";
+import { getSkinImageUrl } from "@/lib/skinImage";
 import { showToast } from "../components/Toast";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -46,16 +48,13 @@ export function NumberField({ label, value, onChange, min, max }: {
 }) {
   const [text, setText] = useState(String(value));
 
-  // Sync if parent changes value externally
-  const displayed = text === "" ? "" : text;
-
   return (
     <div style={{ flex: 1 }}>
       <div className="mobile-label">{label}</div>
       <input
         type="number"
         className="mobile-input"
-        value={displayed}
+        value={text}
         min={min}
         max={max}
         onChange={(e) => setText(e.target.value)}
@@ -69,6 +68,40 @@ export function NumberField({ label, value, onChange, min, max }: {
   );
 }
 
+// ── Builder toggles bar (Show Info + All Parts) ──────────────────────────────
+
+export function BuilderToggles({ showInfo, setShowInfo, allParts, setAllParts }: {
+  showInfo: boolean;
+  setShowInfo: (v: boolean) => void;
+  allParts: boolean;
+  setAllParts: (v: boolean) => void;
+}) {
+  const pill = (active: boolean) => ({
+    padding: "6px 14px",
+    borderRadius: 20,
+    border: `1px solid ${active ? "var(--color-accent)" : "var(--color-panel-border)"}`,
+    background: active ? "var(--color-accent-dim)" : "transparent",
+    color: active ? "var(--color-accent)" : "var(--color-text-muted)",
+    fontSize: 12,
+    fontWeight: 700 as const,
+    cursor: "pointer",
+    touchAction: "manipulation" as const,
+    WebkitTapHighlightColor: "transparent",
+    minHeight: 36,
+  });
+
+  return (
+    <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+      <button type="button" style={pill(showInfo)} onClick={() => setShowInfo(!showInfo)}>
+        {showInfo ? "✓ " : ""}Show Info
+      </button>
+      <button type="button" style={pill(allParts)} onClick={() => setAllParts(!allParts)}>
+        {allParts ? "✓ " : ""}All Parts
+      </button>
+    </div>
+  );
+}
+
 // ── Part checklist (collapsible multi-select with qty) ────────────────────────
 
 export function PartChecklist({
@@ -77,12 +110,14 @@ export function PartChecklist({
   selected,
   onToggle,
   onQtyChange,
+  showInfo,
 }: {
   label: string;
   options: PickerOption[];
   selected: SelectedPart[];
   onToggle: (id: string, label: string) => void;
   onQtyChange: (id: string, qty: number) => void;
+  showInfo?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const selectedIds = new Set(selected.map((s) => s.id));
@@ -127,16 +162,30 @@ export function PartChecklist({
           {options.map((opt) => {
             const isSelected = selectedIds.has(opt.value);
             const sel = selected.find((s) => s.id === opt.value);
+            // Parse label: "42 - +Damage, some description"
+            const stripped = opt.label.replace(/^\d+\s*[-–]\s*/, "").trim() || opt.label;
+            const dashIdx = stripped.indexOf(" - ");
+            const mainText = dashIdx > 0 ? stripped.substring(0, dashIdx) : stripped;
+            const descText = dashIdx > 0 ? stripped.substring(dashIdx + 3) : "";
+
             return (
-              <div key={opt.value} className="mobile-check-row">
+              <div key={opt.value} className="mobile-check-row" style={{ flexWrap: showInfo ? "wrap" : undefined }}>
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => onToggle(opt.value, opt.label)}
                 />
-                <span className="part-name">{opt.label}</span>
-                {isSelected && (
-                  <QtyInput value={sel?.qty ?? 1} onChange={(n) => onQtyChange(opt.value, n)} />
+                <span className="part-name">
+                  <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", marginRight: 6, opacity: 0.7 }}>
+                    {opt.value.includes(":") ? opt.value : opt.value.match(/^\d+/) ? opt.value.match(/^\d+/)![0] : ""}
+                  </span>
+                  {mainText}
+                </span>
+                {isSelected && <QtyInput value={sel?.qty ?? 1} onChange={(n) => onQtyChange(opt.value, n)} />}
+                {showInfo && descText && (
+                  <div style={{ width: "100%", paddingLeft: 32, fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.3, marginTop: 2 }}>
+                    {descText}
+                  </div>
                 )}
               </div>
             );
@@ -168,27 +217,195 @@ function QtyInput({ value, onChange }: { value: number; onChange: (n: number) =>
   );
 }
 
-// ── Code output panel ─────────────────────────────────────────────────────────
+// ── Skin selector with preview ────────────────────────────────────────────────
+
+export function SkinSelector({ skins, value, onChange }: {
+  skins: { label: string; value: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const imageUrl = getSkinImageUrl(value || null);
+
+  useEffect(() => { setImgError(false); }, [value]);
+
+  const opts: PickerOption[] = [{ value: "", label: "-- No Skin --" }, ...skins.map((s) => ({ value: s.value, label: s.label }))];
+  const selectedLabel = skins.find((s) => s.value === value)?.label ?? "";
+
+  return (
+    <div className="mobile-field">
+      <div className="mobile-label">Skin</div>
+      {/* Preview */}
+      {value && imageUrl && !imgError && (
+        <div style={{ marginBottom: 8, borderRadius: 10, overflow: "hidden", border: "1px solid var(--color-panel-border)", background: "rgba(0,0,0,0.3)" }}>
+          <img
+            src={imageUrl}
+            alt={selectedLabel}
+            style={{ width: "100%", height: "auto", display: "block", maxHeight: 160, objectFit: "contain" }}
+            onError={() => setImgError(true)}
+          />
+          <div style={{ padding: "6px 10px", fontSize: 11, color: "var(--color-text-muted)", textAlign: "center" }}>{selectedLabel}</div>
+        </div>
+      )}
+      {/* Picker button using MobileSelect pattern inline */}
+      <SkinPickerButton opts={opts} value={value} onChange={onChange} />
+    </div>
+  );
+}
+
+function SkinPickerButton({ opts, value, onChange }: { opts: PickerOption[]; value: string; onChange: (v: string) => void }) {
+  // Reuse MobileSelect inline to avoid circular import
+  const [open, setOpen] = useState(false);
+  const selectedLabel = opts.find((o) => o.value === value)?.label ?? "-- No Skin --";
+
+  return (
+    <>
+      <button type="button" className="mobile-select-btn" onClick={() => setOpen(true)}>
+        <span style={{ opacity: value ? 1 : 0.5 }}>{selectedLabel}</span>
+        <span className="chevron">▾</span>
+      </button>
+      {open && (
+        <div className="mobile-picker-overlay" onClick={() => setOpen(false)}>
+          <div className="mobile-picker-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-picker-header">
+              <h3>Select Skin</h3>
+              <button type="button" onClick={() => setOpen(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Done</button>
+            </div>
+            <div className="mobile-picker-list">
+              {opts.map((opt) => (
+                <button key={opt.value} type="button" className={`mobile-picker-item ${opt.value === value ? "selected" : ""}`} onClick={() => { onChange(opt.value); setOpen(false); }}>
+                  <span className="mobile-picker-radio" />
+                  <span>{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── Code output panel with Base85 encode/decode ──────────────────────────────
 
 export function CodeOutput({ code, onClear }: { code: string; onClear: () => void }) {
+  const [base85, setBase85] = useState("");
+  const [encoding, setEncoding] = useState(false);
+
+  // Auto-encode to Base85 when code changes
+  useEffect(() => {
+    if (!code) { setBase85(""); return; }
+    let cancelled = false;
+    setEncoding(true);
+    fetchApi("save/encode-serial", {
+      method: "POST",
+      body: JSON.stringify({ decoded_string: code.split(/\r?\n/)[0]?.trim() ?? "" }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return;
+        if (d?.success && typeof d?.serial === "string") setBase85(d.serial);
+        else setBase85("");
+        setEncoding(false);
+      })
+      .catch(() => { if (!cancelled) { setBase85(""); setEncoding(false); } });
+    return () => { cancelled = true; };
+  }, [code]);
+
   if (!code) return null;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code).then(() => showToast("Copied!")).catch(() => showToast("Copy failed"));
+  const copyDecoded = () => {
+    navigator.clipboard.writeText(code).then(() => showToast("Decoded copied!")).catch(() => showToast("Copy failed"));
+  };
+  const copyBase85 = () => {
+    if (!base85) return;
+    navigator.clipboard.writeText(base85).then(() => showToast("Base85 copied!")).catch(() => showToast("Copy failed"));
   };
 
   return (
     <div className="mobile-card">
-      <div className="mobile-label">Generated Code</div>
-      <textarea className="mobile-textarea" value={code} readOnly rows={4} style={{ marginBottom: 10 }} />
+      {/* Decoded */}
+      <div className="mobile-label">Decoded String</div>
+      <textarea className="mobile-textarea" value={code} readOnly rows={3} style={{ marginBottom: 8 }} />
+      <button type="button" className="mobile-btn" onClick={copyDecoded} style={{ marginBottom: 14 }}>
+        Copy Decoded
+      </button>
+
+      {/* Base85 */}
+      <div className="mobile-label">
+        Serialized Base85
+        {encoding && <span style={{ fontSize: 10, color: "var(--color-text-muted)", fontWeight: 400 }}>Encoding…</span>}
+      </div>
+      <textarea
+        className="mobile-textarea"
+        value={base85}
+        readOnly
+        rows={2}
+        style={{ marginBottom: 8 }}
+        placeholder={encoding ? "Encoding…" : "Generate a code first"}
+      />
       <div style={{ display: "flex", gap: 10 }}>
-        <button type="button" className="mobile-btn" onClick={handleCopy} style={{ flex: 2 }}>
-          Copy to Clipboard
+        <button type="button" className="mobile-btn" onClick={copyBase85} style={{ flex: 2 }} disabled={!base85}>
+          Copy Base85
         </button>
         <button type="button" className="mobile-btn danger" onClick={onClear} style={{ flex: 1 }}>
           Clear
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Decode Box (paste Base85, get decoded) ────────────────────────────────────
+
+export function DecodeBox() {
+  const [input, setInput] = useState("");
+  const [decoded, setDecoded] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleDecode = useCallback(async () => {
+    const serial = input.trim();
+    if (!serial) return;
+    setLoading(true);
+    try {
+      const res = await fetchApi("save/decode-serial", {
+        method: "POST",
+        body: JSON.stringify({ serial }),
+      });
+      const d = await res.json();
+      if (d?.success && typeof d?.decoded === "string") setDecoded(d.decoded);
+      else setDecoded("Decode failed");
+    } catch {
+      setDecoded("Decode error");
+    }
+    setLoading(false);
+  }, [input]);
+
+  return (
+    <div className="mobile-card">
+      <div className="mobile-label">Paste Base85 to Decode</div>
+      <textarea
+        className="mobile-textarea"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        rows={2}
+        placeholder="@U..."
+        style={{ marginBottom: 8 }}
+      />
+      <button type="button" className="mobile-btn" onClick={handleDecode} disabled={loading} style={{ marginBottom: 8 }}>
+        {loading ? "Decoding…" : "Decode"}
+      </button>
+      {decoded && (
+        <>
+          <div className="mobile-label">Decoded Result</div>
+          <textarea className="mobile-textarea" value={decoded} readOnly rows={3} style={{ marginBottom: 8 }} />
+          <button type="button" className="mobile-btn" onClick={() => {
+            navigator.clipboard.writeText(decoded).then(() => showToast("Copied!")).catch(() => showToast("Copy failed"));
+          }}>
+            Copy Decoded
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -1,27 +1,16 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
-import { showToast } from "../components/Toast";
+import { fetchApi } from "@/lib/apiClient";
+import {
+  type SelectedPart, usePartList, NumberField, PartChecklist, CodeOutput,
+  DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+} from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
-// ── Types (mirrors API shape) ─────────────────────────────────────────────────
-
-interface GrenadeBuilderPart {
-  partId: number;
-  stat: string;
-  description?: string;
-}
-
-interface GrenadeBuilderLegendaryPart extends GrenadeBuilderPart {
-  mfgId: number;
-  mfgName: string;
-}
-
-interface GrenadeBuilderRarity {
-  id: number;
-  label: string;
-}
-
+interface GrenadeBuilderPart { partId: number; stat: string; description?: string; }
+interface GrenadeBuilderLegendaryPart extends GrenadeBuilderPart { mfgId: number; mfgName: string; }
+interface GrenadeBuilderRarity { id: number; label: string; }
 interface GrenadeBuilderData {
   mfgs: { id: number; name: string }[];
   raritiesByMfg: Record<number, GrenadeBuilderRarity[]>;
@@ -32,423 +21,146 @@ interface GrenadeBuilderData {
   mfgPerks: Record<number, GrenadeBuilderPart[]>;
 }
 
-// ── Part selection state ──────────────────────────────────────────────────────
-
-interface SelectedPart {
-  id: string; // "partId" or "mfgId:partId"
-  label: string;
-  qty: number;
+interface UniversalPartRow {
+  code: string; label: string; effect?: string; partType?: string;
+  category?: string; manufacturer?: string;
 }
 
 const GRENADE_TYPE_ID = 245;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function partIdFromLabel(label: string): string | null {
-  const m = label.match(/^(\d+)/);
-  return m ? m[1] : null;
-}
-
 function buildDecodedString(
-  mfgId: number,
-  level: number,
-  seed: number,
-  rarity: string,
-  legendaries: SelectedPart[],
-  elements: SelectedPart[],
-  firmware: SelectedPart[],
-  mfgPerks: SelectedPart[],
-  universalPerks: SelectedPart[],
-  skinValue: string,
+  mfgId: number, level: number, seed: number, rarity: string,
+  legendaries: SelectedPart[], elements: SelectedPart[], firmware: SelectedPart[],
+  mfgPerks: SelectedPart[], universalPerks: SelectedPart[], skinValue: string,
   data: GrenadeBuilderData,
 ): string {
   const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
   const parts: string[] = [];
-
-  // Rarity
   const rarities = data.raritiesByMfg[mfgId] ?? [];
   const rarityEntry = rarities.find((r) => r.label === rarity);
   if (rarityEntry) parts.push(`{${rarityEntry.id}}`);
 
-  // Legendaries (may be cross-mfg)
   const otherMfg: Record<number, number[]> = {};
   for (const leg of legendaries) {
     if (leg.id.includes(":")) {
       const [m, p] = leg.id.split(":");
-      const legMfg = parseInt(m, 10);
-      const legPart = parseInt(p, 10);
+      const legMfg = parseInt(m, 10), legPart = parseInt(p, 10);
       if (!Number.isFinite(legMfg) || !Number.isFinite(legPart)) continue;
-      if (legMfg === mfgId) {
-        for (let i = 0; i < leg.qty; i++) parts.push(`{${legPart}}`);
-      } else {
-        if (!otherMfg[legMfg]) otherMfg[legMfg] = [];
-        for (let i = 0; i < leg.qty; i++) otherMfg[legMfg].push(legPart);
-      }
+      if (legMfg === mfgId) { for (let i = 0; i < leg.qty; i++) parts.push(`{${legPart}}`); }
+      else { if (!otherMfg[legMfg]) otherMfg[legMfg] = []; for (let i = 0; i < leg.qty; i++) otherMfg[legMfg].push(legPart); }
     }
   }
   for (const [m, ids] of Object.entries(otherMfg)) {
     const sorted = [...ids].sort((a, b) => a - b);
-    if (sorted.length === 1) parts.push(`{${m}:${sorted[0]}}`);
-    else parts.push(`{${m}:[${sorted.join(" ")}]}`);
+    parts.push(sorted.length === 1 ? `{${m}:${sorted[0]}}` : `{${m}:[${sorted.join(" ")}]}`);
   }
+  for (const p of mfgPerks) { const pid = partIdFromLabel(p.id); if (pid) for (let i = 0; i < p.qty; i++) parts.push(`{${pid}}`); }
 
-  // Mfg Perks
-  for (const p of mfgPerks) {
-    const pid = partIdFromLabel(p.id);
-    if (!pid) continue;
-    for (let i = 0; i < p.qty; i++) parts.push(`{${pid}}`);
-  }
+  const s245: number[] = [];
+  const add = (id: string, qty: number) => { const n = parseInt(id, 10); if (Number.isFinite(n)) for (let i = 0; i < qty; i++) s245.push(n); };
+  for (const e of elements) add(e.id, e.qty);
+  for (const f of firmware) add(f.id, f.qty);
+  for (const u of universalPerks) add(u.id, u.qty);
+  if (s245.length === 1) parts.push(`{${GRENADE_TYPE_ID}:${s245[0]}}`);
+  else if (s245.length > 1) { const sorted = [...s245].sort((a, b) => a - b); parts.push(`{${GRENADE_TYPE_ID}:[${sorted.join(" ")}]}`); }
 
-  // Type 245 grouped: Element + Firmware + Universal Perks
-  const secondary245: number[] = [];
-  const addTo245 = (id: string, qty: number) => {
-    const pid = parseInt(id, 10);
-    if (!Number.isFinite(pid)) return;
-    for (let i = 0; i < qty; i++) secondary245.push(pid);
-  };
-  for (const e of elements) addTo245(e.id, e.qty);
-  for (const f of firmware) addTo245(f.id, f.qty);
-  for (const u of universalPerks) addTo245(u.id, u.qty);
-
-  if (secondary245.length === 1) {
-    parts.push(`{${GRENADE_TYPE_ID}:${secondary245[0]}}`);
-  } else if (secondary245.length > 1) {
-    const sorted = [...secondary245].sort((a, b) => a - b);
-    parts.push(`{${GRENADE_TYPE_ID}:[${sorted.join(" ")}]}`);
-  }
-
-  let decoded = `${header} ${parts.join(" ")} |`;
-  if (skinValue.trim()) {
-    const safe = skinValue.trim().replace(/"/g, '\\"');
-    decoded = decoded.trim().replace(/\|\s*$/, `| "c", "${safe}" |`);
-  }
-  return decoded;
+  return applySkin(`${header} ${parts.join(" ")} |`, skinValue);
 }
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function GrenadeBuilder() {
   const { data, loading, error } = useMobileBuilderData<GrenadeBuilderData>("accessories/grenade/builder-data");
-
   const [mfgId, setMfgId] = useState<number | null>(null);
   const [level, setLevel] = useState(50);
-  const [levelText, setLevelText] = useState("50");
   const [seed, setSeed] = useState(1);
-  const [seedText, setSeedText] = useState("1");
   const [rarity, setRarity] = useState("");
-  const [selectedLegendaries, setSelectedLegendaries] = useState<SelectedPart[]>([]);
-  const [selectedElements, setSelectedElements] = useState<SelectedPart[]>([]);
-  const [selectedFirmware, setSelectedFirmware] = useState<SelectedPart[]>([]);
-  const [selectedMfgPerks, setSelectedMfgPerks] = useState<SelectedPart[]>([]);
-  const [selectedUniversalPerks, setSelectedUniversalPerks] = useState<SelectedPart[]>([]);
   const [skinValue, setSkinValue] = useState("");
-  const [generatedCode, setGeneratedCode] = useState("");
+  const [code, setCode] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+  const [allParts, setAllParts] = useState(false);
+  const [skins, setSkins] = useState<{ label: string; value: string }[]>([]);
+  const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
 
-  // Auto-select first mfg
-  if (data && mfgId == null && data.mfgs.length > 0) {
-    setMfgId(data.mfgs[0].id);
-  }
+  const legends = usePartList();
+  const elements = usePartList();
+  const fw = usePartList();
+  const mfgPerks = usePartList();
+  const uniPerks = usePartList();
 
-  // ── Picker options ────────────────────────────────────────────────────────
+  if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
-  const mfgOptions = useMemo<PickerOption[]>(() => {
-    if (!data) return [];
-    return data.mfgs.map((m) => ({ value: String(m.id), label: m.name }));
-  }, [data]);
-
-  const rarityOptions = useMemo<PickerOption[]>(() => {
-    if (!data || mfgId == null) return [];
-    return (data.raritiesByMfg[mfgId] ?? []).map((r) => ({ value: r.label, label: r.label }));
-  }, [data, mfgId]);
-
-  const elementOptions = useMemo<PickerOption[]>(() => {
-    if (!data) return [];
-    return data.element.map((e) => ({ value: String(e.partId), label: `${e.partId} - ${e.stat}` }));
-  }, [data]);
-
-  const firmwareOptions = useMemo<PickerOption[]>(() => {
-    if (!data) return [];
-    return data.firmware.map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` }));
-  }, [data]);
-
-  const legendaryOptions = useMemo<PickerOption[]>(() => {
-    if (!data) return [];
-    return data.legendaryPerks.map((l) => ({
-      value: `${l.mfgId}:${l.partId}`,
-      label: `${l.mfgName}: ${l.stat}`,
-    }));
-  }, [data]);
-
-  const mfgPerkOptions = useMemo<PickerOption[]>(() => {
-    if (!data || mfgId == null) return [];
-    return (data.mfgPerks[mfgId] ?? []).map((p) => ({
-      value: String(p.partId),
-      label: `${p.partId} - ${p.stat}`,
-    }));
-  }, [data, mfgId]);
-
-  const universalPerkOptions = useMemo<PickerOption[]>(() => {
-    if (!data) return [];
-    return data.universalPerks.map((p) => ({
-      value: String(p.partId),
-      label: `${p.partId} - ${p.stat}`,
-    }));
-  }, [data]);
-
-  // ── Toggle helpers ────────────────────────────────────────────────────────
-
-  const togglePart = useCallback((_list: SelectedPart[], setList: React.Dispatch<React.SetStateAction<SelectedPart[]>>, id: string, label: string) => {
-    setList((prev) => {
-      const exists = prev.find((p) => p.id === id);
-      if (exists) return prev.filter((p) => p.id !== id);
-      return [...prev, { id, label, qty: 1 }];
-    });
+  // Load skins + universal parts for "All Parts" mode
+  useEffect(() => {
+    fetchApi("weapon-gen/data").then((r) => r.json()).then((d) => { if (d?.skins) setSkins(d.skins); }).catch(() => {});
+    fetchApi("parts/data").then((r) => r.json()).then((d) => {
+      if (d?.items) setUniversalParts(d.items.map((i: Record<string, unknown>) => ({
+        code: String(i.code ?? ""), label: String(i.partName ?? i.itemType ?? ""),
+        effect: String(i.effect ?? ""), partType: String(i.partType ?? ""),
+        category: String(i.category ?? ""), manufacturer: String(i.manufacturer ?? ""),
+      })));
+    }).catch(() => {});
   }, []);
 
-  const setPartQty = useCallback((setList: React.Dispatch<React.SetStateAction<SelectedPart[]>>, id: string, qty: number) => {
-    setList((prev) => prev.map((p) => p.id === id ? { ...p, qty: Math.max(1, Math.min(99, qty)) } : p));
-  }, []);
+  const expandOpts = useCallback((base: PickerOption[], partType: string): PickerOption[] => {
+    if (!allParts) return base;
+    const seen = new Set(base.map((o) => o.value));
+    const extra: PickerOption[] = [];
+    const ptLower = partType.toLowerCase();
+    for (const up of universalParts) {
+      if (!up.code || (up.category || "").toLowerCase() !== "grenade") continue;
+      if ((up.partType || "").toLowerCase() !== ptLower) continue;
+      const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+      if (!m) continue;
+      const pid = m[2];
+      if (seen.has(pid)) continue;
+      seen.add(pid);
+      const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
+      extra.push({ value: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}` });
+    }
+    return [...base, ...extra];
+  }, [allParts, universalParts]);
 
-  // ── Generate code ─────────────────────────────────────────────────────────
+  const mfgOptions = useMemo<PickerOption[]>(() => data?.mfgs.map((m) => ({ value: String(m.id), label: m.name })) ?? [], [data]);
+  const rarityOptions = useMemo<PickerOption[]>(() => (data && mfgId != null ? (data.raritiesByMfg[mfgId] ?? []) : []).map((r) => ({ value: r.label, label: r.label })), [data, mfgId]);
+  const elementOptions = useMemo(() => expandOpts(
+    (data?.element ?? []).map((e) => ({ value: String(e.partId), label: `${e.partId} - ${e.stat}` })), "Element"), [data, expandOpts]);
+  const firmwareOptions = useMemo(() => expandOpts(
+    (data?.firmware ?? []).map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` })), "Firmware"), [data, expandOpts]);
+  const legendaryOptions = useMemo<PickerOption[]>(() => (data?.legendaryPerks ?? []).map((l) => ({ value: `${l.mfgId}:${l.partId}`, label: `${l.mfgName}: ${l.stat}` })), [data]);
+  const mfgPerkOptions = useMemo(() => expandOpts(
+    (data && mfgId != null ? (data.mfgPerks[mfgId] ?? []) : []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, mfgId, expandOpts]);
+  const universalPerkOptions = useMemo(() => expandOpts(
+    (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, expandOpts]);
 
   const handleGenerate = useCallback(() => {
     if (!data || mfgId == null) return;
-    const code = buildDecodedString(
-      mfgId, level, seed, rarity,
-      selectedLegendaries, selectedElements, selectedFirmware,
-      selectedMfgPerks, selectedUniversalPerks, skinValue, data,
-    );
-    setGeneratedCode(code);
-  }, [data, mfgId, level, seed, rarity, selectedLegendaries, selectedElements, selectedFirmware, selectedMfgPerks, selectedUniversalPerks, skinValue]);
-
-  const handleCopy = useCallback(() => {
-    if (!generatedCode) return;
-    navigator.clipboard.writeText(generatedCode).then(() => showToast("Copied!")).catch(() => showToast("Copy failed"));
-  }, [generatedCode]);
+    setCode(buildDecodedString(mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, data));
+  }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue]);
 
   const handleClear = useCallback(() => {
-    setRarity("");
-    setSelectedLegendaries([]);
-    setSelectedElements([]);
-    setSelectedFirmware([]);
-    setSelectedMfgPerks([]);
-    setSelectedUniversalPerks([]);
-    setSkinValue("");
-    setGeneratedCode("");
-  }, []);
-
-  // ── Render ────────────────────────────────────────────────────────────────
+    setRarity(""); setSkinValue(""); legends.clear(); elements.clear(); fw.clear(); mfgPerks.clear(); uniPerks.clear(); setCode("");
+  }, [legends, elements, fw, mfgPerks, uniPerks]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading grenade data…</div>;
-  if (error) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error: {error}</div>;
-  if (!data) return null;
+  if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error: {error}</div>;
 
   return (
     <div>
-      {/* Manufacturer */}
-      <MobileSelect
-        label="Manufacturer"
-        required
-        options={mfgOptions}
-        value={mfgId != null ? String(mfgId) : ""}
-        onChange={(v) => { setMfgId(Number(v)); setRarity(""); setSelectedMfgPerks([]); }}
-      />
-
-      {/* Level + Seed */}
+      <BuilderToggles showInfo={showInfo} setShowInfo={setShowInfo} allParts={allParts} setAllParts={setAllParts} />
+      <MobileSelect label="Manufacturer" required options={mfgOptions} value={mfgId != null ? String(mfgId) : ""} onChange={(v) => { setMfgId(Number(v)); setRarity(""); mfgPerks.clear(); }} />
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-        <div style={{ flex: 1 }}>
-          <div className="mobile-label">Level</div>
-          <input
-            type="number"
-            className="mobile-input"
-            value={levelText}
-            min={1}
-            max={100}
-            onChange={(e) => setLevelText(e.target.value)}
-            onBlur={() => { const n = Math.max(1, Math.min(100, Number(levelText) || 1)); setLevel(n); setLevelText(String(n)); }}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div className="mobile-label">Seed</div>
-          <input
-            type="number"
-            className="mobile-input"
-            value={seedText}
-            min={1}
-            max={4096}
-            onChange={(e) => setSeedText(e.target.value)}
-            onBlur={() => { const n = Math.max(1, Math.min(4096, Number(seedText) || 1)); setSeed(n); setSeedText(String(n)); }}
-          />
-        </div>
+        <NumberField label="Level" value={level} onChange={setLevel} min={1} max={100} />
+        <NumberField label="Seed" value={seed} onChange={setSeed} min={1} max={4096} />
       </div>
-
-      {/* Rarity */}
-      <MobileSelect
-        label="Rarity"
-        required
-        options={rarityOptions}
-        value={rarity}
-        onChange={setRarity}
-        placeholder="Select rarity…"
-      />
-
-      {/* Element */}
-      <PartChecklist
-        label="Element"
-        options={elementOptions}
-        selected={selectedElements}
-        onToggle={(id, label) => togglePart(selectedElements, setSelectedElements, id, label)}
-        onQtyChange={(id, qty) => setPartQty(setSelectedElements, id, qty)}
-      />
-
-      {/* Firmware */}
-      <PartChecklist
-        label="Firmware"
-        options={firmwareOptions}
-        selected={selectedFirmware}
-        onToggle={(id, label) => togglePart(selectedFirmware, setSelectedFirmware, id, label)}
-        onQtyChange={(id, qty) => setPartQty(setSelectedFirmware, id, qty)}
-      />
-
-      {/* Legendary Perks */}
-      <PartChecklist
-        label="Legendary Perks"
-        options={legendaryOptions}
-        selected={selectedLegendaries}
-        onToggle={(id, label) => togglePart(selectedLegendaries, setSelectedLegendaries, id, label)}
-        onQtyChange={(id, qty) => setPartQty(setSelectedLegendaries, id, qty)}
-      />
-
-      {/* Mfg Perks */}
-      {mfgPerkOptions.length > 0 && (
-        <PartChecklist
-          label="Manufacturer Perks"
-          options={mfgPerkOptions}
-          selected={selectedMfgPerks}
-          onToggle={(id, label) => togglePart(selectedMfgPerks, setSelectedMfgPerks, id, label)}
-          onQtyChange={(id, qty) => setPartQty(setSelectedMfgPerks, id, qty)}
-        />
-      )}
-
-      {/* Universal Perks */}
-      <PartChecklist
-        label="Universal Perks"
-        options={universalPerkOptions}
-        selected={selectedUniversalPerks}
-        onToggle={(id, label) => togglePart(selectedUniversalPerks, setSelectedUniversalPerks, id, label)}
-        onQtyChange={(id, qty) => setPartQty(setSelectedUniversalPerks, id, qty)}
-      />
-
-      {/* Actions */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-        <button type="button" className="mobile-btn primary" onClick={handleGenerate} style={{ flex: 2 }}>
-          Generate Code
-        </button>
-        <button type="button" className="mobile-btn danger" onClick={handleClear} style={{ flex: 1 }}>
-          Clear
-        </button>
-      </div>
-
-      {/* Output */}
-      {generatedCode && (
-        <div className="mobile-card">
-          <div className="mobile-label">Generated Code</div>
-          <textarea
-            className="mobile-textarea"
-            value={generatedCode}
-            readOnly
-            rows={4}
-            style={{ marginBottom: 10 }}
-          />
-          <button type="button" className="mobile-btn" onClick={handleCopy}>
-            Copy to Clipboard
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Part Checklist sub-component ──────────────────────────────────────────────
-
-function PartChecklist({
-  label,
-  options,
-  selected,
-  onToggle,
-  onQtyChange,
-}: {
-  label: string;
-  options: PickerOption[];
-  selected: SelectedPart[];
-  onToggle: (id: string, label: string) => void;
-  onQtyChange: (id: string, qty: number) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const selectedIds = new Set(selected.map((s) => s.id));
-
-  return (
-    <div className="mobile-card" style={{ padding: 0, overflow: "hidden" }}>
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "12px 14px",
-          background: "none",
-          border: "none",
-          color: "var(--color-accent)",
-          fontSize: 12,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-          cursor: "pointer",
-          touchAction: "manipulation",
-          minHeight: 44,
-        }}
-      >
-        <span>
-          {label}
-          {selected.length > 0 && (
-            <span style={{ marginLeft: 8, fontSize: 10, background: "var(--color-accent-dim)", padding: "2px 8px", borderRadius: 10, color: "var(--color-accent)" }}>
-              {selected.length}
-            </span>
-          )}
-        </span>
-        <span style={{ fontSize: 10, color: "var(--color-text-muted)" }}>{expanded ? "▲" : "▼"}</span>
-      </button>
-
-      {expanded && (
-        <div style={{ padding: "0 14px 10px", maxHeight: 300, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-          {options.map((opt) => {
-            const isSelected = selectedIds.has(opt.value);
-            const sel = selected.find((s) => s.id === opt.value);
-            return (
-              <div key={opt.value} className="mobile-check-row">
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => onToggle(opt.value, opt.label)}
-                />
-                <span className="part-name">{opt.label}</span>
-                {isSelected && (
-                  <input
-                    type="number"
-                    className="qty-input"
-                    value={sel?.qty ?? 1}
-                    min={1}
-                    max={99}
-                    onChange={(e) => onQtyChange(opt.value, Number(e.target.value) || 1)}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <MobileSelect label="Rarity" required options={rarityOptions} value={rarity} onChange={setRarity} placeholder="Select rarity…" />
+      <PartChecklist label="Element" options={elementOptions} selected={elements.parts} onToggle={elements.toggle} onQtyChange={elements.setQty} showInfo={showInfo} />
+      <PartChecklist label="Firmware" options={firmwareOptions} selected={fw.parts} onToggle={fw.toggle} onQtyChange={fw.setQty} showInfo={showInfo} />
+      <PartChecklist label="Legendary Perks" options={legendaryOptions} selected={legends.parts} onToggle={legends.toggle} onQtyChange={legends.setQty} showInfo={showInfo} />
+      {mfgPerkOptions.length > 0 && <PartChecklist label="Manufacturer Perks" options={mfgPerkOptions} selected={mfgPerks.parts} onToggle={mfgPerks.toggle} onQtyChange={mfgPerks.setQty} showInfo={showInfo} />}
+      <PartChecklist label="Universal Perks" options={universalPerkOptions} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
+      <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+      <GenerateBar onGenerate={handleGenerate} onClear={handleClear} />
+      <CodeOutput code={code} onClear={() => setCode("")} />
+      <DecodeBox />
     </div>
   );
 }

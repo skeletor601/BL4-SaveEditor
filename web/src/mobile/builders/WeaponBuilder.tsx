@@ -1,7 +1,11 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
-import { usePartList, NumberField, PartChecklist, CodeOutput, GenerateBar, partIdFromLabel, applySkin } from "./shared";
+import { fetchApi } from "@/lib/apiClient";
+import {
+  usePartList, NumberField, PartChecklist, CodeOutput,
+  DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+} from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
 interface MfgTypeIdEntry { manufacturer: string; weaponType: string; mfgWtId: string; }
@@ -15,6 +19,11 @@ interface WeaponGenData {
   pearlByMfgTypeId: Record<string, { partId: string; description: string; effect?: string }[]>;
   elemental: { partId: string; stat: string }[];
   skins: { label: string; value: string }[];
+}
+
+interface UniversalPartRow {
+  code: string; label: string; effect?: string; partType?: string;
+  category?: string; manufacturer?: string;
 }
 
 const PART_TYPES = [
@@ -32,6 +41,9 @@ export default function WeaponBuilder() {
   const [rarity, setRarity] = useState("");
   const [skin, setSkin] = useState("");
   const [code, setCode] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+  const [allParts, setAllParts] = useState(false);
+  const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
 
   // Part lists for each category
   const legendary = usePartList();
@@ -53,6 +65,36 @@ export default function WeaponBuilder() {
   const scopeAcc = usePartList(); partLists["Scope Accessory"] = scopeAcc;
   const underbarrel = usePartList(); partLists["Underbarrel"] = underbarrel;
   const underbarrelAcc = usePartList(); partLists["Underbarrel Accessory"] = underbarrelAcc;
+
+  // Load universal parts for "All Parts" mode
+  useEffect(() => {
+    fetchApi("parts/data").then((r) => r.json()).then((d) => {
+      if (d?.items) setUniversalParts(d.items.map((i: Record<string, unknown>) => ({
+        code: String(i.code ?? ""), label: String(i.partName ?? i.itemType ?? ""),
+        effect: String(i.effect ?? ""), partType: String(i.partType ?? ""),
+        category: String(i.category ?? ""), manufacturer: String(i.manufacturer ?? ""),
+      })));
+    }).catch(() => {});
+  }, []);
+
+  const expandOpts = useCallback((base: PickerOption[], partType: string): PickerOption[] => {
+    if (!allParts) return base;
+    const seen = new Set(base.map((o) => o.value));
+    const extra: PickerOption[] = [];
+    const ptLower = partType.toLowerCase();
+    for (const up of universalParts) {
+      if (!up.code || (up.category || "").toLowerCase() !== "weapon") continue;
+      if ((up.partType || "").toLowerCase() !== ptLower) continue;
+      const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+      if (!m) continue;
+      const pid = m[2];
+      if (seen.has(pid)) continue;
+      seen.add(pid);
+      const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
+      extra.push({ value: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}` });
+    }
+    return [...base, ...extra];
+  }, [allParts, universalParts]);
 
   // Derived
   const mfgWtId = useMemo(() => {
@@ -87,14 +129,16 @@ export default function WeaponBuilder() {
     return (data.pearlByMfgTypeId[mfgWtId] ?? []).map((p) => ({ value: p.partId, label: `${p.partId} - ${p.description}` }));
   }, [data, mfgWtId]);
 
-  const elemOpts = useMemo<PickerOption[]>(() => (data?.elemental ?? []).map((e) => ({ value: e.partId, label: `${e.partId} - ${e.stat}` })), [data]);
-
-  const skinOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- No Skin --" }, ...(data?.skins ?? []).map((s) => ({ value: s.value, label: s.label }))], [data]);
+  const elemOpts = useMemo(() => expandOpts(
+    (data?.elemental ?? []).map((e) => ({ value: e.partId, label: `${e.partId} - ${e.stat}` })), "Element"), [data, expandOpts]);
 
   const getPartOpts = useCallback((partType: string): PickerOption[] => {
     if (!data || !mfgWtId) return [];
-    return (data.partsByMfgTypeId[mfgWtId]?.[partType] ?? []).map((p) => ({ value: p.partId, label: p.label }));
-  }, [data, mfgWtId]);
+    return expandOpts(
+      (data.partsByMfgTypeId[mfgWtId]?.[partType] ?? []).map((p) => ({ value: p.partId, label: p.label })),
+      partType
+    );
+  }, [data, mfgWtId, expandOpts]);
 
   // Auto-init
   if (data && !manufacturer && data.manufacturers.length) {
@@ -154,6 +198,7 @@ export default function WeaponBuilder() {
 
   return (
     <div>
+      <BuilderToggles showInfo={showInfo} setShowInfo={setShowInfo} allParts={allParts} setAllParts={setAllParts} />
       <MobileSelect label="Manufacturer" required options={mfgOpts} value={manufacturer} onChange={(v) => {
         setManufacturer(v);
         const firstType = data.mfgWtIdList.find((e) => e.manufacturer === v);
@@ -168,26 +213,27 @@ export default function WeaponBuilder() {
       <MobileSelect label="Rarity" required options={rarityOpts} value={rarity} onChange={setRarity} placeholder="Select rarity…" />
 
       {rarity === "Legendary" && legendaryOpts.length > 0 && (
-        <PartChecklist label="Legendary Type" options={legendaryOpts} selected={legendary.parts} onToggle={legendary.toggle} onQtyChange={legendary.setQty} />
+        <PartChecklist label="Legendary Type" options={legendaryOpts} selected={legendary.parts} onToggle={legendary.toggle} onQtyChange={legendary.setQty} showInfo={showInfo} />
       )}
       {rarity === "Pearl" && pearlOpts.length > 0 && (
-        <PartChecklist label="Pearl Type" options={pearlOpts} selected={pearl.parts} onToggle={pearl.toggle} onQtyChange={pearl.setQty} />
+        <PartChecklist label="Pearl Type" options={pearlOpts} selected={pearl.parts} onToggle={pearl.toggle} onQtyChange={pearl.setQty} showInfo={showInfo} />
       )}
 
-      <PartChecklist label="Element 1" options={elemOpts} selected={element1.parts} onToggle={element1.toggle} onQtyChange={element1.setQty} />
-      <PartChecklist label="Element 2" options={elemOpts} selected={element2.parts} onToggle={element2.toggle} onQtyChange={element2.setQty} />
+      <PartChecklist label="Element 1" options={elemOpts} selected={element1.parts} onToggle={element1.toggle} onQtyChange={element1.setQty} showInfo={showInfo} />
+      <PartChecklist label="Element 2" options={elemOpts} selected={element2.parts} onToggle={element2.toggle} onQtyChange={element2.setQty} showInfo={showInfo} />
 
       {PART_TYPES.map((pt) => {
         const opts = getPartOpts(pt);
         if (opts.length === 0) return null;
         const list = partLists[pt];
         if (!list) return null;
-        return <PartChecklist key={pt} label={pt} options={opts} selected={list.parts} onToggle={list.toggle} onQtyChange={list.setQty} />;
+        return <PartChecklist key={pt} label={pt} options={opts} selected={list.parts} onToggle={list.toggle} onQtyChange={list.setQty} showInfo={showInfo} />;
       })}
 
-      <MobileSelect label="Skin" options={skinOpts} value={skin} onChange={setSkin} />
+      <SkinSelector skins={data.skins ?? []} value={skin} onChange={setSkin} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
+      <DecodeBox />
     </div>
   );
 }

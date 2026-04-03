@@ -1,7 +1,12 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
-import { usePartList, NumberField, PartChecklist, CodeOutput, GenerateBar, buildLegendaryTokens, buildTypeToken, applySkin } from "./shared";
+import { fetchApi } from "@/lib/apiClient";
+import {
+  usePartList, NumberField, PartChecklist, CodeOutput,
+  DecodeBox, GenerateBar, BuilderToggles, SkinSelector,
+  buildLegendaryTokens, buildTypeToken, applySkin
+} from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
 interface RepkitBuilderPart { partId: number; stat: string; description?: string; }
@@ -18,6 +23,11 @@ interface RepkitBuilderData {
   modelsByMfg: Record<number, number | null>;
 }
 
+interface UniversalPartRow {
+  code: string; label: string; effect?: string; partType?: string;
+  category?: string; manufacturer?: string;
+}
+
 const REPKIT_TYPE_ID = 243;
 const COMBUSTION_IDS = new Set([24, 50, 29, 44]);
 const RADIATION_IDS = new Set([23, 47, 28, 43]);
@@ -32,9 +42,14 @@ export default function RepkitBuilder() {
   const [level, setLevel] = useState(50);
   const [seed, setSeed] = useState(1);
   const [rarity, setRarity] = useState("");
-  const [prefix, setPrefix] = useState("");
-  const [firmware, setFirmware] = useState("");
+  const prefixParts = usePartList();
+  const fwParts = usePartList();
+  const [skinValue, setSkinValue] = useState("");
   const [code, setCode] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+  const [allParts, setAllParts] = useState(false);
+  const [skins, setSkins] = useState<{ label: string; value: string }[]>([]);
+  const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
 
   const legends = usePartList();
   const resistance = usePartList();
@@ -42,13 +57,48 @@ export default function RepkitBuilder() {
 
   if (data && mfgId == null && data.mfgs.length) setMfgId(data.mfgs[0].id);
 
+  // Load skins + universal parts for "All Parts" mode
+  useEffect(() => {
+    fetchApi("weapon-gen/data").then((r) => r.json()).then((d) => { if (d?.skins) setSkins(d.skins); }).catch(() => {});
+    fetchApi("parts/data").then((r) => r.json()).then((d) => {
+      if (d?.items) setUniversalParts(d.items.map((i: Record<string, unknown>) => ({
+        code: String(i.code ?? ""), label: String(i.partName ?? i.itemType ?? ""),
+        effect: String(i.effect ?? ""), partType: String(i.partType ?? ""),
+        category: String(i.category ?? ""), manufacturer: String(i.manufacturer ?? ""),
+      })));
+    }).catch(() => {});
+  }, []);
+
+  const expandOpts = useCallback((base: PickerOption[], partType: string): PickerOption[] => {
+    if (!allParts) return base;
+    const seen = new Set(base.map((o) => o.value));
+    const extra: PickerOption[] = [];
+    const ptLower = partType.toLowerCase();
+    for (const up of universalParts) {
+      if (!up.code || (up.category || "").toLowerCase() !== "repkit") continue;
+      if ((up.partType || "").toLowerCase() !== ptLower) continue;
+      const m = up.code.match(/^\{(\d+):(\d+)\}$/);
+      if (!m) continue;
+      const pid = m[2];
+      if (seen.has(pid)) continue;
+      seen.add(pid);
+      const mfgLabel = up.manufacturer ? ` (${up.manufacturer})` : "";
+      extra.push({ value: pid, label: `${pid} - ${up.label || up.effect || pid}${mfgLabel}` });
+    }
+    return [...base, ...extra];
+  }, [allParts, universalParts]);
+
   const mfgOpts = useMemo<PickerOption[]>(() => data?.mfgs.map((m) => ({ value: String(m.id), label: m.name })) ?? [], [data]);
   const rarityOpts = useMemo<PickerOption[]>(() => (data && mfgId != null ? (data.raritiesByMfg[mfgId] ?? []) : []).map((r) => ({ value: r.label, label: r.label })), [data, mfgId]);
-  const prefixOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- None --" }, ...(data?.prefix ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` }))], [data]);
-  const fwOpts = useMemo<PickerOption[]>(() => [{ value: "", label: "-- None --" }, ...(data?.firmware ?? []).map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` }))], [data]);
-  const resOpts = useMemo<PickerOption[]>(() => (data?.resistance ?? []).map((r) => ({ value: String(r.partId), label: `${r.partId} - ${r.stat}` })), [data]);
+  const prefixOpts = useMemo(() => expandOpts(
+    (data?.prefix ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Prefix"), [data, expandOpts]);
+  const fwOpts = useMemo(() => expandOpts(
+    (data?.firmware ?? []).map((f) => ({ value: String(f.partId), label: `${f.partId} - ${f.stat}` })), "Firmware"), [data, expandOpts]);
+  const resOpts = useMemo(() => expandOpts(
+    (data?.resistance ?? []).map((r) => ({ value: String(r.partId), label: `${r.partId} - ${r.stat}` })), "Resistance"), [data, expandOpts]);
   const legOpts = useMemo<PickerOption[]>(() => (data?.legendaryPerks ?? []).map((l) => ({ value: `${l.mfgId}:${l.partId}`, label: `${l.mfgName}: ${l.stat}` })), [data]);
-  const uniOpts = useMemo<PickerOption[]>(() => (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), [data]);
+  const uniOpts = useMemo(() => expandOpts(
+    (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, expandOpts]);
 
   const generate = useCallback(() => {
     if (!data || mfgId == null) return;
@@ -64,8 +114,8 @@ export default function RepkitBuilder() {
     buildLegendaryTokens(legends.parts, mfgId, p);
 
     const s243: number[] = [];
-    if (prefix) { const n = parseInt(prefix, 10); if (Number.isFinite(n)) s243.push(n); }
-    if (firmware) { const n = parseInt(firmware, 10); if (Number.isFinite(n)) s243.push(n); }
+    for (const px of prefixParts.parts) { const n = parseInt(px.id, 10); if (Number.isFinite(n)) for (let i = 0; i < px.qty; i++) s243.push(n); }
+    for (const fw of fwParts.parts) { const n = parseInt(fw.id, 10); if (Number.isFinite(n)) for (let i = 0; i < fw.qty; i++) s243.push(n); }
 
     let hasComb = false, hasRad = false, hasCor = false, hasShk = false, hasCry = false;
     for (const res of resistance.parts) {
@@ -89,31 +139,34 @@ export default function RepkitBuilder() {
     const t = buildTypeToken(REPKIT_TYPE_ID, s243);
     if (t) p.push(t);
 
-    setCode(applySkin(`${header} ${p.join(" ")} |`, ""));
-  }, [data, mfgId, level, seed, rarity, prefix, firmware, legends.parts, resistance.parts, uniPerks.parts]);
+    setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
+  }, [data, mfgId, level, seed, rarity, prefixParts.parts, fwParts.parts, legends.parts, resistance.parts, uniPerks.parts, skinValue]);
 
   const clearAll = useCallback(() => {
-    setRarity(""); setPrefix(""); setFirmware(""); legends.clear(); resistance.clear(); uniPerks.clear(); setCode("");
-  }, [legends, resistance, uniPerks]);
+    setRarity(""); prefixParts.clear(); fwParts.clear(); setSkinValue(""); legends.clear(); resistance.clear(); uniPerks.clear(); setCode("");
+  }, [prefixParts, fwParts, legends, resistance, uniPerks]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading repkit data…</div>;
   if (error || !data) return <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "#ef4444" }}>Error loading data</div>;
 
   return (
     <div>
+      <BuilderToggles showInfo={showInfo} setShowInfo={setShowInfo} allParts={allParts} setAllParts={setAllParts} />
       <MobileSelect label="Manufacturer" required options={mfgOpts} value={mfgId != null ? String(mfgId) : ""} onChange={(v) => { setMfgId(Number(v)); setRarity(""); }} />
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
         <NumberField label="Level" value={level} onChange={setLevel} min={1} max={100} />
         <NumberField label="Seed" value={seed} onChange={setSeed} min={1} max={4096} />
       </div>
       <MobileSelect label="Rarity" required options={rarityOpts} value={rarity} onChange={setRarity} placeholder="Select rarity…" />
-      <MobileSelect label="Prefix" options={prefixOpts} value={prefix} onChange={setPrefix} />
-      <MobileSelect label="Firmware" options={fwOpts} value={firmware} onChange={setFirmware} />
-      <PartChecklist label="Resistance" options={resOpts} selected={resistance.parts} onToggle={resistance.toggle} onQtyChange={resistance.setQty} />
-      <PartChecklist label="Legendary Perks" options={legOpts} selected={legends.parts} onToggle={legends.toggle} onQtyChange={legends.setQty} />
-      <PartChecklist label="Universal Perks" options={uniOpts} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} />
+      <PartChecklist label="Prefix" options={prefixOpts} selected={prefixParts.parts} onToggle={prefixParts.toggle} onQtyChange={prefixParts.setQty} showInfo={showInfo} />
+      <PartChecklist label="Firmware" options={fwOpts} selected={fwParts.parts} onToggle={fwParts.toggle} onQtyChange={fwParts.setQty} showInfo={showInfo} />
+      <PartChecklist label="Resistance" options={resOpts} selected={resistance.parts} onToggle={resistance.toggle} onQtyChange={resistance.setQty} showInfo={showInfo} />
+      <PartChecklist label="Legendary Perks" options={legOpts} selected={legends.parts} onToggle={legends.toggle} onQtyChange={legends.setQty} showInfo={showInfo} />
+      <PartChecklist label="Universal Perks" options={uniOpts} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
+      <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
+      <DecodeBox />
     </div>
   );
 }
