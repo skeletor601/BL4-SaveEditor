@@ -1,9 +1,12 @@
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import BackpackView from "@/pages/inventory/BackpackView";
 import PartsTranslatorView from "@/pages/inventory/PartsTranslatorView";
 import DecoderView from "@/pages/inventory/DecoderView";
 import CodeSpawnView from "@/pages/inventory/CodeSpawnView";
 import CodeValidator from "@/components/inventory/CodeValidator";
+
+const LootLobbyView = lazy(() => import("@/pages/inventory/LootLobbyView"));
 
 const branches = [
   { path: "decoder", label: "Decoder" },
@@ -11,6 +14,7 @@ const branches = [
   { path: "backpack", label: "Backpack" },
   { path: "code-spawn", label: "Add in Bulk" },
   { path: "validator", label: "Code Inspector" },
+  { path: "loot-lobby", label: "Loot Lobby" },
 ];
 
 export default function InventoryPage() {
@@ -44,6 +48,7 @@ export default function InventoryPage() {
           <Route path="backpack" element={<BackpackView />} />
           <Route path="code-spawn" element={<CodeSpawnView />} />
           <Route path="validator" element={<CodeValidator />} />
+          <Route path="loot-lobby" element={<Suspense fallback={<p className="text-sm text-[var(--color-text-muted)]">Loading...</p>}><LootLobbyView /></Suspense>} />
           <Route path="*" element={<Navigate to="/inventory/decoder" replace />} />
         </Routes>
       </div>

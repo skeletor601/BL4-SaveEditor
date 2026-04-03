@@ -2,11 +2,16 @@
  * Shared mobile builder components and utilities.
  * Reused across all 7 builders to keep them DRY.
  */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { fetchApi } from "@/lib/apiClient";
 import { getSkinImageUrl } from "@/lib/skinImage";
 import { showToast } from "../components/Toast";
 import type { PickerOption } from "../components/MobilePicker";
+
+const InjectorSetupModalRaw = lazy(() => import("@/components/InjectorSetupModal"));
+function InjectorSetupModalLazy(props: { mode: "inject" | "loot-lobby"; onClose: () => void; onReady?: () => void }) {
+  return <Suspense fallback={null}><InjectorSetupModalRaw {...props} /></Suspense>;
+}
 
 // ── Selected part state ───────────────────────────────────────────────────────
 
@@ -326,6 +331,9 @@ function SkinPickerButton({ opts, value, onChange }: { opts: PickerOption[]; val
 export function CodeOutput({ code, onClear }: { code: string; onClear: () => void }) {
   const [base85, setBase85] = useState("");
   const [encoding, setEncoding] = useState(false);
+  const [injecting, setInjecting] = useState(false);
+  const [injectResult, setInjectResult] = useState<string | null>(null);
+  const [showSetup, setShowSetup] = useState(false);
 
   // Auto-encode to Base85 when code changes
   useEffect(() => {
@@ -387,6 +395,51 @@ export function CodeOutput({ code, onClear }: { code: string; onClear: () => voi
           Clear
         </button>
       </div>
+
+      {/* Inject to Game — requires BL4_Injector.exe running locally */}
+      {base85 && (
+        <button
+          type="button"
+          disabled={injecting || !base85}
+          onClick={async () => {
+            // Check if setup is done
+            if (localStorage.getItem("bl4-injector-setup-done") !== "1") {
+              setShowSetup(true);
+              return;
+            }
+            setInjecting(true);
+            setInjectResult(null);
+            try {
+              const { injectItem } = await import("@/lib/injectorBridge");
+              const resp = await injectItem(base85);
+              setInjectResult(resp.ok ? resp.message || "Injected!" : resp.error || "Failed");
+              if (resp.ok) showToast("Item injected to game!");
+              else showToast(resp.error || "Injection failed");
+            } catch {
+              setInjectResult("Bridge not running. Download & run BL4_Injector.exe");
+              showToast("Bridge not connected");
+            }
+            setInjecting(false);
+          }}
+          style={{
+            width: "100%", marginTop: 10, padding: "12px 14px", borderRadius: 10,
+            border: "1px solid #22c55e", background: "rgba(34,197,94,0.12)",
+            color: "#22c55e", fontSize: 13, fontWeight: 700,
+            cursor: injecting ? "wait" : "pointer",
+            touchAction: "manipulation", opacity: injecting ? 0.5 : 1,
+          }}
+        >
+          {injecting ? "Injecting..." : "Inject to Game"}
+        </button>
+      )}
+      {injectResult && (
+        <p style={{ fontSize: 11, color: injectResult.includes("!") ? "#4ade80" : "#f87171", marginTop: 6, textAlign: "center" }}>
+          {injectResult}
+        </p>
+      )}
+      {showSetup && (
+        <InjectorSetupModalLazy mode="inject" onClose={() => setShowSetup(false)} onReady={() => setShowSetup(false)} />
+      )}
     </div>
   );
 }

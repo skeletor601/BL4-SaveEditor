@@ -1046,7 +1046,7 @@ export default function BackpackView() {
           >
             <h3 className="text-[var(--color-accent)] font-medium mb-2">Change Gear Level</h3>
             <p className="text-sm text-[var(--color-text-muted)] mb-3">
-              Set all backpack items to this level (0–99):
+              Set all items (backpack + equipped) to this level (0–99):
             </p>
             <input
               type="number"

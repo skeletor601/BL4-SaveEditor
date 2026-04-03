@@ -6,6 +6,7 @@ import SearchPage from "./pages/SearchPage";
 import CommunityPage from "./pages/CommunityPage";
 import TranslatePage from "./pages/TranslatePage";
 import SettingsPage from "./pages/SettingsPage";
+import LootLobbyPage from "./pages/LootLobbyPage";
 import "./mobile.css";
 
 export default function MobileApp() {
@@ -18,6 +19,7 @@ export default function MobileApp() {
           <Route path="community" element={<CommunityPage />} />
           <Route path="translate" element={<TranslatePage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="loot-lobby" element={<LootLobbyPage />} />
           <Route path="*" element={<Navigate to="/mobile" replace />} />
         </Routes>
       </div>

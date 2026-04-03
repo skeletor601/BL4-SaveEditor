@@ -32,6 +32,7 @@ import SkinPreview from "@/components/weapon-toolbox/SkinPreview";
 import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
 import ClassModNameHoverCard, { type ClassModNameCardData } from "@/components/ClassModNameHoverCard";
+import InjectorSetupModal from "@/components/InjectorSetupModal";
 import { getClassModNameInfo } from "@/data/classModNameDescriptions";
 import PartDetailModal from "@/components/master-search/PartDetailModal";
 import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
@@ -4390,8 +4391,11 @@ export default function UnifiedItemBuilderPage() {
             ◈ Live codec (encode/decode API)
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">
-            {codecLoading ? "Converting…" : codecStatus}
+            {codecLoading ? "Converting…" : codecStatus === "__show_injector_setup__" ? "Setup required..." : codecStatus}
           </p>
+          {codecStatus === "__show_injector_setup__" && (
+            <InjectorSetupModal mode="inject" onClose={() => setCodecStatus("Ready.")} onReady={() => setCodecStatus("Setup complete! Click Inject to Game again.")} />
+          )}
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-1">
@@ -4455,6 +4459,34 @@ export default function UnifiedItemBuilderPage() {
             title="Reset current builder — clears selections and codes"
           >
             Reset
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              if (localStorage.getItem("bl4-injector-setup-done") !== "1") {
+                const { default: Modal } = await import("@/components/InjectorSetupModal");
+                // Show setup modal by setting state
+                setCodecStatus("__show_injector_setup__");
+                return;
+              }
+              let serial = liveBase85.split(/\r?\n/)[0]?.trim() ?? "";
+              if (!serial.startsWith("@U")) {
+                setCodecStatus("Generate a Base85 code first.");
+                return;
+              }
+              setCodecStatus("Injecting...");
+              try {
+                const { injectItem } = await import("@/lib/injectorBridge");
+                const resp = await injectItem(serial);
+                setCodecStatus(resp.ok ? "Injected to game!" : (resp.error ?? "Injection failed"));
+              } catch {
+                setCodecStatus("Bridge not running. Download & run BL4_Injector.exe");
+              }
+            }}
+            className="px-4 py-2 rounded-lg border border-green-500/40 text-green-400 hover:bg-green-500/10 hover:border-green-500/60 text-sm min-h-[44px] touch-manipulation"
+            title="Inject item into running Borderlands 4 — requires BL4_Injector running"
+          >
+            Inject to Game
           </button>
           <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
             <span>Flag</span>

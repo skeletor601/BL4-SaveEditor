@@ -3,14 +3,14 @@
  * Build & Edit Items as the centerpiece, sidebar nav, modern dark UI.
  */
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useTheme, THEMES, THEME_META } from "@/contexts/ThemeContext";
 import { getEggCount, discoverEgg } from "@/lib/easterEggs";
 import { fetchApi } from "@/lib/apiClient";
 import { CHANGE_LOG } from "@/data/changelog";
 
 // ── Tab definitions ──────────────────────────────────────────────────────────
-type TabId = "gear-lab" | "arsenal" | "command" | "vault" | "save-ops" | "workbench";
+type TabId = "gear-lab" | "arsenal" | "command" | "vault" | "save-ops" | "backpack";
 
 interface TabDef {
   id: TabId;
@@ -25,7 +25,7 @@ const TABS: TabDef[] = [
   { id: "arsenal",  label: "Parts Search",       sublabel: "6,100+ Parts Database", icon: "⌕" },
   { id: "save-ops", label: "Inventory Ops",      sublabel: "Characters & Backpack", icon: "◉" },
   { id: "vault",    label: "The Vault",      sublabel: "Community & Recipes",   icon: "◎" },
-  { id: "workbench", label: "Workbench",    sublabel: "Classic Item Editors",   icon: "⚒" },
+  { id: "backpack", label: "Backpack",       sublabel: "Inventory & Loot Lobby", icon: "▤" },
 ];
 
 // ── Quick stats (loaded from API) ────────────────────────────────────────────
@@ -279,7 +279,7 @@ export default function TestAppPage() {
           {activeTab === "arsenal" && <ArsenalTab />}
           {activeTab === "save-ops" && <SaveOpsTab />}
           {activeTab === "vault" && <VaultTab />}
-          {activeTab === "workbench" && <WorkbenchTab />}
+          {activeTab === "backpack" && <BackpackTab />}
         </div>
       </main>
     </div>
@@ -523,114 +523,9 @@ function VaultTab() {
   );
 }
 
-// ── Tab: Workbench (Legacy Editors) ────────────────────────────────────────────
-function WorkbenchTab() {
-  return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="rounded-xl border border-[var(--color-panel-border)] overflow-hidden"
-        style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
-        <div className="px-5 py-4 border-b border-[var(--color-panel-border)]">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-[var(--color-accent)]">Workbench</h3>
-            <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-[var(--color-text-muted)]/30 bg-white/5 text-[var(--color-text-muted)]">
-              Classic
-            </span>
-          </div>
-          <p className="text-xs text-[var(--color-text-muted)] mt-1">
-            The original standalone editors. Same tools, dedicated interface — for those who prefer the classic workflow.
-          </p>
-        </div>
-        <div className="p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <WorkbenchCard
-              to="/gear-forge"
-              title="Gear Forge"
-              desc="The original unified workbench — build + edit with live codec"
-              badge="All-in-One"
-              color="text-[var(--color-accent)] border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=editor&editorKind=editor"
-              title="Weapon Editor"
-              desc="Direct weapon part editing — pick every slot manually"
-              badge="Weapons"
-              color="text-red-400 border-red-500/30 bg-red-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=editor&editorKind=editor"
-              title="Item Editor"
-              desc="Edit any item type — shields, grenades, class mods, etc."
-              badge="All Items"
-              color="text-blue-400 border-blue-500/30 bg-blue-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=grenade"
-              title="Grenade Builder"
-              desc="Standalone grenade builder with perk ordering and recipes"
-              badge="Grenades"
-              color="text-orange-400 border-orange-500/30 bg-orange-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=shield"
-              title="Shield Builder"
-              desc="Shield builder with firmware, elements, and legendary perks"
-              badge="Shields"
-              color="text-cyan-400 border-cyan-500/30 bg-cyan-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=class-mod"
-              title="Class Mod Builder"
-              desc="Class mod builder with skills, names, and character perks"
-              badge="Class Mods"
-              color="text-green-400 border-green-500/30 bg-green-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=enhancement"
-              title="Enhancement Builder"
-              desc="Enhancement builder with manufacturer perks and stats"
-              badge="Enhancements"
-              color="text-yellow-400 border-yellow-500/30 bg-yellow-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=repkit"
-              title="Repkit Builder"
-              desc="Repair kit builder with manufacturer and universal perks"
-              badge="Repkits"
-              color="text-teal-400 border-teal-500/30 bg-teal-500/5"
-            />
-            <WorkbenchCard
-              to="/gear-forge?tab=builder&builderKind=heavy"
-              title="Heavy Builder"
-              desc="Heavy weapon builder with barrels and accessories"
-              badge="Heavies"
-              color="text-pink-400 border-pink-500/30 bg-pink-500/5"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center text-[10px] font-mono text-[var(--color-text-muted)]/40 select-none">
-        These editors predate the Build & Edit Items. They still work great — use whatever feels right.
-      </div>
-    </div>
-  );
-}
-
-function WorkbenchCard({ to, title, desc, badge, color }: { to: string; title: string; desc: string; badge: string; color: string }) {
-  return (
-    <Link
-      to={to}
-      className={`rounded-xl border p-4 hover:scale-[1.02] transition-all group ${color}`}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-bold">{title}</span>
-        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-current/30 bg-current/5 opacity-60 group-hover:opacity-100 transition-opacity">
-          {badge}
-        </span>
-      </div>
-      <p className="text-[10px] text-[var(--color-text-muted)]">{desc}</p>
-    </Link>
-  );
+// ── Tab: Backpack — renders the backpack view directly ─────────────────────────
+function BackpackTab() {
+  return <Navigate to="/inventory/backpack" replace />;
 }
 
 // ── Top Community Code spotlight ─────────────────────────────────────────────

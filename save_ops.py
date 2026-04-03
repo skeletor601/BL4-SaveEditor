@@ -47,8 +47,15 @@ def find_currency_paths(yaml_data: Dict[str, Any]) -> Dict[str, Optional[List[Un
 def _set_by_path(root: Any, toks: List[Union[str, int]], val: Any):
     cur = root
     for t in toks[:-1]:
-        cur = cur[t]
-    cur[toks[-1]] = val
+        if isinstance(cur, list) and isinstance(t, str) and t.isdigit():
+            cur = cur[int(t)]
+        else:
+            cur = cur[t]
+    last = toks[-1]
+    if isinstance(cur, list) and isinstance(last, str) and last.isdigit():
+        cur[int(last)] = val
+    else:
+        cur[last] = val
 
 # Main function to apply all character and currency changes
 def apply_character_and_currency_changes(data: Dict[str, Any], yaml_data: Dict[str, Any], current_paths: Dict[str, Any]) -> bool:
@@ -878,8 +885,9 @@ def set_backpack_item_levels(yaml_data: Dict[str, Any], target_level: int) -> Tu
     all_discovered_items = _walk_for_serials(yaml_data, [])
     inventory_items = []
     for path, item_data in all_discovered_items:
-        path_str = '/'.join(map(str, path))
-        if 'inventory' in path and ('backpack' in path_str or 'items' in path_str):
+        path_str = '/'.join(map(str, path)).lower()
+        # Include both backpack AND equipped items
+        if 'inventory' in path_str or 'backpack' in path_str or 'equipped' in path_str or 'items' in path_str:
             inventory_items.append((path, item_data))
 
     if not inventory_items:
