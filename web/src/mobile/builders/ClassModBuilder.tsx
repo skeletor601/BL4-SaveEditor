@@ -380,23 +380,26 @@ export default function ClassModBuilder() {
                     style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0, borderRadius: 4, border: "1px solid var(--color-panel-border)" }}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
-                  {/* Skill name (tappable for details) */}
+                  {/* Skill name + IDs (tappable for details) */}
                   <button
                     type="button"
                     onClick={() => setSkillPopup(skill.skillNameEN)}
                     style={{
                       flex: 1, background: "none", border: "none", padding: 0, cursor: "pointer",
                       textAlign: "left", touchAction: "manipulation",
+                    }}
+                  >
+                    <span style={{
                       fontSize: 13, fontWeight: 600,
                       color: skillColor ?? "var(--color-text)",
                       textDecoration: "underline",
                       textDecorationColor: "rgba(255,255,255,0.15)",
                       textUnderlineOffset: 2,
-                    }}
-                  >
-                    {skill.skillNameEN}
-                    <span style={{ display: "block", fontSize: 10, color: "var(--color-text-muted)", fontWeight: 400, textDecoration: "none", marginTop: 1 }}>
-                      Tap for details
+                    }}>
+                      {skill.skillNameEN}
+                    </span>
+                    <span style={{ display: "block", fontSize: 10, color: "var(--color-text-muted)", fontWeight: 400, marginTop: 2 }}>
+                      {`{${skill.skillIds.join(", ")}}`}
                     </span>
                   </button>
                   {/* Level controls: Min / - / input / + / Max */}
