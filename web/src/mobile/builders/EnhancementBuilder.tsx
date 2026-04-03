@@ -90,7 +90,7 @@ export default function EnhancementBuilder() {
   const perkOpts = useMemo(() => expandOpts(
     mfg ? mfg.perks
       .filter((p) => ENHANCEMENT_PERK_ORDER.includes(p.code) || ENHANCEMENT_PERK_ORDER.includes(p.index ?? -1))
-      .map((p) => ({ value: String(p.code), label: `[${p.code}] ${p.name}${p.description ? ` - ${p.description}` : ""}` })) : [],
+      .map((p) => ({ value: String(p.code), label: p.description ? `[${p.code}] ${p.description}, ${p.name}` : `[${p.code}] ${p.name}` })) : [],
     "Perk"), [mfg, expandOpts]);
 
   // Cross-manufacturer stacked perks (legendary perks from OTHER mfgs)
@@ -102,10 +102,11 @@ export default function EnhancementBuilder() {
       for (const p of om.perks || []) {
         const idx = p.index ?? p.code;
         if (!ENHANCEMENT_PERK_ORDER.includes(idx)) continue;
-        const desc = p.description ? ` - ${p.description}` : "";
+        const displayName = p.description || p.name;
+        const effectText = p.description ? `, ${p.name}` : "";
         opts.push({
           value: `${om.code}:${idx}`,
-          label: `${om.code}:${idx} - ${p.name} — ${name}${desc}`,
+          label: `${om.code}:${idx} - ${displayName} — ${name}${effectText}`,
         });
       }
     }
