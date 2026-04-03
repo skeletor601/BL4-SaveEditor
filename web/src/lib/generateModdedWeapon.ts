@@ -825,12 +825,23 @@ export function generateModdedWeapon(
     { name: "Hemorrhage",       code: "{16:87}",  visual: true },
     { name: "Fearstalker",      code: "{24:77}",  visual: true },
     { name: "DahlFather",       code: "{273:42}", visual: true },
+    { name: "Eigenburst",       code: "{11:81}",  visual: true },
+    { name: "Conflux",          code: "{25:81}",  visual: true },
+    { name: "Bubbles",          code: "{18:99}",  visual: true },
+    { name: "Shalashaska",      code: "{3:82}",   visual: true },
+    { name: "UnstableKor",      code: "{12:76}",  visual: true },
+    { name: "Doeshot",          code: "{9:99}",   visual: true },
+    { name: "BrokenWings",      code: "{21:80}",  visual: true },
+    { name: "Firework",         code: "{21:82}",  visual: true },
+    { name: "ArcTan",           code: "{12:78}",  visual: true },
+    { name: "Tankbuster",       code: "{23:22}",  visual: true },
+    { name: "Roulette",         code: "{4:84}",   visual: true },
   ];
   const FALLBACK_VISUAL_BARRELS = [...BASE_VISUAL_BARRELS, ...COWBELL_VISUAL_BARRELS];
   const visualOnly = (options.visualBarrelEntries ?? []).filter((e) => e.visual === true);
   const visualBarrelPool = visualOnly.length > 0 ? visualOnly : FALLBACK_VISUAL_BARRELS;
-  // 20% chance to roll a Cowbell DLC barrel
-  const useCowbell = Math.random() < 0.20;
+  // 33% chance to roll a Cowbell DLC barrel
+  const useCowbell = Math.random() < 0.33;
   const chosenVisualBarrel = isClaudeGun
     ? "{7:64}"
     : options.customMode
