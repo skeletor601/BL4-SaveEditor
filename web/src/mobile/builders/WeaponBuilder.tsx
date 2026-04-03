@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedWeapon } from "@/lib/generateModdedWeapon";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -350,7 +350,7 @@ export default function WeaponBuilder() {
         {modGenerating ? "Generating…" : "Generate Modded Weapon"}
       </button>
       <CodeOutput code={code} onClear={() => setCode("")} />
-      <DecodeBox />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }

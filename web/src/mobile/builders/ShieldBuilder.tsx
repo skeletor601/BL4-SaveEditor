@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  DecodeBox, GenerateBar, BuilderToggles, SkinSelector,
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -206,7 +206,7 @@ export default function ShieldBuilder() {
       )}
 
       <CodeOutput code={code} onClear={() => { setCode(""); setShieldStats(null); }} />
-      <DecodeBox />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }

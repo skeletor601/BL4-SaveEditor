@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  DecodeBox, GenerateBar, BuilderToggles, SkinSelector, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -134,7 +134,7 @@ export default function HeavyBuilder() {
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
       <CodeOutput code={code} onClear={() => setCode("")} />
-      <DecodeBox />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }

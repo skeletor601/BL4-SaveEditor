@@ -6,7 +6,7 @@ import { generateModdedGrenade, type GenerateModdedGrenadeResult } from "@/lib/g
 import type { GrenadeVisualRecipe } from "@/lib/generateModdedWeapon";
 import {
   type SelectedPart, usePartList, NumberField, PartChecklist, CodeOutput,
-  DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -232,7 +232,7 @@ export default function GrenadeBuilder() {
       )}
 
       <CodeOutput code={code} onClear={() => { setCode(""); setGrenadeStats(null); }} />
-      <DecodeBox />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }

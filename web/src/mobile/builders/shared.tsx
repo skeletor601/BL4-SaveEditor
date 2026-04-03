@@ -356,56 +356,105 @@ export function CodeOutput({ code, onClear }: { code: string; onClear: () => voi
   );
 }
 
-// ── Decode Box (paste Base85, get decoded) ────────────────────────────────────
+// ── Build Parts List (shows all parts in the generated code) ──────────────
 
-export function DecodeBox() {
-  const [input, setInput] = useState("");
-  const [decoded, setDecoded] = useState("");
-  const [loading, setLoading] = useState(false);
+interface ParsedBuildPart {
+  raw: string;
+  prefix?: number;
+  partId?: number;
+  qty: number;
+}
 
-  const handleDecode = useCallback(async () => {
-    const serial = input.trim();
-    if (!serial) return;
-    setLoading(true);
-    try {
-      const res = await fetchApi("save/decode-serial", {
-        method: "POST",
-        body: JSON.stringify({ serial }),
-      });
-      const d = await res.json();
-      if (d?.success && typeof d?.decoded === "string") setDecoded(d.decoded);
-      else setDecoded("Decode failed");
-    } catch {
-      setDecoded("Decode error");
+function parsePartsFromCode(code: string): ParsedBuildPart[] {
+  const first = code.split(/\r?\n/)[0]?.trim() ?? "";
+  const idx = first.indexOf("||");
+  if (idx === -1) return [];
+  const segment = first.slice(idx + 2).replace(/\|\s*$/, "").replace(/"c",\s*"[^"]*"\s*\|?\s*$/, "").trim();
+  const beforePipe = first.split("|")[0].trim();
+  const headerTypeId = parseInt(beforePipe.split(",")[0].trim(), 10) || null;
+
+  const out: ParsedBuildPart[] = [];
+  const regex = /\{(\d+)(?::(\d+|\[[\d\s]+\]))?\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(segment)) !== null) {
+    const raw = m[0];
+    const outer = Number(m[1]);
+    const inner = m[2];
+    if (!inner) {
+      out.push({ raw, prefix: headerTypeId ?? outer, partId: outer, qty: 1 });
+      continue;
     }
-    setLoading(false);
-  }, [input]);
+    if (inner.includes("[")) {
+      const subIds = inner.replace(/[\[\]]/g, "").trim().split(/\s+/).filter(Boolean).map(Number);
+      const countByPartId = new Map<number, number>();
+      for (const id of subIds) countByPartId.set(id, (countByPartId.get(id) ?? 0) + 1);
+      for (const [partId, qty] of countByPartId) {
+        out.push({ raw: `{${outer}:${partId}}`, prefix: outer, partId, qty });
+      }
+      continue;
+    }
+    out.push({ raw, prefix: outer, partId: Number(inner), qty: 1 });
+  }
+  return out;
+}
+
+export function BuildPartsList({ code, universalParts }: {
+  code: string;
+  universalParts: { code: string; label: string; partType?: string; rarity?: string }[];
+}) {
+  if (!code) return null;
+  const parts = parsePartsFromCode(code);
+  if (parts.length === 0) return null;
+
+  const nameMap = new Map<string, { label: string; partType?: string; rarity?: string }>();
+  for (const p of universalParts) {
+    if (p.code) nameMap.set(p.code, { label: p.label, partType: p.partType, rarity: p.rarity });
+  }
+
+  const rarityColor = (r?: string) => {
+    const rl = (r ?? "").toLowerCase();
+    if (rl === "pearl" || rl === "pearlescent") return "#38bdf8";
+    if (rl === "legendary") return "#fbbf24";
+    if (rl === "epic") return "#a78bfa";
+    if (rl === "rare") return "#60a5fa";
+    if (rl === "uncommon") return "#4ade80";
+    return "var(--color-text)";
+  };
 
   return (
     <div className="mobile-card">
-      <div className="mobile-label">Paste Base85 to Decode</div>
-      <textarea
-        className="mobile-textarea"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        rows={2}
-        placeholder="@U..."
-        style={{ marginBottom: 8 }}
-      />
-      <button type="button" className="mobile-btn" onClick={handleDecode} disabled={loading} style={{ marginBottom: 8 }}>
-        {loading ? "Decoding…" : "Decode"}
-      </button>
-      {decoded && (
-        <>
-          <div className="mobile-label">Decoded Result</div>
-          <textarea className="mobile-textarea" value={decoded} readOnly rows={3} style={{ marginBottom: 8 }} />
-          <button type="button" className="mobile-btn" onClick={() => {
-            navigator.clipboard.writeText(decoded).then(() => showToast("Copied!")).catch(() => showToast("Copy failed"));
-          }}>
-            Copy Decoded
-          </button>
-        </>
-      )}
+      <div className="mobile-label">Build Parts ({parts.length})</div>
+      <div style={{ maxHeight: 280, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+        {parts.map((part, i) => {
+          const codeStr = part.prefix != null && part.partId != null ? `{${part.prefix}:${part.partId}}` : part.raw;
+          const info = nameMap.get(codeStr);
+          const label = info?.label ?? codeStr;
+          return (
+            <div key={`${codeStr}-${i}`} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
+              fontSize: 12, minHeight: 32,
+            }}>
+              <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", opacity: 0.6, flexShrink: 0, minWidth: 52 }}>
+                {codeStr}
+              </span>
+              <span style={{ flex: 1, color: rarityColor(info?.rarity), minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {label}
+              </span>
+              {part.qty > 1 && (
+                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-accent)", background: "var(--color-accent-dim)", padding: "1px 6px", borderRadius: 8, flexShrink: 0 }}>
+                  x{part.qty}
+                </span>
+              )}
+              {info?.partType && (
+                <span style={{ fontSize: 9, color: "var(--color-text-muted)", background: "rgba(255,255,255,0.05)", padding: "2px 5px", borderRadius: 3, flexShrink: 0 }}>
+                  {info.partType}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

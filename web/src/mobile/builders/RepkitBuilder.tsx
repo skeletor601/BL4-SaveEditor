@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedRepkit, type RepkitStatEstimate } from "@/lib/generateModdedRepkit";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  DecodeBox, GenerateBar, BuilderToggles, SkinSelector,
+  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -196,7 +196,7 @@ export default function RepkitBuilder() {
         </div>
       )}
       <CodeOutput code={code} onClear={() => { setCode(""); setRepkitStats(null); }} />
-      <DecodeBox />
+      <BuildPartsList code={code} universalParts={universalParts} />
     </div>
   );
 }
