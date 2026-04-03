@@ -255,8 +255,41 @@ export default function WeaponBuilder() {
   }, [data, mfgWtId, rarity, legendary.parts, pearl.parts, element1, element2,
       body, bodyAcc, barrel, barrelAcc, mag, statMod, grip, foregrip, mfgPart, scope, scopeAcc, underbarrel, underbarrelAcc]);
 
-  const handleGenerateModded = useCallback(async () => {
-    if (!data || !mfgWtId) return;
+  const [showModdedModal, setShowModdedModal] = useState(false);
+  const [customModMfg, setCustomModMfg] = useState("");
+  const [customModWt, setCustomModWt] = useState("");
+  const [customModRarity, setCustomModRarity] = useState("");
+  const [customModLegPearl, setCustomModLegPearl] = useState("");
+
+  const customModMfgWtId = useMemo(() => {
+    if (!data || !customModMfg || !customModWt) return "";
+    return data.mfgWtIdList.find((e) => e.manufacturer === customModMfg && e.weaponType === customModWt)?.mfgWtId ?? "";
+  }, [data, customModMfg, customModWt]);
+
+  const customModWtOpts = useMemo(() => {
+    if (!data || !customModMfg) return [];
+    return [...new Set(data.mfgWtIdList.filter((e) => e.manufacturer === customModMfg).map((e) => e.weaponType))].sort().map((t) => ({ value: t, label: t }));
+  }, [data, customModMfg]);
+
+  const customModRarityOpts = useMemo(() => {
+    if (!data || !customModMfgWtId) return [];
+    const opts: PickerOption[] = [];
+    if ((data.legendaryByMfgTypeId[customModMfgWtId] ?? []).length) opts.push({ value: "Legendary", label: "Legendary" });
+    if ((data.pearlByMfgTypeId[customModMfgWtId] ?? []).length) opts.push({ value: "Pearl", label: "Pearl" });
+    return opts;
+  }, [data, customModMfgWtId]);
+
+  const customModLegPearlOpts = useMemo(() => {
+    if (!data || !customModMfgWtId || !customModRarity) return [];
+    if (customModRarity === "Legendary") return (data.legendaryByMfgTypeId[customModMfgWtId] ?? []).map((l) => ({ value: `${l.partId} - ${l.description}`, label: `${l.partId} - ${l.description}` }));
+    if (customModRarity === "Pearl") return (data.pearlByMfgTypeId[customModMfgWtId] ?? []).map((p) => ({ value: `${p.partId} - ${p.description}`, label: `${p.partId} - ${p.description}` }));
+    return [];
+  }, [data, customModMfgWtId, customModRarity]);
+
+  const handleGenerateModded = useCallback(async (custom?: { mfgWtId: string; rarity: string; legPearl: string }) => {
+    const targetMfgWtId = custom?.mfgWtId || mfgWtId;
+    if (!data || !targetMfgWtId) return;
+    setShowModdedModal(false);
     setModGenerating(true);
     try {
       const base = window.location.origin || "";
@@ -295,14 +328,29 @@ export default function WeaponBuilder() {
 
       // Build stock base via auto-fill (same as desktop)
       const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
-      const autoPrefix = Number(mfgWtId);
-      const partsByType = data.partsByMfgTypeId[mfgWtId];
+      const autoPrefix = Number(targetMfgWtId);
+      const partsByType = data.partsByMfgTypeId[targetMfgWtId];
       let stockBaseDecoded: string | undefined;
       if (partsByType) {
         const autoSel: Record<string, { label: string; qty: string }[]> = {};
-        const legendaryTypes = data.legendaryByMfgTypeId[mfgWtId] ?? [];
-        const pearlTypes = data.pearlByMfgTypeId[mfgWtId] ?? [];
-        if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
+        const legendaryTypes = data.legendaryByMfgTypeId[targetMfgWtId] ?? [];
+        const pearlTypes = data.pearlByMfgTypeId[targetMfgWtId] ?? [];
+
+        if (custom?.rarity) {
+          // Custom mode: use user's choices
+          autoSel["Rarity"] = [{ label: custom.rarity, qty: "1" }];
+          if (custom.rarity === "Legendary" && custom.legPearl) autoSel["Legendary Type"] = [{ label: custom.legPearl, qty: "1" }];
+          else if (custom.rarity === "Pearl" && custom.legPearl) autoSel["Pearl Type"] = [{ label: custom.legPearl, qty: "1" }];
+          // Match barrel to the legendary/pearl name
+          if (custom.legPearl) {
+            const weaponName = custom.legPearl.replace(/^\d+\s*[-–]\s*/, "").trim();
+            if (weaponName) {
+              const barrelOpts = (partsByType["Barrel"] ?? []).filter((o) => o.label && !/^none$/i.test(o.label));
+              const matched = barrelOpts.find((o) => o.label.toLowerCase().includes(weaponName.toLowerCase()));
+              if (matched) autoSel["Barrel"] = [{ label: matched.label, qty: "1" }];
+            }
+          }
+        } else if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
           autoSel["Rarity"] = [{ label: "Pearl", qty: "1" }];
           const pt = pick(pearlTypes);
           autoSel["Pearl Type"] = [{ label: `${pt.partId} - ${pt.description}`, qty: "1" }];
@@ -311,10 +359,11 @@ export default function WeaponBuilder() {
           const lt = pick(legendaryTypes);
           autoSel["Legendary Type"] = [{ label: `${lt.partId} - ${lt.description}`, qty: "1" }];
         } else {
-          const rarities = data.rarityByMfgTypeId[mfgWtId] ?? [];
+          const rarities = data.rarityByMfgTypeId[targetMfgWtId] ?? [];
           if (rarities.length) autoSel["Rarity"] = [{ label: rarities[rarities.length - 1].stat, qty: "1" }];
         }
         for (const pt of PART_TYPES) {
+          if (pt === "Barrel" && autoSel["Barrel"]?.length) continue; // skip if custom-matched
           const opts = partsByType[pt];
           if (opts?.length) autoSel[pt] = [{ label: opts[0].label, qty: "1" }];
         }
@@ -323,7 +372,7 @@ export default function WeaponBuilder() {
           if (el.length) autoSel["Element 1"] = [{ label: `${pick(el).partId} - ${pick(el).stat}`, qty: "1" }];
         }
         // Build decoded from auto-fill selections using same logic as desktop
-        const header = `${mfgWtId}, 0, 1, ${level}| 2, ${seed}||`;
+        const header = `${targetMfgWtId}, 0, 1, ${level}| 2, ${seed}||`;
         const parts: string[] = [];
         const rarityList = autoSel["Rarity"] ?? [];
         for (const r of rarityList) {
@@ -332,7 +381,7 @@ export default function WeaponBuilder() {
           } else if (r.label === "Pearl") {
             for (const p of (autoSel["Pearl Type"] ?? [])) { const pid = partIdFromLabel(p.label); if (pid) parts.push(`{${pid}}`); }
           } else {
-            const entry = (data.rarityByMfgTypeId[mfgWtId] ?? []).find((x) => x.stat === r.label);
+            const entry = (data.rarityByMfgTypeId[targetMfgWtId] ?? []).find((x) => x.stat === r.label);
             if (entry) parts.push(`{${entry.partId}}`);
           }
         }
@@ -422,9 +471,43 @@ export default function WeaponBuilder() {
         { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
-      <button type="button" className="mobile-btn" onClick={handleGenerateModded} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+      <button type="button" className="mobile-btn" onClick={() => setShowModdedModal(true)} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
         {modGenerating ? "Generating…" : "Generate Modded Weapon"}
       </button>
+
+      {/* Modded Weapon Modal — Random or Custom */}
+      {showModdedModal && (
+        <div className="mobile-picker-overlay" onClick={() => setShowModdedModal(false)}>
+          <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-picker-header">
+              <h3>Modded Weapon</h3>
+              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Cancel</button>
+            </div>
+            <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+              {/* Random */}
+              <button type="button" className="mobile-btn primary" onClick={() => handleGenerateModded()} style={{ marginBottom: 16 }}>
+                Random Modded Weapon
+              </button>
+
+              <div style={{ textAlign: "center", fontSize: 11, color: "var(--color-text-muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>— or customize —</div>
+
+              {/* Custom options */}
+              <MobileSelect label="Manufacturer" required options={mfgOpts} value={customModMfg} onChange={(v) => { setCustomModMfg(v); setCustomModWt(""); setCustomModRarity(""); setCustomModLegPearl(""); }} />
+              {customModMfg && <MobileSelect label="Weapon Type" required options={customModWtOpts} value={customModWt} onChange={(v) => { setCustomModWt(v); setCustomModRarity(""); setCustomModLegPearl(""); }} />}
+              {customModMfgWtId && <MobileSelect label="Rarity" required options={customModRarityOpts} value={customModRarity} onChange={(v) => { setCustomModRarity(v); setCustomModLegPearl(""); }} />}
+              {customModRarity && customModLegPearlOpts.length > 0 && (
+                <MobileSelect label={customModRarity === "Pearl" ? "Pearl Type" : "Legendary Type"} required options={customModLegPearlOpts} value={customModLegPearl} onChange={setCustomModLegPearl} />
+              )}
+
+              {customModMfgWtId && customModRarity && (customModLegPearlOpts.length === 0 || customModLegPearl) && (
+                <button type="button" className="mobile-btn" onClick={() => handleGenerateModded({ mfgWtId: customModMfgWtId, rarity: customModRarity, legPearl: customModLegPearl })} style={{ marginTop: 8, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+                  Generate Custom Modded
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />
     </div>

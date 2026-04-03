@@ -146,23 +146,48 @@ export default function GrenadeBuilder() {
     setCode(decoded);
   }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, extras.tokens]);
 
-  const handleGenerateModded = useCallback(async () => {
-    if (!data || mfgId == null) return;
+  const [showModdedModal, setShowModdedModal] = useState(false);
+  const [customModMfgId, setCustomModMfgId] = useState("");
+  const [customModLeg, setCustomModLeg] = useState("");
+
+  const customModLegOpts = useMemo<PickerOption[]>(() => {
+    if (!data || !customModMfgId) return [];
+    const mfgNum = Number(customModMfgId);
+    const forMfg = data.legendaryPerks.filter((l) => l.mfgId === mfgNum);
+    const pool = forMfg.length ? forMfg : data.legendaryPerks;
+    return pool.map((l) => ({ value: `${l.mfgId}:${l.partId}`, label: `${l.mfgName}: ${l.stat}` }));
+  }, [data, customModMfgId]);
+
+  const handleGenerateModded = useCallback(async (custom?: { mfgId: number; legLabel: string }) => {
+    if (!data) return;
+    setShowModdedModal(false);
     setModGenerating(true);
+    const targetMfgId = custom?.mfgId ?? mfgId ?? data.mfgs[0]?.id;
+    if (targetMfgId == null) { setModGenerating(false); return; }
     try {
-      // Build a random stock base
       const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
-      const rarities = data.raritiesByMfg[mfgId] ?? [];
+      const rarities = data.raritiesByMfg[targetMfgId] ?? [];
       const autoSel: Record<string, { label: string; qty: string }[]> = {};
-      if (rarities.length) autoSel["Rarity"] = [{ label: pickR(rarities).label, qty: "1" }];
+      // Rarity — always legendary for modded
+      const legendaryRarity = rarities.find((r) => /legendary/i.test(r.label));
+      autoSel["Rarity"] = [{ label: legendaryRarity?.label ?? (rarities.length ? rarities[rarities.length - 1]!.label : "Legendary"), qty: "1" }];
+      // Legendary — custom or random
+      const legendaryForMfg = data.legendaryPerks.filter((l) => l.mfgId === targetMfgId);
+      const legs = legendaryForMfg.length ? legendaryForMfg : data.legendaryPerks;
+      if (custom?.legLabel) {
+        autoSel["Legendary"] = [{ label: custom.legLabel, qty: "1" }];
+      } else if (legs.length) {
+        const leg = pickR(legs);
+        autoSel["Legendary"] = [{ label: `${leg.mfgId}:${leg.partId}`, qty: "1" }];
+      }
       const nonKinetic = data.element.filter((e) => !/kinetic/i.test(e.stat));
       if (nonKinetic.length) { const el = pickR(nonKinetic); autoSel["Element"] = [{ label: `${el.partId} - ${el.stat}`, qty: "1" }]; }
       if (data.firmware.length) { const fw = pickR(data.firmware); autoSel["Firmware"] = [{ label: `${fw.partId} - ${fw.stat}`, qty: "1" }]; }
-      const mfgP = data.mfgPerks[mfgId] ?? [];
+      const mfgP = data.mfgPerks[targetMfgId] ?? [];
       if (mfgP.length) autoSel["Mfg Perk"] = [...mfgP].sort(() => Math.random() - 0.5).slice(0, Math.min(6, mfgP.length)).map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: "1" }));
       if (data.universalPerks.length) autoSel["Universal Perk"] = [...data.universalPerks].sort(() => Math.random() - 0.5).slice(0, Math.min(4, data.universalPerks.length)).map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: "1" }));
 
-      const stockBase = buildDecodedString(mfgId, level, seed, autoSel["Rarity"]?.[0]?.label ?? "", [], [], [], [], [], "", data);
+      const stockBase = buildDecodedString(targetMfgId, level, seed, autoSel["Rarity"]?.[0]?.label ?? "", [], [], [], [], [], "", data);
 
       let grenadeVisualRecipes: GrenadeVisualRecipe[] = [];
       try { const res = await fetch("/data/grenade_visual_recipes.json"); if (res.ok) { const raw = await res.json(); if (Array.isArray(raw)) grenadeVisualRecipes = raw; } } catch {}
@@ -218,9 +243,35 @@ export default function GrenadeBuilder() {
       <GenerateBar onGenerate={handleGenerate} onClear={handleClear} />
 
       {/* Generate Modded */}
-      <button type="button" className="mobile-btn" onClick={handleGenerateModded} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+      <button type="button" className="mobile-btn" onClick={() => setShowModdedModal(true)} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
         {modGenerating ? "Generating…" : "Generate Modded Grenade"}
       </button>
+
+      {showModdedModal && (
+        <div className="mobile-picker-overlay" onClick={() => setShowModdedModal(false)}>
+          <div className="mobile-picker-sheet" style={{ maxHeight: "85vh" }} onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-picker-header">
+              <h3>Modded Grenade</h3>
+              <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 14, padding: 8, cursor: "pointer" }}>Cancel</button>
+            </div>
+            <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+              <button type="button" className="mobile-btn primary" onClick={() => handleGenerateModded()} style={{ marginBottom: 16 }}>
+                Random Modded Grenade
+              </button>
+              <div style={{ textAlign: "center", fontSize: 11, color: "var(--color-text-muted)", marginBottom: 12, textTransform: "uppercase", letterSpacing: 1 }}>— or customize —</div>
+              <MobileSelect label="Manufacturer" required options={mfgOptions} value={customModMfgId} onChange={(v) => { setCustomModMfgId(v); setCustomModLeg(""); }} />
+              {customModMfgId && customModLegOpts.length > 0 && (
+                <MobileSelect label="Legendary Type" required options={customModLegOpts} value={customModLeg} onChange={setCustomModLeg} />
+              )}
+              {customModMfgId && (
+                <button type="button" className="mobile-btn" onClick={() => handleGenerateModded({ mfgId: Number(customModMfgId), legLabel: customModLeg })} style={{ marginTop: 8, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+                  Generate Custom Modded
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Estimate */}
       {grenadeStats && (
