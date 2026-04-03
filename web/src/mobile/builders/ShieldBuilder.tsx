@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
+import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
   DecodeBox, GenerateBar, BuilderToggles, SkinSelector,
@@ -38,6 +39,12 @@ export default function ShieldBuilder() {
   const [rarity, setRarity] = useState("");
   const [skinValue, setSkinValue] = useState("");
   const [code, setCode] = useState("");
+  const [modPower, setModPower] = useState<"stable" | "op" | "insane">("stable");
+  const [shieldStats, setShieldStats] = useState<ShieldStatsEstimate | null>(null);
+  const [ammoRegen, setAmmoRegen] = useState(false);
+  const [movementSpeed, setMovementSpeed] = useState(false);
+  const [fireworks, setFireworks] = useState(false);
+  const [immortality, setImmortality] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [allParts, setAllParts] = useState(false);
   const [skins, setSkins] = useState<{ label: string; value: string }[]>([]);
@@ -135,8 +142,15 @@ export default function ShieldBuilder() {
     setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
   }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, uniPerks.parts, energyPerks.parts, armorPerks.parts, skinValue]);
 
+  const handleGenerateModded = useCallback(() => {
+    if (!data?.mfgs?.length) return;
+    const result = generateModdedShield({ level, modPowerMode: modPower, ammoRegen, movementSpeed, fireworks, immortality });
+    setCode(result.code.trim());
+    setShieldStats(result.stats);
+  }, [data, level, modPower, ammoRegen, movementSpeed, fireworks, immortality]);
+
   const clearAll = useCallback(() => {
-    setRarity(""); setSkinValue(""); legends.clear(); elements.clear(); fw.clear(); uniPerks.clear(); energyPerks.clear(); armorPerks.clear(); setCode("");
+    setRarity(""); setSkinValue(""); setShieldStats(null); legends.clear(); elements.clear(); fw.clear(); uniPerks.clear(); energyPerks.clear(); armorPerks.clear(); setCode("");
   }, [legends, elements, fw, uniPerks, energyPerks, armorPerks]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading shield data…</div>;
@@ -158,8 +172,40 @@ export default function ShieldBuilder() {
       {shieldType === "Energy" && <PartChecklist label="Energy Perks" options={enOpts} selected={energyPerks.parts} onToggle={energyPerks.toggle} onQtyChange={energyPerks.setQty} showInfo={showInfo} />}
       {shieldType === "Armor" && <PartChecklist label="Armor Perks" options={arOpts} selected={armorPerks.parts} onToggle={armorPerks.toggle} onQtyChange={armorPerks.setQty} showInfo={showInfo} />}
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      {/* Mod Power + Glow Toggles */}
+      <MobileSelect label="Mod Power" options={[
+        { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
+      ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
+
+      <div className="mobile-card" style={{ padding: "10px 14px" }}>
+        <div className="mobile-label" style={{ marginBottom: 8 }}>Shield Glow Effects</div>
+        {([["Ammo Regen", ammoRegen, setAmmoRegen], ["Movement Speed", movementSpeed, setMovementSpeed], ["Fireworks", fireworks, setFireworks], ["Immortality", immortality, setImmortality]] as const).map(([label, val, setter]) => (
+          <div key={label} className="mobile-check-row">
+            <input type="checkbox" checked={val} onChange={() => setter(!val)} />
+            <span className="part-name">{label}</span>
+          </div>
+        ))}
+      </div>
+
       <GenerateBar onGenerate={generate} onClear={clearAll} />
-      <CodeOutput code={code} onClear={() => setCode("")} />
+      <button type="button" className="mobile-btn" onClick={handleGenerateModded} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+        Generate Modded Shield
+      </button>
+
+      {shieldStats && (
+        <div className="mobile-card" style={{ fontSize: 12 }}>
+          <div className="mobile-label">Stats Estimate</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+            <div>Capacity: <strong style={{ color: "var(--color-accent)" }}>{shieldStats.capacityMultiplier.toFixed(1)}x</strong></div>
+            <div>Recharge: <strong style={{ color: "var(--color-accent)" }}>{shieldStats.rechargeMultiplier.toFixed(1)}x</strong></div>
+            <div>Type: <strong style={{ color: "var(--color-accent)" }}>{shieldStats.shieldType}</strong></div>
+            <div>Style: <strong style={{ color: "var(--color-accent)" }}>{shieldStats.style}</strong></div>
+          </div>
+        </div>
+      )}
+
+      <CodeOutput code={code} onClear={() => { setCode(""); setShieldStats(null); }} />
       <DecodeBox />
     </div>
   );

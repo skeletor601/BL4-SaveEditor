@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
+import { generateModdedRepkit, type RepkitStatEstimate } from "@/lib/generateModdedRepkit";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
   DecodeBox, GenerateBar, BuilderToggles, SkinSelector,
@@ -46,6 +47,8 @@ export default function RepkitBuilder() {
   const fwParts = usePartList();
   const [skinValue, setSkinValue] = useState("");
   const [code, setCode] = useState("");
+  const [modPower, setModPower] = useState<"stable" | "op" | "insane">("stable");
+  const [repkitStats, setRepkitStats] = useState<RepkitStatEstimate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [allParts, setAllParts] = useState(false);
   const [skins, setSkins] = useState<{ label: string; value: string }[]>([]);
@@ -142,8 +145,17 @@ export default function RepkitBuilder() {
     setCode(applySkin(`${header} ${p.join(" ")} |`, skinValue));
   }, [data, mfgId, level, seed, rarity, prefixParts.parts, fwParts.parts, legends.parts, resistance.parts, uniPerks.parts, skinValue]);
 
+  const handleGenerateModded = useCallback(() => {
+    if (!data?.mfgs?.length) return;
+    const result = generateModdedRepkit(data as Parameters<typeof generateModdedRepkit>[0], {
+      level, modPowerMode: modPower, forcedMfgId: mfgId ?? undefined,
+    });
+    setCode(result.code.trim());
+    setRepkitStats(result.stats);
+  }, [data, level, modPower, mfgId]);
+
   const clearAll = useCallback(() => {
-    setRarity(""); prefixParts.clear(); fwParts.clear(); setSkinValue(""); legends.clear(); resistance.clear(); uniPerks.clear(); setCode("");
+    setRarity(""); prefixParts.clear(); fwParts.clear(); setSkinValue(""); setRepkitStats(null); legends.clear(); resistance.clear(); uniPerks.clear(); setCode("");
   }, [prefixParts, fwParts, legends, resistance, uniPerks]);
 
   if (loading) return <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading repkit data…</div>;
@@ -164,8 +176,26 @@ export default function RepkitBuilder() {
       <PartChecklist label="Legendary Perks" options={legOpts} selected={legends.parts} onToggle={legends.toggle} onQtyChange={legends.setQty} showInfo={showInfo} />
       <PartChecklist label="Universal Perks" options={uniOpts} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+      <MobileSelect label="Mod Power" options={[
+        { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
+      ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
-      <CodeOutput code={code} onClear={() => setCode("")} />
+      <button type="button" className="mobile-btn" onClick={handleGenerateModded} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+        Generate Modded RepKit
+      </button>
+      {repkitStats && (
+        <div className="mobile-card" style={{ fontSize: 12 }}>
+          <div className="mobile-label">Stats Estimate</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+            <div>Archetype: <strong style={{ color: "var(--color-accent)" }}>{repkitStats.archetypeName}</strong></div>
+            <div>Legendary: <strong style={{ color: "var(--color-accent)" }}>{repkitStats.legendaryName}</strong></div>
+            <div>Mfg: <strong style={{ color: "var(--color-accent)" }}>{repkitStats.mfgName}</strong></div>
+            <div>Prefix: <strong style={{ color: "var(--color-accent)" }}>{repkitStats.prefixName}</strong></div>
+          </div>
+          {repkitStats.archetypeDesc && <p style={{ marginTop: 6, color: "var(--color-text-muted)", fontSize: 11 }}>{repkitStats.archetypeDesc}</p>}
+        </div>
+      )}
+      <CodeOutput code={code} onClear={() => { setCode(""); setRepkitStats(null); }} />
       <DecodeBox />
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
+import { generateModdedWeapon } from "@/lib/generateModdedWeapon";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
   DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
@@ -41,6 +42,8 @@ export default function WeaponBuilder() {
   const [rarity, setRarity] = useState("");
   const [skin, setSkin] = useState("");
   const [code, setCode] = useState("");
+  const [modPower, setModPower] = useState<"stable" | "op" | "insane">("stable");
+  const [modGenerating, setModGenerating] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [allParts, setAllParts] = useState(false);
   const [universalParts, setUniversalParts] = useState<UniversalPartRow[]>([]);
@@ -187,6 +190,114 @@ export default function WeaponBuilder() {
       body.parts, bodyAcc.parts, barrel.parts, barrelAcc.parts, mag.parts, statMod.parts,
       grip.parts, foregrip.parts, mfgPart.parts, scope.parts, scopeAcc.parts, underbarrel.parts, underbarrelAcc.parts]);
 
+  const handleGenerateModded = useCallback(async () => {
+    if (!data || !mfgWtId) return;
+    setModGenerating(true);
+    try {
+      const base = window.location.origin || "";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dataPath = typeof (import.meta as any)?.env?.BASE_URL === "string" ? String((import.meta as any).env.BASE_URL).replace(/\/$/, "") : "";
+      // Fetch all required data in parallel — same as desktop
+      const [editRes, partsRes, visualBarrelsRes, allowedBarrelsRes, underbarrelRecipesRes] = await Promise.all([
+        fetchApi("weapon-edit/data"),
+        fetchApi("parts/data"),
+        fetch(`${base}${dataPath}/data/visual_heavy_barrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/allowed_barrels.json`).catch(() => null),
+        fetch(`${base}${dataPath}/data/underbarrel_recipes.json`).catch(() => null),
+      ]);
+      const editData = await editRes.json().catch(() => null);
+      const partsPayload = (await partsRes.json().catch(() => ({}))) as { items?: unknown[] };
+      const visualBarrelEntries = visualBarrelsRes?.ok ? (await visualBarrelsRes.json().catch(() => [])) as Array<{ name: string; code: string }> : [];
+      const allowedBarrelEntries = allowedBarrelsRes?.ok ? (await allowedBarrelsRes.json().catch(() => [])) as Array<{ name: string; code: string }> : [];
+      const underbarrelRecipes = underbarrelRecipesRes?.ok ? await underbarrelRecipesRes.json().catch(() => []) : [];
+
+      if (!editData?.parts?.length) throw new Error("No weapon edit data");
+
+      // Build universal part codes — same mapping as desktop
+      const items = Array.isArray(partsPayload?.items) ? partsPayload.items : [];
+      const universalPartCodes = items
+        .filter((it): it is Record<string, unknown> => it != null && typeof it === "object" && !!((it as Record<string, unknown>).code))
+        .map((raw) => ({
+          code: String(raw.code ?? ""),
+          partType: String(raw.partType ?? ""),
+          rarity: String(raw.rarity ?? ""),
+          itemType: String(raw.itemType ?? ""),
+          weaponType: String(raw.weaponType ?? ""),
+          manufacturer: String(raw.manufacturer ?? ""),
+          uniqueEffect: /^(true|1|yes)$/i.test(String(raw.uniqueEffect ?? "")),
+          statText: [raw.effect, raw.stat, raw.string, raw.partName, raw.name].map((v) => String(v ?? "").trim()).filter(Boolean).join(" "),
+        }));
+
+      // Build stock base via auto-fill (same as desktop)
+      const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+      const autoPrefix = Number(mfgWtId);
+      const partsByType = data.partsByMfgTypeId[mfgWtId];
+      let stockBaseDecoded: string | undefined;
+      if (partsByType) {
+        const autoSel: Record<string, { label: string; qty: string }[]> = {};
+        const legendaryTypes = data.legendaryByMfgTypeId[mfgWtId] ?? [];
+        const pearlTypes = data.pearlByMfgTypeId[mfgWtId] ?? [];
+        if (pearlTypes.length && (Math.random() < 0.3 || !legendaryTypes.length)) {
+          autoSel["Rarity"] = [{ label: "Pearl", qty: "1" }];
+          const pt = pick(pearlTypes);
+          autoSel["Pearl Type"] = [{ label: `${pt.partId} - ${pt.description}`, qty: "1" }];
+        } else if (legendaryTypes.length) {
+          autoSel["Rarity"] = [{ label: "Legendary", qty: "1" }];
+          const lt = pick(legendaryTypes);
+          autoSel["Legendary Type"] = [{ label: `${lt.partId} - ${lt.description}`, qty: "1" }];
+        } else {
+          const rarities = data.rarityByMfgTypeId[mfgWtId] ?? [];
+          if (rarities.length) autoSel["Rarity"] = [{ label: rarities[rarities.length - 1].stat, qty: "1" }];
+        }
+        for (const pt of PART_TYPES) {
+          const opts = partsByType[pt];
+          if (opts?.length) autoSel[pt] = [{ label: opts[0].label, qty: "1" }];
+        }
+        if (data.elemental?.length) {
+          const el = data.elemental.filter((e) => !/kinetic/i.test(e.stat));
+          if (el.length) autoSel["Element 1"] = [{ label: `${pick(el).partId} - ${pick(el).stat}`, qty: "1" }];
+        }
+        // Build decoded from auto-fill selections using same logic as desktop
+        const header = `${mfgWtId}, 0, 1, ${level}| 2, ${seed}||`;
+        const parts: string[] = [];
+        const rarityList = autoSel["Rarity"] ?? [];
+        for (const r of rarityList) {
+          if (r.label === "Legendary") {
+            for (const l of (autoSel["Legendary Type"] ?? [])) { const pid = partIdFromLabel(l.label); if (pid) parts.push(`{${pid}}`); }
+          } else if (r.label === "Pearl") {
+            for (const p of (autoSel["Pearl Type"] ?? [])) { const pid = partIdFromLabel(p.label); if (pid) parts.push(`{${pid}}`); }
+          } else {
+            const entry = (data.rarityByMfgTypeId[mfgWtId] ?? []).find((x) => x.stat === r.label);
+            if (entry) parts.push(`{${entry.partId}}`);
+          }
+        }
+        for (const pt of PART_TYPES) {
+          for (const s of (autoSel[pt] ?? [])) { const pid = partIdFromLabel(s.label); if (pid) parts.push(`{${pid}}`); }
+        }
+        for (const key of ["Element 1", "Element 2"]) {
+          for (const s of (autoSel[key] ?? [])) { const pid = partIdFromLabel(s.label); if (pid) parts.push(`{1:${pid}}`); }
+        }
+        stockBaseDecoded = `${header} ${parts.join(" ")} |`;
+      }
+
+      const result = generateModdedWeapon(editData, universalPartCodes, {
+        level,
+        modPowerMode: modPower,
+        skin: skin || undefined,
+        forcedPrefix: autoPrefix || undefined,
+        stockBaseDecoded,
+        visualBarrelEntries: visualBarrelEntries.length ? visualBarrelEntries : undefined,
+        allowedBarrelEntries: allowedBarrelEntries.length ? allowedBarrelEntries : undefined,
+        skinOptions: data.skins?.length ? data.skins : undefined,
+        underbarrelRecipes: Array.isArray(underbarrelRecipes) ? underbarrelRecipes : undefined,
+      });
+      setCode(result.code.trim());
+    } catch (e) {
+      console.error("Modded weapon generation failed:", e);
+    }
+    setModGenerating(false);
+  }, [data, mfgWtId, level, seed, modPower, skin]);
+
   const clearAll = useCallback(() => {
     setRarity(""); setSkin(""); legendary.clear(); pearl.clear(); element1.clear(); element2.clear();
     Object.values(partLists).forEach((l) => l.clear());
@@ -231,7 +342,13 @@ export default function WeaponBuilder() {
       })}
 
       <SkinSelector skins={data.skins ?? []} value={skin} onChange={setSkin} />
+      <MobileSelect label="Mod Power" options={[
+        { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
+      ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
       <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn" onClick={handleGenerateModded} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+        {modGenerating ? "Generating…" : "Generate Modded Weapon"}
+      </button>
       <CodeOutput code={code} onClear={() => setCode("")} />
       <DecodeBox />
     </div>

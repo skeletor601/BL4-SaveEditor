@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
+import { generateModdedGrenade, type GenerateModdedGrenadeResult } from "@/lib/generateModdedGrenade";
+import type { GrenadeVisualRecipe } from "@/lib/generateModdedWeapon";
 import {
   type SelectedPart, usePartList, NumberField, PartChecklist, CodeOutput,
   DecodeBox, GenerateBar, BuilderToggles, SkinSelector, partIdFromLabel, applySkin
@@ -75,6 +77,9 @@ export default function GrenadeBuilder() {
   const [rarity, setRarity] = useState("");
   const [skinValue, setSkinValue] = useState("");
   const [code, setCode] = useState("");
+  const [modPower, setModPower] = useState<"stable" | "op" | "insane">("stable");
+  const [grenadeStats, setGrenadeStats] = useState<GenerateModdedGrenadeResult["stats"] | null>(null);
+  const [modGenerating, setModGenerating] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [allParts, setAllParts] = useState(false);
   const [skins, setSkins] = useState<{ label: string; value: string }[]>([]);
@@ -136,6 +141,42 @@ export default function GrenadeBuilder() {
     setCode(buildDecodedString(mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, data));
   }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue]);
 
+  const handleGenerateModded = useCallback(async () => {
+    if (!data || mfgId == null) return;
+    setModGenerating(true);
+    try {
+      // Build a random stock base
+      const pickR = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]!;
+      const rarities = data.raritiesByMfg[mfgId] ?? [];
+      const autoSel: Record<string, { label: string; qty: string }[]> = {};
+      if (rarities.length) autoSel["Rarity"] = [{ label: pickR(rarities).label, qty: "1" }];
+      const nonKinetic = data.element.filter((e) => !/kinetic/i.test(e.stat));
+      if (nonKinetic.length) { const el = pickR(nonKinetic); autoSel["Element"] = [{ label: `${el.partId} - ${el.stat}`, qty: "1" }]; }
+      if (data.firmware.length) { const fw = pickR(data.firmware); autoSel["Firmware"] = [{ label: `${fw.partId} - ${fw.stat}`, qty: "1" }]; }
+      const mfgP = data.mfgPerks[mfgId] ?? [];
+      if (mfgP.length) autoSel["Mfg Perk"] = [...mfgP].sort(() => Math.random() - 0.5).slice(0, Math.min(6, mfgP.length)).map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: "1" }));
+      if (data.universalPerks.length) autoSel["Universal Perk"] = [...data.universalPerks].sort(() => Math.random() - 0.5).slice(0, Math.min(4, data.universalPerks.length)).map((p) => ({ label: `${p.partId} - ${p.stat}`, qty: "1" }));
+
+      const stockBase = buildDecodedString(mfgId, level, seed, autoSel["Rarity"]?.[0]?.label ?? "", [], [], [], [], [], "", data);
+
+      let grenadeVisualRecipes: GrenadeVisualRecipe[] = [];
+      try { const res = await fetch("/data/grenade_visual_recipes.json"); if (res.ok) { const raw = await res.json(); if (Array.isArray(raw)) grenadeVisualRecipes = raw; } } catch {}
+
+      const result = generateModdedGrenade({
+        level,
+        modPowerMode: modPower,
+        stockBaseDecoded: stockBase,
+        grenadeVisualRecipes,
+        skinOptions: skins.length ? skins : undefined,
+      });
+      setCode(result.code.trim());
+      setGrenadeStats(result.stats);
+    } catch {
+      setGrenadeStats(null);
+    }
+    setModGenerating(false);
+  }, [data, mfgId, level, seed, modPower, skins]);
+
   const handleClear = useCallback(() => {
     setRarity(""); setSkinValue(""); legends.clear(); elements.clear(); fw.clear(); mfgPerks.clear(); uniPerks.clear(); setCode("");
   }, [legends, elements, fw, mfgPerks, uniPerks]);
@@ -158,8 +199,39 @@ export default function GrenadeBuilder() {
       {mfgPerkOptions.length > 0 && <PartChecklist label="Manufacturer Perks" options={mfgPerkOptions} selected={mfgPerks.parts} onToggle={mfgPerks.toggle} onQtyChange={mfgPerks.setQty} showInfo={showInfo} />}
       <PartChecklist label="Universal Perks" options={universalPerkOptions} selected={uniPerks.parts} onToggle={uniPerks.toggle} onQtyChange={uniPerks.setQty} showInfo={showInfo} />
       <SkinSelector skins={skins} value={skinValue} onChange={setSkinValue} />
+
+      {/* Mod Power Mode */}
+      <MobileSelect label="Mod Power" options={[
+        { value: "stable", label: "Stable" },
+        { value: "op", label: "OP" },
+        { value: "insane", label: "Insane" },
+      ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
+
       <GenerateBar onGenerate={handleGenerate} onClear={handleClear} />
-      <CodeOutput code={code} onClear={() => setCode("")} />
+
+      {/* Generate Modded */}
+      <button type="button" className="mobile-btn" onClick={handleGenerateModded} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
+        {modGenerating ? "Generating…" : "Generate Modded Grenade"}
+      </button>
+
+      {/* Stats Estimate */}
+      {grenadeStats && (
+        <div className="mobile-card" style={{ fontSize: 12 }}>
+          <div className="mobile-label">Stats Estimate</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px" }}>
+            <div>Damage: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.damageMultiplier.toFixed(1)}x</strong></div>
+            <div>Radius: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.radiusMultiplier.toFixed(1)}x</strong></div>
+            <div>Charges: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.charges}</strong></div>
+            <div>Cooldown: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.cooldownMultiplier.toFixed(2)}x</strong></div>
+            <div>Crit: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.critChance}%</strong></div>
+            <div>Lifesteal: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.lifesteal}%</strong></div>
+            <div>Status: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.statusChanceMultiplier.toFixed(1)}x</strong></div>
+            <div>Style: <strong style={{ color: "var(--color-accent)" }}>{grenadeStats.style}</strong></div>
+          </div>
+        </div>
+      )}
+
+      <CodeOutput code={code} onClear={() => { setCode(""); setGrenadeStats(null); }} />
       <DecodeBox />
     </div>
   );
