@@ -445,8 +445,8 @@ export default function BackpackView() {
       setDupeAllDialog(null);
       setDupeAllLoading(true);
       setAddMessage(null);
-      const num = Math.min(99, Math.max(1, qty));
-      // Collect all backpack item serials
+      const num = Math.min(50, Math.max(1, qty));
+      // Collect ONLY the original backpack item serials (before any dupes)
       const backpackSerials = slots.backpack
         .map((s) => ({ serial: s.serial?.trim(), flags: s.stateFlags ?? s.flags ?? 1 }))
         .filter((s) => s.serial && s.serial.startsWith("@U"));
@@ -456,10 +456,7 @@ export default function BackpackView() {
         return;
       }
       try {
-        // Client-side dupe: directly insert slots into the parsed save data.
-        // No API calls — instant, regardless of item count.
-        const cloned = JSON.parse(JSON.stringify(saveData)) as Record<string, unknown>;
-        // Find backpack node in the cloned data
+        // Find the backpack node directly in saveData (no deep clone of entire save)
         const findBackpack = (obj: Record<string, unknown>): Record<string, unknown> | null => {
           for (const path of [
             ["state", "inventory", "items", "backpack"],
@@ -473,7 +470,6 @@ export default function BackpackView() {
             for (const key of path) {
               if (node == null || typeof node !== "object") { node = null; break; }
               const record = node as Record<string, unknown>;
-              // Case-insensitive key lookup
               const found = Object.keys(record).find((k) => k.toLowerCase() === key.toLowerCase());
               node = found ? record[found] : null;
             }
@@ -481,7 +477,7 @@ export default function BackpackView() {
           }
           return null;
         };
-        const backpack = findBackpack(cloned);
+        const backpack = findBackpack(saveData as Record<string, unknown>);
         if (!backpack) {
           setAddMessage("Could not find backpack in save data.");
           setDupeAllLoading(false);
@@ -495,7 +491,7 @@ export default function BackpackView() {
             if (Number.isFinite(n) && n > maxSlot) maxSlot = n;
           }
         }
-        // Insert duplicates
+        // Insert duplicates directly into the live backpack object
         let totalAdded = 0;
         for (let round = 0; round < num; round++) {
           for (const { serial, flags } of backpackSerials) {
@@ -504,7 +500,8 @@ export default function BackpackView() {
             totalAdded++;
           }
         }
-        updateSaveData(cloned);
+        // Trigger React re-render with a shallow clone of saveData
+        updateSaveData({ ...saveData } as Record<string, unknown>);
         setAddMessage(`Duplicated ${backpackSerials.length} items x${num} (${totalAdded} copies added).`);
       } catch {
         setAddMessage("Dupe failed unexpectedly.");
@@ -1107,7 +1104,7 @@ export default function BackpackView() {
             <input
               type="number"
               min={1}
-              max={99}
+              max={50}
               value={dupeAllDialog.qty}
               onChange={(e) => setDupeAllDialog((d) => d ? { ...d, qty: e.target.value } : null)}
               className="w-20 px-3 py-2 rounded-lg border border-purple-500/40 bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center font-mono"
