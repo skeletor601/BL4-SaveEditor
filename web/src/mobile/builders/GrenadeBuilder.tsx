@@ -6,7 +6,7 @@ import { generateModdedGrenade, type GenerateModdedGrenadeResult } from "@/lib/g
 import type { GrenadeVisualRecipe } from "@/lib/generateModdedWeapon";
 import {
   type SelectedPart, usePartList, useExtraTokens, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase,
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase,
   ExtraTokensList, extraTokensToString, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -138,8 +138,11 @@ export default function GrenadeBuilder() {
   const universalPerkOptions = useMemo(() => expandOpts(
     (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, expandOpts]);
 
-  const handleGenerate = useCallback(() => {
+  // Auto-generate code when any selection changes
+  useEffect(() => {
     if (!data || mfgId == null) return;
+    const hasAnySelection = rarity || legends.parts.length || elements.parts.length || fw.parts.length || mfgPerks.parts.length || uniPerks.parts.length || extras.tokens.length;
+    if (!hasAnySelection) { setCode(""); return; }
     let decoded = buildDecodedString(mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, data);
     const extra = extraTokensToString(extras.tokens);
     if (extra) decoded = decoded.replace(/\s*\|\s*$/, ` ${extra} |`);
@@ -240,7 +243,7 @@ export default function GrenadeBuilder() {
         { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
 
-      <GenerateBar onGenerate={handleGenerate} onClear={handleClear} />
+      <button type="button" className="mobile-btn danger" onClick={handleClear} style={{ marginBottom: 14 }}>Clear All</button>
 
       {/* Generate Modded */}
       <button type="button" className="mobile-btn" onClick={() => setShowModdedModal(true)} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>

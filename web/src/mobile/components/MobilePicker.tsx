@@ -4,6 +4,11 @@ export interface PickerOption {
   value: string;
   label: string;
   badge?: string;
+  /** Extra info shown when Show Info is on */
+  partType?: string;
+  manufacturer?: string;
+  effect?: string;
+  category?: string;
 }
 
 interface MobilePickerProps {

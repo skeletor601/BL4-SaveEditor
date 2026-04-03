@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -92,8 +92,9 @@ export default function EnhancementBuilder() {
   const fwOpts = useMemo(() => expandOpts(
     (data?.firmware247 ?? []).map((f) => ({ value: String(f.code), label: `${f.code} - ${f.name}` })), "Firmware"), [data, expandOpts]);
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data || !mfg) return;
+    if (!rarity && mfgPerks.parts.length === 0 && stats247.parts.length === 0 && fw247.parts.length === 0) { setCode(""); return; }
     const header = `${mfg.code}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
@@ -144,7 +145,7 @@ export default function EnhancementBuilder() {
       <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
       <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
 
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />
     </div>

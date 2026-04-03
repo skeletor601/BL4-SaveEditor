@@ -175,29 +175,48 @@ export function PartChecklist({
             const sel = selected.find((s) => s.id === opt.value);
             // Parse label: "42 - +Damage, some description"
             const stripped = opt.label.replace(/^\d+\s*[-–]\s*/, "").trim() || opt.label;
-            const dashIdx = stripped.indexOf(" - ");
-            const mainText = dashIdx > 0 ? stripped.substring(0, dashIdx) : stripped;
-            const descText = dashIdx > 0 ? stripped.substring(dashIdx + 3) : "";
+            const commaIdx = stripped.indexOf(",");
+            const mainText = commaIdx > 0 ? stripped.substring(0, commaIdx).trim() : stripped;
+            const statText = commaIdx > 0 ? stripped.substring(commaIdx + 1).trim() : "";
+            const codeDisplay = opt.value.includes(":") ? `{${opt.value}}` : opt.value.match(/^\d+/) ? opt.value.match(/^\d+/)![0] : "";
 
             return (
-              <div key={opt.value} className="mobile-check-row" style={{ flexWrap: showInfo ? "wrap" : undefined }}>
+              <div key={opt.value} className="mobile-check-row" style={{ flexWrap: "wrap", alignItems: "flex-start", padding: showInfo ? "10px 0" : "8px 0" }}>
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => onToggle(opt.value, opt.label)}
+                  style={{ marginTop: 2 }}
                 />
-                <span className="part-name">
-                  <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", marginRight: 6, opacity: 0.7 }}>
-                    {opt.value.includes(":") ? opt.value : opt.value.match(/^\d+/) ? opt.value.match(/^\d+/)![0] : ""}
+                <span className="part-name" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {/* Row 1: code + name */}
+                  <span>
+                    <span style={{ fontFamily: "monospace", fontSize: 10, color: "var(--color-accent)", marginRight: 6, opacity: 0.7 }}>
+                      {codeDisplay}
+                    </span>
+                    <span style={{ fontWeight: 600 }}>{mainText}</span>
                   </span>
-                  {mainText}
+                  {/* Row 2: stats (always show if available) */}
+                  {statText && (
+                    <span style={{ fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.3 }}>
+                      {statText}
+                    </span>
+                  )}
+                  {/* Row 3: metadata tags (show info mode) */}
+                  {showInfo && (opt.partType || opt.manufacturer || opt.effect || opt.category) && (
+                    <span style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 2 }}>
+                      {opt.partType && <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,255,255,0.06)", color: "var(--color-text-muted)" }}>{opt.partType}</span>}
+                      {opt.manufacturer && <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,255,255,0.06)", color: "var(--color-text-muted)" }}>{opt.manufacturer}</span>}
+                      {opt.category && <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "rgba(255,255,255,0.06)", color: "var(--color-text-muted)" }}>{opt.category}</span>}
+                      {opt.effect && (
+                        <span style={{ width: "100%", fontSize: 10, color: "var(--color-text-muted)", lineHeight: 1.3, marginTop: 1 }}>
+                          {opt.effect}
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </span>
                 {isSelected && <QtyInput value={sel?.qty ?? 1} onChange={(n) => onQtyChange(opt.value, n)} />}
-                {showInfo && descText && (
-                  <div style={{ width: "100%", paddingLeft: 32, fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.3, marginTop: 2 }}>
-                    {descText}
-                  </div>
-                )}
               </div>
             );
           })}
@@ -657,6 +676,39 @@ export function ExtraTokensList({ tokens, onRemove }: { tokens: ExtraToken[]; on
       ))}
     </div>
   );
+}
+
+// ── Enrich options with universal DB metadata ─────────────────────────────────
+
+interface UniversalPartSimple {
+  code: string; label: string; effect?: string; partType?: string;
+  category?: string; manufacturer?: string;
+}
+
+/** Enrich base picker options with metadata from universal parts DB.
+ *  Matches by partId against the given typeId prefix(es). */
+export function enrichOptions(
+  base: PickerOption[],
+  universalParts: UniversalPartSimple[],
+  typeIds: (string | number)[],
+): PickerOption[] {
+  // Build lookup: "{typeId:partId}" -> metadata
+  const lookup = new Map<string, UniversalPartSimple>();
+  for (const up of universalParts) {
+    if (up.code) lookup.set(up.code, up);
+  }
+  return base.map((opt) => {
+    if (opt.partType || opt.manufacturer || opt.effect) return opt; // already enriched
+    // Try each typeId prefix
+    for (const tid of typeIds) {
+      const key = `{${tid}:${opt.value}}`;
+      const meta = lookup.get(key);
+      if (meta) {
+        return { ...opt, partType: meta.partType, manufacturer: meta.manufacturer, effect: meta.effect, category: meta.category };
+      }
+    }
+    return opt;
+  });
 }
 
 // ── Action bar ────────────────────────────────────────────────────────────────

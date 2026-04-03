@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedWeapon } from "@/lib/generateModdedWeapon";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, partIdFromLabel, applySkin
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, partIdFromLabel, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -136,13 +136,23 @@ export default function WeaponBuilder() {
   const elemOpts = useMemo(() => expandOpts(
     (data?.elemental ?? []).map((e) => ({ value: e.partId, label: `${e.partId} - ${e.stat}` })), "Element"), [data, expandOpts]);
 
+  // Build a lookup from code -> universal part for enriching options
+  const universalByCode = useMemo(() => {
+    const map = new Map<string, { partType?: string; manufacturer?: string; effect?: string; category?: string }>();
+    for (const up of universalParts) {
+      if (up.code) map.set(up.code, { partType: up.partType, manufacturer: up.manufacturer, effect: up.effect, category: up.category });
+    }
+    return map;
+  }, [universalParts]);
+
   const getPartOpts = useCallback((partType: string): PickerOption[] => {
     if (!data || !mfgWtId) return [];
-    return expandOpts(
-      (data.partsByMfgTypeId[mfgWtId]?.[partType] ?? []).map((p) => ({ value: p.partId, label: p.label })),
-      partType
-    );
-  }, [data, mfgWtId, expandOpts]);
+    const base = (data.partsByMfgTypeId[mfgWtId]?.[partType] ?? []).map((p) => {
+      const meta = universalByCode.get(`{${mfgWtId}:${p.partId}}`);
+      return { value: p.partId, label: p.label, partType: meta?.partType, manufacturer: meta?.manufacturer, effect: meta?.effect, category: meta?.category };
+    });
+    return expandOpts(base, partType);
+  }, [data, mfgWtId, expandOpts, universalByCode]);
 
   // Auto-init
   if (data && !manufacturer && data.manufacturers.length) {
@@ -151,8 +161,13 @@ export default function WeaponBuilder() {
     if (firstEntry) setWeaponType(firstEntry.weaponType);
   }
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data || !mfgWtId) return;
+    const hasAnyParts = rarity || legendary.parts.length > 0 || pearl.parts.length > 0 || element1.parts.length > 0 || element2.parts.length > 0 ||
+      body.parts.length > 0 || bodyAcc.parts.length > 0 || barrel.parts.length > 0 || barrelAcc.parts.length > 0 ||
+      mag.parts.length > 0 || statMod.parts.length > 0 || grip.parts.length > 0 || foregrip.parts.length > 0 ||
+      mfgPart.parts.length > 0 || scope.parts.length > 0 || scopeAcc.parts.length > 0 || underbarrel.parts.length > 0 || underbarrelAcc.parts.length > 0;
+    if (!hasAnyParts) { setCode(""); return; }
     const header = `${mfgWtId}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
@@ -250,7 +265,7 @@ export default function WeaponBuilder() {
       list.setParts([{ id: chosen.partId, label: chosen.label, qty: 1 }]);
     }
 
-    setAutoFillMsg("Auto-filled! Hit Generate Code.");
+    setAutoFillMsg("Auto-filled!");
     setTimeout(() => setAutoFillMsg(null), 2000);
   }, [data, mfgWtId, rarity, legendary.parts, pearl.parts, element1, element2,
       body, bodyAcc, barrel, barrelAcc, mag, statMod, grip, foregrip, mfgPart, scope, scopeAcc, underbarrel, underbarrelAcc]);
@@ -464,7 +479,7 @@ export default function WeaponBuilder() {
       <MobileSelect label="Mod Power" options={[
         { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <button type="button" className="mobile-btn" onClick={() => setShowModdedModal(true)} disabled={modGenerating} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
         {modGenerating ? "Generating…" : "Generate Modded Weapon"}
       </button>

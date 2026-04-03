@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -90,8 +90,9 @@ export default function HeavyBuilder() {
   const boOpts = useMemo(() => expandOpts(
     (data?.bodyAccPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Body Accessory"), [data, expandOpts]);
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data || mfgId == null) return;
+    if (!rarity && !barrel && !element && fwParts.parts.length === 0 && barrelAcc.parts.length === 0 && bodyAcc.parts.length === 0) { setCode(""); return; }
     const header = `${mfgId}, 0, 1, ${level}| 2, ${244}||`;
     const p: string[] = [];
 
@@ -140,7 +141,7 @@ export default function HeavyBuilder() {
       <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
       <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
 
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />
     </div>

@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedRepkit, type RepkitStatEstimate } from "@/lib/generateModdedRepkit";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -104,8 +104,9 @@ export default function RepkitBuilder() {
   const uniOpts = useMemo(() => expandOpts(
     (data?.universalPerks ?? []).map((p) => ({ value: String(p.partId), label: `${p.partId} - ${p.stat}` })), "Perk"), [data, expandOpts]);
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data || mfgId == null) return;
+    if (!rarity && prefixParts.parts.length === 0 && fwParts.parts.length === 0 && legends.parts.length === 0 && resistance.parts.length === 0 && uniPerks.parts.length === 0) { setCode(""); return; }
     const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
@@ -187,7 +188,7 @@ export default function RepkitBuilder() {
       <MobileSelect label="Mod Power" options={[
         { value: "stable", label: "Stable" }, { value: "op", label: "OP" }, { value: "insane", label: "Insane" },
       ]} value={modPower} onChange={(v) => setModPower(v as "stable" | "op" | "insane")} />
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <button type="button" className="mobile-btn" onClick={handleGenerateModded} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
         Generate Modded RepKit
       </button>

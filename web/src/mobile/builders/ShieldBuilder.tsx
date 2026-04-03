@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/apiClient";
 import { generateModdedShield, type ShieldStatsEstimate } from "@/lib/generateModdedShield";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
+  BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens,
   buildLegendaryTokens, buildTypeToken, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
@@ -107,8 +107,9 @@ export default function ShieldBuilder() {
 
   const shieldType = data && mfgId != null ? (data.mfgTypeById[mfgId] ?? "Energy") : "Energy";
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data || mfgId == null) return;
+    if (!rarity && legends.parts.length === 0 && elements.parts.length === 0 && fw.parts.length === 0 && uniPerks.parts.length === 0 && energyPerks.parts.length === 0 && armorPerks.parts.length === 0) { setCode(""); return; }
     const header = `${mfgId}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
@@ -195,7 +196,7 @@ export default function ShieldBuilder() {
         ))}
       </div>
 
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <button type="button" className="mobile-btn" onClick={handleGenerateModded} style={{ marginBottom: 14, background: "rgba(168,85,247,0.15)", borderColor: "#a855f7", color: "#a855f7" }}>
         Generate Modded Shield
       </button>

@@ -4,7 +4,7 @@ import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import {
   usePartList, useExtraTokens, NumberField, PartChecklist, CodeOutput,
-  BuildPartsList, GenerateBar, AddFromDatabase, ExtraTokensList, extraTokensToString, applySkin
+  BuildPartsList, AddFromDatabase, ExtraTokensList, extraTokensToString, applySkin
 } from "./shared";
 import type { PickerOption } from "../components/MobilePicker";
 
@@ -82,8 +82,9 @@ export default function ClassModBuilder() {
     setSkillPoints((prev) => ({ ...prev, [name]: Math.max(0, Math.min(5, pts)) }));
   }, []);
 
-  const generate = useCallback(() => {
+  useEffect(() => {
     if (!data) return;
+    if (!rarity || !nameCode) { setCode(""); return; }
     const header = `${classId}, 0, 1, ${level}| 2, ${seed}||`;
     const p: string[] = [];
 
@@ -194,7 +195,7 @@ export default function ClassModBuilder() {
       <AddFromDatabase universalParts={universalParts} onAdd={extras.add} />
       <ExtraTokensList tokens={extras.tokens} onRemove={extras.remove} />
 
-      <GenerateBar onGenerate={generate} onClear={clearAll} />
+      <button type="button" className="mobile-btn danger" onClick={clearAll} style={{ marginBottom: 14 }}>Clear All</button>
       <CodeOutput code={code} onClear={() => setCode("")} />
       <BuildPartsList code={code} universalParts={universalParts} />
     </div>
