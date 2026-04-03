@@ -132,7 +132,9 @@ export default function GrenadeBuilder() {
 
   const [mfgId, setMfgId] = useState<number | null>(null);
   const [level, setLevel] = useState(50);
+  const [levelText, setLevelText] = useState("50");
   const [seed, setSeed] = useState(1);
+  const [seedText, setSeedText] = useState("1");
   const [rarity, setRarity] = useState("");
   const [selectedLegendaries, setSelectedLegendaries] = useState<SelectedPart[]>([]);
   const [selectedElements, setSelectedElements] = useState<SelectedPart[]>([]);
@@ -259,10 +261,11 @@ export default function GrenadeBuilder() {
           <input
             type="number"
             className="mobile-input"
-            value={level}
+            value={levelText}
             min={1}
             max={100}
-            onChange={(e) => setLevel(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
+            onChange={(e) => setLevelText(e.target.value)}
+            onBlur={() => { const n = Math.max(1, Math.min(100, Number(levelText) || 1)); setLevel(n); setLevelText(String(n)); }}
           />
         </div>
         <div style={{ flex: 1 }}>
@@ -270,10 +273,11 @@ export default function GrenadeBuilder() {
           <input
             type="number"
             className="mobile-input"
-            value={seed}
+            value={seedText}
             min={1}
             max={4096}
-            onChange={(e) => setSeed(Math.max(1, Math.min(4096, Number(e.target.value) || 1)))}
+            onChange={(e) => setSeedText(e.target.value)}
+            onBlur={() => { const n = Math.max(1, Math.min(4096, Number(seedText) || 1)); setSeed(n); setSeedText(String(n)); }}
           />
         </div>
       </div>
