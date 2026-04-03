@@ -1,11 +1,13 @@
 import { lazy, Suspense, useState } from "react";
 import MobileSelect from "../components/MobileSelect";
 
+const WeaponBuilder = lazy(() => import("../builders/WeaponBuilder"));
 const GrenadeBuilder = lazy(() => import("../builders/GrenadeBuilder"));
 const ShieldBuilder = lazy(() => import("../builders/ShieldBuilder"));
 const RepkitBuilder = lazy(() => import("../builders/RepkitBuilder"));
 const HeavyBuilder = lazy(() => import("../builders/HeavyBuilder"));
 const EnhancementBuilder = lazy(() => import("../builders/EnhancementBuilder"));
+const ClassModBuilder = lazy(() => import("../builders/ClassModBuilder"));
 
 const BUILDER_TYPES = [
   { value: "weapon", label: "Weapon" },
@@ -18,12 +20,6 @@ const BUILDER_TYPES = [
 ];
 
 const LOADING = <div className="mobile-card" style={{ textAlign: "center", padding: 32 }}>Loading builder…</div>;
-const COMING_SOON = (name: string) => (
-  <div className="mobile-card" style={{ textAlign: "center", padding: 32, color: "var(--color-text-muted)" }}>
-    <p style={{ fontSize: 14, marginBottom: 4 }}>{name} Builder</p>
-    <p style={{ fontSize: 12 }}>Coming soon</p>
-  </div>
-);
 
 export default function MobileBuildPage() {
   const [builderType, setBuilderType] = useState("grenade");
@@ -48,8 +44,8 @@ export default function MobileBuildPage() {
         {builderType === "repkit" && <RepkitBuilder />}
         {builderType === "heavy" && <HeavyBuilder />}
         {builderType === "enhancement" && <EnhancementBuilder />}
-        {builderType === "weapon" && COMING_SOON("Weapon")}
-        {builderType === "class-mod" && COMING_SOON("Class Mod")}
+        {builderType === "weapon" && <WeaponBuilder />}
+        {builderType === "class-mod" && <ClassModBuilder />}
       </Suspense>
     </div>
   );
