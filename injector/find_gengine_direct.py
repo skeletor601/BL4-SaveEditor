@@ -99,9 +99,15 @@ def find_gengine_scan_sections(handle, base, size):
                 # +0x880 → Backpack data
                 bp_data = read_ptr(handle, state + 0x880)
                 bp_count = read_u32(handle, state + 0x888)
+                bp_max_size = read_u32(handle, state + 0x924)
                 if not bp_data or bp_data < 0x10000:
                     continue
                 if bp_count is None or bp_count > 500:
+                    continue
+
+                # Sanity: count should not exceed max backpack size (SDU limit)
+                # Max size is typically 12-70 for normal characters
+                if bp_max_size is not None and bp_max_size > 0 and bp_count > bp_max_size:
                     continue
 
                 # Verify with @U serial if items exist
