@@ -445,8 +445,7 @@ export default function BackpackView() {
       setDupeAllDialog(null);
       setDupeAllLoading(true);
       setAddMessage(null);
-      const num = Math.min(50, Math.max(1, qty));
-      // Collect ONLY the original backpack item serials (before any dupes)
+      const num = Math.min(100, Math.max(1, qty));
       const backpackSerials = slots.backpack
         .map((s) => ({ serial: s.serial?.trim(), flags: s.stateFlags ?? s.flags ?? 1 }))
         .filter((s) => s.serial && s.serial.startsWith("@U"));
@@ -456,7 +455,6 @@ export default function BackpackView() {
         return;
       }
       try {
-        // Find the backpack node directly in saveData (no deep clone of entire save)
         const findBackpack = (obj: Record<string, unknown>): Record<string, unknown> | null => {
           for (const path of [
             ["state", "inventory", "items", "backpack"],
@@ -483,7 +481,6 @@ export default function BackpackView() {
           setDupeAllLoading(false);
           return;
         }
-        // Find highest existing slot number
         let maxSlot = -1;
         for (const key of Object.keys(backpack)) {
           if (typeof key === "string" && key.startsWith("slot_")) {
@@ -491,7 +488,6 @@ export default function BackpackView() {
             if (Number.isFinite(n) && n > maxSlot) maxSlot = n;
           }
         }
-        // Insert duplicates directly into the live backpack object
         let totalAdded = 0;
         for (let round = 0; round < num; round++) {
           for (const { serial, flags } of backpackSerials) {
@@ -500,7 +496,6 @@ export default function BackpackView() {
             totalAdded++;
           }
         }
-        // Trigger React re-render with a shallow clone of saveData
         updateSaveData({ ...saveData } as Record<string, unknown>);
         setAddMessage(`Duplicated ${backpackSerials.length} items x${num} (${totalAdded} copies added).`);
       } catch {
@@ -1104,12 +1099,15 @@ export default function BackpackView() {
             <input
               type="number"
               min={1}
-              max={50}
+              max={100}
               value={dupeAllDialog.qty}
               onChange={(e) => setDupeAllDialog((d) => d ? { ...d, qty: e.target.value } : null)}
               className="w-20 px-3 py-2 rounded-lg border border-purple-500/40 bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center font-mono"
               autoFocus
             />
+            <p className="text-xs text-amber-400/80 mt-2 leading-snug">
+              Warning: Duping a second time on a large backpack may crash the app. Save your work first.
+            </p>
             <div className="flex gap-2 mt-4">
               <button
                 type="button"
