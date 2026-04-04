@@ -396,8 +396,7 @@ export function CodeOutput({ code, onClear }: { code: string; onClear: () => voi
         </button>
       </div>
 
-      {/* Inject to Game — disabled: injected items crash game on drop/interact
-         TODO: need to populate Type/Info pointers correctly for stable injection */}
+      {/* Inject to Game — desktop only, mobile users can't run the .exe */}
       {false && base85 && (
         <button
           type="button"

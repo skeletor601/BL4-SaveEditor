@@ -266,6 +266,13 @@ export default function TestAppPage() {
                 <span>{stats.categories} categories</span>
               </div>
             )}
+            <button
+              type="button"
+              onClick={() => { localStorage.setItem("bl4-layout", "simple"); window.location.href = "/layout-test"; }}
+              className="px-2 py-0.5 rounded text-[10px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-accent)] border border-[var(--color-panel-border)] hover:border-[var(--color-accent)]/30 transition-colors"
+            >
+              Simple Mode
+            </button>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/10 text-emerald-400">
               v2.0
             </span>
@@ -413,6 +420,21 @@ function GearLabTab() {
           </div>
         </div>
       </div>
+
+      {/* Build from URL */}
+      <Link
+        to="/beta/unified-item-builder"
+        state={{ showBuildFromUrl: true }}
+        className="block rounded-xl border border-purple-500/30 bg-purple-500/5 p-4 hover:border-purple-500/60 hover:bg-purple-500/10 transition-all"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-purple-400 text-xl">🔗</span>
+          <div>
+            <h3 className="text-sm font-bold text-purple-400">Build from URL</h3>
+            <p className="text-[10px] text-[var(--color-text-muted)]">Paste a Mobalytics build guide URL → auto-generate stock gear set</p>
+          </div>
+        </div>
+      </Link>
 
       {/* Feature highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

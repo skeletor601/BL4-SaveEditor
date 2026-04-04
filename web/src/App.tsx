@@ -17,6 +17,7 @@ import SaveComparisonPage from "@/pages/SaveComparisonPage";
 import CommunityVaultPage from "@/pages/CommunityVaultPage";
 import GodRollsPage from "@/pages/GodRollsPage";
 import TestAppPage from "@/pages/TestAppPage";
+import LayoutTestPage from "@/pages/LayoutTestPage";
 import TerraLabPage from "@/pages/TerraLabPage";
 import GreenLabPage from "@/pages/GreenLabPage";
 import DrLecterPage from "@/pages/DrLecterPage";
@@ -139,6 +140,7 @@ export default function App() {
     <StagingGate>
       <Routes>
         <Route path="/mobile/*" element={<Suspense fallback={<div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", color: "var(--color-accent)" }}>Loading…</div>}><MobileApp /></Suspense>} />
+        <Route path="/layout-test" element={<LayoutTestPage />} />
         <Route path="/*" element={<AppRoutes />} />
       </Routes>
     </StagingGate>

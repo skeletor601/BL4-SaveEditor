@@ -3,7 +3,10 @@
  * skills + context from guide text → pick variant → review → generate stock items.
  */
 import { useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { fetchApi } from "@/lib/apiClient";
+import { useSave } from "@/contexts/SaveContext";
+import { parse as yamlParse } from "yaml";
 
 // ── Types matching API response ─────────────────────────────────────────────
 
@@ -178,16 +181,81 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
     onLoadDecoded(item.decoded, label);
   }, [onLoadDecoded]);
 
-  const handleLoadAll = useCallback(() => {
+  void handleLoadItem; // keep reference alive
+
+  const [addingToBackpack, setAddingToBackpack] = useState(false);
+  const [backpackResult, setBackpackResult] = useState<string | null>(null);
+  const { saveData, getYamlText, updateSaveData } = useSave();
+
+  const handleAddAllToBackpack = useCallback(async () => {
     if (!assembleResult) return;
-    for (const item of assembleResult.items) handleLoadItem(item);
-  }, [assembleResult, handleLoadItem]);
+    if (!saveData) {
+      setBackpackResult("Load a save file first (Save tab → load .sav)");
+      return;
+    }
+
+    setAddingToBackpack(true);
+    setBackpackResult(null);
+
+    let added = 0;
+    let failed = 0;
+    let currentYaml = getYamlText() || "";
+
+    for (const item of assembleResult.items) {
+      try {
+        // Encode decoded string to Base85
+        const encRes = await fetchApi("save/encode-serial", {
+          method: "POST",
+          body: JSON.stringify({ decoded_string: item.decoded.split(/\r?\n/)[0]?.trim() }),
+        });
+        const encData = await encRes.json();
+        if (!encData?.success || !encData?.serial) {
+          failed++;
+          continue;
+        }
+
+        // Add to backpack — needs current YAML content
+        const addRes = await fetchApi("save/add-item", {
+          method: "POST",
+          body: JSON.stringify({
+            yaml_content: currentYaml,
+            serial: encData.serial,
+            flag: "1",
+          }),
+        });
+        const addData = await addRes.json();
+        if (addData?.success && typeof addData?.yaml_content === "string") {
+          // Update YAML for next iteration (items build on each other)
+          currentYaml = addData.yaml_content;
+          added++;
+        } else {
+          failed++;
+        }
+      } catch {
+        failed++;
+      }
+    }
+
+    // Update save context with final YAML (all items added)
+    if (added > 0 && currentYaml) {
+      try {
+        updateSaveData(yamlParse(currentYaml) as Record<string, unknown>);
+      } catch { /* ignore parse errors */ }
+    }
+
+    setBackpackResult(
+      failed > 0
+        ? `Added ${added}/${assembleResult.items.length} items. ${failed} failed.`
+        : `All ${added} items added to backpack! Use "Overwrite Save" to export.`
+    );
+    setAddingToBackpack(false);
+  }, [assembleResult, saveData, getYamlText, updateSaveData]);
 
   const variant = scrapeResult?.variants[selectedVariantIdx];
   const ctx = scrapeResult?.context;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--color-panel-border)] bg-[var(--color-panel)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}>
@@ -384,15 +452,21 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setAssembleResult(null)}
                     className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Back</button>
-                  <button type="button" onClick={handleLoadAll}
-                    className="px-3 py-1.5 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs font-bold hover:bg-[var(--color-accent)]/30">
-                    Load All to Builder
+                  <button type="button" onClick={handleAddAllToBackpack} disabled={addingToBackpack}
+                    className="px-3 py-1.5 rounded-lg border border-green-500 bg-green-500/20 text-green-400 text-xs font-bold hover:bg-green-500/30 disabled:opacity-50">
+                    {addingToBackpack ? "Adding..." : "Add All to Backpack"}
                   </button>
                 </div>
               </div>
 
+              {backpackResult && (
+                <p className={`text-xs ${backpackResult.includes("failed") ? "text-yellow-400" : "text-green-400"}`}>
+                  {backpackResult}
+                </p>
+              )}
+
               <p className="text-xs text-[var(--color-text-muted)]">
-                {assembleResult.items.length} items generated. Click Load to send each to the codec.
+                {assembleResult.items.length} items generated. Click "Add All to Backpack" or load individually.
               </p>
 
               <div className="space-y-2">
@@ -448,6 +522,7 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

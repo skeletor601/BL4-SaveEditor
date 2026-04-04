@@ -33,6 +33,8 @@ import { FLAG_OPTIONS } from "@/components/weapon-toolbox/builderStyles";
 import SkillCardPopup from "@/components/SkillCardPopup";
 import ClassModNameHoverCard, { type ClassModNameCardData } from "@/components/ClassModNameHoverCard";
 import InjectorSetupModal from "@/components/InjectorSetupModal";
+import { lazy, Suspense } from "react";
+const BuildFromUrlModal = lazy(() => import("@/components/BuildFromUrlModal"));
 import { getClassModNameInfo } from "@/data/classModNameDescriptions";
 import PartDetailModal from "@/components/master-search/PartDetailModal";
 import PartHoverCard, { type HoverCardData } from "@/components/master-search/PartHoverCard";
@@ -1425,6 +1427,12 @@ export default function UnifiedItemBuilderPage() {
       container?: string;
       path?: string[];
     } | null;
+    // Build from URL — open modal
+    if (state?.showBuildFromUrl) {
+      setShowBuildFromUrlModal(true);
+      window.history.replaceState({}, "");
+      return;
+    }
     // Build from URL — load decoded string
     if (state?.loadDecoded) {
       prevFreshDecodedRef.current = "";
@@ -1488,6 +1496,7 @@ export default function UnifiedItemBuilderPage() {
   const [codecLoading, setCodecLoading] = useState(false);
   const [codecStatus, setCodecStatus] = useState<string>("Paste Base85 or decoded to start.");
   const [addToBackpackLoading, setAddToBackpackLoading] = useState(false);
+  const [showBuildFromUrlModal, setShowBuildFromUrlModal] = useState(false);
   const [showCleanCodeDialog, setShowCleanCodeDialog] = useState(false);
   const codecRequestId = useRef(0);
   const { saveData, getYamlText, updateSaveData, canOverwriteInPlace, overwriteSaveInPlace, savePlatform, saveUserId } = useSave();
@@ -3215,7 +3224,7 @@ export default function UnifiedItemBuilderPage() {
   const resetCodec = useCallback(() => {
     setLiveBase85("");
     setLiveDecoded("");
-    setCodecStatus(null);
+    setCodecStatus("Paste Base85 or decoded to start.");
     setGenerateModdedError(null);
     setSeed(Math.floor(100 + Math.random() * 9900));
     prevFreshDecodedRef.current = "";
@@ -3272,10 +3281,10 @@ export default function UnifiedItemBuilderPage() {
   }, [resetCodec]);
 
   const resetClassModBuilder = useCallback(() => {
-    setClassModPartSelections({});
+    setClassModSelections({});
     setClassModExtraTokens([]);
     setClassModSkillPoints({});
-    setClassModRarity("Common");
+    setClassModRarity("Legendary");
     setClassModSkinValue("");
     resetCodec();
   }, [resetCodec]);
@@ -4396,6 +4405,23 @@ export default function UnifiedItemBuilderPage() {
           {codecStatus === "__show_injector_setup__" && (
             <InjectorSetupModal mode="inject" onClose={() => setCodecStatus("Ready.")} onReady={() => setCodecStatus("Setup complete! Click Inject to Game again.")} />
           )}
+          {showBuildFromUrlModal && (
+            <Suspense fallback={null}>
+              <BuildFromUrlModal
+                onClose={() => setShowBuildFromUrlModal(false)}
+                onLoadDecoded={(decoded: string, label: string) => {
+                  setShowBuildFromUrlModal(false);
+                  prevFreshDecodedRef.current = "";
+                  setTimeout(() => {
+                    setLiveDecoded(decoded.trim());
+                    setLastEditedCodecSide("decoded");
+                    setCodecStatus(`Build URL loaded: ${label || "item"}`);
+                    prevFreshDecodedRef.current = decoded.trim();
+                  }, 100);
+                }}
+              />
+            </Suspense>
+          )}
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-1">
@@ -4460,8 +4486,32 @@ export default function UnifiedItemBuilderPage() {
           >
             Reset
           </button>
-          {/* Inject to Game — disabled: injected items crash game on drop/interact
-              TODO: need to populate Type/Info pointers correctly for stable injection */}
+          <button
+            type="button"
+            onClick={async () => {
+              if (localStorage.getItem("bl4-injector-setup-done") !== "1") {
+                setCodecStatus("__show_injector_setup__");
+                return;
+              }
+              let serial = liveBase85.split(/\r?\n/)[0]?.trim() ?? "";
+              if (!serial.startsWith("@U")) {
+                setCodecStatus("Generate a Base85 code first.");
+                return;
+              }
+              setCodecStatus("Injecting...");
+              try {
+                const { injectItem } = await import("@/lib/injectorBridge");
+                const resp = await injectItem(serial);
+                setCodecStatus(resp.ok ? "Injected to game!" : (resp.error ?? "Injection failed"));
+              } catch {
+                setCodecStatus("Bridge not running. Download & run BL4_Injector.exe");
+              }
+            }}
+            className="px-4 py-2 rounded-lg border border-green-500/40 text-green-400 hover:bg-green-500/10 hover:border-green-500/60 text-sm min-h-[44px] touch-manipulation"
+            title="Inject item into running Borderlands 4 — requires BL4_Injector running"
+          >
+            Inject to Game
+          </button>
           <label className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
             <span>Flag</span>
             <select

@@ -144,22 +144,51 @@ class GameState:
             bp_data = new_array
             bp_max = new_max
 
-        # Write a clean zeroed slot (don't copy template — Type/Info pointers
-        # from template override the item type, making everything show as whatever slot 0 is)
-        new_addr = bp_data + (bp_count * 0x150)
-        write_mem(self.handle, new_addr, b'\x00' * 0x150)
+        # Use the game's "empty slot" pattern as template, then add serial.
+        # Empty slots: ReplicationID=0xFFFFFFFF, InstanceId=0, Type=NULL,
+        # Handle=0xFFFFFFFF, Flags2=0xFF00, MaxQuantity=1
+        # The game resolves Type/Info from the serial when it encounters one.
 
-        # Set minimal required fields
+        # Read an empty slot as template if available (slots 8-15 pattern)
+        empty_template = None
+        for t in range(bp_count):
+            t_addr = bp_data + (t * 0x150)
+            t_type = read_ptr(self.handle, t_addr + 0x18)
+            t_repl = read_u32(self.handle, t_addr)
+            if t_type == 0 and t_repl == 0xFFFFFFFF:
+                empty_template = read_mem(self.handle, t_addr, 0x150)
+                if empty_template:
+                    break
+
+        new_addr = bp_data + (bp_count * 0x150)
+
+        if empty_template:
+            # Use real empty slot pattern from the game
+            write_mem(self.handle, new_addr, empty_template)
+        else:
+            # Build empty slot from scratch based on observed pattern
+            write_mem(self.handle, new_addr, b'\x00' * 0x150)
+            write_mem(self.handle, new_addr + 0x00, struct.pack('<I', 0xFFFFFFFF))  # ReplicationID
+            write_mem(self.handle, new_addr + 0x04, struct.pack('<I', 0xFFFFFFFF))  # ReplicationKey
+            write_mem(self.handle, new_addr + 0x08, struct.pack('<I', 0xFFFFFFFF))  # MostRecent
+            write_mem(self.handle, new_addr + 0x80, struct.pack('<Q', 0x8000000000))  # observed constant
+            write_mem(self.handle, new_addr + 0x88, struct.pack('<I', 0xFFFFFFFF))  # observed
+            write_mem(self.handle, new_addr + 0xD0, struct.pack('<I', 0x0F))        # observed
+            write_mem(self.handle, new_addr + 0xD8, struct.pack('<I', 1))           # observed
+
+        # Set unique IDs
         new_id = bp_count + 200
         write_mem(self.handle, new_addr + 0x00, struct.pack('<I', new_id))       # ReplicationID
-        write_mem(self.handle, new_addr + 0x04, struct.pack('<I', new_id))       # ReplicationKey
+        write_mem(self.handle, new_addr + 0x04, struct.pack('<I', 0))            # ReplicationKey
+        write_mem(self.handle, new_addr + 0x08, struct.pack('<I', 0xFFFFFFFF))   # MostRecent
         write_mem(self.handle, new_addr + 0x10, struct.pack('<I', new_id))       # InstanceId
         write_mem(self.handle, new_addr + 0x108, struct.pack('<I', new_id))      # Handle
         write_mem(self.handle, new_addr + 0x10D, bytes([0xFF]))                  # EquipSlot = free
         write_mem(self.handle, new_addr + 0xF8, struct.pack('<I', 1))            # Quantity
         write_mem(self.handle, new_addr + 0xFC, struct.pack('<I', 1))            # Flags
+        write_mem(self.handle, new_addr + 0x138, struct.pack('<I', 1))           # MaxQuantity
 
-        # Write serial string — this is what the game uses to resolve the actual item
+        # Write serial string to new allocated buffer
         str_buf = alloc_mem(self.handle, len(serial) + 64)
         if not str_buf:
             return {"ok": False, "error": "Could not allocate string memory"}
@@ -250,21 +279,42 @@ class GameState:
             bp_data = new_array
             bp_max = new_max
 
+        # Find empty slot template from game
+        empty_template = None
+        for t in range(bp_count):
+            t_addr = bp_data + (t * 0x150)
+            t_type = read_ptr(self.handle, t_addr + 0x18)
+            t_repl = read_u32(self.handle, t_addr)
+            if t_type == 0 and t_repl == 0xFFFFFFFF:
+                empty_template = read_mem(self.handle, t_addr, 0x150)
+                if empty_template:
+                    break
+
         injected = 0
         for idx, serial in enumerate(serials):
             if bp_count >= bp_max:
                 break
             new_addr = bp_data + (bp_count * 0x150)
-            write_mem(self.handle, new_addr, b'\x00' * 0x150)
+
+            if empty_template:
+                write_mem(self.handle, new_addr, empty_template)
+            else:
+                write_mem(self.handle, new_addr, b'\x00' * 0x150)
+                write_mem(self.handle, new_addr + 0x80, struct.pack('<Q', 0x8000000000))
+                write_mem(self.handle, new_addr + 0x88, struct.pack('<I', 0xFFFFFFFF))
+                write_mem(self.handle, new_addr + 0xD0, struct.pack('<I', 0x0F))
+                write_mem(self.handle, new_addr + 0xD8, struct.pack('<I', 1))
 
             new_id = bp_count + 500 + idx
             write_mem(self.handle, new_addr + 0x00, struct.pack('<I', new_id))
-            write_mem(self.handle, new_addr + 0x04, struct.pack('<I', new_id))
+            write_mem(self.handle, new_addr + 0x04, struct.pack('<I', 0))
+            write_mem(self.handle, new_addr + 0x08, struct.pack('<I', 0xFFFFFFFF))
             write_mem(self.handle, new_addr + 0x10, struct.pack('<I', new_id))
             write_mem(self.handle, new_addr + 0x108, struct.pack('<I', new_id))
             write_mem(self.handle, new_addr + 0x10D, bytes([0xFF]))
             write_mem(self.handle, new_addr + 0xF8, struct.pack('<I', 1))
             write_mem(self.handle, new_addr + 0xFC, struct.pack('<I', 1))
+            write_mem(self.handle, new_addr + 0x138, struct.pack('<I', 1))
 
             str_buf = alloc_mem(self.handle, len(serial) + 64)
             if not str_buf:

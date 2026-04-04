@@ -105,9 +105,12 @@ def find_gengine_scan_sections(handle, base, size):
                 if bp_count is None or bp_count > 500:
                     continue
 
-                # Sanity: count should not exceed max backpack size (SDU limit)
-                # Max size is typically 12-70 for normal characters
-                if bp_max_size is not None and bp_max_size > 0 and bp_count > bp_max_size:
+                # Strict sanity checks:
+                # 1. Max backpack size (SDU) must be reasonable (10-100)
+                if bp_max_size is None or bp_max_size < 10 or bp_max_size > 100:
+                    continue
+                # 2. Count can exceed max_size (from injection extending array) but not crazy high
+                if bp_count > 500:
                     continue
 
                 # Verify with @U serial if items exist
@@ -122,9 +125,8 @@ def find_gengine_scan_sections(handle, base, size):
                 elapsed = time.time() - start
                 loc_addr = sec_start + offset + i
 
-                # Skip candidates with 0 items — likely stale/secondary engine
-                if bp_count == 0:
-                    print(f"\n  [~] Candidate: {hex(val)} (0 items, skipping...)", end="", flush=True)
+                # For 0-item backpacks, only accept if max_size looks legitimate
+                if bp_count == 0 and (bp_max_size < 10 or bp_max_size > 100):
                     continue
 
                 print(f"\n\n  [+] FOUND GEngine: {hex(val)}")
