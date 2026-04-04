@@ -837,6 +837,110 @@ function resolveManufacturerParts(
   return codes.slice(0, 4);
 }
 
+/** Resolve firmware names to part codes for a given category.
+ *  firmwareHint format: "3x Deadeye, 2x High Caliber" or just slot-specific firmware titles.
+ *  Returns array of {typeId:partId} strings. */
+function resolveFirmware(
+  db: UniversalRow[], category: string, slotFirmwareTitle: string | null, firmwareHintText: string | null,
+): string[] {
+  // Map category to the typeId used for firmware
+  const fwTypeIds: Record<string, string> = {
+    "Shield": "246", "Grenade": "245", "Repkit": "243", "Heavy": "244",
+    "Class Mod": "234", "Enhancement": "247",
+  };
+  const fwTypeId = fwTypeIds[category];
+  if (!fwTypeId) return [];
+
+  const fwRows = db.filter(r =>
+    r.partType === "Firmware" && parseCode(r.code).typeId === fwTypeId
+  );
+  if (fwRows.length === 0) {
+    // Fallback: search across all categories for same firmware name
+    const allFw = db.filter(r => r.partType === "Firmware");
+    if (allFw.length === 0) return [];
+  }
+
+  const results: string[] = [];
+
+  // 1. Use slot-specific firmware title (e.g. "Deadeye" from the firmware slot)
+  if (slotFirmwareTitle) {
+    const normTitle = normalize(slotFirmwareTitle);
+    const match = fwRows.find(r => normalize(r.partName || "").includes(normTitle));
+    if (match) {
+      const pid = parseCode(match.code).partId;
+      results.push(`{${fwTypeId}:${pid}}`);
+    }
+  }
+
+  // 2. Parse firmwareHint text for counts: "3x Deadeye, 2x High Caliber"
+  if (firmwareHintText) {
+    const parts = firmwareHintText.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+    for (const part of parts) {
+      const countMatch = part.match(/^(\d+)[x/]\s*(.+)/i);
+      const fwName = countMatch ? countMatch[2].trim() : part;
+      const count = countMatch ? parseInt(countMatch[1]) : 1;
+      const normName = normalize(fwName);
+      const match = fwRows.find(r =>
+        normalize(r.partName || "").includes(normName) ||
+        normName.includes(normalize(r.partName || ""))
+      );
+      if (match) {
+        const pid = parseCode(match.code).partId;
+        for (let i = 0; i < Math.min(count, 3); i++) {
+          results.push(`{${fwTypeId}:${pid}}`);
+        }
+      }
+    }
+  }
+
+  // Deduplicate isn't needed — stacking firmware is valid in BL4
+  return results;
+}
+
+/** Resolve class mod skills with proper tier levels.
+ *  Each skill has 5 tier IDs (sorted ascending). Level N means use first N tier IDs. */
+function resolveClassModSkills(
+  db: UniversalRow[], typeId: string, character: string,
+  skills: { name: string; level: number }[],
+): string[] {
+  const allSkills = db.filter(r =>
+    r.category === "Class Mod" && r.partType === "Skill" &&
+    (r.manufacturer === character || parseCode(r.code).typeId === typeId)
+  );
+
+  // Group by skill name → sorted IDs (tier 1-5)
+  const skillGroups = new Map<string, number[]>();
+  for (const row of allSkills) {
+    const name = (row.partName || "").trim();
+    if (!name) continue;
+    const pid = parseInt(parseCode(row.code).partId);
+    if (!skillGroups.has(name)) skillGroups.set(name, []);
+    skillGroups.get(name)!.push(pid);
+  }
+  for (const [, ids] of skillGroups) ids.sort((a, b) => a - b);
+
+  const parts: string[] = [];
+  for (const skill of skills) {
+    const normName = normalize(skill.name);
+    // Find matching skill group
+    let matched: number[] | undefined;
+    for (const [name, ids] of skillGroups) {
+      if (normalize(name) === normName || normalize(name).includes(normName)) {
+        matched = ids;
+        break;
+      }
+    }
+    if (matched) {
+      // Level N = use first N tier IDs
+      const tierCount = Math.max(1, Math.min(5, skill.level));
+      for (let i = 0; i < tierCount && i < matched.length; i++) {
+        parts.push(`{${matched[i]}}`);
+      }
+    }
+  }
+  return parts;
+}
+
 function resolveUnderbarrel(
   db: UniversalRow[], typeId: string, hint: string | null,
 ): string | null {
@@ -957,6 +1061,11 @@ function assembleAccessory(
     fwSlugMap[slotCat] = fw.title;
   }
 
+  // Get firmware title for this category from variant firmware slots
+  const fwSlotKey = category.toLowerCase().replace(" ", "-") + "-firmware";
+  const slotFw = firmware.find(f => f.slot === fwSlotKey);
+  const slotFwTitle = slotFw?.title || null;
+
   if (category === "Shield") {
     parts.push(`{${partId}}`);
     if (resolved.match.partType === "Legendary Perk") {
@@ -976,10 +1085,15 @@ function assembleAccessory(
       );
       if (perkRow) parts.push(`{${parseCode(perkRow.code).partId}}`);
     }
-    // Firmware + perks
-    const fw = pickParts(db, typeId, "Firmware", 1);
-    if (fw.length > 0) parts.push(`{${fw[0].partId}}`);
-    const perks = pickParts(db, typeId, "Perk", 3);
+    // Firmware from build guide
+    const fwParts = resolveFirmware(db, "Shield", slotFwTitle, context.firmwareHint);
+    for (const fw of fwParts.slice(0, 3)) parts.push(fw);
+    if (fwParts.length === 0) {
+      const fallback = pickParts(db, typeId, "Firmware", 1);
+      if (fallback.length > 0) parts.push(`{${typeId}:${fallback[0].partId}}`);
+    }
+    // Perks
+    const perks = pickParts(db, typeId, "Perk", 3, ["capacity", "recharge"]);
     for (const p of perks) parts.push(`{${p.partId}}`);
 
   } else if (category === "Grenade") {
@@ -1002,17 +1116,20 @@ function assembleAccessory(
       if (perkRow) parts.push(`{${parseCode(perkRow.code).partId}}`);
     }
 
-    // If ordnance hint is "Crit Knife", add Penetrator augment
-    if (context.ordnanceHint === "Crit Knife") {
-      // Penetrator = {245:69} (universal grenade perk)
+    // Ordnance hint (Penetrator Knife etc)
+    if (context.ordnanceHint && normalize(context.ordnanceHint).includes("penetrator")) {
       const penetrator = db.find(r =>
         r.category === "Grenade" && normalize(r.partName || "").includes("penetrator")
       );
       if (penetrator) parts.push(`{245:${parseCode(penetrator.code).partId}}`);
     }
 
+    // Firmware from build guide
+    const fwParts = resolveFirmware(db, "Grenade", slotFwTitle, context.firmwareHint);
+    for (const fw of fwParts.slice(0, 3)) parts.push(fw);
+
     // Universal grenade perks
-    const uniPerks = pickParts(db, "245", "Perk", 3);
+    const uniPerks = pickParts(db, "245", "Perk", 3, ["damage", "radius"]);
     for (const p of uniPerks) parts.push(`{245:${p.partId}}`);
 
   } else if (category === "Repkit") {
@@ -1034,34 +1151,72 @@ function assembleAccessory(
       );
       if (perkRow) parts.push(`{${parseCode(perkRow.code).partId}}`);
     }
+    // Firmware from build guide
+    const fwParts = resolveFirmware(db, "Repkit", slotFwTitle, context.firmwareHint);
+    for (const fw of fwParts.slice(0, 3)) parts.push(fw);
     // Universal repkit prefix
     const prefix = pickParts(db, "243", "Prefix", 1);
     if (prefix.length > 0) parts.push(`{243:${prefix[0].partId}}`);
+    // Resistance
+    const resist = pickParts(db, "243", "Resistance", 1);
+    if (resist.length > 0) parts.push(`{243:${resist[0].partId}}`);
 
   } else if (category === "Class Mod") {
+    // Class mod: name + rarity + skills with proper tier levels + firmware + perks
     parts.push(`{${partId}}`);
-    // Legendary rarity
+    // Legendary rarity from legendary map
     const rarityRow = db.find(r =>
       r.category === "Class Mod" && r.partType === "Rarity" && r.rarity === "Legendary" &&
       parseCode(r.code).typeId === typeId
     );
     if (rarityRow) parts.push(`{${parseCode(rarityRow.code).partId}}`);
 
-    // Skills from context — match skill names against DB
+    // Skills from context WITH PROPER TIER LEVELS
+    const character = resolved.match.manufacturer || "";
     if (context.classModSkills.length > 0) {
-      const skillRows = db.filter(r =>
-        r.category === "Class Mod" && r.partType === "Skill" && parseCode(r.code).typeId === typeId
+      const skillParts = resolveClassModSkills(db, typeId, character, context.classModSkills);
+      for (const sp of skillParts) parts.push(sp);
+    }
+
+    // Firmware for class mod
+    const fwParts = resolveFirmware(db, "Class Mod", slotFwTitle, context.firmwareHint);
+    for (const fw of fwParts.slice(0, 3)) parts.push(fw);
+
+    // Perks from universal type 234
+    const perks = pickParts(db, "234", "Perk", 3, ["damage", "crit"]);
+    for (const p of perks) parts.push(`{234:${p.partId}}`);
+
+  } else if (category === "Enhancement") {
+    parts.push(`{${partId}}`);
+    // Enhancement rarity
+    const rarityRow = db.find(r =>
+      r.category === "Enhancement" && r.partType === "Rarity" && r.rarity === "Legendary" &&
+      parseCode(r.code).typeId === typeId
+    );
+    if (rarityRow) parts.push(`{${parseCode(rarityRow.code).partId}}`);
+
+    // Enhancement stats from context
+    if (context.enhancementStats.length > 0) {
+      const statRows = db.filter(r =>
+        r.category === "Enhancement" && r.partType === "Stat Perk"
       );
-      for (const cs of context.classModSkills.slice(0, 3)) {
-        const normSkill = normalize(cs.name);
-        const match = skillRows.find(r => normalize(r.partName || "").includes(normSkill));
-        if (match) parts.push(`{${parseCode(match.code).partId}}`);
+      for (const stat of context.enhancementStats.slice(0, 4)) {
+        const normStat = normalize(stat);
+        const match = statRows.find(r =>
+          normalize(r.partName || "").includes(normStat) ||
+          normalize(r.effect || "").includes(normStat)
+        );
+        if (match) parts.push(`{247:${parseCode(match.code).partId}}`);
       }
     }
 
-    // Perks from universal type 234
-    const perks = pickParts(db, "234", "Perk", 3);
-    for (const p of perks) parts.push(`{234:${p.partId}}`);
+    // Enhancement firmware
+    const fwParts = resolveFirmware(db, "Enhancement", slotFwTitle, context.firmwareHint);
+    for (const fw of fwParts.slice(0, 3)) parts.push(fw);
+
+    // Core perks from manufacturer
+    const corePerks = pickParts(db, typeId, "Core Perk", 2);
+    for (const p of corePerks) parts.push(`{${p.partId}}`);
   }
 
   const decoded = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${parts.join(" ")}|`;
