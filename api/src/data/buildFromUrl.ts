@@ -547,9 +547,25 @@ function parseEquipmentContext(
   const enhancementStats: string[] = [];
   const enhText = sections["enhancement"] || "";
   const statSection = (sections["stat"] || "") + "\n" + enhText;
-  const statMatches = statSection.match(/(Shotgun|Gun|Weapon|Melee|Skill|Sniper|SMG|Splash)\s+(Damage|Crit Damage|Mag Size|Magazine Size|Equip Speed|Fire Rate|Reload Speed|damage)/gi);
+
+  // Match "Gun Damage", "Gun Crit Damage", "Shotgun Mag Size", etc.
+  const statMatches = statSection.match(/(Shotgun|Gun|Weapon|Melee|Skill|Sniper|SMG|Splash|Pistol|Assault Rifle|AR)\s+(Type\s+)?(Damage|Crit Damage|Crit|Mag Size|Magazine Size|Equip Speed|Fire Rate|Reload Speed|Splash Radius|damage)/gi);
   if (statMatches) {
     for (const s of statMatches) enhancementStats.push(s.trim());
+  }
+
+  // Also parse line-by-line stat recommendations (common in build guides)
+  // Lines that are just stat names: "Gun Damage", "Gun Type Damage", etc.
+  const lines = statSection.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Match standalone stat lines (not inside longer sentences)
+    if (trimmed.length > 5 && trimmed.length < 40 && !trimmed.startsWith("-") && !trimmed.startsWith("#")) {
+      const statLine = trimmed.match(/^(Gun|Shotgun|Pistol|Sniper|SMG|AR|Assault Rifle|Melee|Skill|Weapon)\s+(Type\s+)?(Damage|Crit Damage|Splash Radius|Type Splash Radius|Equip Speed|Fire Rate|Reload Speed|Mag Size)$/i);
+      if (statLine && !enhancementStats.some(s => normalize(s) === normalize(trimmed))) {
+        enhancementStats.push(trimmed);
+      }
+    }
   }
 
   // ── Enhancement perks ─────────────────────────────────────────────────
@@ -1087,7 +1103,7 @@ function assembleWeapon(
 
 function assembleAccessory(
   resolved: ResolvedItem, level: number, firmware: MobaGearSlot[],
-  context: BuildContext,
+  context: BuildContext, allResolved?: ResolvedItem[],
 ): StockItem | null {
   if (!resolved.match) return null;
   const db = loadDb();
@@ -1254,12 +1270,115 @@ function assembleAccessory(
     );
     if (rarityRow) parts.push(`{${parseCode(rarityRow.code).partId}}`);
 
-    // Enhancement stats from context
+    // 247 rarity too
+    const r247 = db.find(r =>
+      parseCode(r.code).typeId === "247" && r.partType === "Rarity" && r.rarity === "Legendary"
+    );
+    if (r247) parts.push(`{247:${parseCode(r247.code).partId}}`);
+
+    // ── Core perks from this enhancement's manufacturer ─────────────────
+    const corePerks = db.filter(r =>
+      r.category === "Enhancement" && r.partType === "Core Perk" &&
+      parseCode(r.code).typeId === typeId
+    );
+    for (const p of corePerks.slice(0, 4)) parts.push(`{${parseCode(p.code).partId}}`);
+
+    // ── Cross-manufacturer perks from ALL weapons + their mfg parts ────
+    if (allResolved) {
+      const weaponMfgs = new Set<string>();
+      const weaponTypes = new Set<string>();
+      const referencedMfgs = new Set<string>(); // mfgs from weapon manufacturer parts
+
+      for (const r of allResolved) {
+        if (r.category === "Weapon" && r.match) {
+          if (r.match.manufacturer) weaponMfgs.add(r.match.manufacturer);
+          if (r.match.weaponType) weaponTypes.add(r.match.weaponType.toLowerCase());
+
+          // Find manufacturer parts on this weapon and extract referenced manufacturers
+          const wTypeId = r.match.typeId;
+          const mfgPartsOnWeapon = db.filter(row =>
+            parseCode(row.code).typeId === wTypeId && row.partType === "Manufacturer Part"
+          );
+          const MFG_KEYWORDS = ["hyperion", "tediore", "torgue", "jakobs", "maliwan",
+            "daedalus", "vladof", "ripper", "order", "atlas", "cov"];
+          for (const mp of mfgPartsOnWeapon) {
+            const partName = (mp.partName || "").toLowerCase();
+            for (const kw of MFG_KEYWORDS) {
+              if (partName.includes(kw)) {
+                // Map keyword to proper manufacturer name
+                const mfgNameMap: Record<string, string> = {
+                  "hyperion": "Hyperion", "tediore": "Tediore", "torgue": "Torgue",
+                  "jakobs": "Jakobs", "maliwan": "Maliwan", "daedalus": "Daedalus",
+                  "vladof": "Vladof", "ripper": "Ripper", "order": "The Order",
+                  "atlas": "Atlas", "cov": "COV",
+                };
+                referencedMfgs.add(mfgNameMap[kw] || kw);
+              }
+            }
+          }
+        }
+      }
+
+      // Combine weapon manufacturers + referenced manufacturers from parts
+      const allMfgs = new Set([...weaponMfgs, ...referencedMfgs]);
+
+      // Add core perks from each manufacturer's enhancement
+      const enhMfgs = db.filter(r => r.category === "Enhancement" && r.partType === "Core Perk");
+      const addedMfgTypeIds = new Set([typeId]); // skip own mfg (already added above)
+      for (const mfg of allMfgs) {
+        const mfgPerks = enhMfgs.filter(r =>
+          r.manufacturer === mfg && !addedMfgTypeIds.has(parseCode(r.code).typeId)
+        );
+        if (mfgPerks.length > 0) {
+          const mfgTypeId = parseCode(mfgPerks[0].code).typeId;
+          addedMfgTypeIds.add(mfgTypeId);
+          // Add all core perks from this manufacturer as cross-mfg (stacked)
+          for (const p of mfgPerks.slice(0, 4)) {
+            parts.push(`{${mfgTypeId}:${parseCode(p.code).partId}}`);
+          }
+        }
+      }
+
+      // ── Weapon-type specific stat perks (247) ─────────────────────────
+      // Map weapon types to stat perk search terms
+      const typeStatMap: Record<string, string[]> = {
+        "shotgun": ["shotgun damage", "shotgun mag", "shotgun splash"],
+        "pistol": ["pistol damage", "pistol mag"],
+        "smg": ["smg damage", "smg mag"],
+        "sniper": ["sniper damage", "sniper mag", "sniper crit"],
+        "assault rifle": ["assault rifle damage", "assault rifle mag"],
+        "ar": ["assault rifle damage", "assault rifle mag"],
+      };
+
+      const statPerks = db.filter(r =>
+        parseCode(r.code).typeId === "247" && (r.partType === "Stat Perk" || r.partType === "Stat Group1")
+      );
+      const addedStatPids = new Set<string>();
+
+      for (const wType of weaponTypes) {
+        const searchTerms = typeStatMap[wType] || [`${wType} damage`];
+        for (const term of searchTerms) {
+          const normTerm = normalize(term);
+          const match = statPerks.find(r =>
+            !addedStatPids.has(parseCode(r.code).partId) &&
+            (normalize(r.partName || "").includes(normTerm) ||
+             normalize(r.effect || "").includes(normTerm))
+          );
+          if (match) {
+            const pid = parseCode(match.code).partId;
+            addedStatPids.add(pid);
+            parts.push(`{247:${pid}}`);
+          }
+        }
+      }
+    }
+
+    // ── Enhancement stats from build guide text ─────────────────────────
     if (context.enhancementStats.length > 0) {
       const statRows = db.filter(r =>
-        r.category === "Enhancement" && r.partType === "Stat Perk"
+        (parseCode(r.code).typeId === "247") && (r.partType === "Stat Perk" || r.partType === "Stat Group1")
       );
-      for (const stat of context.enhancementStats.slice(0, 4)) {
+      for (const stat of context.enhancementStats.slice(0, 6)) {
         const normStat = normalize(stat);
         const match = statRows.find(r =>
           normalize(r.partName || "").includes(normStat) ||
@@ -1269,13 +1388,23 @@ function assembleAccessory(
       }
     }
 
+    // ── Universal beneficial stat perks ─────────────────────────────────
+    const universalStats = ["gun damage", "gun crit damage", "movement speed", "reload speed"];
+    const uniStatRows = db.filter(r =>
+      parseCode(r.code).typeId === "247" && (r.partType === "Stat Perk" || r.partType === "Stat Group1")
+    );
+    for (const uStat of universalStats) {
+      const normU = normalize(uStat);
+      const match = uniStatRows.find(r =>
+        normalize(r.partName || "").includes(normU) ||
+        normalize(r.effect || "").includes(normU)
+      );
+      if (match) parts.push(`{247:${parseCode(match.code).partId}}`);
+    }
+
     // Enhancement firmware
     const fwParts = resolveFirmware(db, "Enhancement", slotFwTitle, context.firmwareHint);
     for (const fw of fwParts.slice(0, 3)) parts.push(fw);
-
-    // Core perks from manufacturer
-    const corePerks = pickParts(db, typeId, "Core Perk", 2);
-    for (const p of corePerks) parts.push(`{${p.partId}}`);
   }
 
   const decoded = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${parts.join(" ")}|`;
@@ -1343,8 +1472,47 @@ export function assembleBuild(
         if (item) items.push(item);
       }
     } else {
-      const item = assembleAccessory(r, level, firmware, context);
+      const item = assembleAccessory(r, level, firmware, context, resolved);
       if (item) items.push(item);
+    }
+  }
+
+  // Auto-generate enhancement if not in resolved but firmware exists for it
+  const hasEnhancement = items.some(it => it.category === "Enhancement");
+  const hasEnhFirmware = firmware.some(f => f.slot === "enhancement-firmware");
+  if (!hasEnhancement && hasEnhFirmware) {
+    const db = loadDb();
+    // Pick a default enhancement manufacturer based on the weapons in the build
+    const weaponMfgs = new Set<string>();
+    for (const r of resolved) {
+      if (r.category === "Weapon" && r.match?.manufacturer) weaponMfgs.add(r.match.manufacturer);
+    }
+    // Find enhancement manufacturer entries
+    const enhMfgs = db.filter(r => r.category === "Enhancement" && r.partType === "Rarity" && r.rarity === "Legendary");
+    // Prefer a manufacturer matching one of our weapons
+    let enhRow = enhMfgs.find(r => weaponMfgs.has(r.manufacturer || ""));
+    if (!enhRow && enhMfgs.length > 0) enhRow = enhMfgs[0];
+
+    if (enhRow) {
+      const enhTypeId = parseCode(enhRow.code).typeId;
+      const fakeResolved: ResolvedItem = {
+        slot: "enhancement",
+        mobaName: "Auto Enhancement",
+        mobaType: "enhancements",
+        category: "Enhancement",
+        confidence: "fuzzy",
+        match: {
+          code: enhRow.code,
+          partName: (enhRow.manufacturer || "Unknown") + " Enhancement",
+          partType: "Rarity",
+          manufacturer: enhRow.manufacturer || "",
+          rarity: "Legendary",
+          typeId: enhTypeId,
+          partId: parseCode(enhRow.code).partId,
+        },
+      };
+      const enhItem = assembleAccessory(fakeResolved, level, firmware, context, resolved);
+      if (enhItem) items.push(enhItem);
     }
   }
 
