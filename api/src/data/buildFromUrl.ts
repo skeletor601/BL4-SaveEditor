@@ -57,6 +57,8 @@ export interface BuildContext {
   enhancementStats: string[];
   /** Enhancement firmware perk names */
   enhancementPerks: string[];
+  /** Repkit perk hints parsed from text (e.g. "Amp (Amplified)", "Enrage (Experimental)") */
+  repkitPerks: string[];
   /** Ordnance hints (e.g. "Crit Knife" = Jakobs throwing knife + Penetrator) */
   ordnanceHint: string | null;
   /** Firmware recommendation parsed from text */
@@ -477,26 +479,55 @@ function parseEquipmentContext(
   }
 
   // Manufacturer parts: "Jakobs (Ricochet Accessory)", "Ripper (Charge Mag)"
+  // Filter out repkit/shield/enhancement perks
+  const REPKIT_PERK_NAMES = new Set(["amp", "enrage", "immunity", "chrome", "cardiac", "blood siphon", "heart pump", "time dilation", "blood rush", "pulseometer"]);
   const mfgPartMatches = equipmentText.match(/\[([A-Z][a-z]+ \([^)]+\))\]/g) || [];
-  const manufacturerParts = mfgPartMatches.map(m => m.replace(/[\[\]]/g, ""));
-
-  // Underbarrel from text: "Spread Launcher", "Knife Launcher", "Zip Rockets", "shotgun underbarrel"
-  let underbarrel: string | null = null;
-  const underbarrelMatch = lower.match(/(?:spread launcher|knife launcher|zip rockets)/);
-  if (underbarrelMatch) underbarrel = underbarrelMatch[0].replace(/\b\w/g, c => c.toUpperCase());
-  // Also check "X underbarrel" pattern (e.g. "Daedalus shotgun underbarrel")
-  if (!underbarrel) {
-    const ubMatch = lower.match(/(\w+)\s+(?:shotgun\s+)?underbarrel/);
-    if (ubMatch) underbarrel = "Spread Launcher"; // most common underbarrel reference
+  const manufacturerParts: string[] = [];
+  const repkitPerks: string[] = [];
+  for (const m of mfgPartMatches) {
+    const clean = m.replace(/[\[\]]/g, "");
+    const firstWord = clean.split(/\s*\(/)[0].trim().toLowerCase();
+    if (REPKIT_PERK_NAMES.has(firstWord)) {
+      repkitPerks.push(clean);
+    } else {
+      manufacturerParts.push(clean);
+    }
   }
 
-  // Per-weapon hints (scan for weapon name + specific context)
+  // Underbarrel detection — parse per-weapon underbarrels
+  const UNDERBARREL_NAMES = ["spread launcher", "knife launcher", "zip rockets", "beam tosser",
+    "kill drones", "space laser", "harpoon", "gravity well", "meathook"];
+  let globalUnderbarrel: string | null = null;
   const perWeapon: Record<string, { underbarrel?: string; element?: string; mfgParts?: string[] }> = {};
-  // E.g. "[Luty Madlad] with the Daedalus shotgun underbarrel"
-  const perWeaponUb = equipmentText.matchAll(/\[([^\]]+)\]\s+with\s+(?:the\s+)?(\w+\s+(?:shotgun\s+)?underbarrel)/gi);
-  for (const m of perWeaponUb) {
-    const name = m[1].trim();
-    perWeapon[name] = { ...(perWeapon[name] || {}), underbarrel: "Spread Launcher" };
+
+  // Scan for patterns like "Spread Launcher [Jakobs Shotgun]" or "[Spread Launcher] on [Jakobs Shotgun]"
+  // or "- Spread Launcher [Jakobs Shotgun]"
+  for (const ubName of UNDERBARREL_NAMES) {
+    const ubTitleCase = ubName.replace(/\b\w/g, c => c.toUpperCase());
+    // Pattern: underbarrel name near a weapon name in brackets
+    const patterns = [
+      new RegExp(`${ubName}\\s*\\[([^\\]]+)\\]`, "gi"),
+      new RegExp(`\\[${ubName}\\]\\s*(?:on|for|with)?\\s*\\[([^\\]]+)\\]`, "gi"),
+      new RegExp(`\\[([^\\]]+)\\]\\s*(?:with|using)?\\s*(?:the\\s+)?(?:\\[)?${ubName}`, "gi"),
+    ];
+    let foundPerWeapon = false;
+    for (const pat of patterns) {
+      for (const m of equipmentText.matchAll(pat)) {
+        const weaponName = m[1].trim();
+        perWeapon[weaponName] = { ...(perWeapon[weaponName] || {}), underbarrel: ubTitleCase };
+        foundPerWeapon = true;
+      }
+    }
+    // If found globally but not per-weapon, set as global
+    if (!foundPerWeapon && lower.includes(ubName)) {
+      if (!globalUnderbarrel) globalUnderbarrel = ubTitleCase;
+    }
+  }
+
+  // Also check "X underbarrel" pattern
+  if (!globalUnderbarrel && Object.keys(perWeapon).length === 0) {
+    const ubMatch = lower.match(/(\w+)\s+(?:shotgun\s+)?underbarrel/);
+    if (ubMatch) globalUnderbarrel = "Spread Launcher";
   }
 
   // ── Class mod skills ──────────────────────────────────────────────────
@@ -596,10 +627,11 @@ function parseEquipmentContext(
   }
 
   return {
-    weaponHints: { allElements, dominantElement, manufacturerParts, underbarrel, perWeapon },
+    weaponHints: { allElements, dominantElement, manufacturerParts, underbarrel: globalUnderbarrel, perWeapon },
     classModSkills,
     enhancementStats,
     enhancementPerks,
+    repkitPerks,
     ordnanceHint,
     firmwareHint,
     textDerivedGear,
@@ -815,14 +847,23 @@ function resolveManufacturerParts(
   );
 
   for (const hint of hints) {
+    // Extract key words: "Amp (Amplified)" → try "amp", "amplified"
+    // "Enrage (Experimental)" → try "enrage", "experimental"
+    const words = hint.replace(/[()]/g, " ").split(/\s+/).filter(w => w.length > 2);
     const normHint = normalize(hint);
-    const match = allMfgParts.find(r =>
-      normalize(r.partName || "").includes(normHint) ||
-      normalize(r.effect || "").includes(normHint) ||
-      normHint.includes(normalize(r.partName || ""))
-    );
-    if (match) {
-      codes.push(parseCode(match.code).partId);
+
+    let found = false;
+    // Try each word as a search term
+    for (const word of [normHint, ...words.map(normalize)]) {
+      if (found) break;
+      const match = allMfgParts.find(r => {
+        const n = normalize(r.partName || "") + " " + normalize(r.effect || "");
+        return n.includes(word);
+      });
+      if (match) {
+        codes.push(parseCode(match.code).partId);
+        found = true;
+      }
     }
   }
 
@@ -1017,8 +1058,11 @@ function assembleWeapon(
   const foregrips = pickParts(db, typeId, "Foregrip", 1, ["damage", "fire rate"]);
   if (foregrips.length > 0) parts.push(`{${foregrips[0].partId}}`);
 
-  // 13. Underbarrel (from context)
-  const ubPid = resolveUnderbarrel(db, typeId, context.weaponHints.underbarrel);
+  // 13. Underbarrel — check per-weapon first, then global
+  const itemName = resolved.match!.partName;
+  const perWeaponHint = context.weaponHints.perWeapon[itemName];
+  const ubHint = perWeaponHint?.underbarrel || context.weaponHints.underbarrel;
+  const ubPid = resolveUnderbarrel(db, typeId, ubHint);
   if (ubPid) parts.push(`{${ubPid}}`);
 
   const elementName = elementCode
@@ -1160,6 +1204,21 @@ function assembleAccessory(
     // Resistance
     const resist = pickParts(db, "243", "Resistance", 1);
     if (resist.length > 0) parts.push(`{243:${resist[0].partId}}`);
+
+    // Repkit perks from context (e.g. "Amp", "Enrage")
+    if (context.repkitPerks && context.repkitPerks.length > 0) {
+      const allRepkitPerks = db.filter(r => r.category === "Repkit" && (r.partType === "Perk" || r.partType === "Universal Perk"));
+      for (const hint of context.repkitPerks) {
+        const words = hint.replace(/[()]/g, " ").split(/\s+/).filter(w => w.length > 2);
+        for (const word of words.map(normalize)) {
+          const match = allRepkitPerks.find(r => normalize(r.partName || "").includes(word));
+          if (match) {
+            parts.push(`{243:${parseCode(match.code).partId}}`);
+            break;
+          }
+        }
+      }
+    }
 
   } else if (category === "Class Mod") {
     // Class mod: name + rarity + skills with proper tier levels + firmware + perks
