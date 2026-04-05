@@ -12,6 +12,8 @@ import type { GrenadeVisualRecipe, GrenadeVisualRecipeGroup } from "./generateMo
 const GRENADE_MFGS: number[] = [263, 267, 270, 272, 278, 291, 298, 311];
 //                    MAL  JAK  DAE  ORD  RIP  VLA  TOR  TED
 
+export type GrenadeStyleFilter = "singularity" | "mirv" | "artillery" | "lingering" | "random";
+
 export interface GenerateModdedGrenadeOptions {
   level?: number;
   modPowerMode?: "stable" | "op" | "insane";
@@ -19,6 +21,8 @@ export interface GenerateModdedGrenadeOptions {
   stockBaseDecoded?: string;
   /** Grenade visual recipes (from grenade_visual_recipes.json). */
   grenadeVisualRecipes?: GrenadeVisualRecipe[];
+  /** Style filter — pick only recipes of this style, then hybridize. "random" = all styles. */
+  grenadeStyle?: GrenadeStyleFilter;
   /** Skin value to apply. */
   skin?: string;
   /** Skin options pool (from weapon-gen/data skins). */
@@ -251,32 +255,115 @@ export function generateModdedGrenade(
     ];
     grenadePerkBlock = `{245:[${ids.join(" ")}]}`;
   } else {
-    const recipes = (options.grenadeVisualRecipes ?? []).filter((r) => r?.groups?.length > 0);
+    const allRecipes = (options.grenadeVisualRecipes ?? []).filter((r) => r?.groups?.length > 0);
+    const styleFilter = options.grenadeStyle ?? "random";
+
+    // Filter recipes by style (if not random)
+    let filteredRecipes = allRecipes;
+    if (styleFilter !== "random") {
+      const styleMatches = allRecipes.filter((r) =>
+        (r as { style?: string }).style === styleFilter
+      );
+      // Also include hybrid recipes that contain the style's core perks
+      const hybridMatches = allRecipes.filter((r) => {
+        if ((r as { style?: string }).style === "hybrid") {
+          const ids = new Set(r.groups.flatMap((g: GrenadeVisualRecipeGroup) => g.entries.map((e) => e.id)));
+          if (styleFilter === "singularity") return ids.has(33) || ids.has(60);
+          if (styleFilter === "mirv") return ids.has(29) || ids.has(42);
+          if (styleFilter === "artillery") return ids.has(32) || ids.has(57) || ids.has(55);
+          if (styleFilter === "lingering") return ids.has(34) || ids.has(35) || ids.has(36);
+        }
+        return false;
+      });
+      filteredRecipes = [...styleMatches, ...hybridMatches];
+      if (filteredRecipes.length === 0) filteredRecipes = allRecipes; // fallback
+    }
+
+    const recipes = filteredRecipes;
     if (recipes.length > 0) {
       const recipe = pick(recipes);
       recipeName = recipe.label;
-      const groupTokens = recipe.groups.map((group: GrenadeVisualRecipeGroup) => {
-        const ids: number[] = [];
-        for (const entry of group.entries) {
-          if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
-          const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.8, 1.2)));
-          const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
-            ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id])
-            : rawCount;
-          for (let i = 0; i < count; i++) ids.push(entry.id);
-        }
-        return ids.length > 0 ? `{245:[${ids.join(" ")}]}` : null;
-      }).filter((t): t is string => t !== null);
 
-      if (groupTokens.length > 0) {
-        // Inject firmware into first token
-        const fwInject = firmwareIds.join(" ");
-        groupTokens[0] = groupTokens[0]!.replace("{245:[", `{245:[${fwInject} `);
-        // Append Overflow + Express to last token — more charges + faster cooldown on every grenade
-        const overflowExpress = Array(randInt(8, 16)).fill(70).concat(Array(randInt(8, 16)).fill(71));
-        const lastIdx = groupTokens.length - 1;
-        groupTokens[lastIdx] = groupTokens[lastIdx]!.replace(/\]\}$/, ` ${overflowExpress.join(" ")}]}`);
-        grenadePerkBlock = groupTokens.join(" ");
+      // ── Build perk IDs from recipe with jitter ──────────────────────
+      const recipeBaseIds: number[] = [];
+      for (const group of recipe.groups) {
+        for (const entry of (group as GrenadeVisualRecipeGroup).entries) {
+          if (GRENADE_245_FORBIDDEN.has(entry.id)) continue;
+          // Wider jitter: ±30% randomization on stack counts
+          const rawCount = Math.max(1, Math.round(entry.n * scaleForMode * randFloat(0.7, 1.3)));
+          const count = GRENADE_PERK_HARD_CAP[entry.id] !== undefined
+            ? Math.min(rawCount, GRENADE_PERK_HARD_CAP[entry.id]!)
+            : rawCount;
+          for (let i = 0; i < count; i++) recipeBaseIds.push(entry.id);
+        }
+      }
+
+      // ── Hybridization: sprinkle complementary effects ─────────────
+      // Only when a style filter is active (not random) — adds variety
+      const BOUNCING_PERKS = new Set([23, 31, 41, 43]); // Always go to END
+      const sprinkleIds: number[] = [];
+      const bouncingIds: number[] = [];
+
+      if (styleFilter !== "random") {
+        // Sprinkle effects based on current style
+        const sprinklePool: { ids: number[]; chance: number; minN: number; maxN: number }[] = [];
+
+        if (styleFilter !== "lingering") {
+          sprinklePool.push({ ids: [34, 35, 36, 37, 38], chance: 0.40, minN: 3, maxN: 12 }); // Lingering
+        }
+        if (styleFilter !== "mirv") {
+          sprinklePool.push({ ids: [29, 42], chance: 0.30, minN: 3, maxN: 10 }); // MIRV
+        }
+        if (styleFilter !== "artillery") {
+          sprinklePool.push({ ids: [32, 55, 57], chance: 0.25, minN: 3, maxN: 8 }); // Artillery
+        }
+        if (styleFilter !== "singularity") {
+          sprinklePool.push({ ids: [33, 60, 46], chance: 0.20, minN: 2, maxN: 8 }); // Singularity
+        }
+        // Universal sprinkles
+        sprinklePool.push({ ids: [65], chance: 0.35, minN: 3, maxN: 8 });  // Fracture pillars
+        sprinklePool.push({ ids: [63], chance: 0.25, minN: 3, maxN: 6 });  // Pulsing
+        sprinklePool.push({ ids: [78], chance: 0.20, minN: 2, maxN: 5 });  // Bloodthirsty
+        sprinklePool.push({ ids: [69], chance: 0.15, minN: 2, maxN: 5 });  // Penetrator
+        sprinklePool.push({ ids: [77], chance: 0.10, minN: 2, maxN: 4 });  // Concussive
+
+        for (const sp of sprinklePool) {
+          if (Math.random() < sp.chance) {
+            const spId = pick(sp.ids);
+            const spCount = Math.round(randInt(sp.minN, sp.maxN) * scaleForMode);
+            const capped = GRENADE_PERK_HARD_CAP[spId] !== undefined
+              ? Math.min(spCount, GRENADE_PERK_HARD_CAP[spId]!)
+              : spCount;
+            for (let i = 0; i < capped; i++) sprinkleIds.push(spId);
+          }
+        }
+
+        // Small chance to add bouncing perks (goes to end)
+        if (Math.random() < 0.08) {
+          const bouncePerk = pick([23, 43]);
+          const bounceCount = Math.round(randInt(2, 5) * scaleForMode);
+          for (let i = 0; i < bounceCount; i++) bouncingIds.push(bouncePerk);
+        }
+
+        recipeName = recipe.label + (sprinkleIds.length > 0 ? " +" : "");
+      }
+
+      // ── Combine: firmware + recipe + sprinkles + bouncing at END ──
+      const allIds = [
+        ...firmwareIds,
+        ...recipeBaseIds.filter((id) => !BOUNCING_PERKS.has(id)),
+        ...sprinkleIds.filter((id) => !BOUNCING_PERKS.has(id)),
+        // Bouncing perks ALWAYS at the end (they look dumb otherwise)
+        ...recipeBaseIds.filter((id) => BOUNCING_PERKS.has(id)),
+        ...bouncingIds,
+      ];
+
+      // Append Overflow + Express — more charges + faster cooldown
+      const overflowExpress = Array(randInt(8, 16)).fill(70).concat(Array(randInt(8, 16)).fill(71));
+      allIds.push(...overflowExpress);
+
+      if (allIds.length > 0) {
+        grenadePerkBlock = `{245:[${allIds.join(" ")}]}`;
       } else {
         grenadePerkBlock = buildFallbackPerkBlock(firmwareIds, modPowerMode, scaleForMode);
       }

@@ -186,6 +186,8 @@ export interface GenerateModdedWeaponOptions {
   customMode?: boolean;
   forcedVisualBarrel?: string;
   forcedRarityToken?: string;
+  /** Style filter for grenade reload perks — "singularity", "mirv", "artillery", "lingering", or "random" */
+  grenadeStyle?: "singularity" | "mirv" | "artillery" | "lingering" | "random";
 }
 
 /**
@@ -1413,8 +1415,26 @@ export function generateModdedWeapon(
     ];
     terraGrenadePerkBlock = `{245:[${claudeIds.join(" ")}]}`;
   } else if (recipes.length > 0) {
+    // Filter by style if set
+    const weaponGrenadeStyle = options.grenadeStyle ?? "random";
+    let styleFiltered = recipes;
+    if (weaponGrenadeStyle !== "random") {
+      const styleDirect = recipes.filter((r) => (r as { style?: string }).style === weaponGrenadeStyle);
+      const styleHybrid = recipes.filter((r) => {
+        if ((r as { style?: string }).style !== "hybrid") return false;
+        const ids = new Set(r.groups?.flatMap((g: { entries?: { id: number }[] }) => (g.entries ?? []).map((e) => e.id)) ?? []);
+        if (weaponGrenadeStyle === "singularity") return ids.has(33) || ids.has(60);
+        if (weaponGrenadeStyle === "mirv") return ids.has(29) || ids.has(42);
+        if (weaponGrenadeStyle === "artillery") return ids.has(32) || ids.has(57);
+        if (weaponGrenadeStyle === "lingering") return ids.has(34) || ids.has(35) || ids.has(36);
+        return false;
+      });
+      styleFiltered = [...styleDirect, ...styleHybrid];
+      if (styleFiltered.length === 0) styleFiltered = recipes;
+    }
+
     // Enforce grenade recipes: keep trying until we get at least one non-empty token.
-    const remaining = [...recipes];
+    const remaining = [...styleFiltered];
     let chosenTokens: string[] = [];
     let chosenRecipe: GrenadeVisualRecipe | null = null;
     while (remaining.length > 0 && chosenTokens.length === 0) {
