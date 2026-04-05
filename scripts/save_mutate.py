@@ -117,7 +117,7 @@ def main() -> None:
     if not isinstance(yaml_content, str) or not yaml_content.strip():
         print(json.dumps({"success": False, "error": "yaml_content is required"}))
         sys.exit(0)
-    if action not in ("sync_levels", "set_backpack_level", "add_item", "apply_preset", "update_item", "remove_item", "clear_backpack"):
+    if action not in ("sync_levels", "set_backpack_level", "add_item", "apply_preset", "update_item", "remove_item", "clear_backpack", "get_specs", "set_specs"):
         print(json.dumps({"success": False, "error": "action must be sync_levels, set_backpack_level, add_item, apply_preset, update_item, remove_item, or clear_backpack"}))
         sys.exit(0)
 
@@ -165,6 +165,21 @@ def main() -> None:
             "fail_count": fail_count,
             "info": info,
         }))
+        sys.exit(0)
+
+    if action == "get_specs":
+        result = progression.get_specializations(data)
+        print(json.dumps({"success": True, "specs": result}))
+        sys.exit(0)
+
+    if action == "set_specs":
+        tree_points = params.get("tree_points") or {}
+        active_skills = params.get("active_skills") or []
+        slotted_skills = params.get("slotted_skills") or None
+        total_pool = params.get("total_pool")
+        progression.set_specializations(data, tree_points, active_skills, slotted_skills, total_pool)
+        out_yaml = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        print(json.dumps({"success": True, "yaml_content": out_yaml}))
         sys.exit(0)
 
     if action == "add_item":

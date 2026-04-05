@@ -30,7 +30,7 @@ export async function maxrollRoutes(fastify: FastifyInstance, _opts: FastifyPlug
     }
     try {
       const scraped = await scrapeMaxroll(url.trim());
-      const equipment = scraped.equipment.map(e => ({
+      const equipment = scraped.equipment.map((e: { slot: string; item: { type: string; customAttr: Record<string, unknown> } }) => ({
         slot: e.slot,
         item: e.item as { type: string; customAttr: Record<string, unknown> },
       }));

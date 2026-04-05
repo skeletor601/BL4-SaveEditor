@@ -1,5 +1,5 @@
 /**
- * /green — Rexalz's private testing ground.
+ * /rexalz — Rexalz's private testing ground.
  * Same feature set as Terra's lab — code vault, grenade codes, feedback.
  */
 import { useState, useEffect, useCallback } from "react";
@@ -14,7 +14,7 @@ export default function RexalzLabPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
         <div className="text-center space-y-6 max-w-sm px-6">
-          <div className="text-6xl opacity-20 select-none">🎯</div>
+          <div className="text-6xl opacity-20 select-none">{"\uD83C\uDFAF"}</div>
           <h1 className="text-xl font-bold text-[var(--color-text)]">Rexalz's Lab</h1>
           <p className="text-sm text-[var(--color-text-muted)]">This area is restricted. Enter the passphrase.</p>
           <form onSubmit={(e) => { e.preventDefault(); if (input.trim() === "1982") setUnlocked(true); }} className="space-y-3">
@@ -40,7 +40,7 @@ export default function RexalzLabPage() {
       <header className="border-b border-sky-500/20 px-6 py-4" style={{ backgroundColor: "rgba(18, 21, 27, 0.9)" }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🎯</span>
+            <span className="text-2xl">{"\uD83C\uDFAF"}</span>
             <div>
               <h1 className="text-lg font-bold text-sky-400">Rexalz's Lab</h1>
               <p className="text-[10px] font-mono tracking-widest text-sky-400/50">TESTING GROUND</p>
@@ -51,31 +51,21 @@ export default function RexalzLabPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
               REXALZ ONLINE
             </span>
-            <Link to="/" className="text-xs text-[var(--color-text-muted)] hover:text-sky-400">← Home</Link>
+            <Link to="/" className="text-xs text-[var(--color-text-muted)] hover:text-sky-400">&larr; Home</Link>
           </div>
         </div>
       </header>
 
+      {void LabCard}
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         <div className="rounded-xl border border-sky-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
           <div className="relative px-6 py-6">
-            <p className="text-sky-400 font-bold text-lg mb-2">Welcome aboard, Rexalz</p>
+            <p className="text-sky-400 font-bold text-lg mb-2">Welcome to the team, Rexalz.</p>
             <p className="text-sm text-[var(--color-text-muted)]">
               Your personal testing ground is ready. Test features, save codes, send feedback.
               Everything here is persistent — go wild.
             </p>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <LabCard title="DLC Cowbell — C4SH Character" status="new" desc="New character C4SH (Rogue) fully integrated. Class mod builder has all 100 skills across 3 trees (blue/red/green) with color-tinted icons, descriptions, and 5-tier skill IDs. Test building C4SH class mods." link="/beta/unified-item-builder" />
-          <LabCard title="34 New DLC Legendary Weapons" status="new" desc="Mantra, Shalashaska, Roulette, Eigenburst, Flash Cyclone, Inscriber, Jetsetter, Doeshot, Mercredi, and more. All with enriched perk descriptions and red text. 6 Pearlescent weapons. Check weapon builder dropdowns." link="/beta/unified-item-builder" />
-          <LabCard title="Custom Modded Grenade Generator" status="new" desc="Pick manufacturer + legendary grenade, then mods are stacked on top. Same as custom weapon generator. Hit 'Generate Modded' in grenade tab for Random/Custom modal." link="/beta/unified-item-builder" />
-          <LabCard title="Grenade Reload + Inf Alt Fire Combo" status="new" desc="Both modes can now be selected together in the weapon generator. Get grenade reload AND infinite ammo Rowan's Charge on the same gun." link="/beta/unified-item-builder" />
-          <LabCard title="New DLC Shields, Grenades, Repkits" status="new" desc="Honey Badger, Elpis Star, Hopscotch, Undershield (shields). Barb'ara, Bismuth-Tipped Dagger, Urchin, Slippy (grenades). Healthraiser, Blood Moon, Geiger-Roid (repkits). All with full descriptions." link="/beta/unified-item-builder" />
-          <LabCard title="Pearl Rarity — 33%" status="testing" desc="Pearl rarity chance changed to 33% for both weapon and grenade generators. Was 100% weapons / 10% grenades. Test that non-pearl weapons still generate correctly." link="/beta/unified-item-builder" />
-          <LabCard title="5,680 Parts in Universal DB" status="live" desc="All weapon parts now in Master Search. Search for any weapon by name, barrel, or code." link="/master-search" />
-          <LabCard title="Modded Repkit Generator" status="testing" desc="60 recipe archetypes (Tank, DPS, Healer, Speed, Elemental, Brawler, Support, Terra Specials). Class mod perks matched per archetype. Random elemental perks." link="/beta/unified-item-builder" />
         </div>
 
         {/* Testing checklist */}
@@ -84,31 +74,27 @@ export default function RexalzLabPage() {
             <h3 className="text-sm font-semibold text-sky-400">Testing Checklist</h3>
           </div>
           <div className="p-5 space-y-2 text-sm">
-            <CheckItem label="Select C4SH in class mod builder — do all 100 skills show with colored icons?" />
-            <CheckItem label="Click a C4SH skill — does the popup show name + description (all 16 placeholders now filled)?" />
-            <CheckItem label="Max All Skills button works for C4SH?" />
-            <CheckItem label="Build a C4SH legendary class mod — does the code generate correctly?" />
-            <CheckItem label="New DLC weapons show in weapon builder rarity dropdown (Shalashaska, Roulette, etc.)?" />
-            <CheckItem label="Pearl weapons show 'Pearl' in rarity dropdown (Eigenburst, Handcannon, Conflux)?" />
-            <CheckItem label="Custom modded grenade generator — pick manufacturer + legendary, does it generate?" />
-            <CheckItem label="Grenade Reload + Inf Alt Fire both selected — does the weapon get both?" />
-            <CheckItem label="Generate 10+ weapons — ~33% should be Pearl rarity?" />
-            <CheckItem label="New shields in shield builder (Honey Badger, Hopscotch, Undershield, Elpis Star)?" />
-            <CheckItem label="New grenades in grenade builder (Urchin, Slippy, Barb'ara, Bismuth, Transmitter)?" />
-            <CheckItem label="New repkits in repkit builder (Healthraiser, Blood Moon, Geiger-Roid)?" />
-            <CheckItem label="Master Search — search 'Mantra' or 'Shalashaska' — do new weapons appear?" />
-            <CheckItem label="Modded repkit generator — test all 8 categories (Tank, DPS, Healer, etc.)?" />
-            <CheckItem label="NEW: Build from URL — paste a Maxroll link, does it assemble all gear with godroll parts?" />
-            <CheckItem label="NEW: Build from URL — paste a Mobalytics link, does it assemble all gear?" />
-            <CheckItem label="NEW: Build from URL — paste a YouTube link — does it auto-detect planner links in description?" />
-            <CheckItem label="NEW: Crit Knife — any build with Jakobs grenade / penetrator outputs full modded crit knife?" />
-            <CheckItem label="NEW: Bod All Rounder — when Bod in build, enhancement gets ALL weapon type damage perks (pistol+SMG+shotgun+sniper+AR)?" />
-            <CheckItem label="NEW: Grenade style filter — Singularity/MIRV/Artillery/Lingering modes work in weapon + grenade generators?" />
-            <CheckItem label="NEW: Repkit names fixed — Torgue legendary shows 'War Paint' not just 'Legendary'?" />
-            <CheckItem label="NEW: C4SH skill icons — correct tree colors (blue=Sleight of Hand, red=Cross Fire, green=Cleromancy)?" />
-            <CheckItem label="NEW: Mobile Build from URL — paste link, copy all codes to clipboard?" />
-            <CheckItem label="NEW: Mobile grenade style + weapon presets (Grenade Reload / Inf Alt Fire)?" />
-            <CheckItem label="COMING SOON: Specialization editor — view and edit spec point allocations" />
+            <CheckItem label="C4SH class mod builder — do all 100 skills show with colored icons (blue/red/green trees)?" />
+            <CheckItem label="C4SH skill popup — shows name + full description?" />
+            <CheckItem label="Build from URL — paste a Maxroll link, does it assemble all gear?" />
+            <CheckItem label="Build from URL — paste a Mobalytics link, does it assemble all gear?" />
+            <CheckItem label="Build from URL — paste a YouTube link with a planner link in description — does it auto-detect and redirect?" />
+            <CheckItem label="Build from URL — paste a YouTube link WITHOUT planner link — does the warning appear?" />
+            <CheckItem label="Godroll priority — does Bod come out with Torgue Stickies + SMG Ammo (not a bare weapon)?" />
+            <CheckItem label="Crit Knife — does any build with Jakobs grenade / penetrator output the full modded crit knife?" />
+            <CheckItem label="Bod All Rounder — when Bod is in the build, does enhancement get ALL weapon type damage perks?" />
+            <CheckItem label="Grenade style filter — select Singularity/MIRV/Artillery/Lingering, does the generator respect the filter?" />
+            <CheckItem label="Grenade Reload + Inf Alt Fire presets — can both be selected, does weapon get both?" />
+            <CheckItem label="Modded weapon generator — does it produce varied weapons with different underbarrels?" />
+            <CheckItem label="Modded grenade generator — custom mode with manufacturer + legendary, does it work?" />
+            <CheckItem label="Modded shield generator — Bininu, Vintage, glow toggles all working?" />
+            <CheckItem label="Modded repkit generator — test Tank, DPS, Healer, Speed categories" />
+            <CheckItem label="Shield builder — Watts 4 Dinner, Honey Badger, Hopscotch show in legendaries?" />
+            <CheckItem label="Repkit names correct — Torgue legendary shows 'War Paint' not just 'Legendary'?" />
+            <CheckItem label="Master Search — search any weapon name, does it appear with description?" />
+            <CheckItem label="Mobile app — all builders accessible, grenade style filter present?" />
+            <CheckItem label="Mobile Build from URL — paste link, copy codes to clipboard works?" />
+            <CheckItem label="Specialization editor — can view and edit spec point allocations (COMING SOON)" />
           </div>
         </div>
 
@@ -225,7 +211,7 @@ function RexalzGrenadeCodes() {
         <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" maxLength={200} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
         <div className="flex gap-2 items-center">
           <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 font-medium text-sm hover:bg-sky-500/30 disabled:opacity-50">
-            {submitting ? "Saving…" : "Save Code"}
+            {submitting ? "Saving\u2026" : "Save Code"}
           </button>
           {msg && <span className="text-xs opacity-70">{msg}</span>}
         </div>
@@ -406,7 +392,7 @@ function RexalzVault() {
   );
 }
 
-// ── Feedback Panel (shared with Terra) ──────────────────────────────────────
+// ── Feedback Panel ──────────────────────────────────────────────────────────
 interface FeedbackEntry { id: string; author: string; type: string; message: string; page: string; status: string; reply?: string; timestamp: number; }
 const TYPE_COLORS: Record<string, string> = { bug: "border-red-500/40 bg-red-500/10 text-red-400", idea: "border-blue-500/40 bg-blue-500/10 text-blue-400", question: "border-yellow-500/40 bg-yellow-500/10 text-yellow-400", note: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]" };
 const STATUS_COLORS: Record<string, string> = { new: "border-sky-500/40 bg-sky-500/10 text-sky-400", seen: "border-blue-500/40 bg-blue-500/10 text-blue-400", fixed: "border-sky-500/40 bg-sky-500/10 text-sky-400", wontfix: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]" };

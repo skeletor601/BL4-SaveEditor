@@ -15,7 +15,7 @@ const SAVE_MUTATE_TIMEOUT_MS = 90_000;
 
 type SaveMutatePayload = {
   yaml_content: string;
-  action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item" | "clear_backpack";
+  action: "sync_levels" | "set_backpack_level" | "add_item" | "apply_preset" | "update_item" | "remove_item" | "clear_backpack" | "get_specs" | "set_specs";
   params?: Record<string, unknown>;
 };
 
@@ -535,4 +535,62 @@ export async function saveRoutes(
         .send({ success: false, error: isTimeout ? "Request timed out. Try again." : message });
     }
   });
+
+  // ── Specializations ─────────────────────────────────────────────────
+  fastify.post<{ Body: { yaml_content?: string } }>("/save/get-specs", async (request, reply) => {
+    const body = request.body as { yaml_content?: string } | undefined;
+    const yamlContent = body?.yaml_content;
+    if (!yamlContent || typeof yamlContent !== "string") {
+      return reply.code(400).send({ success: false, error: "yaml_content is required" });
+    }
+    try {
+      const result = await runSaveMutate({
+        yaml_content: yamlContent,
+        action: "get_specs",
+        params: {},
+      });
+      return reply.send({ success: true, specs: (result as Record<string, unknown>).specs });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed";
+      fastify.log.warn({ err: e }, "save/get-specs failed");
+      return reply.code(500).send({ success: false, error: message });
+    }
+  });
+
+  fastify.post<{ Body: { yaml_content?: string; tree_points?: Record<string, number>; active_skills?: string[]; slotted_skills?: (string | null)[]; total_pool?: number } }>(
+    "/save/set-specs",
+    async (request, reply) => {
+      const body = request.body as {
+        yaml_content?: string;
+        tree_points?: Record<string, number>;
+        active_skills?: string[];
+        slotted_skills?: (string | null)[];
+        total_pool?: number;
+      } | undefined;
+      const yamlContent = body?.yaml_content;
+      if (!yamlContent || typeof yamlContent !== "string") {
+        return reply.code(400).send({ success: false, error: "yaml_content is required" });
+      }
+      try {
+        const result = await runSaveMutate({
+          yaml_content: yamlContent,
+          action: "set_specs",
+          params: {
+            tree_points: body?.tree_points ?? {},
+            active_skills: body?.active_skills ?? [],
+            slotted_skills: body?.slotted_skills ?? undefined,
+            total_pool: body?.total_pool ?? undefined,
+          },
+        });
+        if (!result.success) {
+          return reply.code(400).send({ success: false, error: result.error ?? "Set specs failed" });
+        }
+        return reply.send({ success: true, yaml_content: result.yaml_content });
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed";
+        fastify.log.warn({ err: e }, "save/set-specs failed");
+        return reply.code(500).send({ success: false, error: message });
+      }
+    },
+  );
 }

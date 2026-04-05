@@ -1,0 +1,270 @@
+{
+  "trees": [
+    {
+      "id": 1,
+      "internalName": "Survivor",
+      "displayName": "Survivor",
+      "maxrollSlug": "survivor",
+      "icon": "/icons/specializations/ico_art_specialization_survivor.png",
+      "description": "The Vault Hunter gains increased Maximum Health and Shields.",
+      "baseEffect": "Maximum Health & Shields",
+      "perks": [
+        {
+          "slot": "ST_1_Skill_1",
+          "skillRef": "Skill_Specializations_Survivor_Skill_1",
+          "name": "Sturdy Stuff",
+          "unlockPoints": 1,
+          "description": "Fight For Your Life lasts longer when not moving, and Second Winds fully restore the Vault Hunter's Health.",
+          "effects": "FFYL Duration: +50% when not moving | Health Restoration: 100%",
+          "icon": "/icons/specializations/ico_specialization_passive_survivor_rank_1.png"
+        },
+        {
+          "slot": "ST_1_Skill_2",
+          "skillRef": "Skill_Specializations_Survivor_Skill_2",
+          "name": "Bullets Are Scared Of Me",
+          "unlockPoints": 10,
+          "description": "The Vault Hunter gains increased Damage Reduction based on the fullness of their Shield or Health, whichever has higher Maximum.",
+          "effects": "Damage Reduction: 30% when Full",
+          "icon": "/icons/specializations/ico_specialization_passive_survivor_rank_10.png"
+        },
+        {
+          "slot": "ST_1_Skill_3",
+          "skillRef": "Skill_Specializations_Survivor_Skill_3",
+          "name": "The Best Defense",
+          "unlockPoints": 20,
+          "description": "The Vault Hunter gains increased Damage Dealt based on the fullness of their Shield or Health, whichever has higher Maximum.",
+          "effects": "Damage Dealt: +30% when Full",
+          "icon": "/icons/specializations/ico_specialization_passive_survivor_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "internalName": "Artificer",
+      "displayName": "Gadgeteer",
+      "maxrollSlug": "gadgeteer",
+      "icon": "/icons/specializations/ico_art_specialization_artificer.png",
+      "description": "The Vault Hunter gains increased Ordnance Cooldown Rate.",
+      "baseEffect": "Ordnance Cooldown Rate",
+      "perks": [
+        {
+          "slot": "ST_2_Skill_1",
+          "skillRef": "Skill_Specializations_Artificer_Skill_1",
+          "name": "Tripwire",
+          "unlockPoints": 1,
+          "description": "Reduce Ordnance Cooldown whenever Action Skill is activated.",
+          "effects": "Ordnance Cooldown Reduction: 25%",
+          "icon": "/icons/specializations/ico_specialization_passive_artificer_rank_1.png"
+        },
+        {
+          "slot": "ST_2_Skill_2",
+          "skillRef": "Skill_Specializations_Artificer_Skill_2",
+          "name": "Full Spectrum Arsenal",
+          "unlockPoints": 10,
+          "description": "Ordnance Damage now benefits from increases to Gun Damage.",
+          "effects": "Ordnance Damage: 50% of increases to Gun Damage",
+          "icon": "/icons/specializations/ico_specialization_passive_artificer_rank_10.png"
+        },
+        {
+          "slot": "ST_2_Skill_3",
+          "skillRef": "Skill_Specializations_Artificer_Skill_3",
+          "name": "Fragmentation Payload",
+          "unlockPoints": 20,
+          "description": "Ordnance gains a chance to Critically Hit enemies, and also gains increased Ordnance Critical Hit Damage.",
+          "effects": "Ordnance Critical Hit Chance: 5% | Ordnance Critical Hit Damage: +50%",
+          "icon": "/icons/specializations/ico_specialization_passive_artificer_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "internalName": "Enforcer",
+      "displayName": "Brute",
+      "maxrollSlug": "brute",
+      "icon": "/icons/specializations/ico_art_specialization_enforcer.png",
+      "description": "The Vault Hunter gains increased Gun Damage.",
+      "baseEffect": "Gun Damage",
+      "perks": [
+        {
+          "slot": "ST_3_Skill_1",
+          "skillRef": "Skill_Specializations_Enforcer_Skill_1",
+          "name": "Lead or Alive",
+          "unlockPoints": 1,
+          "description": "When entering Fight For Your Life, all Guns are automatically Reloaded, and the Vault Hunter gains increased Fire Rate.",
+          "effects": "Fire Rate: +25% while in FFYL",
+          "icon": "/icons/specializations/ico_specialization_passive_enforcer_rank_1.png"
+        },
+        {
+          "slot": "ST_3_Skill_2",
+          "skillRef": "Skill_Specializations_Enforcer_Skill_2",
+          "name": "CQC",
+          "unlockPoints": 10,
+          "description": "Melee Damage grants the Vault Hunter increased Fire Rate for a Duration.",
+          "effects": "Fire Rate: +30% | Duration: 8 seconds",
+          "icon": "/icons/specializations/ico_specialization_passive_enforcer_rank_10.png"
+        },
+        {
+          "slot": "ST_3_Skill_3",
+          "skillRef": "Skill_Specializations_Enforcer_Skill_3",
+          "name": "Riddle You This",
+          "unlockPoints": 20,
+          "description": "Whenever the Vault Hunter deals Gun Damage, gain a Stack of Riddle You This, increasing Gun Damage.",
+          "effects": "Gun Damage: +1% per Stack | Maximum Stacks: 50 | Duration: 6 seconds",
+          "icon": "/icons/specializations/ico_specialization_passive_enforcer_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "internalName": "Slayer",
+      "displayName": "Sharpshooter",
+      "maxrollSlug": "sharpshooter",
+      "icon": "/icons/specializations/ico_art_specialization_slayer.png",
+      "description": "The Vault Hunter gains increased Reload Speed and Accuracy.",
+      "baseEffect": "Reload Speed & Accuracy",
+      "perks": [
+        {
+          "slot": "ST_4_Skill_1",
+          "skillRef": "Skill_Specializations_Slayer_Skill_1",
+          "name": "Down But Not Out",
+          "unlockPoints": 1,
+          "description": "During Fight For Your Life the Vault Hunter can now Aim down sights and does not suffer Gun Accuracy penalties.",
+          "effects": "ADS enabled in FFYL | No accuracy penalty",
+          "icon": "/icons/specializations/ico_specialization_passive_slayer_rank_1.png"
+        },
+        {
+          "slot": "ST_4_Skill_2",
+          "skillRef": "Skill_Specializations_Slayer_Skill_2",
+          "name": "In The Zone",
+          "unlockPoints": 10,
+          "description": "While Aiming, the Vault Hunter gains increased Gun Damage and Critical Hit Damage per second. Bonuses are lost after 2 seconds of not Aiming.",
+          "effects": "Gun Damage: +5% per Stack | Critical Hit Damage: +5% per Stack | Maximum Stacks: 5",
+          "icon": "/icons/specializations/ico_specialization_passive_slayer_rank_10.png"
+        },
+        {
+          "slot": "ST_4_Skill_3",
+          "skillRef": "Skill_Specializations_Slayer_Skill_3",
+          "name": "One Shot, One Kill",
+          "unlockPoints": 20,
+          "description": "Kill Skill. Excess Damage will be Stored and added to your next Gun Shot.",
+          "effects": "Excess Damage Stored: 100% | Stored Duration: 12 seconds",
+          "icon": "/icons/specializations/ico_specialization_passive_slayer_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "internalName": "Hunter",
+      "displayName": "Killer",
+      "maxrollSlug": "killer",
+      "icon": "/icons/specializations/ico_art_specialization_hunter.png",
+      "description": "The Vault Hunter gains increased Critical Hit Damage and Status Effect Damage.",
+      "baseEffect": "Critical Hit Damage & Status Effect Damage",
+      "perks": [
+        {
+          "slot": "ST_5_Skill_1",
+          "skillRef": "Skill_Specializations_Hunter_Skill_1",
+          "name": "Contamination",
+          "unlockPoints": 1,
+          "description": "Critical Hits grant increased Status Effect Application Chance.",
+          "effects": "Status Effect Application Chance: +10% per Stack | Stack Duration: 10 seconds | Maximum Stacks: 10",
+          "icon": "/icons/specializations/ico_specialization_passive_hunter_rank_1.png"
+        },
+        {
+          "slot": "ST_5_Skill_2",
+          "skillRef": "Skill_Specializations_Hunter_Skill_2",
+          "name": "Compounding Afflictions",
+          "unlockPoints": 10,
+          "description": "Enemies take increased Damage for each Status Effect applied to them.",
+          "effects": "Damage Taken: +1% per Status Effect",
+          "icon": "/icons/specializations/ico_specialization_passive_hunter_rank_10.png"
+        },
+        {
+          "slot": "ST_5_Skill_3",
+          "skillRef": "Skill_Specializations_Hunter_Skill_3",
+          "name": "Overkill",
+          "unlockPoints": 20,
+          "description": "Kill Skill. Killing an enemy with a Critical Hit will cause them to explode, dealing Skill Damage.",
+          "effects": "Damage Dealt: 50% of initial hit",
+          "icon": "/icons/specializations/ico_specialization_passive_hunter_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "internalName": "Adventurer",
+      "displayName": "Daredevil",
+      "maxrollSlug": "daredevil",
+      "icon": "/icons/specializations/ico_art_specialization_adventurer.png",
+      "description": "The Vault Hunter gains increased Action Skill Cooldown Rate.",
+      "baseEffect": "Action Skill Cooldown Rate",
+      "perks": [
+        {
+          "slot": "ST_6_Skill_1",
+          "skillRef": "Skill_Specializations_Adventurer_Skill_1",
+          "name": "Now With Caffeine",
+          "unlockPoints": 1,
+          "description": "Reduce Action Skill Cooldown whenever a Repkit is activated.",
+          "effects": "Action Skill Cooldown Reduction: 25%",
+          "icon": "/icons/specializations/ico_specialization_passive_adventurer_rank_1.png"
+        },
+        {
+          "slot": "ST_6_Skill_2",
+          "skillRef": "Skill_Specializations_Adventurer_Skill_2",
+          "name": "I Am A Gun",
+          "unlockPoints": 10,
+          "description": "Action Skill Damage now benefits from increases to Gun Damage.",
+          "effects": "Action Skill Damage: +50% of increases to Gun Damage",
+          "icon": "/icons/specializations/ico_specialization_passive_adventurer_rank_10.png"
+        },
+        {
+          "slot": "ST_6_Skill_3",
+          "skillRef": "Skill_Specializations_Adventurer_Skill_3",
+          "name": "A Honed Mind",
+          "unlockPoints": 20,
+          "description": "Action Skills gain a chance to Critically Hit enemies, and also gain increased Action Skill Critical Hit Damage.",
+          "effects": "Action Skill Critical Hit Chance: 5% | Action Skill Critical Hit Damage: +50%",
+          "icon": "/icons/specializations/ico_specialization_passive_adventurer_rank_20.png"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "internalName": "Wanderer",
+      "displayName": "Runner",
+      "maxrollSlug": "runner",
+      "icon": "/icons/specializations/ico_art_specialization_wanderer.png",
+      "description": "The Vault Hunter gains increased Movement Speed and Melee Damage.",
+      "baseEffect": "Movement Speed & Melee Damage",
+      "perks": [
+        {
+          "slot": "ST_7_Skill_1",
+          "skillRef": "Skill_Specializations_Wanderer_Skill_1",
+          "name": "Bear Arms",
+          "unlockPoints": 1,
+          "description": "Melee Damage now benefits from increases to Gun Damage.",
+          "effects": "Melee Damage: 50% of increases to Gun Damage",
+          "icon": "/icons/specializations/ico_specialization_passive_wanderer_rank_1.png"
+        },
+        {
+          "slot": "ST_7_Skill_2",
+          "skillRef": "Skill_Specializations_Wanderer_Skill_2",
+          "name": "Bullet Train",
+          "unlockPoints": 10,
+          "description": "The Vault Hunter can now Hipfire while Sprinting, and gain Gun Damage the faster they move.",
+          "effects": "Gun Damage: +15% when Walking",
+          "icon": "/icons/specializations/ico_specialization_passive_wanderer_rank_10.png"
+        },
+        {
+          "slot": "ST_7_Skill_3",
+          "skillRef": "Skill_Specializations_Wanderer_Skill_3",
+          "name": "Groundbreaker",
+          "unlockPoints": 20,
+          "description": "Non-Melee Attack Damage and Slam Damage are Stored. Melee Attacks and Slam deal Kinetic Bonus Damage equal to all Stored Damage.",
+          "effects": "Stored Damage: 20% | Stored Damage Duration: 5 seconds",
+          "icon": "/icons/specializations/ico_specialization_passive_wanderer_rank_20.png"
+        }
+      ]
+    }
+  ]
+}

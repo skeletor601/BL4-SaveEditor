@@ -2,10 +2,12 @@ import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import SelectSaveView from "@/pages/SelectSaveView";
 import CharacterPage from "@/pages/save-tools/CharacterPage";
 import YamlPage from "@/pages/save-tools/YamlPage";
+import SpecializationsPage from "@/pages/save-tools/SpecializationsPage";
 
 const subTabs = [
   { path: "select-save", label: "Select Save" },
   { path: "edit", label: "Character" },
+  { path: "specs", label: "Specializations" },
   { path: "yaml", label: "YAML" },
   { path: "/inventory/backpack", label: "Backpack", external: true },
 ];
@@ -42,6 +44,7 @@ export default function CharacterSectionPage() {
           <Route index element={<Navigate to="/character/select-save" replace />} />
           <Route path="select-save" element={<SelectSaveView />} />
           <Route path="edit" element={<CharacterPage />} />
+          <Route path="specs" element={<SpecializationsPage />} />
           <Route path="yaml" element={<YamlPage />} />
           <Route path="*" element={<Navigate to="/character/select-save" replace />} />
         </Routes>

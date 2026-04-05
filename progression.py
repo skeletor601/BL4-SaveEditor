@@ -347,25 +347,181 @@ def unlock_all_specialization(data):
         }
         graphs.append(graph)
         
-    spec_names = [
-        'Survivor', 'Artificer', 'Enforcer', 'Slayer',
-        'Hunter', 'Adventurer', 'Wanderer'
-    ]
-    
-    # Find group_def_name
+    # Find group_def_name from existing graphs
     found_group_def = None
     for g in graphs:
-        if g.get('group_def_name') and g['group_def_name'] != 'progress_group':
-            found_group_def = g['group_def_name']
+        gdn = g.get('group_def_name', '')
+        if gdn and gdn not in ('', 'progress_group', 'Oak2_GlobalProgressGraph_Group'):
+            found_group_def = gdn
             break
-            
+
     graph['group_def_name'] = found_group_def or graph.get('group_def_name') or ''
-    graph['nodes'] = [{'name': name, 'points_spent': 100} for name in spec_names]
-    
+    graph['nodes'] = [{'name': name, 'points_spent': 100} for name in SPEC_TREE_NAMES]
+
+    # Also activate all skills with is_activated format
+    skills_graph = next((g for g in graphs if g.get('name') == 'ProgressGraph_Specializations_Skills'), None)
+    if not skills_graph:
+        skills_graph = {
+            'name': 'ProgressGraph_Specializations_Skills',
+            'group_def_name': graph['group_def_name'],
+            'nodes': []
+        }
+        graphs.append(skills_graph)
+    else:
+        skills_graph['group_def_name'] = graph['group_def_name']
+
+    # Activate all 21 skills, slot the first 4 as active
+    skill_nodes = []
+    slot_idx = 0
+    for slot_name in SPEC_SKILL_SLOTS:
+        node = {'name': slot_name, 'is_activated': True}
+        if slot_idx < 4:
+            node['activation_level'] = slot_idx
+            slot_idx += 1
+        skill_nodes.append(node)
+    skills_graph['nodes'] = skill_nodes
+
     point_pools = get_or_create_dict(progression, 'point_pools')
     point_pools['specializationtokenpool'] = 700
-    
+
     stage_epilogue_mission(data)
+
+SPEC_TREE_NAMES = ['Survivor', 'Artificer', 'Enforcer', 'Slayer', 'Hunter', 'Adventurer', 'Wanderer']
+
+SPEC_SKILL_SLOTS = [
+    'ST_1_Skill_1', 'ST_1_Skill_2', 'ST_1_Skill_3',  # Survivor
+    'ST_2_Skill_1', 'ST_2_Skill_2', 'ST_2_Skill_3',  # Artificer/Gadgeteer
+    'ST_3_Skill_1', 'ST_3_Skill_2', 'ST_3_Skill_3',  # Enforcer/Brute
+    'ST_4_Skill_1', 'ST_4_Skill_2', 'ST_4_Skill_3',  # Slayer/Sharpshooter
+    'ST_5_Skill_1', 'ST_5_Skill_2', 'ST_5_Skill_3',  # Hunter/Killer
+    'ST_6_Skill_1', 'ST_6_Skill_2', 'ST_6_Skill_3',  # Adventurer/Daredevil
+    'ST_7_Skill_1', 'ST_7_Skill_2', 'ST_7_Skill_3',  # Wanderer/Runner
+]
+
+def get_specializations(data):
+    """Read current spec allocations from save data."""
+    progression = data.get('progression', {})
+    graphs = progression.get('graphs', [])
+    point_pools = progression.get('point_pools', {})
+
+    # Read tree point allocations
+    spec_graph = next((g for g in graphs if g.get('name') == 'ProgressGraph_Specializations'), None)
+    tree_points = {}
+    if spec_graph:
+        for node in spec_graph.get('nodes', []):
+            # Normalize name casing (game sometimes uses HUNTER instead of Hunter)
+            name = node['name']
+            for canonical in SPEC_TREE_NAMES:
+                if name.lower() == canonical.lower():
+                    name = canonical
+                    break
+            tree_points[name] = node.get('points_spent', 0)
+
+    # Read skill activations + slotted skills
+    skills_graph = next((g for g in graphs if g.get('name') == 'ProgressGraph_Specializations_Skills'), None)
+    active_skills = []       # all unlocked skills
+    slotted_skills = [None, None, None, None]  # the 4 equipped slots
+    if skills_graph:
+        for node in skills_graph.get('nodes', []):
+            if node.get('is_activated'):
+                active_skills.append(node['name'])
+                # activation_level = slot index (0-3) for the 4 active perks
+                al = node.get('activation_level')
+                if al is not None and isinstance(al, int) and 0 <= al <= 3:
+                    slotted_skills[al] = node['name']
+
+    # Available points
+    total_pool = point_pools.get('specializationtokenpool', 0)
+    spent = sum(tree_points.values())
+
+    return {
+        'treePoints': tree_points,
+        'activeSkills': active_skills,
+        'slottedSkills': slotted_skills,
+        'totalPool': total_pool,
+        'pointsSpent': spent,
+        'pointsAvailable': total_pool - spent,
+    }
+
+
+def set_specializations(data, tree_points, active_skills, slotted_skills=None, total_pool=None):
+    """Write spec allocations to save data.
+
+    tree_points: dict like {'Survivor': 20, 'Enforcer': 20, ...}
+    active_skills: list of all unlocked skills like ['ST_1_Skill_1', 'ST_3_Skill_3', ...]
+    slotted_skills: list of exactly 4 skill slots (the equipped perks), e.g. ['ST_3_Skill_3', 'ST_5_Skill_1', 'ST_6_Skill_2', 'ST_1_Skill_1']
+    total_pool: optional override for total spec points (default: keep existing or 700)
+    """
+    progression = get_or_create_dict(data, 'progression')
+    graphs = get_or_create_list(progression, 'graphs')
+    point_pools = get_or_create_dict(progression, 'point_pools')
+
+    # Find the group_def_name from an existing graph
+    found_group_def = ''
+    for g in graphs:
+        gdn = g.get('group_def_name', '')
+        if gdn and gdn not in ('', 'progress_group', 'Oak2_GlobalProgressGraph_Group'):
+            found_group_def = gdn
+            break
+
+    # ── Tree point allocations ──────────────────────────────────────────
+    spec_graph = next((g for g in graphs if g.get('name') == 'ProgressGraph_Specializations'), None)
+    if not spec_graph:
+        spec_graph = {
+            'name': 'ProgressGraph_Specializations',
+            'group_def_name': found_group_def,
+            'nodes': []
+        }
+        graphs.append(spec_graph)
+
+    if not spec_graph.get('group_def_name'):
+        spec_graph['group_def_name'] = found_group_def
+
+    nodes = []
+    for name in SPEC_TREE_NAMES:
+        pts = tree_points.get(name, 0)
+        if isinstance(pts, (int, float)) and pts >= 0:
+            nodes.append({'name': name, 'points_spent': int(pts)})
+    spec_graph['nodes'] = nodes
+
+    # ── Skill activations with is_activated + activation_level ──────────
+    skills_graph = next((g for g in graphs if g.get('name') == 'ProgressGraph_Specializations_Skills'), None)
+    if not skills_graph:
+        skills_graph = {
+            'name': 'ProgressGraph_Specializations_Skills',
+            'group_def_name': found_group_def,
+            'nodes': []
+        }
+        graphs.append(skills_graph)
+
+    if not skills_graph.get('group_def_name'):
+        skills_graph['group_def_name'] = found_group_def
+
+    # Build a set of slotted skills for quick lookup
+    slotted_set = {}  # skill_name -> slot_index
+    if slotted_skills:
+        for idx, skill in enumerate(slotted_skills):
+            if skill and skill in SPEC_SKILL_SLOTS:
+                slotted_set[skill] = idx
+
+    skill_nodes = []
+    for slot in active_skills:
+        if slot not in SPEC_SKILL_SLOTS:
+            continue
+        node = {'name': slot, 'is_activated': True}
+        if slot in slotted_set:
+            node['activation_level'] = slotted_set[slot]
+        skill_nodes.append(node)
+    skills_graph['nodes'] = skill_nodes
+
+    # ── Point pool ──────────────────────────────────────────────────────
+    if total_pool is not None:
+        point_pools['specializationtokenpool'] = int(total_pool)
+    elif 'specializationtokenpool' not in point_pools:
+        point_pools['specializationtokenpool'] = 700
+
+    return True
+
 
 def set_character_to_max_level(data):
     set_character_level(data, MAX_LEVEL)
