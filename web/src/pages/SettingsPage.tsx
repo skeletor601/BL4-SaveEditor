@@ -133,6 +133,9 @@ export default function SettingsPage() {
           <strong className="text-emerald-300">Gre3nZ89</strong> - tester, code hunter, and generator whisperer. Green jumped in headfirst — stress-testing every modded generator, hunting down edge cases, validating DLC weapon codes, and pushing the builders to their limits. The kind of tester every project needs.
         </p>
         <p className="text-sm text-[var(--color-text-muted)] mt-2">
+          <strong className="text-sky-300">Rexalz</strong> - the newest weapon in the arsenal. Fresh eyes catch what veterans miss. Rexalz came in swinging — testing build planners, validating godroll pipelines, and making sure every assembled build hits as hard as it should.
+        </p>
+        <p className="text-sm text-[var(--color-text-muted)] mt-2">
           <strong>Spliff, Shaggy, Hydra, Shadow</strong> - the front line. Bug hunting, stress testing, and getting the word out so others can enjoy it too.
         </p>
         <p className="text-sm mt-3">

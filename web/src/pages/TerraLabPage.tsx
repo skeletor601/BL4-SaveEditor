@@ -142,13 +142,17 @@ export default function TerraLabPage() {
             <CheckItem label="New repkits in repkit builder (Healthraiser, Blood Moon, Geiger-Roid)?" />
             <CheckItem label="Master Search — search 'Mantra' or 'Shalashaska' — do new weapons appear?" />
             <CheckItem label="Modded repkit generator — test all 8 categories (Tank, DPS, Healer, etc.)?" />
-            <CheckItem label="NEW: Hover over legendary type in weapon builder — does hover card show perk name + description + red text?" />
-            <CheckItem label="NEW: Hover over barrels in weapon builder — do legendary barrels show perk info in hover card?" />
-            <CheckItem label="NEW: Custom modded weapon generator — legendary list shows hover cards on the right side?" />
-            <CheckItem label="NEW: Custom modded grenade generator — legendary list shows hover cards on the right side?" />
-            <CheckItem label="NEW: Shield legendary picker — hover cards show perk descriptions?" />
-            <CheckItem label="NEW: Repkit legendary picker — hover cards show perk descriptions?" />
-            <CheckItem label="NEW: Heavy weapons in database — Sidewinder, Heimdahl, Ichor show up in Master Search?" />
+            <CheckItem label="NEW: Build from URL — paste a Maxroll link, does it assemble all gear with godroll parts?" />
+            <CheckItem label="NEW: Build from URL — paste a Mobalytics link, does it assemble all gear?" />
+            <CheckItem label="NEW: Build from URL — paste a YouTube link — does it auto-detect planner links in description?" />
+            <CheckItem label="NEW: Crit Knife — any build with Jakobs grenade / penetrator outputs full modded crit knife?" />
+            <CheckItem label="NEW: Bod All Rounder — when Bod in build, enhancement gets ALL weapon type damage perks (pistol+SMG+shotgun+sniper+AR)?" />
+            <CheckItem label="NEW: Grenade style filter — Singularity/MIRV/Artillery/Lingering modes work in weapon + grenade generators?" />
+            <CheckItem label="NEW: Repkit names fixed — Torgue legendary shows 'War Paint' not just 'Legendary'?" />
+            <CheckItem label="NEW: C4SH skill icons — correct tree colors (blue=Sleight of Hand, red=Cross Fire, green=Cleromancy)?" />
+            <CheckItem label="NEW: Mobile Build from URL — paste link, copy all codes to clipboard?" />
+            <CheckItem label="NEW: Mobile grenade style + weapon presets (Grenade Reload / Inf Alt Fire)?" />
+            <CheckItem label="COMING SOON: Specialization editor — view and edit spec point allocations" />
           </div>
         </div>
 

@@ -20,6 +20,7 @@ import TestAppPage from "@/pages/TestAppPage";
 import LayoutTestPage from "@/pages/LayoutTestPage";
 import TerraLabPage from "@/pages/TerraLabPage";
 import GreenLabPage from "@/pages/GreenLabPage";
+import RexalzLabPage from "@/pages/RexalzLabPage";
 import DrLecterPage from "@/pages/DrLecterPage";
 
 function AppRoutes() {
@@ -86,6 +87,7 @@ function AppRoutes() {
         <Route path="/test-app" element={<TestAppPage />} />
         <Route path="/terra" element={<TerraLabPage />} />
         <Route path="/green" element={<GreenLabPage />} />
+        <Route path="/rexalz" element={<RexalzLabPage />} />
         <Route path="/drlecter" element={<DrLecterPage />} />
         <Route path="/testing" element={<UnifiedItemBuilderPage />} />
         <Route path="/save-tools" element={<Navigate to="/character/select-save" replace />} />

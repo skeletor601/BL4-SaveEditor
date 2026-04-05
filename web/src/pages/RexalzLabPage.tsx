@@ -1,12 +1,12 @@
 /**
- * /green — Green's private testing ground.
+ * /green — Rexalz's private testing ground.
  * Same feature set as Terra's lab — code vault, grenade codes, feedback.
  */
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { fetchApi } from "@/lib/apiClient";
 
-export default function GreenLabPage() {
+export default function RexalzLabPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [input, setInput] = useState("");
 
@@ -14,20 +14,20 @@ export default function GreenLabPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
         <div className="text-center space-y-6 max-w-sm px-6">
-          <div className="text-6xl opacity-20 select-none">🧪</div>
-          <h1 className="text-xl font-bold text-[var(--color-text)]">Green's Lab</h1>
+          <div className="text-6xl opacity-20 select-none">🎯</div>
+          <h1 className="text-xl font-bold text-[var(--color-text)]">Rexalz's Lab</h1>
           <p className="text-sm text-[var(--color-text-muted)]">This area is restricted. Enter the passphrase.</p>
-          <form onSubmit={(e) => { e.preventDefault(); if (input.trim() === "9989") setUnlocked(true); }} className="space-y-3">
+          <form onSubmit={(e) => { e.preventDefault(); if (input.trim() === "1982") setUnlocked(true); }} className="space-y-3">
             <input
               type="text"
               inputMode="numeric"
               value={input}
-              onChange={(e) => { setInput(e.target.value); if (e.target.value.trim() === "9989") setUnlocked(true); }}
+              onChange={(e) => { setInput(e.target.value); if (e.target.value.trim() === "1982") setUnlocked(true); }}
               placeholder="Passphrase"
-              className="w-full px-4 py-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center text-lg tracking-wider focus:border-emerald-500 focus:outline-none"
+              className="w-full px-4 py-3 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-center text-lg tracking-wider focus:border-sky-500 focus:outline-none"
               autoFocus
             />
-            <button type="submit" className="w-full px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold tracking-wider transition-colors">Enter</button>
+            <button type="submit" className="w-full px-4 py-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold tracking-wider transition-colors">Enter</button>
           </form>
           <p className="text-[10px] text-[var(--color-text-muted)]/30 select-none">If you know, you know.</p>
         </div>
@@ -37,32 +37,32 @@ export default function GreenLabPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "rgba(12, 14, 18, 0.95)" }}>
-      <header className="border-b border-emerald-500/20 px-6 py-4" style={{ backgroundColor: "rgba(18, 21, 27, 0.9)" }}>
+      <header className="border-b border-sky-500/20 px-6 py-4" style={{ backgroundColor: "rgba(18, 21, 27, 0.9)" }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🧪</span>
+            <span className="text-2xl">🎯</span>
             <div>
-              <h1 className="text-lg font-bold text-emerald-400">Green's Lab</h1>
-              <p className="text-[10px] font-mono tracking-widest text-emerald-400/50">TESTING GROUND</p>
+              <h1 className="text-lg font-bold text-sky-400">Rexalz's Lab</h1>
+              <p className="text-[10px] font-mono tracking-widest text-sky-400/50">TESTING GROUND</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              GREEN ONLINE
+            <span className="flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-sky-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+              REXALZ ONLINE
             </span>
-            <Link to="/" className="text-xs text-[var(--color-text-muted)] hover:text-emerald-400">← Home</Link>
+            <Link to="/" className="text-xs text-[var(--color-text-muted)] hover:text-sky-400">← Home</Link>
           </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-        <div className="rounded-xl border border-emerald-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+        <div className="rounded-xl border border-sky-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
           <div className="relative px-6 py-6">
-            <p className="text-emerald-400 font-bold text-lg mb-2">What's up Green</p>
+            <p className="text-sky-400 font-bold text-lg mb-2">Welcome aboard, Rexalz</p>
             <p className="text-sm text-[var(--color-text-muted)]">
-              This is your private lab. Test features, save codes, send feedback.
-              Everything here survives redeploys — your data is persistent.
+              Your personal testing ground is ready. Test features, save codes, send feedback.
+              Everything here is persistent — go wild.
             </p>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function GreenLabPage() {
         {/* Testing checklist */}
         <div className="rounded-xl border border-[var(--color-panel-border)] overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
           <div className="px-5 py-3 border-b border-[var(--color-panel-border)]">
-            <h3 className="text-sm font-semibold text-emerald-400">Testing Checklist</h3>
+            <h3 className="text-sm font-semibold text-sky-400">Testing Checklist</h3>
           </div>
           <div className="p-5 space-y-2 text-sm">
             <CheckItem label="Select C4SH in class mod builder — do all 100 skills show with colored icons?" />
@@ -112,12 +112,12 @@ export default function GreenLabPage() {
           </div>
         </div>
 
-        <GreenGrenadeCodes />
-        <GreenVault />
-        <FeedbackPanel author="Green" />
+        <RexalzGrenadeCodes />
+        <RexalzVault />
+        <FeedbackPanel author="Rexalz" />
 
         <div className="text-center text-[10px] font-mono text-[var(--color-text-muted)]/30 select-none space-y-1">
-          <p>Green — Welcome to the team. Break stuff, report stuff.</p>
+          <p>Rexalz — The newest weapon in the arsenal. Fresh eyes catch what veterans miss.</p>
           <p>Built with Claude. Powered by late nights and good ideas.</p>
         </div>
       </main>
@@ -128,12 +128,12 @@ export default function GreenLabPage() {
 function LabCard({ title, status, desc, link }: { title: string; status: "new" | "testing" | "live" | "easter-egg"; desc: string; link?: string }) {
   const statusColors = {
     "new": "border-blue-500/40 bg-blue-500/10 text-blue-400",
-    "testing": "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
-    "live": "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+    "testing": "border-sky-500/40 bg-sky-500/10 text-sky-400",
+    "live": "border-sky-500/40 bg-sky-500/10 text-sky-400",
     "easter-egg": "border-purple-500/40 bg-purple-500/10 text-purple-400",
   };
   const content = (
-    <div className="rounded-xl border border-[var(--color-panel-border)] p-4 hover:border-emerald-500/30 transition-colors" style={{ backgroundColor: "rgba(18, 21, 27, 0.6)" }}>
+    <div className="rounded-xl border border-[var(--color-panel-border)] p-4 hover:border-sky-500/30 transition-colors" style={{ backgroundColor: "rgba(18, 21, 27, 0.6)" }}>
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-bold text-[var(--color-text)]">{title}</h4>
         <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${statusColors[status]}`}>
@@ -151,14 +151,14 @@ function CheckItem({ label }: { label: string }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer group">
       <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)}
-        className="w-4 h-4 rounded border-2 border-[var(--color-panel-border)] bg-transparent checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer" />
-      <span className={`${checked ? "line-through text-[var(--color-text-muted)]/50" : "text-[var(--color-text)]"} group-hover:text-emerald-400 transition-colors`}>{label}</span>
+        className="w-4 h-4 rounded border-2 border-[var(--color-panel-border)] bg-transparent checked:bg-sky-500 checked:border-sky-500 cursor-pointer" />
+      <span className={`${checked ? "line-through text-[var(--color-text-muted)]/50" : "text-[var(--color-text)]"} group-hover:text-sky-400 transition-colors`}>{label}</span>
     </label>
   );
 }
 
-// ── Green's Grenade Codes ────────────────────────────────────────────────────
-function GreenGrenadeCodes() {
+// ── Rexalz's Grenade Codes ────────────────────────────────────────────────────
+function RexalzGrenadeCodes() {
   const [codes, setCodes] = useState<Array<{ id: string; name: string; code: string; rating: string; notes: string; timestamp: number }>>([]);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -169,7 +169,7 @@ function GreenGrenadeCodes() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetchApi("green-grenade-codes");
+      const res = await fetchApi("rexalz-grenade-codes");
       const data = await res.json();
       if (Array.isArray(data)) setCodes(data);
     } catch { /* offline */ }
@@ -181,7 +181,7 @@ function GreenGrenadeCodes() {
     setSubmitting(true);
     setMsg(null);
     try {
-      const res = await fetchApi("green-grenade-codes", {
+      const res = await fetchApi("rexalz-grenade-codes", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, code, rating, notes }),
       });
@@ -197,7 +197,7 @@ function GreenGrenadeCodes() {
   };
 
   const handleDelete = async (id: string) => {
-    await fetchApi(`green-grenade-codes/${id}`, { method: "DELETE" }).catch(() => {});
+    await fetchApi(`rexalz-grenade-codes/${id}`, { method: "DELETE" }).catch(() => {});
     void load();
   };
 
@@ -209,9 +209,9 @@ function GreenGrenadeCodes() {
   };
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
-      <div className="px-5 py-3 border-b border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 via-transparent to-transparent">
-        <h3 className="text-sm font-semibold text-emerald-400">Grenade Codes</h3>
+    <div className="rounded-xl border border-sky-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+      <div className="px-5 py-3 border-b border-sky-500/20 bg-gradient-to-r from-sky-500/10 via-transparent to-transparent">
+        <h3 className="text-sm font-semibold text-sky-400">Grenade Codes</h3>
         <p className="text-[10px] text-[var(--color-text-muted)]">Post grenade codes here — DrLecter uses these to create new recipes for the generator.</p>
       </div>
       <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
@@ -224,7 +224,7 @@ function GreenGrenadeCodes() {
         <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste decoded grenade code here..." rows={3} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm font-mono" />
         <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" maxLength={200} className="w-full px-3 py-2 rounded border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-sm" />
         <div className="flex gap-2 items-center">
-          <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium text-sm hover:bg-emerald-500/30 disabled:opacity-50">
+          <button type="button" onClick={handleSubmit} disabled={submitting} className="px-4 py-2 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 font-medium text-sm hover:bg-sky-500/30 disabled:opacity-50">
             {submitting ? "Saving…" : "Save Code"}
           </button>
           {msg && <span className="text-xs opacity-70">{msg}</span>}
@@ -249,7 +249,7 @@ function GreenGrenadeCodes() {
   );
 }
 
-// ── Green's Code Vault ──────────────────────────────────────────────────────
+// ── Rexalz's Code Vault ──────────────────────────────────────────────────────
 const ITEM_TYPES = ["weapon", "grenade", "shield", "class-mod", "repkit", "enhancement", "heavy", "other"] as const;
 const ITEM_TYPE_COLORS: Record<string, string> = {
   weapon: "border-red-500/40 bg-red-500/10 text-red-400",
@@ -262,7 +262,7 @@ const ITEM_TYPE_COLORS: Record<string, string> = {
   other: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]",
 };
 
-function GreenVault() {
+function RexalzVault() {
   const [entries, setEntries] = useState<Array<{ id: string; label: string; code: string; type: string; tags: string[]; notes: string; author: string; timestamp: number }>>([]);
   const [label, setLabel] = useState("");
   const [code, setCode] = useState("");
@@ -289,7 +289,7 @@ function GreenVault() {
     if (!editingId) return;
     setEditSaving(true);
     try {
-      const res = await fetchApi(`green-vault/${editingId}`, { method: "PATCH", body: JSON.stringify({ label: editLabel.trim(), code: editCode.trim(), notes: editNotes.trim(), tags: editTags.split(",").map((t) => t.trim()).filter(Boolean), type: editType }) });
+      const res = await fetchApi(`rexalz-vault/${editingId}`, { method: "PATCH", body: JSON.stringify({ label: editLabel.trim(), code: editCode.trim(), notes: editNotes.trim(), tags: editTags.split(",").map((t) => t.trim()).filter(Boolean), type: editType }) });
       if (res.ok) { setEditingId(null); loadEntries(); }
     } catch { /* ignore */ }
     finally { setEditSaving(false); }
@@ -297,7 +297,7 @@ function GreenVault() {
 
   const loadEntries = useCallback(async () => {
     try {
-      const res = await fetchApi("green-vault");
+      const res = await fetchApi("rexalz-vault");
       if (res.ok) { const data = await res.json(); if (Array.isArray(data)) setEntries(data); }
     } catch { /* ignore */ }
   }, []);
@@ -307,9 +307,9 @@ function GreenVault() {
     if (!code.trim() || !label.trim()) return;
     setSaving(true); setStatus(null);
     try {
-      const res = await fetchApi("green-vault", {
+      const res = await fetchApi("rexalz-vault", {
         method: "POST",
-        body: JSON.stringify({ label: label.trim(), code: code.trim(), type, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), notes: notes.trim(), author: "Green" }),
+        body: JSON.stringify({ label: label.trim(), code: code.trim(), type, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), notes: notes.trim(), author: "Rexalz" }),
       });
       if (res.ok) { setLabel(""); setCode(""); setTags(""); setNotes(""); setStatus("Saved!"); loadEntries(); }
       else { const data = await res.json().catch(() => ({})); setStatus((data as { error?: string }).error ?? "Failed."); }
@@ -319,7 +319,7 @@ function GreenVault() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this code?")) return;
-    await fetchApi(`green-vault/${id}`, { method: "DELETE" }).catch(() => {});
+    await fetchApi(`rexalz-vault/${id}`, { method: "DELETE" }).catch(() => {});
     loadEntries();
   };
 
@@ -329,31 +329,31 @@ function GreenVault() {
   const filtered = filter === "all" ? entries : entries.filter((e) => e.type === filter);
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+    <div className="rounded-xl border border-sky-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
       <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-emerald-400">Green's Code Vault</h3>
+          <h3 className="text-sm font-semibold text-sky-400">Rexalz's Code Vault</h3>
           <p className="text-[10px] text-[var(--color-text-muted)]">{entries.length} codes stored — DrLecter studies these to improve the generators</p>
         </div>
-        <span className="text-[10px] font-mono text-emerald-400/50">{entries.length}/500</span>
+        <span className="text-[10px] font-mono text-sky-400/50">{entries.length}/500</span>
       </div>
       <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
         <div className="flex flex-wrap gap-2">
           {ITEM_TYPES.map((t) => (<button key={t} onClick={() => setType(t)} className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${type === t ? ITEM_TYPE_COLORS[t] : "border-transparent text-[var(--color-text-muted)]/50"}`}>{t}</button>))}
         </div>
         <div className="flex gap-2">
-          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Name this code" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm focus:border-emerald-500 focus:outline-none" />
-          <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tags (comma separated)" className="w-40 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Name this code" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm focus:border-sky-500 focus:outline-none" />
+          <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tags (comma separated)" className="w-40 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
         </div>
-        <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste decoded or Base85 code here..." className="w-full h-16 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs font-mono resize-y focus:border-emerald-500 focus:outline-none" />
+        <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Paste decoded or Base85 code here..." className="w-full h-16 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs font-mono resize-y focus:border-sky-500 focus:outline-none" />
         <div className="flex gap-2">
-          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional)" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
-          <button onClick={handleSave} disabled={saving || !code.trim() || !label.trim()} className="px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-sm font-medium hover:bg-emerald-500/30 disabled:opacity-50 min-h-[40px]">{saving ? "Saving..." : "Save to Vault"}</button>
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional)" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
+          <button onClick={handleSave} disabled={saving || !code.trim() || !label.trim()} className="px-4 py-2 rounded-lg bg-sky-500/20 border border-sky-500/40 text-sky-400 text-sm font-medium hover:bg-sky-500/30 disabled:opacity-50 min-h-[40px]">{saving ? "Saving..." : "Save to Vault"}</button>
         </div>
-        {status && <p className="text-xs text-emerald-400">{status}</p>}
+        {status && <p className="text-xs text-sky-400">{status}</p>}
       </div>
       <div className="px-4 py-2 border-b border-[var(--color-panel-border)] flex flex-wrap gap-1.5">
-        {["all", ...ITEM_TYPES].map((f) => (<button key={f} onClick={() => setFilter(f)} className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${filter === f ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-transparent text-[var(--color-text-muted)]/50"}`}>{f} ({f === "all" ? entries.length : entries.filter((e) => e.type === f).length})</button>))}
+        {["all", ...ITEM_TYPES].map((f) => (<button key={f} onClick={() => setFilter(f)} className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${filter === f ? "border-sky-500/40 bg-sky-500/10 text-sky-400" : "border-transparent text-[var(--color-text-muted)]/50"}`}>{f} ({f === "all" ? entries.length : entries.filter((e) => e.type === f).length})</button>))}
       </div>
       <div className="max-h-[500px] overflow-y-auto divide-y divide-[var(--color-panel-border)]/50">
         {filtered.length === 0 ? (
@@ -370,16 +370,16 @@ function GreenVault() {
                   ))}
                 </div>
                 <input value={editLabel} onChange={(ev) => setEditLabel(ev.target.value)} placeholder="Name"
-                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
                 <textarea value={editCode} onChange={(ev) => setEditCode(ev.target.value)} rows={3}
-                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-[10px] font-mono resize-y focus:border-emerald-500 focus:outline-none" />
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-[10px] font-mono resize-y focus:border-sky-500 focus:outline-none" />
                 <input value={editTags} onChange={(ev) => setEditTags(ev.target.value)} placeholder="Tags (comma separated)"
-                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
                 <input value={editNotes} onChange={(ev) => setEditNotes(ev.target.value)} placeholder="Notes"
-                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
+                  className="w-full px-3 py-1.5 rounded border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
                 <div className="flex gap-2">
                   <button onClick={saveEdit} disabled={editSaving}
-                    className="px-3 py-1.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-medium hover:bg-emerald-500/30 disabled:opacity-50">{editSaving ? "Saving..." : "Save"}</button>
+                    className="px-3 py-1.5 rounded bg-sky-500/20 border border-sky-500/40 text-sky-400 text-[10px] font-medium hover:bg-sky-500/30 disabled:opacity-50">{editSaving ? "Saving..." : "Save"}</button>
                   <button onClick={cancelEdit}
                     className="px-3 py-1.5 rounded border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-[10px]">Cancel</button>
                 </div>
@@ -387,12 +387,12 @@ function GreenVault() {
             ) : (
               <>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button onClick={() => toggleExpand(e.id)} className="text-xs font-bold text-[var(--color-text)] hover:text-emerald-400">{e.label}</button>
+                  <button onClick={() => toggleExpand(e.id)} className="text-xs font-bold text-[var(--color-text)] hover:text-sky-400">{e.label}</button>
                   <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${ITEM_TYPE_COLORS[e.type] ?? ITEM_TYPE_COLORS.other}`}>{e.type}</span>
                   {e.tags.map((t) => <span key={t} className="px-1.5 py-0.5 rounded text-[8px] bg-white/5 text-[var(--color-text-muted)] border border-[var(--color-panel-border)]">{t}</span>)}
                   <span className="text-[10px] text-[var(--color-text-muted)]">{timeAgo(e.timestamp)}</span>
-                  <button onClick={() => startEdit(e)} className="text-[10px] text-[var(--color-text-muted)] hover:text-emerald-400">Edit</button>
-                  <button onClick={() => handleCopy(e.code)} className="text-[10px] text-[var(--color-text-muted)] hover:text-emerald-400">Copy</button>
+                  <button onClick={() => startEdit(e)} className="text-[10px] text-[var(--color-text-muted)] hover:text-sky-400">Edit</button>
+                  <button onClick={() => handleCopy(e.code)} className="text-[10px] text-[var(--color-text-muted)] hover:text-sky-400">Copy</button>
                   <button onClick={() => handleDelete(e.id)} className="text-[10px] text-[var(--color-text-muted)] hover:text-red-400">Delete</button>
                 </div>
                 {e.notes && <p className="text-[10px] text-[var(--color-text-muted)] mt-1 italic">{e.notes}</p>}
@@ -409,7 +409,7 @@ function GreenVault() {
 // ── Feedback Panel (shared with Terra) ──────────────────────────────────────
 interface FeedbackEntry { id: string; author: string; type: string; message: string; page: string; status: string; reply?: string; timestamp: number; }
 const TYPE_COLORS: Record<string, string> = { bug: "border-red-500/40 bg-red-500/10 text-red-400", idea: "border-blue-500/40 bg-blue-500/10 text-blue-400", question: "border-yellow-500/40 bg-yellow-500/10 text-yellow-400", note: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]" };
-const STATUS_COLORS: Record<string, string> = { new: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400", seen: "border-blue-500/40 bg-blue-500/10 text-blue-400", fixed: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400", wontfix: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]" };
+const STATUS_COLORS: Record<string, string> = { new: "border-sky-500/40 bg-sky-500/10 text-sky-400", seen: "border-blue-500/40 bg-blue-500/10 text-blue-400", fixed: "border-sky-500/40 bg-sky-500/10 text-sky-400", wontfix: "border-[var(--color-panel-border)] bg-white/5 text-[var(--color-text-muted)]" };
 
 function FeedbackPanel({ author }: { author: string }) {
   const [entries, setEntries] = useState<FeedbackEntry[]>([]);
@@ -436,21 +436,21 @@ function FeedbackPanel({ author }: { author: string }) {
   const timeAgo = (ts: number) => { const diff = Date.now() - ts; if (diff < 60000) return "just now"; if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`; if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`; return `${Math.floor(diff / 86400000)}d ago`; };
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
+    <div className="rounded-xl border border-sky-500/30 overflow-hidden" style={{ backgroundColor: "rgba(18, 21, 27, 0.7)" }}>
       <div className="px-5 py-3 border-b border-[var(--color-panel-border)] flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-emerald-400">Live Feedback</h3>
+        <h3 className="text-sm font-semibold text-sky-400">Live Feedback</h3>
         <span className="text-[10px] font-mono text-[var(--color-text-muted)]">DrLecter sees everything here</span>
       </div>
       <div className="p-4 border-b border-[var(--color-panel-border)] space-y-3">
         <div className="flex gap-2">
           {(["bug", "idea", "question", "note"] as const).map((t) => (<button key={t} onClick={() => setType(t)} className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${type === t ? TYPE_COLORS[t] : "border-transparent text-[var(--color-text-muted)]/50"}`}>{t}</button>))}
         </div>
-        <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="What's on your mind? Bug reports, ideas, questions..." className="w-full h-20 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm resize-y focus:border-emerald-500 focus:outline-none" />
+        <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="What's on your mind? Bug reports, ideas, questions..." className="w-full h-20 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-sm resize-y focus:border-sky-500 focus:outline-none" />
         <div className="flex items-center gap-2">
-          <input type="text" value={page} onChange={(e) => setPage(e.target.value)} placeholder="Which page/feature? (optional)" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-emerald-500 focus:outline-none" />
-          <button onClick={handleSubmit} disabled={sending || !message.trim()} className="px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-sm font-medium hover:bg-emerald-500/30 disabled:opacity-50 min-h-[40px]">{sending ? "Sending..." : "Send"}</button>
+          <input type="text" value={page} onChange={(e) => setPage(e.target.value)} placeholder="Which page/feature? (optional)" className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(12,14,18,0.8)] text-[var(--color-text)] text-xs focus:border-sky-500 focus:outline-none" />
+          <button onClick={handleSubmit} disabled={sending || !message.trim()} className="px-4 py-2 rounded-lg bg-sky-500/20 border border-sky-500/40 text-sky-400 text-sm font-medium hover:bg-sky-500/30 disabled:opacity-50 min-h-[40px]">{sending ? "Sending..." : "Send"}</button>
         </div>
-        {status && <p className="text-xs text-emerald-400">{status}</p>}
+        {status && <p className="text-xs text-sky-400">{status}</p>}
       </div>
       <div className="max-h-[400px] overflow-y-auto divide-y divide-[var(--color-panel-border)]/50">
         {entries.length === 0 ? (
@@ -465,7 +465,7 @@ function FeedbackPanel({ author }: { author: string }) {
               {e.page && <span className="text-[10px] text-[var(--color-text-muted)] font-mono">@ {e.page}</span>}
             </div>
             <p className="text-xs text-[var(--color-text)] leading-relaxed">{e.message}</p>
-            {e.reply && (<div className="mt-1 pl-3 border-l-2 border-emerald-500/40"><p className="text-[10px] text-emerald-400 font-bold">DrLecter:</p><p className="text-xs text-[var(--color-text-muted)]">{e.reply}</p></div>)}
+            {e.reply && (<div className="mt-1 pl-3 border-l-2 border-sky-500/40"><p className="text-[10px] text-sky-400 font-bold">DrLecter:</p><p className="text-xs text-[var(--color-text-muted)]">{e.reply}</p></div>)}
           </div>
         ))}
       </div>

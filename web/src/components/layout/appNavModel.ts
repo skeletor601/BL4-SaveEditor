@@ -4,6 +4,7 @@ export const MINIMAL_HEADER_ROUTES = [
   "/test-app",
   "/terra",
   "/green",
+  "/rexalz",
   "/drlecter",
   "/character",
   "/inventory",
@@ -196,6 +197,8 @@ export function getBreadcrumbsExtended(pathname: string): Crumb[] {
     crumbs.push({ label: "Terra Lab" });
   } else if (pathname.startsWith("/green")) {
     crumbs.push({ label: "Green Lab" });
+  } else if (pathname.startsWith("/rexalz")) {
+    crumbs.push({ label: "Rexalz Lab" });
   } else if (pathname.startsWith("/drlecter")) {
     crumbs.push({ label: "Dr. Lecter" });
   } else if (pathname.startsWith("/dashboard")) {

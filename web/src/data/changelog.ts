@@ -5,6 +5,19 @@ export interface ChangeLogEntry {
 
 export const CHANGE_LOG: ChangeLogEntry[] = [
   {
+    date: "2026-04-05",
+    items: [
+      "BUILD FROM URL — Paste a Maxroll, Mobalytics, or YouTube build guide link and get fully assembled gear codes. Godroll priority: weapons use optimal part templates from godrolls.json. Crit knife auto-detected and output as full modded version. Bod 'All Rounder' enhancement rule: all weapon type damage perks applied simultaneously.",
+      "YOUTUBE INTEGRATION — Auto-detects Maxroll/Mobalytics planner links in video descriptions. If no link found, extracts build info from video transcript via residential proxy. Warning shown for transcript-only builds.",
+      "MAXROLL ASSEMBLER — One-shot scrape + assemble via structured JSON. Maps legendaryId, augmentIds, firmwareId directly to universal parts DB. Cross-mfg enhancement perks from all weapons in the build.",
+      "GRENADE STYLE FILTER — Choose Singularity, MIRV, Artillery, or Lingering style for weapon and grenade modded generators. Hybridization sprinkles complementary visual effects. Available on both desktop and mobile.",
+      "MOBILE BUILD FROM URL — Paste any build planner link on mobile, get all gear codes with 'Copy All Codes' to clipboard. YouTube auto-detect included.",
+      "MOBILE WEAPON PRESETS — Grenade Reload and Inf Alt Fire toggle presets added to mobile weapon builder modded modal.",
+      "C4SH SKILL ICON FIX — All 85 C4SH skills now have correct tree color assignments (blue=Sleight of Hand, red=Cross Fire, green=Cleromancy) verified against NCS skilltrees_data. Icons display with colored backgrounds on desktop and mobile.",
+      "REPKIT DATABASE REBUILD — All manufacturer repkit entries rewritten from NCS source data. Legendary rarity rows now show actual item names (War Paint, Pacemaker, Defibrillator, etc.) instead of just 'Legendary'. Full descriptions and internalNames on every entry.",
+    ],
+  },
+  {
     date: "2026-03-31",
     items: [
       "UNIVERSAL DATABASE ENRICHMENT — 92% of all actionable parts now have descriptions, perk names, and red text. Data extracted from NCS Cowbell DLC game files (ui_stat4.json). Enhancement perks, firmware, shields, grenades, repkits, heavies, and weapons all enriched.",
