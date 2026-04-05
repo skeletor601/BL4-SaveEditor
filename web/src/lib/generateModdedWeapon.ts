@@ -2008,3 +2008,4 @@ export function generateModdedWeapon(
     ...(isClaudeGun ? { isClaudeGun: true } : {}),
   };
 }
+// cache bust 1775430956
