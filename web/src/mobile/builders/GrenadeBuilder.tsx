@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
-import { generateModdedGrenade, type GenerateModdedGrenadeResult } from "@/lib/generateModdedGrenade";
+import { generateModdedGrenade, type GenerateModdedGrenadeResult, type GrenadeStyleFilter } from "@/lib/generateModdedGrenade";
 import type { GrenadeVisualRecipe } from "@/lib/generateModdedWeapon";
 import {
   type SelectedPart, usePartList, useExtraTokens, NumberField, PartChecklist, CodeOutput,
@@ -150,6 +150,7 @@ export default function GrenadeBuilder() {
   }, [data, mfgId, level, seed, rarity, legends.parts, elements.parts, fw.parts, mfgPerks.parts, uniPerks.parts, skinValue, extras.tokens]);
 
   const [showModdedModal, setShowModdedModal] = useState(false);
+  const [grenadeStyleFilter, setGrenadeStyleFilter] = useState<GrenadeStyleFilter>("random");
   const [customModMfgId, setCustomModMfgId] = useState("");
   const [customModLeg, setCustomModLeg] = useState("");
 
@@ -200,6 +201,7 @@ export default function GrenadeBuilder() {
         modPowerMode: modPower,
         stockBaseDecoded: stockBase,
         grenadeVisualRecipes,
+        grenadeStyle: grenadeStyleFilter,
         skinOptions: skins.length ? skins : undefined,
       });
       setCode(result.code.trim());
@@ -258,6 +260,13 @@ export default function GrenadeBuilder() {
               <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+              <MobileSelect label="Grenade Style" options={[
+                { value: "random", label: "Random (Any)" },
+                { value: "singularity", label: "Singularity" },
+                { value: "mirv", label: "MIRV" },
+                { value: "artillery", label: "Artillery" },
+                { value: "lingering", label: "Lingering" },
+              ]} value={grenadeStyleFilter} onChange={(v) => setGrenadeStyleFilter(v as GrenadeStyleFilter)} />
               <button type="button" className="mobile-btn primary" onClick={() => handleGenerateModded()} style={{ marginBottom: 16 }}>
                 Random Modded Grenade
               </button>

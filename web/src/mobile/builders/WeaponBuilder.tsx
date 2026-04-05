@@ -3,6 +3,7 @@ import { useMobileBuilderData } from "../hooks/useMobileBuilderData";
 import MobileSelect from "../components/MobileSelect";
 import { fetchApi } from "@/lib/apiClient";
 import { generateModdedWeapon } from "@/lib/generateModdedWeapon";
+import type { GrenadeStyleFilter } from "@/lib/generateModdedGrenade";
 import {
   usePartList, NumberField, PartChecklist, CodeOutput,
   BuildPartsList, BuilderToggles, SkinSelector, AddFromDatabase, ExtraTokensList, extraTokensToString, useExtraTokens, partIdFromLabel, applySkin
@@ -43,6 +44,8 @@ export default function WeaponBuilder() {
   const [skin, setSkin] = useState("");
   const [code, setCode] = useState("");
   const [modPower, setModPower] = useState<"stable" | "op" | "insane">("stable");
+  const [grenadeStyleFilter, setGrenadeStyleFilter] = useState<GrenadeStyleFilter>("random");
+  const [specialModes, setSpecialModes] = useState<Set<"grenade-reload" | "inf-ammo">>(new Set());
   const [modGenerating, setModGenerating] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [allParts, setAllParts] = useState(false);
@@ -412,6 +415,7 @@ export default function WeaponBuilder() {
       const result = generateModdedWeapon(editData, universalPartCodes, {
         level,
         modPowerMode: modPower,
+        specialMode: specialModes.has("grenade-reload") && specialModes.has("inf-ammo") ? "both" : specialModes.has("grenade-reload") ? "grenade-reload" : specialModes.has("inf-ammo") ? "inf-ammo" : null,
         skin: skin || undefined,
         forcedPrefix: autoPrefix || undefined,
         stockBaseDecoded,
@@ -419,6 +423,7 @@ export default function WeaponBuilder() {
         allowedBarrelEntries: allowedBarrelEntries.length ? allowedBarrelEntries : undefined,
         skinOptions: data.skins?.length ? data.skins : undefined,
         underbarrelRecipes: Array.isArray(underbarrelRecipes) ? underbarrelRecipes : undefined,
+        grenadeStyle: grenadeStyleFilter,
       });
       setCode(result.code.trim());
     } catch (e) {
@@ -493,6 +498,44 @@ export default function WeaponBuilder() {
               <button type="button" onClick={() => setShowModdedModal(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "var(--color-text)", fontSize: 13, fontWeight: 700, padding: "6px 14px", cursor: "pointer", touchAction: "manipulation" }}>✕ Close</button>
             </div>
             <div style={{ padding: 14, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+              {/* Special mode toggles */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>Presets</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {(["grenade-reload", "inf-ammo"] as const).map((mode) => {
+                    const active = specialModes.has(mode);
+                    const label = mode === "grenade-reload" ? "Grenade Reload" : "Inf Alt Fire";
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setSpecialModes((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(mode)) next.delete(mode); else next.add(mode);
+                          return next;
+                        })}
+                        style={{
+                          flex: 1, padding: "10px 8px", borderRadius: 10, fontSize: 13, fontWeight: 600,
+                          border: active ? "1px solid var(--color-accent)" : "1px solid var(--color-panel-border)",
+                          background: active ? "rgba(168,85,247,0.2)" : "rgba(255,255,255,0.04)",
+                          color: active ? "var(--color-accent)" : "var(--color-text-muted)",
+                          cursor: "pointer", touchAction: "manipulation",
+                        }}
+                      >
+                        {active ? "✓ " : ""}{label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Grenade Style (for grenade reload weapons) */}
+              <MobileSelect label="Grenade Style" options={[
+                { value: "random", label: "Random (Any)" },
+                { value: "singularity", label: "Singularity" },
+                { value: "mirv", label: "MIRV" },
+                { value: "artillery", label: "Artillery" },
+                { value: "lingering", label: "Lingering" },
+              ]} value={grenadeStyleFilter} onChange={(v) => setGrenadeStyleFilter(v as GrenadeStyleFilter)} />
               {/* Random */}
               <button type="button" className="mobile-btn primary" onClick={() => handleGenerateModded()} style={{ marginBottom: 16 }}>
                 Random Modded Weapon

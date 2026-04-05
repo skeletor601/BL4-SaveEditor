@@ -48,9 +48,29 @@ const CHARACTER_COLORS: Record<string, string> = {
   Amon: "#fdba74", Harlowe: "#67e8f9", Rafa: "#86efac", Vex: "#c4b5fd", C4SH: "#fca5a5",
 };
 
-const C4SH_BLUE_SKILLS = new Set(["Fast Hands","Insurance","Ante","Splash the Pot","Call the Bet","Cash Out","Double or Nothing","High Roller","Jackpot","Slot Machine","Cold Deck","Card Counter","Stacked Deck","Wild Card","Ace in the Hole","Royal Flush","Dead Man's Hand","Full House","Poker Face","Bluff","Fold","All In","Raise","Check","Bet","Chip Leader","House Edge","Comp'd","The Rake","High Stakes","Marker","Pit Boss","Whale Watch","VIP"]);
-const C4SH_RED_SKILLS = new Set(["Unleashed","Your Huckleberry","The Determinator","Quick Draw","Fan the Hammer","Ricochet","Bullet Time","Dead Eye","Gunslinger","Sharpshooter","Marksman","Sniper","Deadeye","Trick Shot","Kill Shot","Head Shot","Hip Fire","Suppressing Fire","Covering Fire","Rapid Fire","Burst Fire","Auto Fire","Cross Fire","Windfall"]);
-const C4SH_GREEN_SKILLS = new Set(["Luck Be a Robot","Sweet Roll","Charm Bracelet","Lucky Charm","Four Leaf Clover","Rabbit's Foot","Horseshoe","Penny","Wishbone","Shooting Star","Rainbow","Pot of Gold","Leprechaun","Fortune Cookie","Crystal Ball","Magic 8-Ball","Ouija","Tarot","Tea Leaves","Palm Reading","Astrology","Numerology","Feng Shui","Karma","Destiny","Fate","Serendipity","Providence","Kismet"]);
+const C4SH_BLUE_SKILLS = new Set([
+  "Ace in the Hole","Alchemy","Ante","Around the Corner","Bad Men Must Bleed",
+  "Bone Shrapnel","Boom or Bust","C4SH Game","Dealer's Bluff","Double-Down",
+  "Fortuity","Grave Pact","Heart of the Cards","Hero Call","High Roller",
+  "Hot Streak","Late Scratch","Legerdemain","Payout","Read the Signs",
+  "Running Luck","Sounds of Rain","Stack the Deck","Steam","Table Flip",
+  "Take the Pot","The House","The Turn","Trick-Taker","Wretched Shadows",
+]);
+const C4SH_RED_SKILLS = new Set([
+  "Blood on Elpis","Brimstone","Broken Arrow","Cottonmouth","Death Hunt",
+  "Debts to Pay","Forsaken","Gunslinger","Hard-Boiled","Hell and Back",
+  "Lawless","Maverick","Pale Rider","Ride to Ruin","Shootist",
+  "Stand and Bleed","TNT","The Claim","The Determinator","The Furies",
+  "The Gunfighter","The Wind","Unchained","War Wagon","Witching Hour",
+]);
+const C4SH_GREEN_SKILLS = new Set([
+  "All for One","Alpha's Call","Critical Role","Cursed Call","Devil's Tines",
+  "Double Time","Fortune's Favor","Graveyard Shift","Haunted","High Stakes",
+  "Let it Ride","Loaded Dice","Luck Be a Robot","Luckless","Lucky Charm",
+  "Pack Mentality","Red Moon Rising","Riding High","Risky Business",
+  "Rolling the Deep","Serendipity","Shadow's Embrace","Sidekick's Revenge",
+  "Snake Eyes","Spin of Fate","The Lucky One","The Wilds","Undying",
+]);
 
 function getSkillIconFilename(skillNameEN: string, className: string): string {
   const norm = skillNameEN
@@ -69,6 +89,13 @@ function getC4SHSkillColor(skillName: string): string | null {
   if (C4SH_RED_SKILLS.has(skillName)) return "#f87171";
   if (C4SH_GREEN_SKILLS.has(skillName)) return "#4ade80";
   return null;
+}
+
+function getC4SHSkillIconBg(skillName: string): string {
+  if (C4SH_BLUE_SKILLS.has(skillName)) return "rgba(59,130,246,0.35)";
+  if (C4SH_RED_SKILLS.has(skillName)) return "rgba(239,68,68,0.35)";
+  if (C4SH_GREEN_SKILLS.has(skillName)) return "rgba(34,197,94,0.35)";
+  return "transparent";
 }
 
 // ── Name Description Popup ──────────────────────────────────────────────────
@@ -141,12 +168,22 @@ function SkillDetailPopup({ skillName, className, onClose }: { skillName: string
         </div>
         <div style={{ padding: "8px 12px 16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <img
-              src={iconSrc}
-              alt=""
-              style={{ width: 48, height: 48, objectFit: "contain", flexShrink: 0, borderRadius: 6, border: "1px solid var(--color-panel-border)" }}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-            />
+            <div style={{
+              width: 48, height: 48, flexShrink: 0, borderRadius: 6,
+              border: "1px solid var(--color-panel-border)", overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              backgroundColor: className === "C4SH" ? getC4SHSkillIconBg(skillName) : "transparent",
+            }}>
+              <img
+                src={iconSrc}
+                alt=""
+                style={{
+                  width: "100%", height: "100%", objectFit: "contain",
+                  filter: className === "C4SH" ? "brightness(0) invert(1)" : "none",
+                }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            </div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--color-text)", lineHeight: 1.2 }}>{skillName}</h2>
           </div>
           {loading && <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Loading...</p>}
@@ -374,12 +411,22 @@ export default function ClassModBuilder() {
               return (
                 <div key={skill.skillNameEN} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", minHeight: 44 }}>
                   {/* Skill icon */}
-                  <img
-                    src={iconSrc}
-                    alt=""
-                    style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0, borderRadius: 4, border: "1px solid var(--color-panel-border)" }}
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
+                  <div style={{
+                    width: 32, height: 32, flexShrink: 0, borderRadius: 4,
+                    border: "1px solid var(--color-panel-border)",
+                    overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
+                    backgroundColor: className === "C4SH" ? getC4SHSkillIconBg(skill.skillNameEN) : "transparent",
+                  }}>
+                    <img
+                      src={iconSrc}
+                      alt=""
+                      style={{
+                        width: "100%", height: "100%", objectFit: "contain",
+                        filter: className === "C4SH" ? "brightness(0) invert(1)" : "none",
+                      }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
                   {/* Skill name + IDs (tappable for details) */}
                   <button
                     type="button"

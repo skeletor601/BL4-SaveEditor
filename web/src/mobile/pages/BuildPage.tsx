@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import MobileSelect from "../components/MobileSelect";
+import MobileBuildFromUrl from "../components/MobileBuildFromUrl";
 
 const WeaponBuilder = lazy(() => import("../builders/WeaponBuilder"));
 const GrenadeBuilder = lazy(() => import("../builders/GrenadeBuilder"));
@@ -29,6 +30,8 @@ export default function MobileBuildPage() {
       <div className="mobile-page-header">
         <h1>Item Builder</h1>
       </div>
+
+      <MobileBuildFromUrl />
 
       <MobileSelect
         label="Item Type"

@@ -115,22 +115,88 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
   const [assembleResult, setAssembleResult] = useState<AssembleResponse | null>(null);
   const [level, setLevel] = useState(60);
 
-  // ── Scrape ────────────────────────────────────────────────────────────
-  const handleScrape = useCallback(async () => {
-    if (!url.trim()) return;
-    setLoading(true); setError(null); setScrapeResult(null); setAssembleResult(null);
-    try {
+  const [, setIsMaxroll] = useState(false);
+  const [maxrollData, setMaxrollData] = useState<any>(null);
+
+  // YouTube states
+  const [ytCheckResult, setYtCheckResult] = useState<{ title: string; plannerLinks: string[]; hasTranscript: boolean } | null>(null);
+  const [ytPlannerMessage, setYtPlannerMessage] = useState<string | null>(null);
+  const [ytWarning, setYtWarning] = useState(false);
+
+  // ── Helper: run Maxroll or Mobalytics scrape by URL ───────────────────
+  const scrapeByUrl = useCallback(async (targetUrl: string) => {
+    const isMaxrollUrl = targetUrl.includes("maxroll.gg");
+    setIsMaxroll(isMaxrollUrl);
+
+    if (isMaxrollUrl) {
+      const res = await fetchApi("maxroll/scrape", {
+        method: "POST", body: JSON.stringify({ url: targetUrl }),
+      });
+      if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `HTTP ${res.status}`); }
+      const data = await res.json();
+      setMaxrollData(data);
+    } else {
       const res = await fetchApi("build-from-url/scrape", {
-        method: "POST", body: JSON.stringify({ url: url.trim() }),
+        method: "POST", body: JSON.stringify({ url: targetUrl }),
       });
       if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `HTTP ${res.status}`); }
       const data: ScrapeResponse = await res.json();
       setScrapeResult(data);
       setResolved(data.resolved || []);
       setSelectedVariantIdx(0);
+    }
+  }, []);
+
+  // ── Scrape ────────────────────────────────────────────────────────────
+  const handleScrape = useCallback(async () => {
+    if (!url.trim()) return;
+    setLoading(true); setError(null); setScrapeResult(null); setAssembleResult(null); setMaxrollData(null);
+    setYtCheckResult(null); setYtPlannerMessage(null); setYtWarning(false);
+
+    const trimmedUrl = url.trim();
+    const isYouTubeUrl = trimmedUrl.includes("youtube.com") || trimmedUrl.includes("youtu.be");
+
+    try {
+      if (isYouTubeUrl) {
+        // YouTube: check description for planner links first
+        const res = await fetchApi("youtube/check-links", {
+          method: "POST", body: JSON.stringify({ url: trimmedUrl }),
+        });
+        if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `HTTP ${res.status}`); }
+        const data: { title: string; plannerLinks: string[]; hasTranscript: boolean } = await res.json();
+        setYtCheckResult(data);
+
+        if (data.plannerLinks.length > 0) {
+          // Found a planner link — auto-redirect to Maxroll/Mobalytics flow
+          const plannerUrl = data.plannerLinks[0];
+          setYtPlannerMessage(`Found a ${plannerUrl.includes("maxroll") ? "Maxroll" : "Mobalytics"} link in this video! Using that for best results.`);
+          setUrl(plannerUrl);
+          await scrapeByUrl(plannerUrl);
+        } else {
+          // No planner link — show warning, wait for user to confirm
+          setYtWarning(true);
+        }
+      } else {
+        await scrapeByUrl(trimmedUrl);
+      }
     } catch (e: any) { setError(e.message || "Scrape failed"); }
     finally { setLoading(false); }
-  }, [url]);
+  }, [url, scrapeByUrl]);
+
+  // ── YouTube: continue with transcript-based scraping ─────────────────
+  const handleYouTubeContinue = useCallback(async () => {
+    if (!url.trim()) return;
+    setLoading(true); setError(null); setYtWarning(false);
+    try {
+      const res = await fetchApi("youtube/build", {
+        method: "POST", body: JSON.stringify({ url: url.trim(), level }),
+      });
+      if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `HTTP ${res.status}`); }
+      const data: AssembleResponse = await res.json();
+      setAssembleResult(data);
+    } catch (e: any) { setError(e.message || "YouTube build extraction failed"); }
+    finally { setLoading(false); }
+  }, [url, level]);
 
   // ── Switch variant ────────────────────────────────────────────────────
   const handleVariantSwitch = useCallback(async (idx: number) => {
@@ -269,20 +335,58 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
 
         <div className="p-4 space-y-4">
           {/* URL Input */}
-          {!scrapeResult && (
+          {!scrapeResult && !maxrollData && !ytWarning && (
             <div className="space-y-3">
               <p className="text-sm text-[var(--color-text-muted)]">
-                Paste a Mobalytics BL4 build URL to auto-generate stock gear with the guide's recommended parts, elements, skills, and firmware.
+                Paste a <strong>Mobalytics</strong>, <strong>Maxroll</strong>, or <strong>YouTube</strong> BL4 build URL to auto-generate gear with the guide's recommended parts, skills, and firmware.
               </p>
               <div className="flex gap-2">
                 <input type="url" value={url} onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://mobalytics.gg/borderlands-4/builds/..."
+                  placeholder="https://mobalytics.gg/... or https://maxroll.gg/... or https://youtube.com/..."
                   className="flex-1 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[var(--color-bg)] text-[var(--color-text)] text-sm placeholder:text-[var(--color-text-muted)]/50 focus:border-[var(--color-accent)] focus:outline-none"
                   onKeyDown={(e) => { if (e.key === "Enter") handleScrape(); }}
                   disabled={loading} />
                 <button type="button" onClick={handleScrape} disabled={loading || !url.trim()}
                   className="px-4 py-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-sm font-medium hover:bg-[var(--color-accent)]/30 disabled:opacity-50 disabled:cursor-not-allowed">
                   {loading ? "Scraping..." : "Scrape"}
+                </button>
+              </div>
+
+              {/* YouTube planner link found — green success message */}
+              {ytPlannerMessage && (
+                <div className="p-3 rounded-lg border border-green-500/40 bg-green-500/10 text-green-400 text-sm">
+                  {ytPlannerMessage}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* YouTube warning — no planner link found, transcript-only */}
+          {ytWarning && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-lg border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 text-sm">
+                {ytCheckResult?.title && (
+                  <p className="font-bold mb-1">{ytCheckResult.title}</p>
+                )}
+                YouTube builds are extracted from video transcripts. Results may vary.
+                For best results, use a Maxroll or Mobalytics link directly.
+                {!ytCheckResult?.hasTranscript && (
+                  <p className="mt-1 text-red-400">Warning: No transcript found for this video. Extraction may fail.</p>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-[var(--color-text-muted)]">Level</label>
+                <input type="number" min={1} max={60} value={level}
+                  onChange={(e) => setLevel(Math.max(1, Math.min(60, Number(e.target.value) || 60)))}
+                  className="w-16 px-2 py-1 rounded border border-[var(--color-panel-border)] bg-[var(--color-bg)] text-[var(--color-text)] text-sm text-center" />
+                <div className="flex-1" />
+                <button type="button" onClick={() => { setYtWarning(false); setYtCheckResult(null); }}
+                  className="px-4 py-2 rounded-lg border border-[var(--color-panel-border)] text-[var(--color-text-muted)] text-sm hover:text-[var(--color-text)]">
+                  Back
+                </button>
+                <button type="button" onClick={handleYouTubeContinue} disabled={loading}
+                  className="px-4 py-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-sm font-medium hover:bg-[var(--color-accent)]/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {loading ? "Extracting..." : "Continue Anyway"}
                 </button>
               </div>
             </div>
@@ -292,7 +396,77 @@ export default function BuildFromUrlModal({ onClose, onLoadDecoded }: BuildFromU
             <div className="p-3 rounded-lg border border-red-500/40 bg-red-500/10 text-red-400 text-sm">{error}</div>
           )}
 
-          {/* ── Review Step ────────────────────────────────────────────── */}
+          {/* ── Maxroll Results ──────────────────────────────────────────── */}
+          {maxrollData && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--color-text)]">{maxrollData.plannerName}</h3>
+                  <p className="text-xs text-[var(--color-text-muted)] capitalize">{maxrollData.character} {maxrollData.author ? `by ${maxrollData.author}` : ""}</p>
+                </div>
+                <button type="button" onClick={() => { setMaxrollData(null); setIsMaxroll(false); }}
+                  className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)]">Back</button>
+              </div>
+
+              {/* Equipment list */}
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-[var(--color-accent)] font-mono">Equipment ({maxrollData.equipment?.length ?? 0} items)</p>
+                {(maxrollData.equipment ?? []).map((eq: any, i: number) => {
+                  const ca = eq.item?.customAttr ?? {};
+                  const itemType = eq.item?.type?.replace("bl4-", "") ?? "?";
+                  const name = ca.legendaryId?.replace(/^np_/, "").replace(/_/g, " ") ?? ca.manufacturerId ?? "Unknown";
+                  const fw = ca.firmwareId ?? "";
+                  return (
+                    <div key={i} className="p-2 rounded-lg border border-[var(--color-panel-border)] bg-[var(--color-bg)]/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-[var(--color-accent)] uppercase w-16">{eq.slot}</span>
+                        <span className="text-sm text-[var(--color-text)] capitalize">{name}</span>
+                        <span className="text-xs text-[var(--color-text-muted)]">{itemType} {ca.type ? `(${ca.type})` : ""}</span>
+                      </div>
+                      {fw && <span className="text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">{fw}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Skills summary */}
+              {maxrollData.skills?.skillPoints && Object.keys(maxrollData.skills.skillPoints).length > 0 && (
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-[var(--color-accent)] font-mono mb-1">
+                    Skills ({Object.keys(maxrollData.skills.skillPoints).length})
+                  </p>
+                  <div className="text-xs text-[var(--color-text-muted)] flex flex-wrap gap-1">
+                    {Object.entries(maxrollData.skills.skillPoints).slice(0, 10).map(([k, v]: [string, any]) => (
+                      <span key={k} className="px-1.5 py-0.5 rounded bg-[var(--color-panel-border)]/30">{k.replace(/^c4sh-|^ds-|^exo-|^grav-/i, "")}: {v}</span>
+                    ))}
+                    {Object.keys(maxrollData.skills.skillPoints).length > 10 && <span className="opacity-50">+{Object.keys(maxrollData.skills.skillPoints).length - 10} more</span>}
+                  </div>
+                </div>
+              )}
+
+              {/* Specializations */}
+              {maxrollData.specializations?.active?.length > 0 && (
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-[var(--color-accent)] font-mono mb-1">Specializations</p>
+                  <div className="text-xs text-[var(--color-text-muted)] flex flex-wrap gap-1">
+                    {Object.entries(maxrollData.specializations.skillPoints).filter(([, v]: [string, any]) => v > 0).map(([k, v]: [string, any]) => (
+                      <span key={k} className="px-1.5 py-0.5 rounded bg-[var(--color-panel-border)]/30 capitalize">{k}: {v}</span>
+                    ))}
+                  </div>
+                  <div className="text-xs text-green-400 mt-1">
+                    Active: {maxrollData.specializations.active.map((a: string) => a.replace(/-/g, " ")).join(", ")}
+                  </div>
+                </div>
+              )}
+
+              <p className="text-xs text-yellow-400/70">
+                Maxroll planner data extracted. Item assembly from Maxroll's structured data coming soon.
+                For now, you can see the full build details above.
+              </p>
+            </div>
+          )}
+
+          {/* ── Mobalytics Review Step ───────────────────────────────────── */}
           {scrapeResult && !assembleResult && (
             <div className="space-y-4">
               {/* Build header */}

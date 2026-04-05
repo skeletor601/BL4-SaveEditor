@@ -129,6 +129,7 @@ export interface AssembledBuild {
 interface UniversalRow {
   code: string;
   partName: string;
+  internalName?: string;
   itemType: string;
   category: string;
   partType: string;
@@ -1021,6 +1022,31 @@ function assembleWeapon(
   const { typeId, partId } = resolved.match;
 
   const seed = Math.floor(Math.random() * 9000) + 1000;
+
+  // ── Check godrolls first ─────────────────────────────────────────────
+  const elementName = elementCode
+    ? ELEMENTS.find(e => e.code === elementCode)?.name || null
+    : null;
+  const godroll = findGodroll(resolved.match.partName, elementName ?? undefined);
+  if (godroll) {
+    let decoded = godroll.decoded
+      .replace(/^(\d+),\s*0,\s*1,\s*\d+/, `$1, 0, 1, ${level}`)
+      .replace(/\|\s*2,\s*\d+\s*\|/, `| 2, ${seed}|`);
+    // Swap element if needed
+    if (elementCode) decoded = swapElement(decoded, elementName);
+    const grTypeId = decoded.match(/^(\d+)/)?.[1] || typeId;
+    return {
+      slot: resolved.slot, category: "Weapon",
+      itemName: `${resolved.match.partName} (Godroll)`,
+      manufacturer: resolved.match.manufacturer,
+      weaponType: resolved.match.weaponType,
+      element: elementName || undefined,
+      decoded, typeId: grTypeId, confidence: "exact",
+      notes: `From godroll: ${godroll.name}`,
+    };
+  }
+
+  // ── Fall back to DB assembly ─────────────────────────────────────────
   const parts: string[] = [];
 
   // 1. Rarity (the legendary)
@@ -1080,10 +1106,6 @@ function assembleWeapon(
   const ubHint = perWeaponHint?.underbarrel || context.weaponHints.underbarrel;
   const ubPid = resolveUnderbarrel(db, typeId, ubHint);
   if (ubPid) parts.push(`{${ubPid}}`);
-
-  const elementName = elementCode
-    ? ELEMENTS.find(e => e.code === elementCode)?.name || ""
-    : "";
 
   const decoded = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${parts.join(" ")}|`;
 
@@ -1157,6 +1179,28 @@ function assembleAccessory(
     for (const p of perks) parts.push(`{${p.partId}}`);
 
   } else if (category === "Grenade") {
+    // Crit Knife / Penetrator Knife / Jakobs Grenade → hardcoded modded crit knife
+    const isCritKnife = context.ordnanceHint && normalize(context.ordnanceHint).includes("penetrator");
+    const titleLower = normalize(resolved.match.partName || resolved.mobaName || "");
+    const looksLikeCritKnife = isCritKnife ||
+      titleLower.includes("crit knife") || titleLower.includes("penetrator") ||
+      (titleLower.includes("jakobs") && titleLower.includes("grenade"));
+
+    if (looksLikeCritKnife) {
+      // Return the full modded crit knife directly — skip normal assembly
+      const critKnifeDecoded = `267, 0, 1, ${level}| 2, ${seed}|| {20} {11} {11} {11} {11} {11} {11} {11} {11} {11} {11} {14} {14} {14} {14} {14} {14} {14} {14} {14} {14} {15} {15} {15} {15} {15} {15} {15} {15} {15} {15} {16} {16} {16} {16} {16} {16} {16} {16} {16} {16} {17} {17} {17} {17} {17} {17} {17} {17} {17} {17} {18} {18} {18} {18} {18} {18} {18} {18} {18} {18} {19} {19} {19} {19} {19} {19} {19} {19} {19} {19} {245:24} {245:25} {245:26} {245:27} {245:28} {1} {245:[39 39 39 39 39 39 39 39 39 39]} {245:[69 69 69 69 69 69 69 69 69 69]} {245:[70 70 70 70 70 70 70 70 70 70]} {245:[71 71 71 71 71 71 71 71 71 71]} {245:[72 72 72 72 72 72 72 72 72 72]} {245:[73 73 73 73 73 73 73 73 73 73]} {245:[75 75 75 75 75 75 75 75 75 75]} {245:[78 78 78 78 78 78 78 78 78 78]} {245:[79 79 79 79 79 79 79 79 79 79]} |`;
+      return {
+        slot: resolved.slot || "ordnance",
+        category: "Grenade",
+        itemName: "Crit Knife (Modded)",
+        manufacturer: "Jakobs",
+        decoded: critKnifeDecoded,
+        typeId: "267",
+        confidence: "exact",
+        notes: "Jakobs Penetrator Knife — max stacked crit perks",
+      };
+    }
+
     parts.push(`{${partId}}`);
     if (resolved.match.partType === "Legendary Perk") {
       const rarityRow = db.find(r =>
@@ -1174,14 +1218,6 @@ function assembleAccessory(
         r.manufacturer === resolved.match!.manufacturer && parseCode(r.code).typeId === typeId
       );
       if (perkRow) parts.push(`{${parseCode(perkRow.code).partId}}`);
-    }
-
-    // Ordnance hint (Penetrator Knife etc)
-    if (context.ordnanceHint && normalize(context.ordnanceHint).includes("penetrator")) {
-      const penetrator = db.find(r =>
-        r.category === "Grenade" && normalize(r.partName || "").includes("penetrator")
-      );
-      if (penetrator) parts.push(`{245:${parseCode(penetrator.code).partId}}`);
     }
 
     // Firmware from build guide
@@ -1517,4 +1553,711 @@ export function assembleBuild(
   }
 
   return { buildName, character, variantName, items, skipped };
+}
+
+// ── Maxroll Assembler ──────────────────────────────────────────────────────
+// Maxroll provides fully structured data (manufacturer, legendaryId, augments,
+// firmware, weapon type) so we can map directly to DB parts without fuzzy matching.
+
+// ── Godroll Priority System ───────────────────────────────────────────────
+// Always check godrolls.json first for weapon templates. Use the godroll as
+// the base decoded string, then only modify element if needed.
+
+interface GodrollEntry { name: string; decoded: string }
+let godrollCache: GodrollEntry[] | null = null;
+
+function loadGodrolls(): GodrollEntry[] {
+  if (godrollCache) return godrollCache;
+  const p = join(repoRoot, "godrolls.json");
+  if (!existsSync(p)) return [];
+  try {
+    godrollCache = JSON.parse(readFileSync(p, "utf-8")) as GodrollEntry[];
+    return godrollCache;
+  } catch { return []; }
+}
+
+/** Normalize a name for fuzzy matching: lowercase, strip spaces/punctuation */
+function normGodroll(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * Find the best godroll match for a weapon name.
+ * Returns the godroll entry or null. Prefers non-elemental base versions.
+ */
+function findGodroll(weaponName: string, element?: string): GodrollEntry | null {
+  const godrolls = loadGodrolls();
+  if (!godrolls.length) return null;
+  const normName = normGodroll(weaponName);
+  if (!normName || normName.length < 3) return null;
+
+  // Element names for stripping/matching
+  const ELEMENTS = ["fire", "cryo", "shock", "radiation", "corrosive"];
+
+  // First: try exact element + name match (e.g. "Cryo Bod Absorb Shield Sticky Gyrojet")
+  if (element) {
+    const normEl = normGodroll(element);
+    const match = godrolls.find(g => {
+      const n = normGodroll(g.name);
+      return n.includes(normName) && n.includes(normEl);
+    });
+    if (match) return match;
+  }
+
+  // Second: try non-elemental version (base name match, no element prefix)
+  const baseMatch = godrolls.find(g => {
+    const n = normGodroll(g.name);
+    // Check the godroll name doesn't start with an element
+    const startsWithElement = ELEMENTS.some(el => n.startsWith(el));
+    return !startsWithElement && n.includes(normName);
+  });
+  if (baseMatch) return baseMatch;
+
+  // Third: any version containing the weapon name
+  const anyMatch = godrolls.find(g => normGodroll(g.name).includes(normName));
+  if (anyMatch) return anyMatch;
+
+  return null;
+}
+
+/**
+ * Take a godroll decoded string and swap the element if needed.
+ * Element tokens are {1:10}=Corrosive, {1:11}=Cryo, {1:12}=Fire, {1:13}=Radiation, {1:14}=Shock
+ */
+function swapElement(decoded: string, newElement: string | null): string {
+  if (!newElement) return decoded;
+  const ELEMENT_CODES: Record<string, string> = {
+    corrosive: "{1:10}", cryo: "{1:11}", fire: "{1:12}", radiation: "{1:13}", shock: "{1:14}",
+  };
+  const newCode = ELEMENT_CODES[newElement.toLowerCase()];
+  if (!newCode) return decoded;
+
+  // Remove any existing element token and add the new one
+  const cleaned = decoded.replace(/\{1:\d+\}\s*/g, "");
+  // Insert after the first part token
+  return cleaned.replace(/\|\|\s*/, `|| ${newCode} `);
+}
+
+/** Manufacturer name → capitalize for DB matching */
+const MFG_CAPITALIZE: Record<string, string> = {
+  torgue: "Torgue", maliwan: "Maliwan", daedalus: "Daedalus", jakobs: "Jakobs",
+  ripper: "Ripper", vladof: "Vladof", tediore: "Tediore", order: "Order",
+  atlas: "Atlas", cov: "COV", hyperion: "Hyperion",
+};
+
+/** Weapon type → DB weaponType */
+const WEAPON_TYPE_MAP: Record<string, string> = {
+  pistol: "Pistol", smg: "SMG", shotgun: "Shotgun", sniper: "Sniper",
+  assault_rifle: "Assault Rifle", ar: "Assault Rifle",
+};
+
+/** Maxroll item type → our category */
+const MAXROLL_TYPE_MAP: Record<string, string> = {
+  "bl4-weapon": "Weapon", "bl4-shield": "Shield", "bl4-ordnance": "Grenade",
+  "bl4-repkit": "Repkit", "bl4-class-mod": "Class Mod", "bl4-enhancement": "Enhancement",
+};
+
+/** Maxroll augmentId → DB internalName pattern */
+function maxrollAugmentToInternalName(augId: string): string {
+  // lp-bor-mag → part_mag_05_borg (Ripper Mag)
+  // lp-tor-sticky → part_mag_torgue_sticky
+  // lp-jak-ricochet ��� part_barrel_licensed_jak
+  // lp-ted-reload → part_barrel_licensed_ted
+  // lp-hyp-shield → part_shield_default or part_shield_amp etc.
+  // shieldaug-eng-amp → part_eng_amp (shield energy amp)
+  // repkit-aug-u-alldmg → part_aug_u_alldmg_on_use
+  // grenade-payload-damage-amp-aug-penetrator → part_07_damage_amp_03_penetrator
+
+  if (augId === "lp-bor-mag") return "part_mag_05_borg";
+  if (augId === "lp-tor-sticky") return "part_mag_torgue_sticky";
+  if (augId.startsWith("lp-jak")) return "part_barrel_licensed_jak";
+  if (augId.startsWith("lp-ted-mirv")) return "part_barrel_licensed_ted_mirv";
+  if (augId.startsWith("lp-ted-combo")) return "part_barrel_licensed_ted_combo";
+  if (augId.startsWith("lp-ted-shoot")) return "part_barrel_licensed_ted_shooting";
+  if (augId.startsWith("lp-ted")) return "part_barrel_licensed_ted";
+  if (augId.startsWith("lp-hyp")) return "part_barrel_licensed_hyp";
+  if (augId.includes("penetrator")) return "part_07_damage_amp_03_penetrator";
+  if (augId === "shieldaug-eng-amp") return "part_eng_amp";
+  if (augId.startsWith("repkit-aug-u-alldmg")) return "part_aug_u_alldmg_on_use";
+  if (augId.startsWith("repkit-aug-")) {
+    // repkit-aug-u-XYZ → part_aug_u_XYZ_on_use
+    const suffix = augId.replace("repkit-aug-", "").replace(/-/g, "_");
+    return `part_aug_${suffix}_on_use`;
+  }
+  // Generic: replace dashes with underscores
+  return augId.replace(/-/g, "_");
+}
+
+/** Maxroll firmwareId → DB internalName */
+function maxrollFirmwareToInternalName(fwId: string): string {
+  // high-caliber → part_firmware_high_caliber
+  // deadeye → part_firmware_deadeye
+  return "part_firmware_" + fwId.replace(/-/g, "_");
+}
+
+/** Extract the name from Maxroll's legendaryId: np_ScootShoot → scootshoot */
+function extractLegendarySlug(legendaryId: string): string {
+  // np_ScootShoot → scootshoot, np_repkit_uni_TOR_ShinyWarPaint → shinywar, etc.
+  // Take the last segment after the last underscore group
+  const parts = legendaryId.replace(/^np_/, "").split("_");
+  // For weapon/shield/grenade: last part is the name
+  // For repkit: np_repkit_uni_TOR_ShinyWarPaint → ShinyWarPaint
+  // For class mod: np_cm_ds_leg_06 → leg_06
+  return parts[parts.length - 1]?.toLowerCase() || legendaryId.toLowerCase();
+}
+
+interface MaxrollEquipmentSlot {
+  slot: string;
+  item: {
+    type: string;
+    customAttr: Record<string, unknown>;
+  };
+}
+
+export function assembleMaxrollBuild(
+  plannerName: string,
+  character: string,
+  equipment: MaxrollEquipmentSlot[],
+  level: number = 60,
+): AssembledBuild {
+  const db = loadDb();
+  const items: StockItem[] = [];
+  const skipped: { slot: string; reason: string }[] = [];
+
+  // Detect if Bod is in the build — triggers "All Rounder" enhancement rule
+  const hasBod = equipment.some(eq => {
+    if (eq.item.type !== "bl4-weapon") return false;
+    const legId = String(eq.item.customAttr.legendaryId || "").toLowerCase();
+    return legId.includes("bod");
+  });
+
+  for (const eq of equipment) {
+    const category = MAXROLL_TYPE_MAP[eq.item.type];
+    if (!category) { skipped.push({ slot: eq.slot, reason: `Unknown type: ${eq.item.type}` }); continue; }
+
+    const attr = eq.item.customAttr;
+    const mfgId = String(attr.manufacturerId || "");
+    const mfg = MFG_CAPITALIZE[mfgId] || mfgId;
+    const legendaryId = String(attr.legendaryId || "");
+    const augmentIds = (attr.augmentIds || []) as string[];
+    const firmwareId = String(attr.firmwareId || "");
+    const rarity = Number(attr.rarity || 0); // 3=Epic, 4=Legendary
+    const itemLevel = Number(attr.level || level);
+    const seed = Math.floor(Math.random() * 9000) + 1000;
+
+    try {
+      if (category === "Weapon") {
+        const wt = WEAPON_TYPE_MAP[String(attr.type || "")] || String(attr.type || "");
+        const item = assembleMaxrollWeapon(db, eq.slot, mfg, wt, legendaryId, augmentIds, itemLevel, seed);
+        if (item) items.push(item);
+        else skipped.push({ slot: eq.slot, reason: `Could not assemble weapon: ${legendaryId || mfg + " " + wt}` });
+
+      } else if (category === "Grenade") {
+        // Check for crit knife (penetrator augment on Jakobs grenade)
+        const hasPenetrator = augmentIds.some(a => a.includes("penetrator"));
+        const isJakobs = mfgId === "jakobs";
+        if (hasPenetrator || isJakobs) {
+          // Hardcoded modded crit knife
+          items.push({
+            slot: eq.slot, category: "Grenade", itemName: "Crit Knife (Modded)", manufacturer: "Jakobs",
+            decoded: `267, 0, 1, ${itemLevel}| 2, ${seed}|| {20} {11} {11} {11} {11} {11} {11} {11} {11} {11} {11} {14} {14} {14} {14} {14} {14} {14} {14} {14} {14} {15} {15} {15} {15} {15} {15} {15} {15} {15} {15} {16} {16} {16} {16} {16} {16} {16} {16} {16} {16} {17} {17} {17} {17} {17} {17} {17} {17} {17} {17} {18} {18} {18} {18} {18} {18} {18} {18} {18} {18} {19} {19} {19} {19} {19} {19} {19} {19} {19} {19} {245:24} {245:25} {245:26} {245:27} {245:28} {1} {245:[39 39 39 39 39 39 39 39 39 39]} {245:[69 69 69 69 69 69 69 69 69 69]} {245:[70 70 70 70 70 70 70 70 70 70]} {245:[71 71 71 71 71 71 71 71 71 71]} {245:[72 72 72 72 72 72 72 72 72 72]} {245:[73 73 73 73 73 73 73 73 73 73]} {245:[75 75 75 75 75 75 75 75 75 75]} {245:[78 78 78 78 78 78 78 78 78 78]} {245:[79 79 79 79 79 79 79 79 79 79]} |`,
+            typeId: "267", confidence: "exact", notes: "Jakobs Penetrator Knife — max stacked crit perks",
+          });
+        } else {
+          const item = assembleMaxrollAccessory(db, eq.slot, category, mfg, legendaryId, augmentIds, firmwareId, itemLevel, seed, rarity);
+          if (item) items.push(item);
+          else skipped.push({ slot: eq.slot, reason: `Could not assemble grenade: ${mfg}` });
+        }
+
+      } else if (category === "Class Mod") {
+        const item = assembleMaxrollClassMod(db, eq.slot, character, legendaryId, firmwareId, attr, itemLevel, seed);
+        if (item) items.push(item);
+        else skipped.push({ slot: eq.slot, reason: `Could not assemble class mod: ${legendaryId}` });
+
+      } else if (category === "Enhancement") {
+        const item = assembleMaxrollEnhancement(db, eq.slot, mfg, firmwareId, attr, itemLevel, seed, equipment, hasBod);
+        if (item) items.push(item);
+        else skipped.push({ slot: eq.slot, reason: `Could not assemble enhancement: ${mfg}` });
+
+      } else {
+        // Shield, Repkit
+        const item = assembleMaxrollAccessory(db, eq.slot, category, mfg, legendaryId, augmentIds, firmwareId, itemLevel, seed, rarity);
+        if (item) items.push(item);
+        else skipped.push({ slot: eq.slot, reason: `Could not assemble ${category}: ${mfg} ${legendaryId}` });
+      }
+    } catch (e) {
+      skipped.push({ slot: eq.slot, reason: `Error: ${e instanceof Error ? e.message : "unknown"}` });
+    }
+  }
+
+  return { buildName: plannerName, character, variantName: "Maxroll", items, skipped };
+}
+
+function assembleMaxrollWeapon(
+  db: UniversalRow[], slot: string, mfg: string, weaponType: string,
+  legendaryId: string, augmentIds: string[], level: number, seed: number,
+): StockItem | null {
+  const slug = extractLegendarySlug(legendaryId);
+
+  // ── STEP 1: Check godrolls first ─────────────────────────────────────
+  // Find the weapon's display name from DB for godroll lookup
+  let weaponDisplayName = "";
+  if (slug) {
+    const barrelRow = db.find(r =>
+      r.category === "Weapon" && r.partType === "Barrel" &&
+      r.internalName?.toLowerCase().includes(slug)
+    );
+    if (barrelRow) weaponDisplayName = barrelRow.partName || "";
+    if (!weaponDisplayName) {
+      const rarRow = db.find(r =>
+        r.category === "Weapon" && r.partType === "Rarity" &&
+        r.internalName?.toLowerCase().includes(`legendary_${slug}`)
+      );
+      if (rarRow) weaponDisplayName = rarRow.partName || "";
+    }
+  }
+
+  if (weaponDisplayName) {
+    // Detect element from Maxroll data (elementalDamage field or augment hints)
+    const godroll = findGodroll(weaponDisplayName);
+    if (godroll) {
+      // Use godroll as base, adjust level
+      let decoded = godroll.decoded.replace(
+        /^(\d+),\s*0,\s*1,\s*\d+/,
+        `$1, 0, 1, ${level}`
+      );
+      // Swap seed
+      decoded = decoded.replace(
+        /\|\s*2,\s*\d+\s*\|/,
+        `| 2, ${seed}|`
+      );
+      const typeId = decoded.match(/^(\d+)/)?.[1] || "";
+      return {
+        slot, category: "Weapon", itemName: `${weaponDisplayName} (Godroll)`, manufacturer: mfg,
+        weaponType, decoded, typeId, confidence: "exact",
+        notes: `From godroll: ${godroll.name}`,
+      };
+    }
+  }
+
+  // ── STEP 2: Fall back to DB assembly ─────────────────────────────────
+  let barrelRow: UniversalRow | undefined;
+  let rarityRow: UniversalRow | undefined;
+
+  if (slug) {
+    rarityRow = db.find(r =>
+      r.category === "Weapon" && r.partType === "Rarity" &&
+      r.internalName?.toLowerCase().includes(`legendary_${slug}`)
+    );
+    barrelRow = db.find(r =>
+      r.category === "Weapon" && r.partType === "Barrel" &&
+      r.internalName?.toLowerCase().includes(slug)
+    );
+  }
+
+  if (!rarityRow) {
+    rarityRow = db.find(r =>
+      r.category === "Weapon" && r.partType === "Rarity" && r.rarity === "Legendary" &&
+      r.manufacturer === mfg && r.weaponType === weaponType
+    );
+  }
+
+  if (!rarityRow) return null;
+  const typeId = parseCode(rarityRow.code).typeId;
+
+  const parts: string[] = [];
+  parts.push(`{${parseCode(rarityRow.code).partId}}`);
+  if (barrelRow && parseCode(barrelRow.code).typeId === typeId) {
+    parts.push(`{${parseCode(barrelRow.code).partId}}`);
+  }
+
+  // Augments (licensed parts, manufacturer parts)
+  for (const augId of augmentIds) {
+    const internalPattern = maxrollAugmentToInternalName(augId);
+    const augRow = db.find(r =>
+      parseCode(r.code).typeId === typeId &&
+      r.internalName?.toLowerCase().includes(internalPattern.toLowerCase())
+    );
+    if (augRow) parts.push(`{${parseCode(augRow.code).partId}}`);
+  }
+
+  // Fill body, grip, mag
+  for (const partType of ["Body", "Grip", "Magazine"]) {
+    const fill = db.find(r =>
+      parseCode(r.code).typeId === typeId && r.partType === partType
+    );
+    if (fill && parts.length < 10) parts.push(`{${parseCode(fill.code).partId}}`);
+  }
+
+  const decoded = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${parts.join(" ")} |`;
+  const name = barrelRow?.partName || rarityRow.partName || `${mfg} ${weaponType}`;
+
+  return {
+    slot, category: "Weapon", itemName: name, manufacturer: mfg,
+    weaponType, decoded, typeId, confidence: rarityRow ? "exact" : "fuzzy",
+  };
+}
+
+function assembleMaxrollAccessory(
+  db: UniversalRow[], slot: string, category: string, mfg: string,
+  legendaryId: string, augmentIds: string[], firmwareId: string,
+  level: number, seed: number, rarity: number,
+): StockItem | null {
+  const slug = extractLegendarySlug(legendaryId);
+
+  // Universal typeIds for each category (firmware/perks live here)
+  const universalTypeIds: Record<string, string> = {
+    Shield: "246", Grenade: "245", Repkit: "243",
+  };
+  const uniTypeId = universalTypeIds[category] || "";
+
+  // Find legendary perk or rarity by internalName
+  let legRow: UniversalRow | undefined;
+  let rarityRow: UniversalRow | undefined;
+
+  if (slug && legendaryId) {
+    // Search by internalName for the legendary
+    legRow = db.find(r =>
+      r.category === category &&
+      (r.partType === "Legendary Perk" || r.partType === "Rarity") &&
+      r.internalName?.toLowerCase().includes(slug)
+    );
+    // If not found by internalName, try partName (e.g. "Chrome" for ShinyWarPaint)
+    if (!legRow) {
+      legRow = db.find(r =>
+        r.category === category && r.partType === "Legendary Perk" && r.manufacturer === mfg
+      );
+    }
+    // If we found a legendary perk, also get the rarity row for that manufacturer
+    if (legRow && legRow.partType === "Legendary Perk") {
+      const legTypeId = parseCode(legRow.code).typeId;
+      rarityRow = db.find(r =>
+        parseCode(r.code).typeId === legTypeId && r.partType === "Rarity" && r.rarity === "Legendary"
+      );
+    } else if (legRow && legRow.partType === "Rarity") {
+      rarityRow = legRow;
+      const legTypeId = parseCode(legRow.code).typeId;
+      legRow = db.find(r =>
+        parseCode(r.code).typeId === legTypeId && r.partType === "Legendary Perk"
+      ) || legRow;
+    }
+  }
+
+  // Fallback: find by manufacturer
+  if (!rarityRow) {
+    const rarityName = rarity >= 4 ? "Legendary" : rarity === 3 ? "Epic" : "Rare";
+    rarityRow = db.find(r =>
+      r.category === category && r.partType === "Rarity" && r.rarity === rarityName && r.manufacturer === mfg
+    );
+  }
+
+  if (!rarityRow && !legRow) return null;
+  const typeId = parseCode((rarityRow || legRow!).code).typeId;
+
+  // All parts stored with full {typeId:partId} format
+  const parts: string[] = [];
+  if (rarityRow) parts.push(`{${typeId}:${parseCode(rarityRow.code).partId}}`);
+  if (legRow && legRow !== rarityRow) parts.push(`{${typeId}:${parseCode(legRow.code).partId}}`);
+
+  // Firmware — lives in the universal typeId (243 for repkit, 245 for grenade, 246 for shield)
+  if (firmwareId && uniTypeId) {
+    const fwInternal = maxrollFirmwareToInternalName(firmwareId);
+    const fwRow = db.find(r =>
+      r.category === category && r.partType === "Firmware" &&
+      r.internalName?.toLowerCase().includes(fwInternal.replace("part_firmware_", ""))
+    );
+    if (fwRow) parts.push(`{${parseCode(fwRow.code).typeId}:${parseCode(fwRow.code).partId}}`);
+  }
+
+  // Augments / perks — use their actual code (includes correct typeId)
+  for (const augId of augmentIds) {
+    const internalPattern = maxrollAugmentToInternalName(augId);
+    const augRow = db.find(r =>
+      r.category === category &&
+      r.internalName?.toLowerCase().includes(internalPattern.toLowerCase())
+    );
+    if (augRow) {
+      const { typeId: augTid, partId: augPid } = parseCode(augRow.code);
+      parts.push(`{${augTid}:${augPid}}`);
+    }
+  }
+
+  // Fill generic perks from the universal typeId
+  if (uniTypeId) {
+    const perkRows = db.filter(r =>
+      parseCode(r.code).typeId === uniTypeId && r.partType === "Perk"
+    ).slice(0, 3);
+    for (const p of perkRows) parts.push(`{${uniTypeId}:${parseCode(p.code).partId}}`);
+  }
+
+  const decodedFinal = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${parts.join(" ")} |`;
+  const name = legRow?.partName || rarityRow?.partName || `${mfg} ${category}`;
+
+  return {
+    slot, category, itemName: name, manufacturer: mfg,
+    decoded: decodedFinal, typeId, confidence: legRow ? "exact" : "fuzzy",
+  };
+}
+
+function assembleMaxrollClassMod(
+  db: UniversalRow[], slot: string, character: string, legendaryId: string,
+  firmwareId: string, attr: Record<string, unknown>, level: number, seed: number,
+): StockItem | null {
+  // Class mod typeIds: Amon=255, Harlowe=259, Rafa=256, Vex=254
+  const charTypeIds: Record<string, string> = { amon: "255", harlowe: "259", rafa: "256", vex: "254" };
+  const typeId = charTypeIds[character.toLowerCase()] || "254";
+
+  const parts: string[] = [];
+
+  // Find legendary rarity and name from legendaryId
+  // np_cm_ds_leg_06 → internalName contains "legendary_06"
+  const legSuffix = legendaryId.replace(/^np_cm_\w+_/, ""); // "leg_06"
+  if (legSuffix) {
+    // Rarity: comp_05_legendary_06
+    const rarityRow = db.find(r =>
+      parseCode(r.code).typeId === typeId && r.partType === "Rarity" &&
+      r.internalName?.includes(`legendary_${legSuffix.replace("leg_", "")}`)
+    );
+    if (rarityRow) parts.push(`{${parseCode(rarityRow.code).partId}}`);
+
+    // Name body: leg_body_06
+    const nameRow = db.find(r =>
+      parseCode(r.code).typeId === typeId && r.partType === "Name" &&
+      r.internalName?.includes(`leg_body_${legSuffix.replace("leg_", "")}`)
+    );
+    if (nameRow) parts.push(`{${parseCode(nameRow.code).partId}}`);
+  }
+
+  // Firmware (class mod firmware is in typeId 234)
+  if (firmwareId) {
+    const fwInternal = maxrollFirmwareToInternalName(firmwareId);
+    const fwRow = db.find(r =>
+      r.category === "Class Mod" && r.partType?.includes("Class Mod Perk") &&
+      r.internalName?.toLowerCase() === fwInternal.replace("part_", "")
+    );
+    if (fwRow) parts.push(`{234:${parseCode(fwRow.code).partId}}`);
+  }
+
+  // Skill augments
+  const skillAugments = (attr.skillAugments || []) as { skillId: string; noOfLevels: number }[];
+  for (const sa of skillAugments) {
+    // skillId like "grave-thirst" → search for skill with matching slug
+    const skillSlug = sa.skillId.replace(/-/g, "_").toLowerCase();
+    // Find skill part in class mod for this character
+    const skillRow = db.find(r =>
+      parseCode(r.code).typeId === typeId && r.partType === "Skill" &&
+      (r.internalName?.toLowerCase().includes(skillSlug) ||
+       r.partName?.toLowerCase().replace(/[^a-z0-9]/g, "").includes(skillSlug.replace(/_/g, "")))
+    );
+    if (skillRow) {
+      // Add multiple tiers for the number of levels
+      parts.push(`{${typeId}:${parseCode(skillRow.code).partId}}`);
+    }
+  }
+
+  const partsStr = parts.map(p => {
+    if (p.match(/^\{\d+:\d+\}$/)) return p;
+    return `{${typeId}:${p.replace(/[{}]/g, "")}}`;
+  }).join(" ");
+
+  const decoded = `${typeId}, 0, 1, ${level}| 2, ${seed}|| ${partsStr} |`;
+  const name = legendaryId ? legendaryId.replace(/^np_/, "").replace(/_/g, " ") : `${character} Class Mod`;
+
+  return {
+    slot, category: "Class Mod", itemName: name, manufacturer: character,
+    decoded, typeId, confidence: parts.length > 0 ? "exact" : "fuzzy",
+  };
+}
+
+function assembleMaxrollEnhancement(
+  db: UniversalRow[], slot: string, mfg: string, firmwareId: string,
+  attr: Record<string, unknown>, level: number, seed: number,
+  allEquipment: MaxrollEquipmentSlot[],
+  hasBod: boolean = false,
+): StockItem | null {
+  // Enhancement MFG typeIds
+  const enhMfgTypeIds: Record<string, string> = {
+    Atlas: "284", COV: "286", Daedalus: "299", Hyperion: "264", Jakobs: "268",
+    Maliwan: "271", Ripper: "296", Tediore: "292", Order: "281", Torgue: "303", Vladof: "310",
+  };
+
+  // Bod All Rounder rule: force Torgue enhancement with all weapon type perks
+  const effectiveMfg = hasBod ? "Torgue" : mfg;
+  const mfgTypeId = enhMfgTypeIds[effectiveMfg] || "296";
+
+  const parts: string[] = [];
+
+  // Rarity (legendary = 4)
+  const rarity = Number(attr.rarity || 4);
+  const rarityName = rarity >= 4 ? "Legendary" : rarity === 3 ? "Epic" : "Rare";
+  const rarityRow = db.find(r =>
+    parseCode(r.code).typeId === mfgTypeId && r.partType === "Rarity" &&
+    r.internalName?.includes(rarityName === "Legendary" ? "legendary" : rarityName.toLowerCase())
+  );
+  if (rarityRow) parts.push(`{${mfgTypeId}:${parseCode(rarityRow.code).partId}}`);
+
+  // 247 rarity too
+  const r247 = db.find(r =>
+    parseCode(r.code).typeId === "247" && r.partType === "Rarity" && r.rarity === "Legendary"
+  );
+  if (r247) parts.push(`{247:${parseCode(r247.code).partId}}`);
+
+  // ── Core perks from enhancement's own manufacturer ───────────────────
+  const corePerks = db.filter(r =>
+    parseCode(r.code).typeId === mfgTypeId && r.partType === "Core Perk"
+  );
+  for (const p of corePerks.slice(0, 4)) parts.push(`{${mfgTypeId}:${parseCode(p.code).partId}}`);
+
+  // ── Cross-manufacturer perks from ALL weapons in the build ───────────
+  const weaponMfgs = new Set<string>();
+  const weaponTypes = new Set<string>();
+
+  for (const eq of allEquipment) {
+    if (eq.item.type !== "bl4-weapon") continue;
+    const wAttr = eq.item.customAttr;
+    const wMfgId = String(wAttr.manufacturerId || "");
+    const wMfg = MFG_CAPITALIZE[wMfgId] || wMfgId;
+    if (wMfg) weaponMfgs.add(wMfg);
+    const wType = WEAPON_TYPE_MAP[String(wAttr.type || "")] || String(wAttr.type || "");
+    if (wType) weaponTypes.add(wType.toLowerCase());
+
+    // Also check augments for cross-mfg references (lp-bor = Ripper, lp-tor = Torgue, etc.)
+    const augIds = (wAttr.augmentIds || []) as string[];
+    for (const aug of augIds) {
+      if (aug.startsWith("lp-bor")) weaponMfgs.add("Ripper");
+      if (aug.startsWith("lp-tor")) weaponMfgs.add("Torgue");
+      if (aug.startsWith("lp-jak")) weaponMfgs.add("Jakobs");
+      if (aug.startsWith("lp-ted")) weaponMfgs.add("Tediore");
+      if (aug.startsWith("lp-hyp")) weaponMfgs.add("Hyperion");
+      if (aug.startsWith("lp-mal")) weaponMfgs.add("Maliwan");
+      if (aug.startsWith("lp-dae")) weaponMfgs.add("Daedalus");
+      if (aug.startsWith("lp-vla")) weaponMfgs.add("Vladof");
+    }
+  }
+
+  // Add cross-mfg core perks from each weapon manufacturer's enhancement
+  const allEnhCorePerks = db.filter(r => r.category === "Enhancement" && r.partType === "Core Perk");
+  const addedMfgTypeIds = new Set([mfgTypeId]); // skip own mfg (already added above)
+  for (const wMfg of weaponMfgs) {
+    const mfgPerks = allEnhCorePerks.filter(r =>
+      r.manufacturer === wMfg && !addedMfgTypeIds.has(parseCode(r.code).typeId)
+    );
+    if (mfgPerks.length > 0) {
+      const crossTypeId = parseCode(mfgPerks[0].code).typeId;
+      addedMfgTypeIds.add(crossTypeId);
+      for (const p of mfgPerks.slice(0, 4)) {
+        parts.push(`{${crossTypeId}:${parseCode(p.code).partId}}`);
+      }
+    }
+  }
+
+  // ── Bod "All Rounder" rule: force ALL weapon types ────────────────────
+  if (hasBod) {
+    // Bod counts as every weapon type, so add all damage perks
+    for (const wt of ["shotgun", "pistol", "smg", "sniper", "assault rifle"]) {
+      weaponTypes.add(wt);
+    }
+    // Ensure Torgue + Daedalus mfg perks are included
+    weaponMfgs.add("Torgue");
+    weaponMfgs.add("Daedalus");
+    // Re-add any cross-mfg perks that were missed
+    for (const wMfg of ["Torgue", "Daedalus"]) {
+      if (!addedMfgTypeIds.has(enhMfgTypeIds[wMfg] || "")) {
+        const mfgPerks = allEnhCorePerks.filter(r =>
+          r.manufacturer === wMfg && !addedMfgTypeIds.has(parseCode(r.code).typeId)
+        );
+        if (mfgPerks.length > 0) {
+          const crossTypeId = parseCode(mfgPerks[0].code).typeId;
+          addedMfgTypeIds.add(crossTypeId);
+          for (const p of mfgPerks.slice(0, 4)) {
+            parts.push(`{${crossTypeId}:${parseCode(p.code).partId}}`);
+          }
+        }
+      }
+    }
+  }
+
+  // ── Weapon-type specific stat perks (247) ────────────────────────────
+  const typeStatMap: Record<string, string[]> = {
+    "shotgun": ["shotgun dmg", "shotgun damage", "shotgun mag", "shotgun splash", "shotgun crit"],
+    "pistol": ["pistol dmg", "pistol damage", "pistol mag", "pistol crit"],
+    "smg": ["smg dmg", "smg damage", "smg mag", "smg crit"],
+    "sniper": ["sniper dmg", "sniper damage", "sniper mag", "sniper crit"],
+    "assault rifle": ["ar dmg", "ar damage", "ar mag", "ar crit", "assault rifle dmg"],
+  };
+
+  const statPerks = db.filter(r =>
+    parseCode(r.code).typeId === "247" && (r.partType === "Stat Perk" || r.partType === "Stat Group1")
+  );
+  const addedStatPids = new Set<string>();
+
+  for (const wType of weaponTypes) {
+    const searchTerms = typeStatMap[wType] || [`${wType} damage`];
+    for (const term of searchTerms) {
+      const normTerm = normalize(term);
+      const match = statPerks.find(r =>
+        !addedStatPids.has(parseCode(r.code).partId) &&
+        (normalize(r.partName || "").includes(normTerm) ||
+         normalize(r.effect || "").includes(normTerm))
+      );
+      if (match) {
+        const pid = parseCode(match.code).partId;
+        addedStatPids.add(pid);
+        parts.push(`{247:${pid}}`);
+      }
+    }
+  }
+
+  // ── Universal beneficial stat perks ──────────────────────────────────
+  const universalStats = ["gun damage", "gun crit damage", "movement speed", "reload speed"];
+  for (const uStat of universalStats) {
+    const normU = normalize(uStat);
+    const match = statPerks.find(r =>
+      !addedStatPids.has(parseCode(r.code).partId) &&
+      (normalize(r.partName || "").includes(normU) ||
+       normalize(r.effect || "").includes(normU))
+    );
+    if (match) {
+      const pid = parseCode(match.code).partId;
+      addedStatPids.add(pid);
+      parts.push(`{247:${pid}}`);
+    }
+  }
+
+  // ── Firmware (in typeId 247) ─────────────────────────────────────────
+  if (firmwareId) {
+    const fwInternal = maxrollFirmwareToInternalName(firmwareId);
+    const fwRow = db.find(r =>
+      r.code?.startsWith("{247:") && r.partType === "Stat Perk" &&
+      r.internalName?.toLowerCase() === fwInternal.replace("part_", "")
+    );
+    if (fwRow) parts.push(`{247:${parseCode(fwRow.code).partId}}`);
+  }
+
+  // ── Effects from Maxroll (enhancement-19 etc.) ───────────────────────
+  const effects = (attr.effect || []) as string[];
+  for (const eff of effects) {
+    const effNum = eff.replace("enhancement-", "");
+    if (/^\d+$/.test(effNum)) {
+      parts.push(`{247:${effNum}}`);
+    }
+  }
+
+  // Stat perks from Maxroll
+  const statAugmentIds = (attr.statAugmentIds || []) as string[];
+  for (const sa of statAugmentIds) {
+    if (/^\d+$/.test(sa)) {
+      parts.push(`{247:${sa}}`);
+    }
+  }
+
+  const partsStr = parts.join(" ");
+  const decoded = `${mfgTypeId}, 0, 1, ${level}| 2, ${seed}|| ${partsStr} |`;
+
+  return {
+    slot, category: "Enhancement",
+    itemName: hasBod ? `${effectiveMfg} Enhancement (Bod All Rounder)` : `${effectiveMfg} Enhancement`,
+    manufacturer: effectiveMfg,
+    decoded, typeId: mfgTypeId, confidence: "exact",
+  };
 }

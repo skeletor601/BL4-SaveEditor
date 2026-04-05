@@ -366,28 +366,30 @@ function getClassModSkillIconFilename(skillNameEN: string, className: string): s
   return `${safeName}${suffix}.png`;
 }
 
+// C4SH skill tree colors — from NCS skilltrees_data (verified April 2026)
+// BLUE = Sleight of Hand, RED = Cross Fire, GREEN = Cleromancy
 const C4SH_BLUE_SKILLS = new Set([
-  "Fast Hands","Insurance","Ante","Splash the Pot","Alchemy","Go for Broke","Sounds of Rain",
-  "Trick-Taker","Late Scratch","Double-Down","Wretched Shadows","High Roller","Take the Pot",
-  "Stack the Deck","Legerdemain","Vigorish","Dealer's Bluff","Ace in the Hole","Around the Corner",
-  "House Edge","C4SH Game","No Limit","Ante Up","Kill Button","Payout","Boom or Bust",
-  "Tender Hearts","Card Sharp","Hot Streak","Read the Signs","The Turn","Risky Business",
-  "Heart of the Cards","Running Luck",
+  "Ace in the Hole","Alchemy","Ante","Around the Corner","Bad Men Must Bleed",
+  "Bone Shrapnel","Boom or Bust","C4SH Game","Dealer's Bluff","Double-Down",
+  "Fortuity","Grave Pact","Heart of the Cards","Hero Call","High Roller",
+  "Hot Streak","Late Scratch","Legerdemain","Payout","Read the Signs",
+  "Running Luck","Sounds of Rain","Stack the Deck","Steam","Table Flip",
+  "Take the Pot","The House","The Turn","Trick-Taker","Wretched Shadows",
 ]);
 const C4SH_RED_SKILLS = new Set([
-  "Unleashed","Your Huckleberry","The Determinator","Hard-Boiled","Shootist","Stand and Bleed",
-  "Hot Hand","Trick Shot","Ride to Ruin","A Blur of Fingers and Brass","Brimstone","Fast C4SH",
-  "Firestorm","Burn the House Down","High Noon","Bloodstained Moon","Lawless","Truck Full of Nitro",
-  "War Wagon","Pale Rider","Nothing Beats Lead","Forsaken","Broken Arrow","Maverick","Cottonmouth",
-  "Bad Men Must Bleed","The Wind",
+  "Blood on Elpis","Brimstone","Broken Arrow","Cottonmouth","Death Hunt",
+  "Debts to Pay","Forsaken","Gunslinger","Hard-Boiled","Hell and Back",
+  "Lawless","Maverick","Pale Rider","Ride to Ruin","Shootist",
+  "Stand and Bleed","TNT","The Claim","The Determinator","The Furies",
+  "The Gunfighter","The Wind","Unchained","War Wagon","Witching Hour",
 ]);
 const C4SH_GREEN_SKILLS = new Set([
-  "Luck Be a Robot","Sweet Roll","Charm Bracelet","O Fortuna","Red Moon Rising","Ready to Roll",
-  "Riding High","Bonemeal Ticket","Before She Knows You're Dead","Luckless","Double Time",
-  "Can't Stop Winning","Turn of Fate","High Stakes","Fortune's Favor","Let it Ride","The Wilds",
-  "Potent Posse","Restless Remains","Sorcerer","Tooth and Nail","Serendipity","Sidekick's Revenge",
-  "The Glorious Dead","Accursed Bones","Tormented","Loaded Dice","Shadow's Embrace","Graveyard Shift",
-  "Snake Eyes","Call","Cursed Call","Witching Hour",
+  "All for One","Alpha's Call","Critical Role","Cursed Call","Devil's Tines",
+  "Double Time","Fortune's Favor","Graveyard Shift","Haunted","High Stakes",
+  "Let it Ride","Loaded Dice","Luck Be a Robot","Luckless","Lucky Charm",
+  "Pack Mentality","Red Moon Rising","Riding High","Risky Business",
+  "Rolling the Deep","Serendipity","Shadow's Embrace","Sidekick's Revenge",
+  "Snake Eyes","Spin of Fate","The Lucky One","The Wilds","Undying",
 ]);
 
 function getC4SHSkillColor(skillName: string): string {
@@ -395,6 +397,13 @@ function getC4SHSkillColor(skillName: string): string {
   if (C4SH_RED_SKILLS.has(skillName)) return "text-red-400";
   if (C4SH_GREEN_SKILLS.has(skillName)) return "text-green-400";
   return "text-[var(--color-text)]";
+}
+
+function getC4SHSkillIconBg(skillName: string): string {
+  if (C4SH_BLUE_SKILLS.has(skillName)) return "rgba(59,130,246,0.35)";
+  if (C4SH_RED_SKILLS.has(skillName)) return "rgba(239,68,68,0.35)";
+  if (C4SH_GREEN_SKILLS.has(skillName)) return "rgba(34,197,94,0.35)";
+  return "transparent";
 }
 
 function partIdFromLabel(label: string): string | null {
@@ -1554,6 +1563,7 @@ export default function UnifiedItemBuilderPage() {
   const [enhancementSkinValue, setEnhancementSkinValue] = usePersistedState("uib.enhancement.skin", "");
   const [classModSkinValue, setClassModSkinValue] = usePersistedState("uib.classMod.skin", "");
   const [moddedWeaponPowerMode, setModdedWeaponPowerMode] = useState<"stable" | "op" | "insane">("op");
+  const [grenadeStyleFilter, setGrenadeStyleFilter] = useState<"singularity" | "mirv" | "artillery" | "lingering" | "random">("random");
   const [moddedWeaponSpecialModes, setModdedWeaponSpecialModes] = useState<Set<"grenade-reload" | "inf-ammo">>(new Set());
   const [generateModdedLoading, setGenerateModdedLoading] = useState(false);
   const [generateModdedError, setGenerateModdedError] = useState<string | null>(null);
@@ -2340,6 +2350,7 @@ export default function UnifiedItemBuilderPage() {
         stockBaseDecoded: stockBase,
         grenadeVisualRecipes,
         skinOptions: grenadeSkinOptions,
+        grenadeStyle: grenadeStyleFilter,
       });
       setLiveDecoded(result.code.trim());
       setLastEditedCodecSide("decoded");
@@ -3086,6 +3097,7 @@ export default function UnifiedItemBuilderPage() {
         legendaryGrenadeEntries: Array.isArray(legendaryGrenadeEntries) && legendaryGrenadeEntries.length > 0 ? legendaryGrenadeEntries : undefined,
         grenadeVisualRecipes: Array.isArray(grenadeVisualRecipes) && grenadeVisualRecipes.length > 0 ? grenadeVisualRecipes : undefined,
         underbarrelRecipes: Array.isArray(underbarrelRecipes) && underbarrelRecipes.length > 0 ? underbarrelRecipes : undefined,
+        grenadeStyle: grenadeStyleFilter,
         ...(isCustom ? { customMode: true } : {}),
       });
       setLastDps(dps);
@@ -4805,6 +4817,18 @@ export default function UnifiedItemBuilderPage() {
                     <option value="op">OP</option>
                     <option value="insane">Insane</option>
                   </select>
+                  <select
+                    value={grenadeStyleFilter}
+                    onChange={(e) => setGrenadeStyleFilter(e.target.value as typeof grenadeStyleFilter)}
+                    className="px-2 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                    title="Grenade/reload visual style"
+                  >
+                    <option value="random">Style: Random</option>
+                    <option value="singularity">Singularity</option>
+                    <option value="mirv">MIRV</option>
+                    <option value="artillery">Artillery</option>
+                    <option value="lingering">Lingering</option>
+                  </select>
                   {/* Special mode — can select both */}
                   {(["grenade-reload", "inf-ammo"] as const).map((mode) => {
                     const active = moddedWeaponSpecialModes.has(mode);
@@ -5608,6 +5632,21 @@ export default function UnifiedItemBuilderPage() {
                 </div>
               </div>
               <div>
+                <label className="block text-xs text-[var(--color-accent)] mb-1">Style</label>
+                <select
+                  value={grenadeStyleFilter}
+                  onChange={(e) => setGrenadeStyleFilter(e.target.value as typeof grenadeStyleFilter)}
+                  className="px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]"
+                  title="Grenade visual style"
+                >
+                  <option value="random">Random</option>
+                  <option value="singularity">Singularity</option>
+                  <option value="mirv">MIRV</option>
+                  <option value="artillery">Artillery</option>
+                  <option value="lingering">Lingering</option>
+                </select>
+              </div>
+              <div>
                 <label className="block text-xs text-[var(--color-accent)] mb-1">&nbsp;</label>
                 <div className="rounded-lg border border-purple-500/40 bg-purple-500/10 px-3 py-2 min-h-[44px] flex items-center min-w-[10rem]">
                   <button
@@ -5638,13 +5677,28 @@ export default function UnifiedItemBuilderPage() {
                       </button>
                     </div>
 
-                    <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
-                    <input type="number" min={1} max={60} value={customGrenadeLevel} onChange={(e) => setCustomGrenadeLevel(e.target.value)}
-                      className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px] mb-3" />
+                    <div className="flex gap-3 mb-3">
+                      <div>
+                        <label className="block text-xs text-[var(--color-text-muted)] mb-1">Level</label>
+                        <input type="number" min={1} max={60} value={customGrenadeLevel} onChange={(e) => setCustomGrenadeLevel(e.target.value)}
+                          className="w-24 px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs text-[var(--color-text-muted)] mb-1">Grenade Style</label>
+                        <select value={grenadeStyleFilter} onChange={(e) => setGrenadeStyleFilter(e.target.value as typeof grenadeStyleFilter)}
+                          className="w-full px-3 py-2 rounded-lg border border-[var(--color-panel-border)] bg-[rgba(24,28,34,0.9)] text-[var(--color-text)] text-sm min-h-[44px]">
+                          <option value="random">Random (All Styles)</option>
+                          <option value="singularity">Singularity (Pull)</option>
+                          <option value="mirv">MIRV (Split)</option>
+                          <option value="artillery">Artillery (Bullets)</option>
+                          <option value="lingering">Lingering (Beams)</option>
+                        </select>
+                      </div>
+                    </div>
 
                     <button type="button" onClick={() => { setLevel(Number(customGrenadeLevel) || 60); setShowGrenadeGenModeModal(false); void handleGenerateModdedGrenade(); }}
                       className="w-full px-4 py-3 rounded-lg bg-purple-500 text-black font-medium min-h-[44px] hover:opacity-90 mb-4">
-                      Random
+                      {grenadeStyleFilter === "random" ? "Generate Random" : `Generate ${grenadeStyleFilter.charAt(0).toUpperCase() + grenadeStyleFilter.slice(1)}`}
                     </button>
 
                     <div className="border-t border-[var(--color-panel-border)] pt-3">
@@ -8565,12 +8619,22 @@ export default function UnifiedItemBuilderPage() {
                               onKeyDown={(e) => e.key === "Enter" && setClassModSkillCard({ skillName: skill.skillNameEN, className: classModClassName })}
                               className="flex items-center gap-3 px-2 py-1.5 rounded border border-[var(--color-panel-border)]/50 bg-[rgba(24,28,34,0.7)] cursor-pointer hover:border-[var(--color-accent)]/60 hover:bg-[rgba(24,28,34,0.85)] transition-colors"
                             >
-                              <img
-                                src={iconSrc}
-                                alt=""
-                                className="w-9 h-9 object-contain flex-shrink-0 rounded border border-[var(--color-panel-border)]/50"
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                              />
+                              <div
+                                className="w-9 h-9 flex-shrink-0 rounded border border-[var(--color-panel-border)]/50 overflow-hidden flex items-center justify-center"
+                                style={{
+                                  backgroundColor: classModClassName === "C4SH" ? getC4SHSkillIconBg(skill.skillNameEN) : "transparent",
+                                }}
+                              >
+                                <img
+                                  src={iconSrc}
+                                  alt=""
+                                  className="w-full h-full object-contain"
+                                  style={{
+                                    filter: classModClassName === "C4SH" ? "brightness(0) invert(1)" : "none",
+                                  }}
+                                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                />
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <div className={`text-sm truncate ${classModClassName === "C4SH" ? getC4SHSkillColor(skill.skillNameEN) : "text-[var(--color-text)]"}`}>{skill.skillNameEN}</div>
                                 <div className="text-[10px] text-[var(--color-text-muted)]">
